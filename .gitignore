@@ -1,0 +1,31 @@
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# PHP dependencies and tooling
+vendor/
+composer.lock
+.phpunit.result.cache
+
+# Python cache used by build tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Joomla package build output
+dist/
+*.zip
+
+# Local environment
+.env
+.env.*
+!.env.example
+
