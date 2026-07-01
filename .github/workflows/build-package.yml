@@ -2,9 +2,33 @@ name: Build Joomla package
 
 on:
   pull_request:
+    paths:
+      - "administrator/**"
+      - "components/**"
+      - "images/**"
+      - "language/**"
+      - "media/**"
+      - "modules/**"
+      - "plugins/**"
+      - "build/**"
+      - "pkg_joomleague.xml"
+      - "pkg_script.php"
+      - "script.php"
   push:
     branches:
       - main
+    paths:
+      - "administrator/**"
+      - "components/**"
+      - "images/**"
+      - "language/**"
+      - "media/**"
+      - "modules/**"
+      - "plugins/**"
+      - "build/**"
+      - "pkg_joomleague.xml"
+      - "pkg_script.php"
+      - "script.php"
 
 permissions:
   contents: read
@@ -22,6 +46,9 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Check package build script
+        run: test -f build/package.py
+
       - name: Build package
         run: python3 build/package.py
 
@@ -31,4 +58,3 @@ jobs:
           name: joomleague-package
           path: dist/pkg_joomleague-*.zip
           if-no-files-found: error
-
