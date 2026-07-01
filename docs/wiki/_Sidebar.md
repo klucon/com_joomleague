@@ -9,4 +9,5 @@
 - [[Pluginy]]
 - [[Vyvojovy-workflow]]
 - [[Release-postup]]
+- [[Joomla-update-server]]
 - [[GitHub-provoz]]
