@@ -21,8 +21,20 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Validate tag version
+        shell: bash
+        run: |
+          manifest_version="$(python3 build/validate_versions.py)"
+          tag_version="${GITHUB_REF_NAME#v}"
+          if [ "$manifest_version" != "$tag_version" ]; then
+            echo "Manifest version $manifest_version does not match tag $GITHUB_REF_NAME"
+            exit 1
+          fi
+
       - name: Build package
-        run: python3 build/package.py
+        run: |
+          python3 build/package.py
+          python3 build/release_metadata.py
 
       - name: Resolve package
         id: package
@@ -35,7 +47,9 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ steps.package.outputs.path }}
+          files: |
+            ${{ steps.package.outputs.path }}
+            dist/joomleague-update.xml
+            dist/joomleague-changelog.xml
           generate_release_notes: true
           fail_on_unmatched_files: true
-

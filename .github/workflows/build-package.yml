@@ -49,6 +49,9 @@ jobs:
       - name: Check package build script
         run: test -f build/package.py
 
+      - name: Validate version metadata
+        run: python3 build/validate_versions.py
+
       - name: Build package
         run: python3 build/package.py
 

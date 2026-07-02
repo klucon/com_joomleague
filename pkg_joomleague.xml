@@ -9,6 +9,7 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<version>0.20.14</version>
 	<description>PKG_JOOMLEAGUE_XML_DESCRIPTION</description>
+	<changelogurl>https://github.com/klucon/com_joomleague/releases/latest/download/joomleague-changelog.xml</changelogurl>
 	<scriptfile>pkg_script.php</scriptfile>
 	<languages folder="language">
 		<language tag="cs-CZ">cs-CZ/pkg_joomleague.ini</language>
@@ -40,4 +41,7 @@
 		<file type="plugin" id="joomleague" group="finder">plg_finder_joomleague.zip</file>
 		<file type="plugin" id="joomleague" group="quickicon">plg_quickicon_joomleague.zip</file>
 	</files>
+	<updateservers>
+		<server type="extension" priority="1" name="JoomLeague">https://github.com/klucon/com_joomleague/releases/latest/download/joomleague-update.xml</server>
+	</updateservers>
 </extension>
