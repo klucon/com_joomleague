@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.30.0 - 2026-07-02
+
+- First public GitHub milestone release candidate.
+- Prepared package metadata for Joomla update discovery from `0.21.50`.
+- Prepared release assets for package ZIP, update XML and changelog XML.
+- Confirmed the package build path for Joomla 6 source distribution.
+
 ## 0.21.50 - 2026-07-02
 
 - Private bridge package for validating the Joomla update server path.
