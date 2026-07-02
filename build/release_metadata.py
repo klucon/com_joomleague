@@ -77,6 +77,7 @@ def write_update_xml(release_version: str, output: Path) -> None:
     ET.SubElement(update, "description").text = "JoomLeague package for Joomla 6"
     ET.SubElement(update, "element").text = "pkg_joomleague"
     ET.SubElement(update, "type").text = "package"
+    ET.SubElement(update, "client").text = "0"
     ET.SubElement(update, "version").text = release_version
     ET.SubElement(update, "infourl", {"title": "JoomLeague"}).text = release_url
 
