@@ -1,0 +1,1 @@
+-- Version marker: administration CRUD for teams, persons, event types, statistics and positions.

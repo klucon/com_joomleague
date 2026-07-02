@@ -1,0 +1,9 @@
+ALTER TABLE `#__joomleague_eventtype` ADD COLUMN `asset_id` INT UNSIGNED NULL DEFAULT NULL AFTER `modified_by`;
+ALTER TABLE `#__joomleague_league` ADD COLUMN `asset_id` INT UNSIGNED NULL DEFAULT NULL AFTER `modified_by`;
+ALTER TABLE `#__joomleague_person` ADD COLUMN `asset_id` INT UNSIGNED NULL DEFAULT NULL AFTER `modified_by`;
+ALTER TABLE `#__joomleague_playground` ADD COLUMN `asset_id` INT UNSIGNED NULL DEFAULT NULL AFTER `modified_by`;
+ALTER TABLE `#__joomleague_position` ADD COLUMN `asset_id` INT UNSIGNED NULL DEFAULT NULL AFTER `modified_by`;
+ALTER TABLE `#__joomleague_round` ADD COLUMN `asset_id` INT UNSIGNED NULL DEFAULT NULL AFTER `modified_by`;
+ALTER TABLE `#__joomleague_season` ADD COLUMN `asset_id` INT UNSIGNED NULL DEFAULT NULL AFTER `modified_by`;
+ALTER TABLE `#__joomleague_sports_type` ADD COLUMN `asset_id` INT UNSIGNED NULL DEFAULT NULL AFTER `modified_by`;
+ALTER TABLE `#__joomleague_statistic` ADD COLUMN `asset_id` INT UNSIGNED NULL DEFAULT NULL AFTER `modified_by`;

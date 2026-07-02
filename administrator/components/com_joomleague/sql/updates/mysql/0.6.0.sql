@@ -1,0 +1,1 @@
+-- Database schema remains unchanged in version 0.6.0.

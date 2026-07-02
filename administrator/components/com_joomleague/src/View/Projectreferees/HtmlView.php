@@ -1,0 +1,1 @@
+<?php declare(strict_types=1); namespace Joomleague\Component\Joomleague\Administrator\View\Projectreferees; \defined('_JEXEC') or die; use Joomleague\Component\Joomleague\Administrator\View\Projectpositions\HtmlView as Base; final class HtmlView extends Base {public string $section='referees';}

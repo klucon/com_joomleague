@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<form>
+	<fieldset name="details">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" class="readonly" readonly="true" default="0" />
+		<field name="name" type="text" label="COM_JOOMLEAGUE_CLUB_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_CLUB_FIELD_NAME_DESCRIPTION" required="true" maxlength="100" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" maxlength="255" />
+		<field name="create_team" type="checkbox" label="COM_JOOMLEAGUE_CLUB_FIELD_CREATE_TEAM_LABEL" description="COM_JOOMLEAGUE_CLUB_FIELD_CREATE_TEAM_DESCRIPTION" value="1" default="1" />
+		<field name="create_stadium" type="checkbox" label="COM_JOOMLEAGUE_CLUB_FIELD_CREATE_STADIUM_LABEL" description="COM_JOOMLEAGUE_CLUB_FIELD_CREATE_STADIUM_DESCRIPTION" value="1" default="1" />
+		<field name="standard_playground" type="sql" label="COM_JOOMLEAGUE_CLUB_FIELD_STADIUM_LABEL" query="SELECT id, name FROM #__joomleague_playground ORDER BY name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_CLUB_FIELD_STADIUM_LABEL_DESCRIPTION">
+			<option value="">COM_JOOMLEAGUE_CLUB_SELECT_STADIUM</option>
+		</field>
+		<field name="founded" type="calendar" label="COM_JOOMLEAGUE_CLUB_FIELD_FOUNDED_LABEL" format="%Y-%m-%d" showtime="false" todaybutton="true" filter="user_utc" description="COM_JOOMLEAGUE_CLUB_FIELD_FOUNDED_LABEL_DESCRIPTION" />
+		<field name="dissolved" type="calendar" label="COM_JOOMLEAGUE_CLUB_FIELD_DISSOLVED_LABEL" format="%Y-%m-%d" showtime="false" todaybutton="true" filter="user_utc" description="COM_JOOMLEAGUE_CLUB_FIELD_DISSOLVED_LABEL_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="address" label="COM_JOOMLEAGUE_CLUB_FIELDSET_ADDRESS" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
+		<field name="address" type="textarea" label="COM_JOOMLEAGUE_CLUB_FIELD_ADDRESS_LABEL" rows="2" maxlength="100" description="COM_JOOMLEAGUE_CLUB_FIELD_ADDRESS_LABEL_DESCRIPTION" />
+		<field name="zipcode" type="text" label="COM_JOOMLEAGUE_CLUB_FIELD_ZIPCODE_LABEL" maxlength="10" description="COM_JOOMLEAGUE_CLUB_FIELD_ZIPCODE_LABEL_DESCRIPTION" />
+		<field name="location" type="text" label="COM_JOOMLEAGUE_CLUB_FIELD_LOCATION_LABEL" maxlength="50" description="COM_JOOMLEAGUE_CLUB_FIELD_LOCATION_LABEL_DESCRIPTION" />
+		<field name="state" type="text" label="COM_JOOMLEAGUE_CLUB_FIELD_STATE_LABEL" maxlength="50" description="COM_JOOMLEAGUE_CLUB_FIELD_STATE_LABEL_DESCRIPTION" />
+		<field name="country" type="country" label="COM_JOOMLEAGUE_CLUB_FIELD_COUNTRY_LABEL" description="COM_JOOMLEAGUE_CLUB_FIELD_COUNTRY_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="contact" label="COM_JOOMLEAGUE_CLUB_FIELDSET_CONTACT">
+		<field name="phone" type="tel" label="COM_JOOMLEAGUE_CLUB_FIELD_PHONE_LABEL" maxlength="20" description="COM_JOOMLEAGUE_CLUB_FIELD_PHONE_LABEL_DESCRIPTION" />
+		<field name="fax" type="tel" label="COM_JOOMLEAGUE_CLUB_FIELD_FAX_LABEL" maxlength="20" description="COM_JOOMLEAGUE_CLUB_FIELD_FAX_LABEL_DESCRIPTION" />
+		<field name="email" type="email" label="COM_JOOMLEAGUE_CLUB_FIELD_EMAIL_LABEL" maxlength="255" validate="email" description="COM_JOOMLEAGUE_CLUB_FIELD_EMAIL_LABEL_DESCRIPTION" />
+		<field name="website" type="url" label="COM_JOOMLEAGUE_CLUB_FIELD_WEBSITE_LABEL" relative="true" maxlength="250" description="COM_JOOMLEAGUE_CLUB_FIELD_WEBSITE_LABEL_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="management" label="COM_JOOMLEAGUE_CLUB_FIELDSET_MANAGEMENT">
+		<field name="president" type="text" label="COM_JOOMLEAGUE_CLUB_FIELD_PRESIDENT_LABEL" maxlength="50" description="COM_JOOMLEAGUE_CLUB_FIELD_PRESIDENT_LABEL_DESCRIPTION" />
+		<field name="manager" type="text" label="COM_JOOMLEAGUE_CLUB_FIELD_MANAGER_LABEL" maxlength="50" description="COM_JOOMLEAGUE_CLUB_FIELD_MANAGER_LABEL_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="description" label="COM_JOOMLEAGUE_CLUB_FIELDSET_DESCRIPTION">
+		<field name="notes" type="textarea" rows="8" label="COM_JOOMLEAGUE_CLUB_FIELD_NOTES_LABEL" description="COM_JOOMLEAGUE_CLUB_FIELD_NOTES_DESCRIPTION" filter="safehtml" />
+		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_CLUB_FIELD_EXTENDED_LABEL" description="COM_JOOMLEAGUE_CLUB_FIELD_EXTENDED_DESCRIPTION" rows="5" filter="raw" />
+	</fieldset>
+	<fieldset name="logos" label="COM_JOOMLEAGUE_CLUB_LOGOS">
+		<field name="logo_small" type="media" label="COM_JOOMLEAGUE_CLUB_FIELD_LOGO_SMALL_LABEL" directory="com_joomleague/clubs/small" preview="tooltip" description="COM_JOOMLEAGUE_CLUB_FIELD_LOGO_SMALL_LABEL_DESCRIPTION" />
+		<field name="logo_middle" type="media" label="COM_JOOMLEAGUE_CLUB_FIELD_LOGO_MIDDLE_LABEL" directory="com_joomleague/clubs/medium" preview="tooltip" description="COM_JOOMLEAGUE_CLUB_FIELD_LOGO_MIDDLE_LABEL_DESCRIPTION" />
+		<field name="logo_big" type="media" label="COM_JOOMLEAGUE_CLUB_FIELD_LOGO_BIG_LABEL" directory="com_joomleague/clubs/large" preview="tooltip" description="COM_JOOMLEAGUE_CLUB_FIELD_LOGO_BIG_LABEL_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="publishing">
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" default="0" min="0" />
+	</fieldset>
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" validate="rules" component="com_joomleague" section="club" />
+	</fieldset>
+</form>

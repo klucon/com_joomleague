@@ -1,0 +1,37 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS `#__joomleague_treeto_match`;
+DROP TABLE IF EXISTS `#__joomleague_treeto_node`;
+DROP TABLE IF EXISTS `#__joomleague_treeto`;
+DROP TABLE IF EXISTS `#__joomleague_template_config`;
+DROP TABLE IF EXISTS `#__joomleague_team_trainingdata`;
+DROP TABLE IF EXISTS `#__joomleague_match_staff_statistic`;
+DROP TABLE IF EXISTS `#__joomleague_match_statistic`;
+DROP TABLE IF EXISTS `#__joomleague_match_staff`;
+DROP TABLE IF EXISTS `#__joomleague_match_referee`;
+DROP TABLE IF EXISTS `#__joomleague_match_player`;
+DROP TABLE IF EXISTS `#__joomleague_match_event`;
+DROP TABLE IF EXISTS `#__joomleague_match`;
+DROP TABLE IF EXISTS `#__joomleague_team_staff`;
+DROP TABLE IF EXISTS `#__joomleague_team_player`;
+DROP TABLE IF EXISTS `#__joomleague_project_referee`;
+DROP TABLE IF EXISTS `#__joomleague_project_team`;
+DROP TABLE IF EXISTS `#__joomleague_project_position`;
+DROP TABLE IF EXISTS `#__joomleague_position_eventtype`;
+DROP TABLE IF EXISTS `#__joomleague_position_statistic`;
+DROP TABLE IF EXISTS `#__joomleague_round`;
+DROP TABLE IF EXISTS `#__joomleague_division`;
+DROP TABLE IF EXISTS `#__joomleague_project`;
+DROP TABLE IF EXISTS `#__joomleague_statistic`;
+DROP TABLE IF EXISTS `#__joomleague_eventtype`;
+DROP TABLE IF EXISTS `#__joomleague_position`;
+DROP TABLE IF EXISTS `#__joomleague_playground`;
+DROP TABLE IF EXISTS `#__joomleague_team`;
+DROP TABLE IF EXISTS `#__joomleague_person`;
+DROP TABLE IF EXISTS `#__joomleague_club`;
+DROP TABLE IF EXISTS `#__joomleague_season`;
+DROP TABLE IF EXISTS `#__joomleague_league`;
+DROP TABLE IF EXISTS `#__joomleague_sports_type`;
+DROP TABLE IF EXISTS `#__joomleague_version`;
+
+SET FOREIGN_KEY_CHECKS = 1;

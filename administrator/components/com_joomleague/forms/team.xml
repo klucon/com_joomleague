@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<form>
+	<fieldset name="details">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME" required="true" maxlength="100" description="COM_JOOMLEAGUE_FIELD_NAME_DESCRIPTION" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" />
+		<field name="club_id" type="sql" label="COM_JOOMLEAGUE_TEAM_FIELD_CLUB" query="SELECT id,name FROM #__joomleague_club ORDER BY name" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_TEAM_FIELD_CLUB_DESCRIPTION" />
+		<field name="short_name" type="text" label="COM_JOOMLEAGUE_TEAM_FIELD_SHORT_NAME" required="true" maxlength="50" description="COM_JOOMLEAGUE_TEAM_FIELD_SHORT_NAME_DESCRIPTION" />
+		<field name="middle_name" type="text" label="COM_JOOMLEAGUE_TEAM_FIELD_MIDDLE_NAME" maxlength="100" description="COM_JOOMLEAGUE_TEAM_FIELD_MIDDLE_NAME_DESCRIPTION" />
+		<field name="website" type="url" label="COM_JOOMLEAGUE_FIELD_WEBSITE" relative="true" description="COM_JOOMLEAGUE_FIELD_WEBSITE_DESCRIPTION" />
+		<field name="info" type="textarea" rows="8" label="COM_JOOMLEAGUE_FIELD_INFO" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_INFO_DESCRIPTION" />
+		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES" rows="5" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="media" label="COM_JOOMLEAGUE_FIELDSET_MEDIA">
+		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_IMAGE" directory="com_joomleague/teams" preview="tooltip" description="COM_JOOMLEAGUE_FIELD_IMAGE_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="publishing">
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" default="0" />
+	</fieldset>
+	<fieldset name="permissions">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" component="com_joomleague" section="team" />
+	</fieldset>
+</form>

@@ -1,0 +1,1 @@
+<?php declare(strict_types=1);namespace Joomleague\Component\Joomleague\Administrator\Controller;\defined('_JEXEC')or die;final class ProjectteamController extends EntityFormController{protected $text_prefix='COM_JOOMLEAGUE_PROJECTTEAM';protected $view_list='projectteams';}

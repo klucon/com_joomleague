@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<form>
+	<fieldset name="details">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME" required="true" description="COM_JOOMLEAGUE_FIELD_NAME_DESCRIPTION" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" />
+		<field name="sports_type_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SPORT" query="SELECT id,name FROM #__joomleague_sports_type WHERE published=1 ORDER BY name" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_FIELD_SPORT_DESCRIPTION" />
+		<field name="parent_id" type="sql" label="COM_JOOMLEAGUE_FIELD_PARENT" query="SELECT id,name FROM #__joomleague_position ORDER BY name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_FIELD_PARENT_DESCRIPTION">
+			<option value="">JGLOBAL_ROOT</option>
+		</field>
+		<field name="persontype" type="list" label="COM_JOOMLEAGUE_POSITION_FIELD_PERSONTYPE" required="true" description="COM_JOOMLEAGUE_POSITION_FIELD_PERSONTYPE_DESCRIPTION">
+			<option value="1">COM_JOOMLEAGUE_PERSONTYPE_PLAYER</option>
+			<option value="2">COM_JOOMLEAGUE_PERSONTYPE_STAFF</option>
+			<option value="3">COM_JOOMLEAGUE_PERSONTYPE_REFEREE</option>
+			<option value="4">COM_JOOMLEAGUE_PERSONTYPE_OTHER</option>
+		</field>
+	</fieldset>
+	<fieldset name="relations" label="COM_JOOMLEAGUE_POSITION_FIELDSET_RELATIONS">
+		<field name="eventtype_ids" type="sql" label="COM_JOOMLEAGUE_POSITION_FIELD_EVENTS" query="SELECT id,name FROM #__joomleague_eventtype WHERE published=1 ORDER BY name" key_field="id" value_field="name" multiple="true" layout="joomla.form.field.list-fancy-select" description="COM_JOOMLEAGUE_POSITION_FIELD_EVENTS_DESCRIPTION" />
+		<field name="statistic_ids" type="sql" label="COM_JOOMLEAGUE_POSITION_FIELD_STATISTICS" query="SELECT id,name FROM #__joomleague_statistic WHERE published=1 ORDER BY name" key_field="id" value_field="name" multiple="true" layout="joomla.form.field.list-fancy-select" description="COM_JOOMLEAGUE_POSITION_FIELD_STATISTICS_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="publishing">
+		<field name="published" type="list" label="JSTATUS" default="1">
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+		</field>
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" />
+	</fieldset>
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" validate="rules" component="com_joomleague" section="position" />
+	</fieldset>
+</form>

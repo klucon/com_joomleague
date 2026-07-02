@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata><layout title="COM_JOOMLEAGUE_SITE_SCHEDULE"><message><![CDATA[COM_JOOMLEAGUE_SITE_SCHEDULE_DESC]]></message></layout><fields name="request"><fieldset name="request"><field name="project_id" type="number" label="COM_JOOMLEAGUE_SITE_PROJECT_ID" /></fieldset></fields></metadata>

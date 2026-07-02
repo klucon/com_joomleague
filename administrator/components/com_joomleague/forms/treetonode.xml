@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset name="details">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
+		<field name="treeto_id" type="hidden" required="true" />
+		<field name="node" type="number" label="COM_JOOMLEAGUE_TREETONODE_FIELD_NODE" min="1" required="true" />
+		<field name="row" type="number" label="COM_JOOMLEAGUE_TREETONODE_FIELD_ROW" min="0" />
+		<field name="title" type="text" label="COM_JOOMLEAGUE_TREETONODE_FIELD_TITLE" maxlength="50" />
+		<field name="content" type="text" label="COM_JOOMLEAGUE_TREETONODE_FIELD_CONTENT" maxlength="50" />
+		<field name="team_id" type="sql" label="COM_JOOMLEAGUE_MENU_TEAMS" query="SELECT 0 AS value, '- ' AS text UNION SELECT id AS value, name AS text FROM #__joomleague_team ORDER BY text" key_field="value" value_field="text" />
+		<field name="bestof" type="number" label="COM_JOOMLEAGUE_TREETO_FIELD_BESTOF" min="1" default="1" />
+	</fieldset>
+	<fieldset name="flags" label="COM_JOOMLEAGUE_TREETO_FIELDSET_FLAGS">
+		<field name="is_leaf" type="radio" label="COM_JOOMLEAGUE_TREETONODE_FIELD_LEAF" layout="joomla.form.field.radio.switcher" default="0"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="is_lock" type="radio" label="COM_JOOMLEAGUE_TREETONODE_FIELD_LOCK" layout="joomla.form.field.radio.switcher" default="0"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="is_ready" type="radio" label="COM_JOOMLEAGUE_TREETONODE_FIELD_READY" layout="joomla.form.field.radio.switcher" default="0"><option value="0">JNO</option><option value="1">JYES</option></field>
+	</fieldset>
+	<fieldset name="publishing">
+		<field name="published" type="list" label="JSTATUS" default="1"><option value="1">JPUBLISHED</option><option value="0">JUNPUBLISHED</option></field>
+	</fieldset>
+</form>

@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<form>
+	<fieldset name="details">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" />
+		<field name="project_id" type="hidden" />
+		<field name="person_id" type="sql" label="COM_JOOMLEAGUE_PERSON" query="SELECT id,CONCAT_WS(' ',firstname,lastname) AS name FROM #__joomleague_person ORDER BY lastname" key_field="id" value_field="name" readonly="true" description="COM_JOOMLEAGUE_PERSON_DESCRIPTION" />
+		<field name="project_position_id" type="sql" label="COM_JOOMLEAGUE_POSITION" query="SELECT pp.id,p.name FROM #__joomleague_project_position pp JOIN #__joomleague_position p ON p.id=pp.position_id WHERE p.persontype=3 ORDER BY p.name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_POSITION_DESCRIPTION">
+			<option value="">JNONE</option>
+		</field>
+		<field name="notes" type="textarea" rows="8" label="COM_JOOMLEAGUE_FIELD_NOTES" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
+		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_FIELD_EXTENDED" filter="raw" description="COM_JOOMLEAGUE_FIELD_EXTENDED_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="media">
+		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_IMAGE" directory="com_joomleague/persons" description="COM_JOOMLEAGUE_FIELD_IMAGE_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="publishing">
+		<field name="published" type="list" label="JSTATUS">
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+		</field>
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" />
+	</fieldset>
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" validate="rules" component="com_joomleague" section="projectreferee" />
+	</fieldset>
+</form>

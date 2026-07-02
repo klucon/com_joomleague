@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="package" method="upgrade">
+	<name>pkg_joomleague</name>
+	<packagename>joomleague</packagename>
+	<author>Ondřej Klučka (https://klucon.cz)</author>
+	<authorEmail>info@klucon.cz</authorEmail>
+	<creationDate>2026-06</creationDate>
+	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>0.20.14</version>
+	<description>PKG_JOOMLEAGUE_XML_DESCRIPTION</description>
+	<scriptfile>pkg_script.php</scriptfile>
+	<languages folder="language">
+		<language tag="cs-CZ">cs-CZ/pkg_joomleague.ini</language>
+		<language tag="cs-CZ">cs-CZ/pkg_joomleague.sys.ini</language>
+		<language tag="en-GB">en-GB/pkg_joomleague.ini</language>
+		<language tag="en-GB">en-GB/pkg_joomleague.sys.ini</language>
+	</languages>
+	<files folder="packages">
+		<file type="component" id="com_joomleague">com_joomleague.zip</file>
+		<file type="module" id="mod_joomleague_birthday" client="site">mod_joomleague_birthday.zip</file>
+		<file type="module" id="mod_joomleague_calendar" client="site">mod_joomleague_calendar.zip</file>
+		<file type="module" id="mod_joomleague_eventsranking" client="site">mod_joomleague_eventsranking.zip</file>
+		<file type="module" id="mod_joomleague_logo" client="site">mod_joomleague_logo.zip</file>
+		<file type="module" id="mod_joomleague_matches" client="site">mod_joomleague_matches.zip</file>
+		<file type="module" id="mod_joomleague_navigation_menu" client="site">mod_joomleague_navigation_menu.zip</file>
+		<file type="module" id="mod_joomleague_playgroundplan" client="site">mod_joomleague_playgroundplan.zip</file>
+		<file type="module" id="mod_joomleague_randomplayer" client="site">mod_joomleague_randomplayer.zip</file>
+		<file type="module" id="mod_joomleague_ranking" client="site">mod_joomleague_ranking.zip</file>
+		<file type="module" id="mod_joomleague_results" client="site">mod_joomleague_results.zip</file>
+		<file type="module" id="mod_joomleague_sports_type_statistics" client="site">mod_joomleague_sports_type_statistics.zip</file>
+		<file type="module" id="mod_joomleague_statranking" client="site">mod_joomleague_statranking.zip</file>
+		<file type="module" id="mod_joomleague_teamplayers" client="site">mod_joomleague_teamplayers.zip</file>
+		<file type="module" id="mod_joomleague_teamstaffs" client="site">mod_joomleague_teamstaffs.zip</file>
+		<file type="module" id="mod_joomleague_teamstats_ranking" client="site">mod_joomleague_teamstats_ranking.zip</file>
+		<file type="module" id="mod_joomleague_ticker" client="site">mod_joomleague_ticker.zip</file>
+		<file type="plugin" id="joomleagueperson" group="content">plg_content_joomleagueperson.zip</file>
+		<file type="plugin" id="joomleaguematch" group="content">plg_content_joomleaguematch.zip</file>
+		<file type="plugin" id="joomleagueesport" group="extension">plg_extension_joomleagueesport.zip</file>
+		<file type="plugin" id="joomleague" group="finder">plg_finder_joomleague.zip</file>
+		<file type="plugin" id="joomleague" group="quickicon">plg_quickicon_joomleague.zip</file>
+	</files>
+</extension>

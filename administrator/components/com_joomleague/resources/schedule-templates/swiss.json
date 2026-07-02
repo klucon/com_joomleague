@@ -1,0 +1,91 @@
+{
+  "templateFamily": "schedule",
+  "templateId": "swiss-dutch-v1",
+  "type": "swiss",
+  "generation": "progressive",
+  "version": 1,
+  "labelKey": "COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_SWISS",
+  "descriptionKey": "COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_SWISS_DESC",
+  "participantRefKeys": {
+    "seed": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_SEED_DESC",
+    "winnerOf": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_WINNER_OF_DESC",
+    "loserOf": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_LOSER_OF_DESC",
+    "groupRank": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_GROUP_RANK_DESC"
+  },
+  "supportedTeamCounts": {
+    "values": [
+      4,
+      8,
+      12,
+      16,
+      24,
+      32,
+      48,
+      64,
+      128
+    ]
+  },
+  "properties": {
+    "progressiveSchedule": true,
+    "avoidRematch": true,
+    "balanceHomeAway": true
+  },
+  "config": {
+    "pairing": "dutch",
+    "avoidRematch": true,
+    "balanceHomeAway": true,
+    "tiebreak": [
+      "buchholz",
+      "sonnebornBerger",
+      "directEncounter"
+    ],
+    "scoreGroupsKey": "COM_JOOMLEAGUE_SCHEDULE_SWISS_SCORE_GROUPS_DESC"
+  },
+  "perTeamCount": {
+    "4": {
+      "teams": 4,
+      "minRounds": 2,
+      "recommendedRounds": 2
+    },
+    "8": {
+      "teams": 8,
+      "minRounds": 3,
+      "recommendedRounds": 3
+    },
+    "12": {
+      "teams": 12,
+      "minRounds": 4,
+      "recommendedRounds": 5
+    },
+    "16": {
+      "teams": 16,
+      "minRounds": 4,
+      "recommendedRounds": 5
+    },
+    "24": {
+      "teams": 24,
+      "minRounds": 5,
+      "recommendedRounds": 6
+    },
+    "32": {
+      "teams": 32,
+      "minRounds": 5,
+      "recommendedRounds": 6
+    },
+    "48": {
+      "teams": 48,
+      "minRounds": 6,
+      "recommendedRounds": 7
+    },
+    "64": {
+      "teams": 64,
+      "minRounds": 6,
+      "recommendedRounds": 7
+    },
+    "128": {
+      "teams": 128,
+      "minRounds": 7,
+      "recommendedRounds": 8
+    }
+  }
+}

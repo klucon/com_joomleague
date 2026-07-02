@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="plugin" group="quickicon" method="upgrade">
+	<name>plg_quickicon_joomleague</name>
+	<author>Ondřej Klučka (https://klucon.cz)</author>
+	<authorEmail>info@klucon.cz</authorEmail>
+	<creationDate>2026-06</creationDate>
+	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>0.20.0</version>
+	<description>PLG_QUICKICON_JOOMLEAGUE_XML_DESCRIPTION</description>
+	<namespace path="src">Joomleague\Plugin\Quickicon\Joomleague</namespace>
+	<files>
+		<folder plugin="joomleague">services</folder>
+		<folder>src</folder>
+	</files>
+	<languages>
+		<language tag="en-GB">language/en-GB/plg_quickicon_joomleague.ini</language>
+		<language tag="en-GB">language/en-GB/plg_quickicon_joomleague.sys.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/plg_quickicon_joomleague.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/plg_quickicon_joomleague.sys.ini</language>
+	</languages>
+</extension>

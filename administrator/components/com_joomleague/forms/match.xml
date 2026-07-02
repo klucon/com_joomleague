@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<form>
+	<fieldset name="details">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" />
+		<field name="round_id" type="hidden" />
+		<field name="match_number" type="text" label="COM_JOOMLEAGUE_MATCH_FIELD_NUMBER" description="COM_JOOMLEAGUE_MATCH_FIELD_NUMBER_DESCRIPTION" />
+		<field name="match_date" type="calendar" label="COM_JOOMLEAGUE_MATCH_FIELD_DATE" format="%Y-%m-%d %H:%M" showtime="true" filter="string" description="COM_JOOMLEAGUE_MATCH_FIELD_DATE_DESCRIPTION" />
+		<field name="projectteam1_id" type="sql" label="COM_JOOMLEAGUE_MATCH_FIELD_HOME" query="SELECT pt.id,CONCAT(t.name,' — ',p.name) AS name FROM #__joomleague_project_team pt JOIN #__joomleague_team t ON t.id=pt.team_id JOIN #__joomleague_project p ON p.id=pt.project_id ORDER BY p.name,t.name" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_MATCH_FIELD_HOME_DESCRIPTION" />
+		<field name="projectteam2_id" type="sql" label="COM_JOOMLEAGUE_MATCH_FIELD_AWAY" query="SELECT pt.id,CONCAT(t.name,' — ',p.name) AS name FROM #__joomleague_project_team pt JOIN #__joomleague_team t ON t.id=pt.team_id JOIN #__joomleague_project p ON p.id=pt.project_id ORDER BY p.name,t.name" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_MATCH_FIELD_AWAY_DESCRIPTION" />
+		<field name="playground_id" type="sql" label="COM_JOOMLEAGUE_MATCH_FIELD_VENUE" query="SELECT id,name FROM #__joomleague_playground ORDER BY name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_MATCH_FIELD_VENUE_DESCRIPTION">
+			<option value="">JNONE</option>
+		</field>
+		<field name="crowd" type="number" label="COM_JOOMLEAGUE_MATCH_FIELD_CROWD" min="0" default="0" description="COM_JOOMLEAGUE_MATCH_FIELD_CROWD_DESCRIPTION" />
+		<field name="team1_result" type="number" label="COM_JOOMLEAGUE_MATCH_FIELD_HOME_RESULT" step="0.1" description="COM_JOOMLEAGUE_MATCH_FIELD_HOME_RESULT_DESCRIPTION" />
+		<field name="team2_result" type="number" label="COM_JOOMLEAGUE_MATCH_FIELD_AWAY_RESULT" step="0.1" description="COM_JOOMLEAGUE_MATCH_FIELD_AWAY_RESULT_DESCRIPTION" />
+		<field name="match_result_type" type="list" label="COM_JOOMLEAGUE_MATCH_FIELD_RESULT_TYPE" default="0" description="COM_JOOMLEAGUE_MATCH_FIELD_RESULT_TYPE_DESCRIPTION">
+			<option value="0">COM_JOOMLEAGUE_MATCH_RESULT_TYPE_NORMAL</option>
+			<option value="1">COM_JOOMLEAGUE_MATCH_RESULT_TYPE_OT</option>
+			<option value="2">COM_JOOMLEAGUE_MATCH_RESULT_TYPE_SO</option>
+			<option value="3">COM_JOOMLEAGUE_MATCH_RESULT_TYPE_FORFEIT</option>
+		</field>
+		<field name="team1_result_ot" type="number" label="COM_JOOMLEAGUE_MATCH_FIELD_HOME_RESULT_OT" step="0.1" showon="match_result_type:1[OR]match_result_type:2" description="COM_JOOMLEAGUE_MATCH_FIELD_RESULT_OT_DESCRIPTION" />
+		<field name="team2_result_ot" type="number" label="COM_JOOMLEAGUE_MATCH_FIELD_AWAY_RESULT_OT" step="0.1" showon="match_result_type:1[OR]match_result_type:2" description="COM_JOOMLEAGUE_MATCH_FIELD_RESULT_OT_DESCRIPTION" />
+		<field name="team1_result_so" type="number" label="COM_JOOMLEAGUE_MATCH_FIELD_HOME_RESULT_SO" step="0.1" showon="match_result_type:2" description="COM_JOOMLEAGUE_MATCH_FIELD_RESULT_SO_DESCRIPTION" />
+		<field name="team2_result_so" type="number" label="COM_JOOMLEAGUE_MATCH_FIELD_AWAY_RESULT_SO" step="0.1" showon="match_result_type:2" description="COM_JOOMLEAGUE_MATCH_FIELD_RESULT_SO_DESCRIPTION" />
+		<field name="match_result_detail" type="text" label="COM_JOOMLEAGUE_MATCH_FIELD_RESULT_DETAIL" maxlength="64" description="COM_JOOMLEAGUE_MATCH_FIELD_RESULT_DETAIL_DESCRIPTION" />
+		<field name="summary" type="editor" buttons="true" height="300" label="COM_JOOMLEAGUE_MATCH_FIELD_REPORT" filter="safehtml" description="COM_JOOMLEAGUE_MATCH_FIELD_REPORT_DESCRIPTION" />
+		<field name="preview" type="editor" buttons="true" height="300" label="COM_JOOMLEAGUE_MATCH_FIELD_PREVIEW" filter="safehtml" description="COM_JOOMLEAGUE_MATCH_FIELD_PREVIEW_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="status">
+		<field name="cancel" type="radio" label="COM_JOOMLEAGUE_MATCH_FIELD_CANCEL" layout="joomla.form.field.radio.switcher" description="COM_JOOMLEAGUE_MATCH_FIELD_CANCEL_DESCRIPTION">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="cancel_reason" type="text" label="COM_JOOMLEAGUE_MATCH_FIELD_CANCEL_REASON" description="COM_JOOMLEAGUE_MATCH_FIELD_CANCEL_REASON_DESCRIPTION" />
+		<field name="count_result" type="radio" label="COM_JOOMLEAGUE_MATCH_FIELD_COUNT_RESULT" layout="joomla.form.field.radio.switcher" default="1" description="COM_JOOMLEAGUE_MATCH_FIELD_COUNT_RESULT_DESCRIPTION">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="show_report" type="radio" label="COM_JOOMLEAGUE_MATCH_FIELD_SHOW_REPORT" layout="joomla.form.field.radio.switcher" description="COM_JOOMLEAGUE_MATCH_FIELD_SHOW_REPORT_DESCRIPTION">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+	</fieldset>
+	<fieldset name="publishing">
+		<field name="published" type="list" label="JSTATUS" default="1">
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+		</field>
+	</fieldset>
+	<fieldset name="permissions">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" component="com_joomleague" section="match" />
+	</fieldset>
+</form>

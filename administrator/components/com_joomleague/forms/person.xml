@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<form>
+	<fieldset name="details" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
+		<field name="firstname" type="text" label="COM_JOOMLEAGUE_PERSON_FIELD_FIRSTNAME" description="COM_JOOMLEAGUE_PERSON_FIELD_FIRSTNAME_DESCRIPTION" />
+		<field name="lastname" type="text" label="COM_JOOMLEAGUE_PERSON_FIELD_LASTNAME" required="true" description="COM_JOOMLEAGUE_PERSON_FIELD_LASTNAME_DESCRIPTION" />
+		<field name="nickname" type="text" label="COM_JOOMLEAGUE_PERSON_FIELD_NICKNAME" description="COM_JOOMLEAGUE_PERSON_FIELD_NICKNAME_DESCRIPTION" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" />
+		<field name="contact_id" type="sql" label="COM_JOOMLEAGUE_PERSON_FIELD_CONTACT" query="SELECT id,name FROM #__contact_details ORDER BY name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_PERSON_FIELD_CONTACT_DESCRIPTION">
+			<option value="">JOPTION_SELECT_CONTACT</option>
+		</field>
+		<field name="position_id" type="sql" label="COM_JOOMLEAGUE_PERSON_FIELD_POSITION" query="SELECT id,name FROM #__joomleague_position ORDER BY name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_PERSON_FIELD_POSITION_DESCRIPTION">
+			<option value="">COM_JOOMLEAGUE_SELECT_POSITION</option>
+		</field>
+		<field name="birthday" type="calendar" label="COM_JOOMLEAGUE_PERSON_FIELD_BIRTHDAY" format="%Y-%m-%d" showtime="false" description="COM_JOOMLEAGUE_PERSON_FIELD_BIRTHDAY_DESCRIPTION" />
+		<field name="deathday" type="calendar" label="COM_JOOMLEAGUE_PERSON_FIELD_DEATHDAY" format="%Y-%m-%d" showtime="false" description="COM_JOOMLEAGUE_PERSON_FIELD_DEATHDAY_DESCRIPTION" />
+		<field name="height" type="number" label="COM_JOOMLEAGUE_PERSON_FIELD_HEIGHT" min="0" description="COM_JOOMLEAGUE_PERSON_FIELD_HEIGHT_DESCRIPTION" />
+		<field name="weight" type="number" label="COM_JOOMLEAGUE_PERSON_FIELD_WEIGHT" min="0" description="COM_JOOMLEAGUE_PERSON_FIELD_WEIGHT_DESCRIPTION" />
+		<field name="knvbnr" type="text" label="COM_JOOMLEAGUE_PERSON_FIELD_REGISTRATION" description="COM_JOOMLEAGUE_PERSON_FIELD_REGISTRATION_DESCRIPTION" />
+		<field name="country" type="country" label="COM_JOOMLEAGUE_FIELD_COUNTRY" description="COM_JOOMLEAGUE_FIELD_COUNTRY_DESCRIPTION" />
+		<field name="info" type="textarea" rows="8" label="COM_JOOMLEAGUE_FIELD_INFO" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_INFO_DESCRIPTION" />
+		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="contact" label="COM_JOOMLEAGUE_FIELDSET_CONTACT" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
+		<field name="address" type="text" label="COM_JOOMLEAGUE_FIELD_ADDRESS" description="COM_JOOMLEAGUE_FIELD_ADDRESS_DESCRIPTION" />
+		<field name="zipcode" type="text" label="COM_JOOMLEAGUE_FIELD_ZIPCODE" description="COM_JOOMLEAGUE_FIELD_ZIPCODE_DESCRIPTION" />
+		<field name="location" type="text" label="COM_JOOMLEAGUE_FIELD_LOCATION" description="COM_JOOMLEAGUE_FIELD_LOCATION_DESCRIPTION" />
+		<field name="state" type="text" label="COM_JOOMLEAGUE_FIELD_STATE" description="COM_JOOMLEAGUE_FIELD_STATE_DESCRIPTION" />
+		<field name="address_country" type="country" label="COM_JOOMLEAGUE_FIELD_COUNTRY" description="COM_JOOMLEAGUE_FIELD_COUNTRY_DESCRIPTION" />
+		<field name="phone" type="tel" label="COM_JOOMLEAGUE_FIELD_PHONE" description="COM_JOOMLEAGUE_FIELD_PHONE_DESCRIPTION" />
+		<field name="mobile" type="tel" label="COM_JOOMLEAGUE_FIELD_MOBILE" description="COM_JOOMLEAGUE_FIELD_MOBILE_DESCRIPTION" />
+		<field name="email" type="email" label="JGLOBAL_EMAIL" />
+		<field name="website" type="url" label="COM_JOOMLEAGUE_FIELD_WEBSITE" relative="true" description="COM_JOOMLEAGUE_FIELD_WEBSITE_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="media" label="COM_JOOMLEAGUE_FIELDSET_MEDIA">
+		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_IMAGE" directory="com_joomleague/persons" description="COM_JOOMLEAGUE_FIELD_IMAGE_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="privacy" label="COM_JOOMLEAGUE_PERSON_FIELDSET_VISIBILITY">
+		<field name="show_pic" type="radio" label="COM_JOOMLEAGUE_PERSON_FIELD_SHOW_PICTURE" layout="joomla.form.field.radio.switcher" default="1" description="COM_JOOMLEAGUE_PERSON_FIELD_SHOW_PICTURE_DESCRIPTION">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="show_persdata" type="radio" label="COM_JOOMLEAGUE_PERSON_FIELD_SHOW_PERSONAL" layout="joomla.form.field.radio.switcher" default="1" description="COM_JOOMLEAGUE_PERSON_FIELD_SHOW_PERSONAL_DESCRIPTION">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="show_teamdata" type="radio" label="COM_JOOMLEAGUE_PERSON_FIELD_SHOW_TEAM" layout="joomla.form.field.radio.switcher" default="1" description="COM_JOOMLEAGUE_PERSON_FIELD_SHOW_TEAM_DESCRIPTION">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="show_on_frontend" type="radio" label="COM_JOOMLEAGUE_PERSON_FIELD_SHOW_FRONTEND" layout="joomla.form.field.radio.switcher" default="1" description="COM_JOOMLEAGUE_PERSON_FIELD_SHOW_FRONTEND_DESCRIPTION">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+	</fieldset>
+	<fieldset name="publishing">
+		<field name="published" type="list" label="JSTATUS" default="1">
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+		</field>
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" />
+	</fieldset>
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" validate="rules" component="com_joomleague" section="person" />
+	</fieldset>
+</form>

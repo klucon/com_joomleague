@@ -7,7 +7,7 @@ Balíček obsahuje hlavní komponentu `com_joomleague`, sadu frontendových modu
 ## Stav balíčku
 
 - Název balíčku: `pkg_joomleague`
-- Aktuální verze: `0.20.10`
+- Aktuální verze: `0.20.14`
 - Cílová platforma: Joomla 6
 - Licence: GNU GPL v2 nebo novější
 - Jazyky: čeština (`cs-CZ`) a angličtina (`en-GB`)
@@ -72,7 +72,7 @@ Při první instalaci balíčku se vlastní pluginy automaticky zapnou. Při akt
 Aktuálně sestavený artefakt je ukládán do:
 
 ```text
-dist/pkg_joomleague-0.20.10.zip
+dist/pkg_joomleague-<verze>.zip
 ```
 
 ## Sestavení balíčku
@@ -124,4 +124,3 @@ administrator/components/com_joomleague/sql/
 - Build adresář `dist/` je výstup a lze jej kdykoliv znovu vytvořit.
 - Komponenta používá namespacing `Joomleague\Component\Joomleague`.
 - Administrační menu zahrnuje přehled, projekty, druhy sportu, ligy, sezóny, kluby, týmy, osoby, typy událostí, statistiky, pozice, stadiony a nástroje.
-

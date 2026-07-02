@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset name="details">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
+		<field name="projectteam_id" type="sql" label="COM_JOOMLEAGUE_PROJECT_TEAMS" query="SELECT pt.id, CONCAT(p.name, ' — ', t.name) AS title FROM #__joomleague_project_team pt INNER JOIN #__joomleague_project p ON p.id = pt.project_id INNER JOIN #__joomleague_team t ON t.id = pt.team_id ORDER BY p.name, t.name" key_field="id" value_field="title" required="true" description="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_PROJECTTEAM_DESC" />
+		<field name="person_id" type="sql" label="COM_JOOMLEAGUE_PERSON" query="SELECT id, TRIM(CONCAT_WS(' ', firstname, lastname)) AS name FROM #__joomleague_person WHERE published = 1 ORDER BY lastname, firstname" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_PERSON_DESC" />
+		<field name="project_position_id" type="sql" label="COM_JOOMLEAGUE_POSITION" query="SELECT pp.id, CONCAT(pr.name, ' — ', pos.name) AS name FROM #__joomleague_project_position pp INNER JOIN #__joomleague_project pr ON pr.id = pp.project_id INNER JOIN #__joomleague_position pos ON pos.id = pp.position_id WHERE pos.persontype = 2 ORDER BY pr.name, pos.name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_POSITION_DESC">
+			<option value="">JNONE</option>
+		</field>
+		<field name="active" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_ACTIVE" default="1" description="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_ACTIVE_DESC">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES" rows="5" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" />
+	</fieldset>
+	<fieldset name="status" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELDSET_STATUS">
+		<field name="injury" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_INJURY" default="0"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="injury_date_start" type="calendar" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_INJURY_FROM" format="%Y-%m-%d" showtime="false" />
+		<field name="injury_date_end" type="calendar" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_INJURY_TO" format="%Y-%m-%d" showtime="false" />
+		<field name="injury_detail" type="text" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_INJURY_DETAIL" maxlength="255" />
+		<field name="suspension" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_SUSPENSION" default="0"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="susp_date_start" type="calendar" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_SUSPENSION_FROM" format="%Y-%m-%d" showtime="false" />
+		<field name="susp_date_end" type="calendar" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_SUSPENSION_TO" format="%Y-%m-%d" showtime="false" />
+		<field name="suspension_detail" type="text" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_SUSPENSION_DETAIL" maxlength="255" />
+		<field name="away" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_AWAY" default="0"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="away_date_start" type="calendar" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_AWAY_FROM" format="%Y-%m-%d" showtime="false" />
+		<field name="away_date_end" type="calendar" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_AWAY_TO" format="%Y-%m-%d" showtime="false" />
+		<field name="away_detail" type="text" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_AWAY_DETAIL" maxlength="255" />
+	</fieldset>
+	<fieldset name="media" label="COM_JOOMLEAGUE_FIELDSET_MEDIA">
+		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_IMAGE" directory="com_joomleague/persons" preview="tooltip" description="COM_JOOMLEAGUE_FIELD_IMAGE_DESCRIPTION" />
+	</fieldset>
+	<fieldset name="publishing">
+		<field name="published" type="list" label="JSTATUS" default="1"><option value="1">JPUBLISHED</option><option value="0">JUNPUBLISHED</option></field>
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" default="0" />
+	</fieldset>
+	<fieldset name="permissions">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" component="com_joomleague" section="teamstaff" />
+	</fieldset>
+</form>

@@ -1,0 +1,317 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://joomleague.local/schema/schedule-template.schema.json",
+  "title": "JoomLeague schedule template",
+  "type": "object",
+  "required": [
+    "templateFamily",
+    "templateId",
+    "type",
+    "generation",
+    "version",
+    "labelKey",
+    "descriptionKey",
+    "participantRefKeys"
+  ],
+  "properties": {
+    "templateFamily": {
+      "const": "schedule"
+    },
+    "templateId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*-v[0-9]+$"
+    },
+    "type": {
+      "enum": [
+        "round-robin",
+        "single-elimination",
+        "double-elimination",
+        "groups-playoff",
+        "swiss"
+      ]
+    },
+    "generation": {
+      "enum": [
+        "static",
+        "progressive"
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "labelKey": {
+      "$ref": "#/$defs/languageKey"
+    },
+    "descriptionKey": {
+      "$ref": "#/$defs/languageKey"
+    },
+    "roundNamePatternKey": {
+      "$ref": "#/$defs/languageKey"
+    },
+    "participantRefKeys": {
+      "type": "object",
+      "required": [
+        "seed",
+        "winnerOf",
+        "loserOf",
+        "groupRank"
+      ],
+      "additionalProperties": {
+        "$ref": "#/$defs/languageKey"
+      }
+    },
+    "supportedTeamCounts": {
+      "type": "object",
+      "oneOf": [
+        {
+          "required": [
+            "min",
+            "max"
+          ]
+        },
+        {
+          "required": [
+            "values"
+          ]
+        }
+      ],
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "max": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "properties": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "boolean",
+          "string",
+          "number"
+        ]
+      }
+    },
+    "tables": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/roundRobinTable"
+      }
+    },
+    "brackets": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/bracket"
+      }
+    },
+    "phases": {
+      "type": "array"
+    },
+    "config": {
+      "type": "object"
+    },
+    "perTeamCount": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "languageKey": {
+      "type": "string",
+      "pattern": "^COM_JOOMLEAGUE_[A-Z0-9_]+$"
+    },
+    "participant": {
+      "type": "object",
+      "oneOf": [
+        {
+          "required": [
+            "seed"
+          ],
+          "properties": {
+            "seed": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "winnerOf"
+          ],
+          "properties": {
+            "winnerOf": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "loserOf"
+          ],
+          "properties": {
+            "loserOf": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "groupRank"
+          ],
+          "properties": {
+            "groupRank": {
+              "type": "object",
+              "required": [
+                "group",
+                "rank"
+              ],
+              "properties": {
+                "group": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "rank": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "match": {
+      "type": "object",
+      "required": [
+        "id",
+        "home",
+        "away"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "round": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "roundNameKey": {
+          "$ref": "#/$defs/languageKey"
+        },
+        "roundNameParams": {
+          "type": "array"
+        },
+        "conditionalKey": {
+          "$ref": "#/$defs/languageKey"
+        },
+        "home": {
+          "$ref": "#/$defs/participant"
+        },
+        "away": {
+          "$ref": "#/$defs/participant"
+        }
+      },
+      "additionalProperties": true
+    },
+    "roundRobinRound": {
+      "type": "object",
+      "required": [
+        "round",
+        "matches"
+      ],
+      "properties": {
+        "round": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "bye": {
+          "$ref": "#/$defs/participant"
+        },
+        "matches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/match"
+          }
+        }
+      }
+    },
+    "roundRobinTable": {
+      "type": "object",
+      "required": [
+        "teams",
+        "rounds",
+        "matchesPerRound",
+        "totalMatches",
+        "hasBye",
+        "schedule"
+      ],
+      "properties": {
+        "teams": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "rounds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "matchesPerRound": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "totalMatches": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "hasBye": {
+          "type": "boolean"
+        },
+        "schedule": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/roundRobinRound"
+          }
+        }
+      }
+    },
+    "bracket": {
+      "type": "object",
+      "required": [
+        "matches"
+      ],
+      "properties": {
+        "matches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/match"
+          }
+        },
+        "thirdPlaceMatch": {
+          "$ref": "#/$defs/match"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

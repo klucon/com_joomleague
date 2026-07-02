@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<extension type="module" client="site" method="upgrade">
+	<name>mod_joomleague_playgroundplan</name>
+	<author>Ondřej Klučka (https://klucon.cz)</author>
+	<authorEmail>info@klucon.cz</authorEmail>
+	<creationDate>2026-06</creationDate>
+	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>0.20.0</version>
+	<description>MOD_JOOMLEAGUE_PLAYGROUNDPLAN_XML_DESCRIPTION</description>
+	<namespace path="src">Joomleague\Module\Playgroundplan</namespace>
+	<files>
+		<folder module="mod_joomleague_playgroundplan">services</folder>
+		<folder>src</folder>
+		<folder>tmpl</folder>
+	</files>
+	<languages>
+		<language tag="en-GB">language/en-GB/mod_joomleague_playgroundplan.ini</language>
+		<language tag="en-GB">language/en-GB/mod_joomleague_playgroundplan.sys.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_playgroundplan.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_playgroundplan.sys.ini</language>
+	</languages>
+	<config>
+		<fields name="params">
+			<fieldset name="basic" addfieldpath="/administrator/components/com_joomleague/models/fields">
+				<field name="projects" type="sql" default="" required="true" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_PROJECT_ID_LABEL" description="MOD_JOOMLEAGUE_PLAYGROUNDPLANPROJECT_ID_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id" key_field="value" value_field="text" multiple="true" />
+				<field name="playground" type="sql" default="" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_PLAYGROUND_ID_LABEL" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_PLAYGROUND_ID_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_playground ORDER BY name, id" key_field="value" value_field="text" />
+				<field name="show_project_name" type="list" default="0" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_PROJECT_NAME" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_PROJECT_NAME_DESC">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="show_league_name" type="list" default="1" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_LEAGUE_NAME" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_LEAGUE_NAME_DESC">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="show_playground_name" type="list" default="1" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_PLAYGROUND_NAME" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_PLAYGROUND_NAME_DESC">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="show_playground_link" type="list" default="1" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_PLAYGROUND_LINK" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_PLAYGROUND_LINK_DESC">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="teamformat" type="list" default="middle_name" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_LABEL_TEAM_FORMAT" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_TEAM_NAME_DESC">
+					<option value="name">LONG NAME</option>
+					<option value="middle_name">MIDDLE NAME</option>
+					<option value="short_name">SHORT NAME</option>
+				</field>
+				<field name="show_club_logo" type="list" default="1" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_CLUB_LOGO" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_CLUB_LOGO_DESC">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="maxmatches" type="text" default="7" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_MAX_MATCHES_NUMBER" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_MAX_MATCHES_NUMBER_DESC" />
+				<field name="time_zone" type="timezone" default="UTC" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_TIME_ZONE" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_TIME_ZONE">
+				</field>
+				<field name="dateformat" type="text" default="l, d. F Y" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_LABEL_DATE_FORMAT" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_LABEL_DATE_FORMAT_DESC" />
+				<field name="timeformat" type="text" default="H:i" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_LABEL_TIME_FORMAT" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_LABEL_TIME_FORMAT_DESC" />
+				<field name="mode" type="list" default="0" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_LABEL_MODE" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_LABEL_MODE_DESC">
+					<option value="0">MOD_JOOMLEAGUE_PLAYGROUNDPLAN_TICKER</option>
+					<option value="1">MOD_JOOMLEAGUE_PLAYGROUNDPLAN_LIST</option>
+				</field>
+			</fieldset>
+			<fieldset name="advanced">
+				<field name="cache" type="list" default="1" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_CACHING_LABEL" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_CACHING_DESCR">
+					<option value="1">MOD_JOOMLEAGUE_PLAYGROUNDPLAN_CACHING_USE_GLOBAL
+					</option>
+					<option value="0">MOD_JOOMLEAGUE_PLAYGROUNDPLAN_CACHING_NO_CACHING
+					</option>
+				</field>
+				<field name="cache_time" type="text" default="900" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_CACHE_TIME_LABEL" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_CACHE_TIME_DESCR">
+				</field>
+				<field name="moduleclass_sfx" type="text" default="" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_MODULE_CLASS_SUFFIX_LABEL" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_MODULE_CLASS_SUFFIX_DESCR">
+				</field>
+			</fieldset>
+			<fieldset name="advanced">
+				<field name="layout" type="modulelayout" label="JFIELD_ALT_LAYOUT_LABEL" />
+				<field name="moduleclass_sfx" type="textarea" label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL" rows="3" />
+			</fieldset>
+		</fields>
+	</config>
+</extension>

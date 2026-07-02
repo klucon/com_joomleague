@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset name="details">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME" description="COM_JOOMLEAGUE_PROJECT_FIELD_NAME_DESCRIPTION" required="true" maxlength="100" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" maxlength="255" />
+		<field name="sports_type_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SPORT" description="COM_JOOMLEAGUE_PROJECT_FIELD_SPORT_DESCRIPTION" query="SELECT id,name FROM #__joomleague_sports_type WHERE published=1 ORDER BY name" key_field="id" value_field="name" required="true" />
+		<field name="league_id" type="sql" label="COM_JOOMLEAGUE_PROJECT_FIELD_LEAGUE" description="COM_JOOMLEAGUE_PROJECT_FIELD_LEAGUE_DESCRIPTION" query="SELECT id,name FROM #__joomleague_league ORDER BY name" key_field="id" value_field="name" required="true" />
+		<field name="season_id" type="sql" label="COM_JOOMLEAGUE_PROJECT_FIELD_SEASON" description="COM_JOOMLEAGUE_PROJECT_FIELD_SEASON_DESCRIPTION" query="SELECT id,name FROM #__joomleague_season WHERE published=1 ORDER BY name" key_field="id" value_field="name" required="true" />
+		<field name="project_type" type="list" label="COM_JOOMLEAGUE_PROJECT_FIELD_TYPE" description="COM_JOOMLEAGUE_PROJECT_FIELD_TYPE_DESCRIPTION" default="SIMPLE_LEAGUE" required="true">
+			<option value="SIMPLE_LEAGUE">COM_JOOMLEAGUE_PROJECT_TYPE_LEAGUE</option>
+			<option value="DIVISIONS_LEAGUE">COM_JOOMLEAGUE_PROJECT_TYPE_DIVISIONS</option>
+			<option value="TOURNAMENT_MODE">COM_JOOMLEAGUE_PROJECT_TYPE_TOURNAMENT</option>
+			<option value="FRIENDLY_MATCHES">COM_JOOMLEAGUE_PROJECT_TYPE_FRIENDLY</option>
+		</field>
+		<field name="master_template" type="sql" label="COM_JOOMLEAGUE_PROJECT_FIELD_MASTER" description="COM_JOOMLEAGUE_PROJECT_FIELD_MASTER_DESCRIPTION" query="SELECT id,name FROM #__joomleague_project WHERE master_template IS NULL ORDER BY name" key_field="id" value_field="name">
+			<option value="">JNONE</option>
+		</field>
+		<field name="extension" type="text" label="COM_JOOMLEAGUE_PROJECT_FIELD_EXTENSION" description="COM_JOOMLEAGUE_PROJECT_FIELD_EXTENSION_DESCRIPTION" maxlength="80" />
+		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_FIELD_EXTENDED" description="COM_JOOMLEAGUE_PROJECT_FIELD_EXTENDED_DESCRIPTION" rows="5" filter="raw" />
+	</fieldset>
+
+	<fieldset name="schedule" label="COM_JOOMLEAGUE_PROJECT_FIELDSET_SCHEDULE">
+		<field name="start_date" type="calendar" label="COM_JOOMLEAGUE_PROJECT_FIELD_START_DATE" description="COM_JOOMLEAGUE_PROJECT_FIELD_START_DATE_DESCRIPTION" format="%Y-%m-%d" showtime="false" todaybutton="true" />
+		<field name="start_time" type="text" label="COM_JOOMLEAGUE_PROJECT_FIELD_START_TIME" description="COM_JOOMLEAGUE_PROJECT_FIELD_START_TIME_DESCRIPTION" default="15:30" required="true" pattern="(?:[01][0-9]|2[0-3]):[0-5][0-9]" />
+		<field name="timezone" type="timezone" label="COM_JOOMLEAGUE_PROJECT_FIELD_TIMEZONE" description="COM_JOOMLEAGUE_PROJECT_FIELD_TIMEZONE_DESCRIPTION" default="Europe/Prague" />
+		<field name="is_utc_converted" type="radio" label="COM_JOOMLEAGUE_PROJECT_FIELD_UTC" description="COM_JOOMLEAGUE_PROJECT_FIELD_UTC_DESCRIPTION" layout="joomla.form.field.radio.switcher" default="0">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="current_round_auto" type="list" label="COM_JOOMLEAGUE_PROJECT_FIELD_ROUND_AUTO" description="COM_JOOMLEAGUE_PROJECT_FIELD_ROUND_AUTO_DESCRIPTION" default="1">
+			<option value="0">COM_JOOMLEAGUE_PROJECT_ROUND_MANUAL</option>
+			<option value="1">COM_JOOMLEAGUE_PROJECT_ROUND_START</option>
+			<option value="2">COM_JOOMLEAGUE_PROJECT_ROUND_END</option>
+			<option value="3">COM_JOOMLEAGUE_PROJECT_ROUND_FIRST</option>
+			<option value="4">COM_JOOMLEAGUE_PROJECT_ROUND_LAST</option>
+		</field>
+		<field name="current_round" type="text" label="COM_JOOMLEAGUE_PROJECT_FIELD_CURRENT_ROUND" description="COM_JOOMLEAGUE_PROJECT_FIELD_CURRENT_ROUND_DESCRIPTION" default="0" maxlength="32" />
+		<field name="auto_time" type="number" label="COM_JOOMLEAGUE_PROJECT_FIELD_AUTO_TIME" description="COM_JOOMLEAGUE_PROJECT_FIELD_AUTO_TIME_DESCRIPTION" default="7200" min="0" />
+	</fieldset>
+
+	<fieldset name="ruleset" label="COM_JOOMLEAGUE_PROJECT_FIELDSET_RULES">
+		<field name="game_regular_time" type="number" label="COM_JOOMLEAGUE_PROJECT_FIELD_REGULAR_TIME" description="COM_JOOMLEAGUE_PROJECT_FIELD_REGULAR_TIME_DESCRIPTION" default="90" min="0" required="true" />
+		<field name="game_parts" type="number" label="COM_JOOMLEAGUE_PROJECT_FIELD_PARTS" description="COM_JOOMLEAGUE_PROJECT_FIELD_PARTS_DESCRIPTION" default="2" min="1" required="true" />
+		<field name="halftime" type="number" label="COM_JOOMLEAGUE_PROJECT_FIELD_HALFTIME" description="COM_JOOMLEAGUE_PROJECT_FIELD_HALFTIME_DESCRIPTION" default="15" min="0" />
+		<field name="points_after_regular_time" type="text" label="COM_JOOMLEAGUE_PROJECT_FIELD_POINTS_REGULAR" description="COM_JOOMLEAGUE_PROJECT_FIELD_POINTS_REGULAR_DESCRIPTION" default="3,1,0" required="true" />
+		<field name="use_legs" type="radio" label="COM_JOOMLEAGUE_PROJECT_FIELD_LEGS" description="COM_JOOMLEAGUE_PROJECT_FIELD_LEGS_DESCRIPTION" layout="joomla.form.field.radio.switcher" default="0">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="allow_add_time" type="radio" label="COM_JOOMLEAGUE_PROJECT_FIELD_EXTRA_ALLOWED" description="COM_JOOMLEAGUE_PROJECT_FIELD_EXTRA_ALLOWED_DESCRIPTION" layout="joomla.form.field.radio.switcher" default="0">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="add_time" type="number" label="COM_JOOMLEAGUE_PROJECT_FIELD_EXTRA_TIME" description="COM_JOOMLEAGUE_PROJECT_FIELD_EXTRA_TIME_DESCRIPTION" default="30" min="0" showon="allow_add_time:1" />
+		<field name="points_after_add_time" type="text" label="COM_JOOMLEAGUE_PROJECT_FIELD_POINTS_EXTRA" description="COM_JOOMLEAGUE_PROJECT_FIELD_POINTS_EXTRA_DESCRIPTION" default="3,1,0" showon="allow_add_time:1" />
+		<field name="points_after_penalty" type="text" label="COM_JOOMLEAGUE_PROJECT_FIELD_POINTS_PENALTY" description="COM_JOOMLEAGUE_PROJECT_FIELD_POINTS_PENALTY_DESCRIPTION" default="3,1,0" showon="allow_add_time:1" />
+		<field name="teams_as_referees" type="radio" label="COM_JOOMLEAGUE_PROJECT_FIELD_TEAMS_REFEREES" description="COM_JOOMLEAGUE_PROJECT_FIELD_TEAMS_REFEREES_DESCRIPTION" layout="joomla.form.field.radio.switcher" default="0">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+	</fieldset>
+
+	<fieldset name="appearance" label="COM_JOOMLEAGUE_PROJECT_FIELDSET_APPEARANCE">
+		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_IMAGE" description="COM_JOOMLEAGUE_PROJECT_FIELD_IMAGE_DESCRIPTION" directory="com_joomleague/database/projects" preview="tooltip" />
+		<field name="fav_team" type="text" label="COM_JOOMLEAGUE_PROJECT_FIELD_FAV_TEAM" description="COM_JOOMLEAGUE_PROJECT_FIELD_FAV_TEAM_DESCRIPTION" maxlength="64" />
+		<field name="fav_team_highlight_type" type="list" label="COM_JOOMLEAGUE_PROJECT_FIELD_HIGHLIGHT" description="COM_JOOMLEAGUE_PROJECT_FIELD_HIGHLIGHT_DESCRIPTION">
+			<option value="">JNONE</option>
+			<option value="0">COM_JOOMLEAGUE_PROJECT_HIGHLIGHT_ROW</option>
+			<option value="1">COM_JOOMLEAGUE_PROJECT_HIGHLIGHT_NAME</option>
+		</field>
+		<field name="fav_team_color" type="color" label="COM_JOOMLEAGUE_PROJECT_FIELD_BG_COLOR" description="COM_JOOMLEAGUE_PROJECT_FIELD_BG_COLOR_DESCRIPTION" default="#ffffff" />
+		<field name="fav_team_text_color" type="color" label="COM_JOOMLEAGUE_PROJECT_FIELD_TEXT_COLOR" description="COM_JOOMLEAGUE_PROJECT_FIELD_TEXT_COLOR_DESCRIPTION" default="#000000" />
+		<field name="fav_team_text_bold" type="radio" label="COM_JOOMLEAGUE_PROJECT_FIELD_TEXT_BOLD" description="COM_JOOMLEAGUE_PROJECT_FIELD_TEXT_BOLD_DESCRIPTION" layout="joomla.form.field.radio.switcher" default="0">
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field name="template" type="text" label="COM_JOOMLEAGUE_PROJECT_FIELD_TEMPLATE" description="COM_JOOMLEAGUE_PROJECT_FIELD_TEMPLATE_DESCRIPTION" default="default" maxlength="32" />
+	</fieldset>
+
+	<fieldset name="publishing">
+		<field name="published" type="list" label="JSTATUS" default="1">
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+			<option value="2">JARCHIVED</option>
+			<option value="-2">JTRASHED</option>
+		</field>
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" default="0" min="0" />
+	</fieldset>
+
+	<fieldset name="permissions">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" validate="rules" component="com_joomleague" section="project" />
+	</fieldset>
+</form>

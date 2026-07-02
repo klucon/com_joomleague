@@ -1,0 +1,159 @@
+{
+  "templateFamily": "schedule",
+  "templateId": "groups-playoff-4x4-top2-v1",
+  "type": "groups-playoff",
+  "generation": "static",
+  "version": 1,
+  "labelKey": "COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_GROUPS_PLAYOFF",
+  "descriptionKey": "COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_GROUPS_PLAYOFF_DESC",
+  "participantRefKeys": {
+    "seed": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_SEED_DESC",
+    "winnerOf": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_WINNER_OF_DESC",
+    "loserOf": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_LOSER_OF_DESC",
+    "groupRank": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_GROUP_RANK_DESC"
+  },
+  "supportedTeamCounts": {
+    "values": [
+      16
+    ]
+  },
+  "properties": {
+    "groupStage": true,
+    "playoff": true,
+    "staticSchedule": true
+  },
+  "phases": [
+    {
+      "phase": "group-stage",
+      "type": "round-robin",
+      "groups": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "teamsPerGroup": 4,
+      "advancePerGroup": 2,
+      "templateRef": "round-robin-first-half.json#/tables/4",
+      "noteKey": "COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_GROUP_STAGE_NOTE"
+    },
+    {
+      "phase": "playoff",
+      "type": "single-elimination",
+      "matches": [
+        {
+          "id": "QF-1",
+          "round": 1,
+          "home": {
+            "groupRank": {
+              "group": "A",
+              "rank": 1
+            }
+          },
+          "away": {
+            "groupRank": {
+              "group": "B",
+              "rank": 2
+            }
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_QUARTERFINAL"
+        },
+        {
+          "id": "QF-2",
+          "round": 1,
+          "home": {
+            "groupRank": {
+              "group": "C",
+              "rank": 1
+            }
+          },
+          "away": {
+            "groupRank": {
+              "group": "D",
+              "rank": 2
+            }
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_QUARTERFINAL"
+        },
+        {
+          "id": "QF-3",
+          "round": 1,
+          "home": {
+            "groupRank": {
+              "group": "B",
+              "rank": 1
+            }
+          },
+          "away": {
+            "groupRank": {
+              "group": "A",
+              "rank": 2
+            }
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_QUARTERFINAL"
+        },
+        {
+          "id": "QF-4",
+          "round": 1,
+          "home": {
+            "groupRank": {
+              "group": "D",
+              "rank": 1
+            }
+          },
+          "away": {
+            "groupRank": {
+              "group": "C",
+              "rank": 2
+            }
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_QUARTERFINAL"
+        },
+        {
+          "id": "SF-1",
+          "round": 2,
+          "home": {
+            "winnerOf": "QF-1"
+          },
+          "away": {
+            "winnerOf": "QF-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_SEMIFINAL"
+        },
+        {
+          "id": "SF-2",
+          "round": 2,
+          "home": {
+            "winnerOf": "QF-3"
+          },
+          "away": {
+            "winnerOf": "QF-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_SEMIFINAL"
+        },
+        {
+          "id": "F",
+          "round": 3,
+          "home": {
+            "winnerOf": "SF-1"
+          },
+          "away": {
+            "winnerOf": "SF-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_FINAL"
+        },
+        {
+          "id": "3P",
+          "round": 3,
+          "home": {
+            "loserOf": "SF-1"
+          },
+          "away": {
+            "loserOf": "SF-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_THIRD_PLACE"
+        }
+      ]
+    }
+  ]
+}

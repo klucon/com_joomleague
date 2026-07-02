@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset name="details" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" class="readonly" readonly="true" default="0" />
+		<field name="name" type="text" label="COM_JOOMLEAGUE_LEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_LEAGUE_FIELD_NAME_DESCRIPTION" required="true" maxlength="75" />
+		<field name="middle_name" type="text" label="COM_JOOMLEAGUE_LEAGUE_FIELD_MIDDLE_NAME_LABEL" description="COM_JOOMLEAGUE_LEAGUE_FIELD_MIDDLE_NAME_DESCRIPTION" maxlength="25" />
+		<field name="short_name" type="text" label="COM_JOOMLEAGUE_LEAGUE_FIELD_SHORT_NAME_LABEL" description="COM_JOOMLEAGUE_LEAGUE_FIELD_SHORT_NAME_DESCRIPTION" required="true" maxlength="15" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" maxlength="75" />
+		<field name="country" type="country" label="COM_JOOMLEAGUE_LEAGUE_FIELD_COUNTRY_LABEL" description="COM_JOOMLEAGUE_LEAGUE_FIELD_COUNTRY_DESCRIPTION" />
+		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_LEAGUE_FIELD_EXTENDED_LABEL" description="COM_JOOMLEAGUE_LEAGUE_FIELD_EXTENDED_DESCRIPTION" rows="6" filter="raw" />
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" default="0" min="0" />
+	</fieldset>
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" validate="rules" component="com_joomleague" section="league" />
+	</fieldset>
+</form>

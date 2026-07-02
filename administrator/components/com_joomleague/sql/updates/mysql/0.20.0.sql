@@ -1,0 +1,2 @@
+-- JoomLeague 0.20.0
+-- Manifest/schema version marker. Structural changes for this release are handled by previous update files.

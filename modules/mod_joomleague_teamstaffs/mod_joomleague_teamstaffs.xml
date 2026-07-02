@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<extension type="module" client="site" method="upgrade">
+	<name>mod_joomleague_teamstaffs</name>
+	<author>Ondřej Klučka (https://klucon.cz)</author>
+	<authorEmail>info@klucon.cz</authorEmail>
+	<creationDate>2026-06</creationDate>
+	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>0.20.0</version>
+	<description>MOD_JOOMLEAGUE_TEAMSTAFFS_XML_DESCRIPTION</description>
+	<namespace path="src">Joomleague\Module\Teamstaffs</namespace>
+	<files>
+		<folder module="mod_joomleague_teamstaffs">services</folder>
+		<folder>src</folder>
+		<folder>tmpl</folder>
+	</files>
+	<languages>
+		<language tag="en-GB">language/en-GB/mod_joomleague_teamstaffs.ini</language>
+		<language tag="en-GB">language/en-GB/mod_joomleague_teamstaffs.sys.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_teamstaffs.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_teamstaffs.sys.ini</language>
+	</languages>
+	<config>
+		<fields name="params">
+			<fieldset name="basic" addfieldpath="/administrator/components/com_joomleague/models/fields">
+				<field type="sql" name="p" label="MOD_JOOMLEAGUE_TEAMSTAFFS_PROJECT_LABEL" description="MOD_JOOMLEAGUE_TEAMSTAFFS_PROJECT_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id" key_field="value" value_field="text" />
+				<field name="team" type="sql" default="0" depends="p" task="projectteamsoptions" label="MOD_JOOMLEAGUE_TEAMSTAFFS_TEAM_ID_LABEL" description="MOD_JOOMLEAGUE_TEAMSTAFFS_TEAM_ID_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_team ORDER BY name, id" key_field="value" value_field="text" />
+				<field name="show_project_name" type="radio" default="0" label="MOD_JOOMLEAGUE_TEAMSTAFFS_SHOW_PROJECT_NAME" description="MOD_JOOMLEAGUE_TEAMSTAFFS_SHOW_PROJECT_NAME_DESC">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="show_team_name" type="radio" default="0" label="MOD_JOOMLEAGUE_TEAMSTAFFS_SHOW_TEAM_NAME" description="SHOW TEAM NAME DESC">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="show_staff_link" type="radio" default="1" label="MOD_JOOMLEAGUE_TEAMSTAFFS_SHOW_STAFF_LINK" description="MOD_JOOMLEAGUE_TEAMSTAFFS_SHOW_STAFF_LINK_DESC">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="show_flag" type="radio" default="1" label="MOD_JOOMLEAGUE_TEAMSTAFFS_SHOW_STAFF_FLAG" description="MOD_JOOMLEAGUE_TEAMSTAFFS_SHOW_STAFF_FLAG_DESC">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="name_format" type="list" label="COM_JOOMLEAGUE_FES_STAFF_PARAM_LABEL_NAME_FORMAT" description="COM_JOOMLEAGUE_FES_STAFF_PARAM_DESCR_NAME_FORMAT">
+					<option value="0">MOD_JOOMLEAGUE_NAME_FORMAT_FIRST_LAST</option>
+					<option value="1">MOD_JOOMLEAGUE_NAME_FORMAT_LAST_FIRST</option>
+					<option value="2">MOD_JOOMLEAGUE_NAME_FORMAT_NICKNAME</option>
+				</field>
+			</fieldset>
+			<fieldset name="advanced">
+				<field name="cache" type="list" default="1" label="MOD_JOOMLEAGUE_TEAMSTAFFS_CACHING_LABEL" description="MOD_JOOMLEAGUE_TEAMSTAFFS_CACHING_DESCR">
+					<option value="1">MOD_JOOMLEAGUE_TEAMSTAFFS_CACHING_USE_GLOBAL</option>
+					<option value="0">MOD_JOOMLEAGUE_TEAMSTAFFS_CACHING_NO_CACHING</option>
+				</field>
+				<field name="cache_time" type="text" default="900" label="MOD_JOOMLEAGUE_TEAMSTAFFS_CACHE_TIME_LABEL" description="MOD_JOOMLEAGUE_TEAMSTAFFS_CACHE_TIME_DESCR">
+				</field>
+				<field name="moduleclass_sfx" type="text" default="" label="MOD_JOOMLEAGUE_TEAMSTAFFS_MODULE_CLASS_SUFFIX_LABEL" description="MOD_JOOMLEAGUE_TEAMSTAFFS_MODULE_CLASS_SUFFIX_DESCR">
+				</field>
+			</fieldset>
+			<fieldset name="advanced">
+				<field name="layout" type="modulelayout" label="JFIELD_ALT_LAYOUT_LABEL" />
+				<field name="moduleclass_sfx" type="textarea" label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL" rows="3" />
+			</fieldset>
+		</fields>
+	</config>
+</extension>

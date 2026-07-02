@@ -1,0 +1,24 @@
+{
+  "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+  "name": "com_joomleague",
+  "version": "0.5.4",
+  "description": "JoomLeague administrator assets",
+  "license": "GPL-2.0-or-later",
+  "assets": [
+    {
+      "name": "com_joomleague.dashboard",
+      "type": "style",
+      "uri": "com_joomleague/css/dashboard.css",
+      "version": "0.5.4"
+    },
+    {"name":"com_joomleague.duallist","type":"script","uri":"com_joomleague/js/duallist.js","attributes":{"defer":true},"version":"1.0.5"},
+    {"name":"com_joomleague.matchdata","type":"script","uri":"com_joomleague/js/matchdata.js","attributes":{"defer":true},"version":"1.0.0"},
+    {"name":"com_joomleague.form","type":"script","uri":"com_joomleague/js/form.js","attributes":{"defer":true},"version":"1.0.0"},
+    {
+      "name": "com_joomleague.site",
+      "type": "style",
+      "uri": "com_joomleague/css/site.css",
+      "version": "0.14.0"
+    }
+  ]
+}

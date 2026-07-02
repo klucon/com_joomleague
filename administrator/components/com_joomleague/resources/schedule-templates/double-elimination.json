@@ -1,0 +1,1621 @@
+{
+  "templateFamily": "schedule",
+  "templateId": "double-elimination-v1",
+  "type": "double-elimination",
+  "generation": "static",
+  "version": 1,
+  "labelKey": "COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_DOUBLE_ELIMINATION",
+  "descriptionKey": "COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_DOUBLE_ELIMINATION_DESC",
+  "participantRefKeys": {
+    "seed": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_SEED_DESC",
+    "winnerOf": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_WINNER_OF_DESC",
+    "loserOf": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_LOSER_OF_DESC",
+    "groupRank": "COM_JOOMLEAGUE_SCHEDULE_PARTICIPANT_GROUP_RANK_DESC"
+  },
+  "supportedTeamCounts": {
+    "values": [
+      4,
+      8,
+      16,
+      32
+    ]
+  },
+  "properties": {
+    "supportsGrandFinalReset": true,
+    "staticSchedule": true
+  },
+  "brackets": {
+    "4": {
+      "slots": 4,
+      "winnersRounds": 2,
+      "losersRounds": 2,
+      "totalMatches": 7,
+      "totalMatchesWithoutReset": 6,
+      "matches": [
+        {
+          "id": "WB-R1-1",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 1
+          },
+          "away": {
+            "seed": 4
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_SEMIFINAL"
+        },
+        {
+          "id": "WB-R1-2",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 2
+          },
+          "away": {
+            "seed": 3
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_SEMIFINAL"
+        },
+        {
+          "id": "WB-R2-1",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-1"
+          },
+          "away": {
+            "winnerOf": "WB-R1-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_FINAL"
+        },
+        {
+          "id": "LB-R1-1",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-1"
+          },
+          "away": {
+            "loserOf": "WB-R1-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R2-1",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-1"
+          },
+          "away": {
+            "loserOf": "WB-R2-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "GF",
+          "bracket": "final",
+          "round": 0,
+          "home": {
+            "winnerOf": "WB-R2-1"
+          },
+          "away": {
+            "winnerOf": "LB-R2-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_GRAND_FINAL"
+        },
+        {
+          "id": "GF-RESET",
+          "bracket": "final",
+          "round": 0,
+          "home": {
+            "winnerOf": "GF"
+          },
+          "away": {
+            "loserOf": "GF"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_GRAND_FINAL_RESET",
+          "conditionalKey": "COM_JOOMLEAGUE_SCHEDULE_CONDITION_GRAND_FINAL_RESET"
+        }
+      ]
+    },
+    "8": {
+      "slots": 8,
+      "winnersRounds": 3,
+      "losersRounds": 4,
+      "totalMatches": 15,
+      "totalMatchesWithoutReset": 14,
+      "matches": [
+        {
+          "id": "WB-R1-1",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 1
+          },
+          "away": {
+            "seed": 8
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R1-2",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 4
+          },
+          "away": {
+            "seed": 5
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R1-3",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 2
+          },
+          "away": {
+            "seed": 7
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R1-4",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 3
+          },
+          "away": {
+            "seed": 6
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R2-1",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-1"
+          },
+          "away": {
+            "winnerOf": "WB-R1-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_SEMIFINAL"
+        },
+        {
+          "id": "WB-R2-2",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-3"
+          },
+          "away": {
+            "winnerOf": "WB-R1-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_SEMIFINAL"
+        },
+        {
+          "id": "WB-R3-1",
+          "bracket": "winners",
+          "round": 3,
+          "home": {
+            "winnerOf": "WB-R2-1"
+          },
+          "away": {
+            "winnerOf": "WB-R2-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_FINAL"
+        },
+        {
+          "id": "LB-R1-1",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-1"
+          },
+          "away": {
+            "loserOf": "WB-R1-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R1-2",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-3"
+          },
+          "away": {
+            "loserOf": "WB-R1-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R2-1",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-1"
+          },
+          "away": {
+            "loserOf": "WB-R2-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R2-2",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-2"
+          },
+          "away": {
+            "loserOf": "WB-R2-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R3-1",
+          "bracket": "losers",
+          "round": 3,
+          "home": {
+            "winnerOf": "LB-R2-1"
+          },
+          "away": {
+            "winnerOf": "LB-R2-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            3
+          ]
+        },
+        {
+          "id": "LB-R4-1",
+          "bracket": "losers",
+          "round": 4,
+          "home": {
+            "winnerOf": "LB-R3-1"
+          },
+          "away": {
+            "loserOf": "WB-R3-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            4
+          ]
+        },
+        {
+          "id": "GF",
+          "bracket": "final",
+          "round": 0,
+          "home": {
+            "winnerOf": "WB-R3-1"
+          },
+          "away": {
+            "winnerOf": "LB-R4-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_GRAND_FINAL"
+        },
+        {
+          "id": "GF-RESET",
+          "bracket": "final",
+          "round": 0,
+          "home": {
+            "winnerOf": "GF"
+          },
+          "away": {
+            "loserOf": "GF"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_GRAND_FINAL_RESET",
+          "conditionalKey": "COM_JOOMLEAGUE_SCHEDULE_CONDITION_GRAND_FINAL_RESET"
+        }
+      ]
+    },
+    "16": {
+      "slots": 16,
+      "winnersRounds": 4,
+      "losersRounds": 6,
+      "totalMatches": 31,
+      "totalMatchesWithoutReset": 30,
+      "matches": [
+        {
+          "id": "WB-R1-1",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 1
+          },
+          "away": {
+            "seed": 16
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R1-2",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 8
+          },
+          "away": {
+            "seed": 9
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R1-3",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 4
+          },
+          "away": {
+            "seed": 13
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R1-4",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 5
+          },
+          "away": {
+            "seed": 12
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R1-5",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 2
+          },
+          "away": {
+            "seed": 15
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R1-6",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 7
+          },
+          "away": {
+            "seed": 10
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R1-7",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 3
+          },
+          "away": {
+            "seed": 14
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R1-8",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 6
+          },
+          "away": {
+            "seed": 11
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R2-1",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-1"
+          },
+          "away": {
+            "winnerOf": "WB-R1-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R2-2",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-3"
+          },
+          "away": {
+            "winnerOf": "WB-R1-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R2-3",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-5"
+          },
+          "away": {
+            "winnerOf": "WB-R1-6"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R2-4",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-7"
+          },
+          "away": {
+            "winnerOf": "WB-R1-8"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R3-1",
+          "bracket": "winners",
+          "round": 3,
+          "home": {
+            "winnerOf": "WB-R2-1"
+          },
+          "away": {
+            "winnerOf": "WB-R2-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_SEMIFINAL"
+        },
+        {
+          "id": "WB-R3-2",
+          "bracket": "winners",
+          "round": 3,
+          "home": {
+            "winnerOf": "WB-R2-3"
+          },
+          "away": {
+            "winnerOf": "WB-R2-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_SEMIFINAL"
+        },
+        {
+          "id": "WB-R4-1",
+          "bracket": "winners",
+          "round": 4,
+          "home": {
+            "winnerOf": "WB-R3-1"
+          },
+          "away": {
+            "winnerOf": "WB-R3-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_FINAL"
+        },
+        {
+          "id": "LB-R1-1",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-1"
+          },
+          "away": {
+            "loserOf": "WB-R1-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R1-2",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-3"
+          },
+          "away": {
+            "loserOf": "WB-R1-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R1-3",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-5"
+          },
+          "away": {
+            "loserOf": "WB-R1-6"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R1-4",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-7"
+          },
+          "away": {
+            "loserOf": "WB-R1-8"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R2-1",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-1"
+          },
+          "away": {
+            "loserOf": "WB-R2-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R2-2",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-2"
+          },
+          "away": {
+            "loserOf": "WB-R2-3"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R2-3",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-3"
+          },
+          "away": {
+            "loserOf": "WB-R2-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R2-4",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-4"
+          },
+          "away": {
+            "loserOf": "WB-R2-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R3-1",
+          "bracket": "losers",
+          "round": 3,
+          "home": {
+            "winnerOf": "LB-R2-1"
+          },
+          "away": {
+            "winnerOf": "LB-R2-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            3
+          ]
+        },
+        {
+          "id": "LB-R3-2",
+          "bracket": "losers",
+          "round": 3,
+          "home": {
+            "winnerOf": "LB-R2-3"
+          },
+          "away": {
+            "winnerOf": "LB-R2-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            3
+          ]
+        },
+        {
+          "id": "LB-R4-1",
+          "bracket": "losers",
+          "round": 4,
+          "home": {
+            "winnerOf": "LB-R3-1"
+          },
+          "away": {
+            "loserOf": "WB-R3-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            4
+          ]
+        },
+        {
+          "id": "LB-R4-2",
+          "bracket": "losers",
+          "round": 4,
+          "home": {
+            "winnerOf": "LB-R3-2"
+          },
+          "away": {
+            "loserOf": "WB-R3-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            4
+          ]
+        },
+        {
+          "id": "LB-R5-1",
+          "bracket": "losers",
+          "round": 5,
+          "home": {
+            "winnerOf": "LB-R4-1"
+          },
+          "away": {
+            "winnerOf": "LB-R4-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            5
+          ]
+        },
+        {
+          "id": "LB-R6-1",
+          "bracket": "losers",
+          "round": 6,
+          "home": {
+            "winnerOf": "LB-R5-1"
+          },
+          "away": {
+            "loserOf": "WB-R4-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            6
+          ]
+        },
+        {
+          "id": "GF",
+          "bracket": "final",
+          "round": 0,
+          "home": {
+            "winnerOf": "WB-R4-1"
+          },
+          "away": {
+            "winnerOf": "LB-R6-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_GRAND_FINAL"
+        },
+        {
+          "id": "GF-RESET",
+          "bracket": "final",
+          "round": 0,
+          "home": {
+            "winnerOf": "GF"
+          },
+          "away": {
+            "loserOf": "GF"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_GRAND_FINAL_RESET",
+          "conditionalKey": "COM_JOOMLEAGUE_SCHEDULE_CONDITION_GRAND_FINAL_RESET"
+        }
+      ]
+    },
+    "32": {
+      "slots": 32,
+      "winnersRounds": 5,
+      "losersRounds": 8,
+      "totalMatches": 63,
+      "totalMatchesWithoutReset": 62,
+      "matches": [
+        {
+          "id": "WB-R1-1",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 1
+          },
+          "away": {
+            "seed": 32
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-2",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 16
+          },
+          "away": {
+            "seed": 17
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-3",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 8
+          },
+          "away": {
+            "seed": 25
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-4",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 9
+          },
+          "away": {
+            "seed": 24
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-5",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 4
+          },
+          "away": {
+            "seed": 29
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-6",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 13
+          },
+          "away": {
+            "seed": 20
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-7",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 5
+          },
+          "away": {
+            "seed": 28
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-8",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 12
+          },
+          "away": {
+            "seed": 21
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-9",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 2
+          },
+          "away": {
+            "seed": 31
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-10",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 15
+          },
+          "away": {
+            "seed": 18
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-11",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 7
+          },
+          "away": {
+            "seed": 26
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-12",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 10
+          },
+          "away": {
+            "seed": 23
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-13",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 3
+          },
+          "away": {
+            "seed": 30
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-14",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 14
+          },
+          "away": {
+            "seed": 19
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-15",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 6
+          },
+          "away": {
+            "seed": 27
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R1-16",
+          "bracket": "winners",
+          "round": 1,
+          "home": {
+            "seed": 11
+          },
+          "away": {
+            "seed": 22
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_32"
+        },
+        {
+          "id": "WB-R2-1",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-1"
+          },
+          "away": {
+            "winnerOf": "WB-R1-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R2-2",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-3"
+          },
+          "away": {
+            "winnerOf": "WB-R1-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R2-3",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-5"
+          },
+          "away": {
+            "winnerOf": "WB-R1-6"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R2-4",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-7"
+          },
+          "away": {
+            "winnerOf": "WB-R1-8"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R2-5",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-9"
+          },
+          "away": {
+            "winnerOf": "WB-R1-10"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R2-6",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-11"
+          },
+          "away": {
+            "winnerOf": "WB-R1-12"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R2-7",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-13"
+          },
+          "away": {
+            "winnerOf": "WB-R1-14"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R2-8",
+          "bracket": "winners",
+          "round": 2,
+          "home": {
+            "winnerOf": "WB-R1-15"
+          },
+          "away": {
+            "winnerOf": "WB-R1-16"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_ROUND_OF_16"
+        },
+        {
+          "id": "WB-R3-1",
+          "bracket": "winners",
+          "round": 3,
+          "home": {
+            "winnerOf": "WB-R2-1"
+          },
+          "away": {
+            "winnerOf": "WB-R2-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R3-2",
+          "bracket": "winners",
+          "round": 3,
+          "home": {
+            "winnerOf": "WB-R2-3"
+          },
+          "away": {
+            "winnerOf": "WB-R2-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R3-3",
+          "bracket": "winners",
+          "round": 3,
+          "home": {
+            "winnerOf": "WB-R2-5"
+          },
+          "away": {
+            "winnerOf": "WB-R2-6"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R3-4",
+          "bracket": "winners",
+          "round": 3,
+          "home": {
+            "winnerOf": "WB-R2-7"
+          },
+          "away": {
+            "winnerOf": "WB-R2-8"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_QUARTERFINAL"
+        },
+        {
+          "id": "WB-R4-1",
+          "bracket": "winners",
+          "round": 4,
+          "home": {
+            "winnerOf": "WB-R3-1"
+          },
+          "away": {
+            "winnerOf": "WB-R3-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_SEMIFINAL"
+        },
+        {
+          "id": "WB-R4-2",
+          "bracket": "winners",
+          "round": 4,
+          "home": {
+            "winnerOf": "WB-R3-3"
+          },
+          "away": {
+            "winnerOf": "WB-R3-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_SEMIFINAL"
+        },
+        {
+          "id": "WB-R5-1",
+          "bracket": "winners",
+          "round": 5,
+          "home": {
+            "winnerOf": "WB-R4-1"
+          },
+          "away": {
+            "winnerOf": "WB-R4-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_WB_FINAL"
+        },
+        {
+          "id": "LB-R1-1",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-1"
+          },
+          "away": {
+            "loserOf": "WB-R1-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R1-2",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-3"
+          },
+          "away": {
+            "loserOf": "WB-R1-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R1-3",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-5"
+          },
+          "away": {
+            "loserOf": "WB-R1-6"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R1-4",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-7"
+          },
+          "away": {
+            "loserOf": "WB-R1-8"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R1-5",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-9"
+          },
+          "away": {
+            "loserOf": "WB-R1-10"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R1-6",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-11"
+          },
+          "away": {
+            "loserOf": "WB-R1-12"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R1-7",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-13"
+          },
+          "away": {
+            "loserOf": "WB-R1-14"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R1-8",
+          "bracket": "losers",
+          "round": 1,
+          "home": {
+            "loserOf": "WB-R1-15"
+          },
+          "away": {
+            "loserOf": "WB-R1-16"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            1
+          ]
+        },
+        {
+          "id": "LB-R2-1",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-1"
+          },
+          "away": {
+            "loserOf": "WB-R2-8"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R2-2",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-2"
+          },
+          "away": {
+            "loserOf": "WB-R2-7"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R2-3",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-3"
+          },
+          "away": {
+            "loserOf": "WB-R2-6"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R2-4",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-4"
+          },
+          "away": {
+            "loserOf": "WB-R2-5"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R2-5",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-5"
+          },
+          "away": {
+            "loserOf": "WB-R2-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R2-6",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-6"
+          },
+          "away": {
+            "loserOf": "WB-R2-3"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R2-7",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-7"
+          },
+          "away": {
+            "loserOf": "WB-R2-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R2-8",
+          "bracket": "losers",
+          "round": 2,
+          "home": {
+            "winnerOf": "LB-R1-8"
+          },
+          "away": {
+            "loserOf": "WB-R2-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            2
+          ]
+        },
+        {
+          "id": "LB-R3-1",
+          "bracket": "losers",
+          "round": 3,
+          "home": {
+            "winnerOf": "LB-R2-1"
+          },
+          "away": {
+            "winnerOf": "LB-R2-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            3
+          ]
+        },
+        {
+          "id": "LB-R3-2",
+          "bracket": "losers",
+          "round": 3,
+          "home": {
+            "winnerOf": "LB-R2-3"
+          },
+          "away": {
+            "winnerOf": "LB-R2-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            3
+          ]
+        },
+        {
+          "id": "LB-R3-3",
+          "bracket": "losers",
+          "round": 3,
+          "home": {
+            "winnerOf": "LB-R2-5"
+          },
+          "away": {
+            "winnerOf": "LB-R2-6"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            3
+          ]
+        },
+        {
+          "id": "LB-R3-4",
+          "bracket": "losers",
+          "round": 3,
+          "home": {
+            "winnerOf": "LB-R2-7"
+          },
+          "away": {
+            "winnerOf": "LB-R2-8"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            3
+          ]
+        },
+        {
+          "id": "LB-R4-1",
+          "bracket": "losers",
+          "round": 4,
+          "home": {
+            "winnerOf": "LB-R3-1"
+          },
+          "away": {
+            "loserOf": "WB-R3-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            4
+          ]
+        },
+        {
+          "id": "LB-R4-2",
+          "bracket": "losers",
+          "round": 4,
+          "home": {
+            "winnerOf": "LB-R3-2"
+          },
+          "away": {
+            "loserOf": "WB-R3-3"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            4
+          ]
+        },
+        {
+          "id": "LB-R4-3",
+          "bracket": "losers",
+          "round": 4,
+          "home": {
+            "winnerOf": "LB-R3-3"
+          },
+          "away": {
+            "loserOf": "WB-R3-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            4
+          ]
+        },
+        {
+          "id": "LB-R4-4",
+          "bracket": "losers",
+          "round": 4,
+          "home": {
+            "winnerOf": "LB-R3-4"
+          },
+          "away": {
+            "loserOf": "WB-R3-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            4
+          ]
+        },
+        {
+          "id": "LB-R5-1",
+          "bracket": "losers",
+          "round": 5,
+          "home": {
+            "winnerOf": "LB-R4-1"
+          },
+          "away": {
+            "winnerOf": "LB-R4-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            5
+          ]
+        },
+        {
+          "id": "LB-R5-2",
+          "bracket": "losers",
+          "round": 5,
+          "home": {
+            "winnerOf": "LB-R4-3"
+          },
+          "away": {
+            "winnerOf": "LB-R4-4"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            5
+          ]
+        },
+        {
+          "id": "LB-R6-1",
+          "bracket": "losers",
+          "round": 6,
+          "home": {
+            "winnerOf": "LB-R5-1"
+          },
+          "away": {
+            "loserOf": "WB-R4-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            6
+          ]
+        },
+        {
+          "id": "LB-R6-2",
+          "bracket": "losers",
+          "round": 6,
+          "home": {
+            "winnerOf": "LB-R5-2"
+          },
+          "away": {
+            "loserOf": "WB-R4-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            6
+          ]
+        },
+        {
+          "id": "LB-R7-1",
+          "bracket": "losers",
+          "round": 7,
+          "home": {
+            "winnerOf": "LB-R6-1"
+          },
+          "away": {
+            "winnerOf": "LB-R6-2"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            7
+          ]
+        },
+        {
+          "id": "LB-R8-1",
+          "bracket": "losers",
+          "round": 8,
+          "home": {
+            "winnerOf": "LB-R7-1"
+          },
+          "away": {
+            "loserOf": "WB-R5-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_LB_ROUND",
+          "roundNameParams": [
+            8
+          ]
+        },
+        {
+          "id": "GF",
+          "bracket": "final",
+          "round": 0,
+          "home": {
+            "winnerOf": "WB-R5-1"
+          },
+          "away": {
+            "winnerOf": "LB-R8-1"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_GRAND_FINAL"
+        },
+        {
+          "id": "GF-RESET",
+          "bracket": "final",
+          "round": 0,
+          "home": {
+            "winnerOf": "GF"
+          },
+          "away": {
+            "loserOf": "GF"
+          },
+          "roundNameKey": "COM_JOOMLEAGUE_SCHEDULE_ROUND_GRAND_FINAL_RESET",
+          "conditionalKey": "COM_JOOMLEAGUE_SCHEDULE_CONDITION_GRAND_FINAL_RESET"
+        }
+      ]
+    }
+  },
+  "noteKeys": {
+    "reset": "COM_JOOMLEAGUE_SCHEDULE_NOTE_DOUBLE_RESET",
+    "antiRematch": "COM_JOOMLEAGUE_SCHEDULE_NOTE_DOUBLE_ANTI_REMATCH"
+  }
+}
