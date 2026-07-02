@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.21.50 - 2026-07-02
+
+- Private bridge package for validating the Joomla update server path.
+- Added package update server URL to the Joomla package manifest.
+- Added package changelog URL to the Joomla package manifest.
+- Prepared update metadata for the later `0.30.0` release test.
+
 ## 0.20.14 - 2026-07-02
 
 - First synchronized source tree in the public repository.
