@@ -104,9 +104,10 @@ def write_changelog_xml(release_version: str, output: Path) -> None:
         ET.SubElement(changelog, "element").text = "pkg_joomleague"
         ET.SubElement(changelog, "type").text = "package"
         ET.SubElement(changelog, "version").text = section_version
+        changes = ET.SubElement(changelog, "change")
 
         for item in items:
-            ET.SubElement(changelog, "change").text = item
+            ET.SubElement(changes, "item").text = item
 
     if not any(section_version == release_version for section_version, _ in changelog_sections()):
         raise RuntimeError(f"Missing CHANGELOG.md section for {release_version}")
