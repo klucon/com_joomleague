@@ -14,6 +14,7 @@ return new class implements InstallerScriptInterface {
 	public function install(InstallerAdapter $adapter): bool
 	{
 		$this->removeObsoleteFiles();
+		$this->ensureSchemaColumns();
 
 		return $this->installImages($adapter);
 	}
@@ -24,6 +25,7 @@ return new class implements InstallerScriptInterface {
 		$this->removeTreetosMenu();
 		$this->removeCustomFieldsMenu();
 		$this->removeLegacyFlagPngs();
+		$this->ensureSchemaColumns();
 
 		return $this->installImages($adapter);
 	}
@@ -197,6 +199,59 @@ return new class implements InstallerScriptInterface {
 
 		foreach (glob($dir . '/*.png') ?: [] as $png) {
 			@unlink($png);
+		}
+	}
+
+	private function ensureSchemaColumns(): void
+	{
+		try {
+			$db = Factory::getContainer()->get(DatabaseInterface::class);
+		} catch (\Throwable $exception) {
+			return;
+		}
+
+		foreach ([
+			['#__joomleague_round', 'published', 'TINYINT NOT NULL DEFAULT 1', 'round_date_last'],
+			['#__joomleague_eventtype', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
+			['#__joomleague_league', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
+			['#__joomleague_person', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
+			['#__joomleague_playground', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
+			['#__joomleague_position', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
+			['#__joomleague_round', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
+			['#__joomleague_season', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
+			['#__joomleague_sports_type', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
+			['#__joomleague_statistic', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
+			['#__joomleague_division', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
+			['#__joomleague_sports_type', 'periods', 'TINYINT NOT NULL DEFAULT 2', 'name'],
+			['#__joomleague_match', 'article_id', 'INT NULL DEFAULT NULL', null],
+		] as [$table, $column, $definition, $after]) {
+			$this->addColumnIfMissing($db, $table, $column, $definition, $after);
+		}
+	}
+
+	private function addColumnIfMissing(DatabaseInterface $db, string $table, string $column, string $definition, ?string $after): void
+	{
+		try {
+			$columns = $db->getTableColumns($table);
+		} catch (\Throwable $exception) {
+			return;
+		}
+
+		if (array_key_exists($column, $columns)) {
+			return;
+		}
+
+		$query = 'ALTER TABLE ' . $db->quoteName($table)
+			. ' ADD COLUMN ' . $db->quoteName($column) . ' ' . $definition;
+
+		if ($after !== null && array_key_exists($after, $columns)) {
+			$query .= ' AFTER ' . $db->quoteName($after);
+		}
+
+		try {
+			$db->setQuery($query)->execute();
+		} catch (\Throwable $exception) {
+			// Chybějící doplňkový sloupec nesmí shodit celý balíček.
 		}
 	}
 

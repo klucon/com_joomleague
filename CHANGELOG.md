@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.35.1 - 2026-07-02
+
+- Unified package, component, module and plugin manifest versions.
+- Added validation for child extension manifest versions.
+- Prepared the release for Joomla update server verification.
+
+## 0.30.0 - 2026-07-02
+
+- First public GitHub milestone release candidate.
+- Prepared package metadata for Joomla update discovery from `0.21.50`.
+- Prepared release assets for package ZIP, update XML and changelog XML.
+- Confirmed the package build path for Joomla 6 source distribution.
+- Made legacy schema column updates safe for databases that already contain those columns.
+
 ## 0.21.50 - 2026-07-02
 
 - Private bridge package for validating the Joomla update server path.

@@ -7,7 +7,7 @@ Balíček obsahuje hlavní komponentu `com_joomleague`, sadu frontendových modu
 ## Stav balíčku
 
 - Název balíčku: `pkg_joomleague`
-- Aktuální verze: `0.21.50`
+- Aktuální verze: `0.35.1`
 - Cílová platforma: Joomla 6
 - Licence: GNU GPL v2 nebo novější
 - Jazyky: čeština (`cs-CZ`) a angličtina (`en-GB`)

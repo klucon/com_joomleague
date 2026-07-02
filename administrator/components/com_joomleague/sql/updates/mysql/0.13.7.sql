@@ -1,2 +1,1 @@
-ALTER TABLE `#__joomleague_division`
-	ADD COLUMN `asset_id` INT UNSIGNED NULL DEFAULT NULL AFTER `modified_by`;
+-- Schema guard: column `asset_id` on `#__joomleague_division` is added by script.php only when missing.
