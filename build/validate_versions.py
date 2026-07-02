@@ -14,6 +14,10 @@ PACKAGE_MANIFEST = ROOT / "pkg_joomleague.xml"
 COMPONENT_MANIFEST = ROOT / "administrator/components/com_joomleague/joomleague.xml"
 README = ROOT / "README.md"
 CHANGELOG = ROOT / "CHANGELOG.md"
+CHILD_MANIFESTS = (
+    sorted((ROOT / "modules").glob("mod_*/mod_*.xml"))
+    + sorted((ROOT / "plugins").glob("*/*/*.xml"))
+)
 
 
 def manifest_version(path: Path) -> str:
@@ -35,6 +39,15 @@ def main() -> int:
             "Component manifest version does not match package manifest version: "
             f"{component_version} != {package_version}"
         )
+
+    for manifest in CHILD_MANIFESTS:
+        child_version = manifest_version(manifest)
+
+        if child_version != package_version:
+            errors.append(
+                f"{manifest.relative_to(ROOT)} version does not match package manifest version: "
+                f"{child_version} != {package_version}"
+            )
 
     readme = README.read_text(encoding="utf-8")
     if f"Aktuální verze: `{package_version}`" not in readme:

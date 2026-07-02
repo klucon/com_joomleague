@@ -1,1 +1,1 @@
-ALTER TABLE `#__joomleague_match` ADD COLUMN `article_id` INT NULL DEFAULT NULL;
+-- Schema guard: column `article_id` on `#__joomleague_match` is added by script.php only when missing.

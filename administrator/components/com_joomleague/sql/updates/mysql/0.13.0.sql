@@ -1,1 +1,1 @@
-ALTER TABLE `#__joomleague_round` ADD COLUMN `published` TINYINT NOT NULL DEFAULT 1 AFTER `round_date_last`;
+-- Schema guard: column `published` on `#__joomleague_round` is added by script.php only when missing.
