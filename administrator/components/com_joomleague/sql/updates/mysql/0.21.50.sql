@@ -1,0 +1,1 @@
+-- Bridge version for Joomla update server validation.
