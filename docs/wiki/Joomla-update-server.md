@@ -5,22 +5,23 @@ Update server bude plně provozovaný přes GitHub.
 ## Cílová architektura
 
 - ZIP balíčky budou uložené jako GitHub Release assets.
-- Joomla update feed bude publikovaný přes GitHub Pages.
-- Joomla changelog XML bude publikovaný přes GitHub Pages.
-- Release workflow bude automaticky sestavovat balíček a připravovat release.
+- Joomla update feed bude uložený jako GitHub Release asset.
+- Joomla changelog XML bude uložený jako GitHub Release asset.
+- Package manifest bude odkazovat na poslední publikovaný release přes `releases/latest/download`.
+- Release workflow bude automaticky sestavovat balíček, generovat metadata a připravovat release.
 
 ## Veřejné URL
 
 Update feed:
 
 ```text
-https://klucon.github.io/com_joomleague/updates/joomleague.xml
+https://github.com/klucon/com_joomleague/releases/latest/download/joomleague-update.xml
 ```
 
 Changelog:
 
 ```text
-https://klucon.github.io/com_joomleague/updates/changelog.xml
+https://github.com/klucon/com_joomleague/releases/latest/download/joomleague-changelog.xml
 ```
 
 Release asset pro `0.30.0`:
@@ -34,11 +35,11 @@ https://github.com/klucon/com_joomleague/releases/download/v0.30.0/pkg_joomleagu
 Do `pkg_joomleague.xml` se po synchronizaci zdrojů přidá update server a changelog URL:
 
 ```xml
-<updateservers>
-	<server type="extension" priority="1" name="JoomLeague Updates">https://klucon.github.io/com_joomleague/updates/joomleague.xml</server>
-</updateservers>
+<changelogurl>https://github.com/klucon/com_joomleague/releases/latest/download/joomleague-changelog.xml</changelogurl>
 
-<changelogurl>https://klucon.github.io/com_joomleague/updates/changelog.xml</changelogurl>
+<updateservers>
+	<server type="extension" priority="1" name="JoomLeague">https://github.com/klucon/com_joomleague/releases/latest/download/joomleague-update.xml</server>
+</updateservers>
 ```
 
 ## Bridge verze 0.21.50
@@ -76,11 +77,12 @@ Release workflow po tagu `v0.30.0` má:
 1. načíst verzi z manifestu,
 2. ověřit, že tag odpovídá manifest verzi,
 3. sestavit Joomla package,
-4. vytvořit GitHub Release,
-5. přiložit ZIP asset,
-6. vygenerovat update feed,
-7. vygenerovat changelog XML,
-8. publikovat změny přes GitHub Pages.
+4. vygenerovat update feed,
+5. vygenerovat changelog XML,
+6. vytvořit GitHub Release,
+7. přiložit ZIP asset,
+8. přiložit update feed,
+9. přiložit changelog XML.
 
 ## Test
 
@@ -92,4 +94,3 @@ Release workflow po tagu `v0.30.0` má:
 6. Ověřit zobrazení changelogu.
 7. Provést update.
 8. Ověřit nainstalovanou verzi `0.30.0`.
-
