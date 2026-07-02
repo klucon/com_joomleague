@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Prepared package metadata for Joomla update discovery from `0.21.50`.
 - Prepared release assets for package ZIP, update XML and changelog XML.
 - Confirmed the package build path for Joomla 6 source distribution.
+- Made legacy schema column updates safe for databases that already contain those columns.
 
 ## 0.21.50 - 2026-07-02
 
