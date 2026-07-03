@@ -25,6 +25,7 @@ final class Router extends RouterBase
 		'teams' => 'teams',
 		'referees' => 'referees',
 		'stats' => 'stats',
+		'ical' => 'ical',
 	];
 
 	private const VIEW_ID_KEYS = [
@@ -358,7 +359,7 @@ final class Router extends RouterBase
 	{
 		$preferred = match ($view) {
 			'club' => 'clubs',
-			'project', 'ranking', 'results', 'schedule', 'teams', 'team', 'roster', 'referees', 'stats', 'matchreport', 'person' => 'projects',
+			'project', 'ranking', 'results', 'schedule', 'teams', 'team', 'roster', 'referees', 'stats', 'ical', 'matchreport', 'person' => 'projects',
 			default => $view,
 		};
 
@@ -703,6 +704,7 @@ final class Router extends RouterBase
 			'teams' => 'tymy',
 			'referees' => 'rozhodci',
 			'stats' => 'statistiky',
+			'ical' => 'ical',
 			default => $section,
 		};
 	}
@@ -716,6 +718,7 @@ final class Router extends RouterBase
 			$this->segment('COM_JOOMLEAGUE_ROUTE_TEAMS', 'tymy') => 'teams',
 			$this->segment('COM_JOOMLEAGUE_ROUTE_REFEREES', 'rozhodci') => 'referees',
 			$this->segment('COM_JOOMLEAGUE_ROUTE_STATS', 'statistiky') => 'stats',
+			$this->segment('COM_JOOMLEAGUE_ROUTE_ICAL', 'ical') => 'ical',
 			default => 'project',
 		};
 	}

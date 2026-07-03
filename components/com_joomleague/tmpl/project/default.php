@@ -38,10 +38,14 @@ if ($project) {
 		<nav class="jl-site-nav">
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=ranking&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RANKING'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=results&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULTS'); ?></a>
+			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=resultsranking&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULTS_RANKING'); ?></a>
+			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=resultsmatrix&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULT_MATRIX'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=schedule&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=teams&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAMS'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=referees&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_REFEREES'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=stats&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_STATS'); ?></a>
+			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=statsranking&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_STATS_RANKING'); ?></a>
+			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=eventsranking&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_EVENTS_RANKING'); ?></a>
 		</nav>
 	</section>
 	<div class="jl-site-grid mb-4">

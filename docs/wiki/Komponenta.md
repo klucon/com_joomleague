@@ -43,6 +43,8 @@ Frontendová část poskytuje pohledy pro:
 - rozhodčí,
 - detail zápasu.
 
+Pracovní mapa přepisu starších frontendových výstupů je v dokumentu [[Frontend-prepis]].
+
 ## Databáze
 
 Komponenta používá tabulky s prefixem:
@@ -60,4 +62,3 @@ Hlavní oblasti datového modelu:
 - pozice, stadiony a hřiště,
 - turnajové stromy,
 - šablony konfigurace.
-

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.35.4 - 2026-07-03
+
+- Added expanded Joomla 6 frontend views for team, club, schedule and match detail pages.
+- Added result matrix and combined results/standings frontend views.
+- Added event ranking, statistics ranking and team statistics frontend views.
+- Added rivals overview with head-to-head team balance.
+- Added iCal calendar feed plus calendar subscription actions for Google, Apple, Outlook.com and Office 365.
+- Updated frontend rewrite documentation and GitHub wiki source files.
+
 ## 0.35.3 - 2026-07-03
 
 - Fixed undefined module language constants in XML configuration forms.

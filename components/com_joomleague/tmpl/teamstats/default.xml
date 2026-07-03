@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_SITE_TEAM_STATS">
+		<message><![CDATA[COM_JOOMLEAGUE_SITE_TEAM_STATS_DESC]]></message>
+	</layout>
+	<fields name="request">
+		<fieldset name="request">
+			<field name="projectteam_id" type="number" label="COM_JOOMLEAGUE_SITE_PROJECTTEAM_ID" />
+		</fieldset>
+	</fields>
+</metadata>

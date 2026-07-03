@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_SITE_STATS_RANKING">
+		<message><![CDATA[COM_JOOMLEAGUE_SITE_STATS_RANKING_DESC]]></message>
+	</layout>
+	<fields name="request">
+		<fieldset name="request">
+			<field name="project_id" type="number" label="COM_JOOMLEAGUE_SITE_PROJECT_ID" />
+			<field name="statistic_id" type="number" label="COM_JOOMLEAGUE_SITE_STATISTIC_ID" />
+			<field name="projectteam_id" type="number" label="COM_JOOMLEAGUE_SITE_PROJECTTEAM_ID" />
+		</fieldset>
+	</fields>
+</metadata>

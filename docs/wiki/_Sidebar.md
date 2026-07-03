@@ -5,6 +5,7 @@
 - [[Sestaveni-balicku]]
 - [[Struktura-repozitare]]
 - [[Komponenta]]
+- [[Frontend-prepis]]
 - [[Moduly]]
 - [[Pluginy]]
 - [[Vyvojovy-workflow]]

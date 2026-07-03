@@ -19,7 +19,7 @@ JoomLeague je balíček pro Joomla 6 určený ke správě sportovních soutěž�
 
 - Balíček: `pkg_joomleague`
 - Komponenta: `com_joomleague`
-- Aktuální verze: `0.20.10`
+- Aktuální verze: `0.35.4`
 - Platforma: Joomla 6
 - Licence: GPL-2.0-or-later
 - Jazyky: `cs-CZ`, `en-GB`
@@ -36,4 +36,3 @@ Balíček řeší administraci sportovních soutěží, zejména:
 - stadiony/hřiště,
 - turnajové stromy,
 - frontendové výstupy pro web.
-
