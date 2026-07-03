@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import re
 import xml.dom.minidom
 import xml.etree.ElementTree as ET
@@ -65,11 +66,31 @@ def changelog_sections() -> list[tuple[str, list[str]]]:
     return sections
 
 
+def package_zip(release_version: str) -> Path:
+    path = DIST / f"pkg_joomleague-{release_version}.zip"
+
+    if not path.is_file():
+        raise RuntimeError(f"Missing package ZIP for checksum: {path.relative_to(ROOT)}")
+
+    return path
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+
+    return digest.hexdigest()
+
+
 def write_update_xml(release_version: str, output: Path) -> None:
     tag = f"v{release_version}"
     release_url = f"https://github.com/{REPOSITORY}/releases/tag/{tag}"
     download_url = f"https://github.com/{REPOSITORY}/releases/download/{tag}/pkg_joomleague-{release_version}.zip"
     changelog_url = f"https://github.com/{REPOSITORY}/releases/download/{tag}/joomleague-changelog.xml"
+    checksum = sha256(package_zip(release_version))
 
     updates = ET.Element("updates")
     update = ET.SubElement(updates, "update")
@@ -91,6 +112,7 @@ def write_update_xml(release_version: str, output: Path) -> None:
     ET.SubElement(update, "maintainerurl").text = MAINTAINER_URL
     ET.SubElement(update, "targetplatform", {"name": "joomla", "version": JOOMLA_TARGET})
     ET.SubElement(update, "php_minimum").text = PHP_MINIMUM
+    ET.SubElement(update, "sha256").text = checksum
     ET.SubElement(update, "changelogurl").text = changelog_url
 
     output.parent.mkdir(parents=True, exist_ok=True)
