@@ -6,7 +6,7 @@
 	<creationDate>2026-06</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>0.35.2</version>
+	<version>0.35.3</version>
 	<description>MOD_JOOMLEAGUE_PLAYGROUNDPLAN_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Playgroundplan</namespace>
 	<files>
@@ -23,7 +23,7 @@
 	<config>
 		<fields name="params">
 			<fieldset name="basic" addfieldpath="/administrator/components/com_joomleague/models/fields">
-				<field name="projects" type="sql" default="" required="true" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_PROJECT_ID_LABEL" description="MOD_JOOMLEAGUE_PLAYGROUNDPLANPROJECT_ID_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id" key_field="value" value_field="text" multiple="true" />
+				<field name="projects" type="sql" default="" required="true" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_PROJECT_ID_LABEL" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_PROJECT_ID_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id" key_field="value" value_field="text" multiple="true" />
 				<field name="playground" type="sql" default="" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_PLAYGROUND_ID_LABEL" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_PLAYGROUND_ID_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_playground ORDER BY name, id" key_field="value" value_field="text" />
 				<field name="show_project_name" type="list" default="0" label="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_PROJECT_NAME" description="MOD_JOOMLEAGUE_PLAYGROUNDPLAN_SHOW_PROJECT_NAME_DESC">
 					<option value="0">No</option>

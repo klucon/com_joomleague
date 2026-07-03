@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.35.3 - 2026-07-03
+
+- Fixed undefined module language constants in XML configuration forms.
+- Added shared name-format language aliases used by multiple modules.
+- Aligned logo option language aliases with module XML values.
+
 ## 0.35.2 - 2026-07-02
 
 - Added missing uninstall cleanup for the country lookup table.
