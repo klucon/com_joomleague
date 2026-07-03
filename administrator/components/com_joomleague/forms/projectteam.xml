@@ -24,7 +24,7 @@
 		<field name="reason" type="text" label="COM_JOOMLEAGUE_PROJECTTEAM_REASON" description="COM_JOOMLEAGUE_PROJECTTEAM_REASON_DESCRIPTION" />
 		<field name="info" type="textarea" label="COM_JOOMLEAGUE_FIELD_INFO" description="COM_JOOMLEAGUE_FIELD_INFO_DESCRIPTION" />
 		<field name="notes" type="textarea" rows="8" label="COM_JOOMLEAGUE_FIELD_NOTES" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
-		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_FIELD_EXTENDED" filter="raw" description="COM_JOOMLEAGUE_FIELD_EXTENDED_DESCRIPTION" />
+		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_FIELD_EXTENDED" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_EXTENDED_DESCRIPTION" />
 	</fieldset>
 	<fieldset name="media">
 		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_IMAGE" directory="com_joomleague/teams" description="COM_JOOMLEAGUE_FIELD_IMAGE_DESCRIPTION" />

@@ -17,7 +17,7 @@
 			<option value="">JNONE</option>
 		</field>
 		<field name="extension" type="text" label="COM_JOOMLEAGUE_PROJECT_FIELD_EXTENSION" description="COM_JOOMLEAGUE_PROJECT_FIELD_EXTENSION_DESCRIPTION" maxlength="80" />
-		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_FIELD_EXTENDED" description="COM_JOOMLEAGUE_PROJECT_FIELD_EXTENDED_DESCRIPTION" rows="5" filter="raw" />
+		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_FIELD_EXTENDED" description="COM_JOOMLEAGUE_PROJECT_FIELD_EXTENDED_DESCRIPTION" rows="5" filter="safehtml" />
 	</fieldset>
 
 	<fieldset name="schedule" label="COM_JOOMLEAGUE_PROJECT_FIELDSET_SCHEDULE">

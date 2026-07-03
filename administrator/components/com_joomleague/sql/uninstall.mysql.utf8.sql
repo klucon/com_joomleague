@@ -32,6 +32,7 @@ DROP TABLE IF EXISTS `#__joomleague_club`;
 DROP TABLE IF EXISTS `#__joomleague_season`;
 DROP TABLE IF EXISTS `#__joomleague_league`;
 DROP TABLE IF EXISTS `#__joomleague_sports_type`;
+DROP TABLE IF EXISTS `#__joomleague_country`;
 DROP TABLE IF EXISTS `#__joomleague_version`;
 
 SET FOREIGN_KEY_CHECKS = 1;

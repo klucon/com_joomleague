@@ -16,7 +16,7 @@
 		</field>
 		<field name="picture" type="media" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_PICTURE_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_PICTURE_DESCRIPTION" directory="com_joomleague/playgrounds" preview="tooltip" />
 		<field name="notes" type="textarea" rows="8" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_NOTES_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_NOTES_DESCRIPTION" filter="safehtml" />
-		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_EXTENDED_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_EXTENDED_DESCRIPTION" rows="5" filter="raw" />
+		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_EXTENDED_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_EXTENDED_DESCRIPTION" rows="5" filter="safehtml" />
 		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" default="0" min="0" />
 	</fieldset>
 	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL">

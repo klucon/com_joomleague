@@ -8,7 +8,7 @@
 			<option value="">JNONE</option>
 		</field>
 		<field name="notes" type="textarea" rows="8" label="COM_JOOMLEAGUE_FIELD_NOTES" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
-		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_FIELD_EXTENDED" filter="raw" description="COM_JOOMLEAGUE_FIELD_EXTENDED_DESCRIPTION" />
+		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_FIELD_EXTENDED" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_EXTENDED_DESCRIPTION" />
 	</fieldset>
 	<fieldset name="media">
 		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_IMAGE" directory="com_joomleague/persons" description="COM_JOOMLEAGUE_FIELD_IMAGE_DESCRIPTION" />

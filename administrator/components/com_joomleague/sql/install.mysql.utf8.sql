@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_club` (
 	`dissolved` DATE NULL DEFAULT NULL,
 	`asset_id` INT UNSIGNED NULL DEFAULT NULL,
 	PRIMARY KEY (`id`),
-	UNIQUE KEY `name` (`name`)
+	UNIQUE KEY `name` (`name`),
+	KEY `country` (`country`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -114,7 +115,8 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_league` (
 	`modified_by` INT NULL DEFAULT NULL,
 	`asset_id` INT UNSIGNED NULL DEFAULT NULL,
 	PRIMARY KEY (`id`),
-	UNIQUE KEY `name` (`name`)
+	UNIQUE KEY `name` (`name`),
+	KEY `country` (`country`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -371,7 +373,9 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_person` (
 	`asset_id` INT UNSIGNED NULL DEFAULT NULL,
 	PRIMARY KEY (`id`),
 	KEY `contact_id` (`contact_id`),
-	KEY `position_id` (`position_id`)
+	KEY `position_id` (`position_id`),
+	KEY `country` (`country`),
+	KEY `address_country` (`address_country`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -403,7 +407,8 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_playground` (
 	`asset_id` INT UNSIGNED NULL DEFAULT NULL,
 	PRIMARY KEY (`id`),
 	UNIQUE KEY `name` (`name`),
-	KEY `club_id` (`club_id`)
+	KEY `club_id` (`club_id`),
+	KEY `country` (`country`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1477,4 +1482,4 @@ INSERT IGNORE INTO `#__joomleague_country` (`code`, `name`) VALUES
 	('zw', 'COM_JOOMLEAGUE_COUNTRY_ZW');
 
 INSERT INTO `#__joomleague_version` (`major`, `minor`, `build`, `count`, `revision`, `file`, `version`)
-VALUES (0, 14, 0, 0, '', 'install.mysql.utf8.sql', '0.14.0');
+VALUES (0, 35, 2, 0, '', 'install.mysql.utf8.sql', '0.35.2');

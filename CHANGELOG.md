@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.35.2 - 2026-07-02
+
+- Added missing uninstall cleanup for the country lookup table.
+- Added country indexes for club, league, person and playground records.
+- Replaced raw filtering on migrated extended fields with safe HTML filtering.
+- Added missing module language strings for legacy frontend configuration keys.
+- Updated the internal install version marker to the current release.
+
 ## 0.35.1 - 2026-07-02
 
 - Unified package, component, module and plugin manifest versions.
