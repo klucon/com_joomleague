@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_SITE_CURVE">
+		<message><![CDATA[COM_JOOMLEAGUE_SITE_CURVE_DESC]]></message>
+	</layout>
+	<fields name="request">
+		<fieldset name="request">
+			<field name="project_id" type="number" label="COM_JOOMLEAGUE_SITE_PROJECT_ID" />
+			<field name="division_id" type="number" label="COM_JOOMLEAGUE_SITE_DIVISION_ID" />
+			<field name="projectteam1_id" type="number" label="COM_JOOMLEAGUE_SITE_TEAM_1" />
+			<field name="projectteam2_id" type="number" label="COM_JOOMLEAGUE_SITE_TEAM_2" />
+		</fieldset>
+	</fields>
+</metadata>

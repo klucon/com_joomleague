@@ -1,5 +1,8 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS `#__joomleague_prediction_score`;
+DROP TABLE IF EXISTS `#__joomleague_prediction_tip`;
+DROP TABLE IF EXISTS `#__joomleague_prediction_game`;
 DROP TABLE IF EXISTS `#__joomleague_treeto_match`;
 DROP TABLE IF EXISTS `#__joomleague_treeto_node`;
 DROP TABLE IF EXISTS `#__joomleague_treeto`;

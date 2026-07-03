@@ -6,7 +6,7 @@
 	<creationDate>2026-06</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>0.35.4</version>
+	<version>0.40.0</version>
 	<description>COM_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Component\Joomleague</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -43,6 +43,7 @@
 	<languages folder="components/com_joomleague">
 		<language tag="cs-CZ">language/cs-CZ/com_joomleague.ini</language>
 		<language tag="en-GB">language/en-GB/com_joomleague.ini</language>
+		<language tag="de-DE">language/de-DE/com_joomleague.ini</language>
 	</languages>
 
 	<administration>
@@ -79,7 +80,9 @@
 			<language tag="cs-CZ">language/cs-CZ/com_joomleague.ini</language>
 			<language tag="cs-CZ">language/cs-CZ/com_joomleague.sys.ini</language>
 			<language tag="en-GB">language/en-GB/com_joomleague.ini</language>
+			<language tag="de-DE">language/de-DE/com_joomleague.ini</language>
 			<language tag="en-GB">language/en-GB/com_joomleague.sys.ini</language>
+			<language tag="de-DE">language/de-DE/com_joomleague.sys.ini</language>
 		</languages>
 	</administration>
 </extension>

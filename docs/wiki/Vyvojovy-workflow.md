@@ -20,7 +20,7 @@ Zkontrolovat:
 - že se vytvořil `dist/pkg_joomleague-<verze>.zip`,
 - že se nezměnil build výstup v gitu,
 - že manifesty odpovídají reálným souborům,
-- že jazykové klíče existují pro `cs-CZ` i `en-GB`, pokud se měnil text v UI.
+- že jazykové klíče existují pro `cs-CZ`, `en-GB` i `de-DE`, pokud se měnil text v UI.
 
 ## GitHub nastavení
 
@@ -31,4 +31,3 @@ Repozitář používá:
 - chráněnou větev `main` proti force push a smazání,
 - GitHub Actions build workflow,
 - Dependabot pro GitHub Actions.
-

@@ -24,9 +24,10 @@ $match = $this->item;
 	echo LayoutHelper::render(
 		'joomleague.match.detail',
 		[
-			'match'   => $match,
-			'events'  => $this->items,
-			'options' => ['link' => false, 'heading' => 'h1'],
+			'match'    => $match,
+			'events'   => $this->items,
+			'referees' => $this->matchReferees,
+			'options'  => ['link' => false, 'heading' => 'h1'],
 		],
 		JPATH_SITE . '/components/com_joomleague/layouts'
 	);

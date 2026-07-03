@@ -13,12 +13,14 @@ declare(strict_types=1);
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $match   = $displayData['match'] ?? null;
 $events  = $displayData['events'] ?? [];
+$referees = $displayData['referees'] ?? [];
 $options = $displayData['options'] ?? [];
 
 $showSummary = $options['summary'] ?? true;
@@ -79,8 +81,35 @@ for ($i = 0, $n = max(\count($splitHome), \count($splitAway)); $i < $n; $i++) {
 		<div class="jl-site-card"><strong><?php echo (int) ($match->crowd ?? 0); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_ATTENDANCE'); ?></span></div>
 	</div>
 
+	<?php if (trim((string) ($match->preview ?? '')) !== '') : ?>
+		<div class="jl-site-panel mb-4"><h3><?php echo Text::_('COM_JOOMLEAGUE_SITE_PREVIEW'); ?></h3><?php echo HTMLHelper::_('content.prepare', (string) $match->preview); ?></div>
+	<?php endif; ?>
+
 	<?php if ($showSummary && trim((string) ($match->summary ?? '')) !== '') : ?>
 		<div class="jl-site-panel mb-4"><h3><?php echo Text::_('COM_JOOMLEAGUE_SITE_SUMMARY'); ?></h3><?php echo $match->summary; ?></div>
+	<?php endif; ?>
+
+	<?php if ($referees !== []) : ?>
+		<div class="jl-site-panel table-responsive mb-4">
+			<h3><?php echo Text::_('COM_JOOMLEAGUE_SITE_REFEREES'); ?></h3>
+			<table class="table jl-site-table">
+				<thead><tr><th><?php echo Text::_('COM_JOOMLEAGUE_SITE_PERSON'); ?></th><th><?php echo Text::_('COM_JOOMLEAGUE_SITE_POSITION'); ?></th></tr></thead>
+				<tbody>
+					<?php foreach ($referees as $referee) : ?>
+						<tr>
+							<td>
+								<?php if (!empty($referee->person_id)) : ?>
+									<a href="<?php echo $escape(Route::_('index.php?option=com_joomleague&view=person&id=' . (int) $referee->person_id)); ?>"><?php echo $escape($referee->person_name ?: $referee->nickname); ?></a>
+								<?php else : ?>
+									<?php echo $escape($referee->person_name ?: $referee->nickname); ?>
+								<?php endif; ?>
+							</td>
+							<td><?php echo $escape($referee->position_name ?? ''); ?></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
 	<?php endif; ?>
 
 	<?php if ($showEvents) : ?>

@@ -78,6 +78,15 @@ $cards = [
 		'future' => false,
 	],
 	[
+		'url' => Route::_('index.php?option=com_joomleague&view=predictiongames&project_id=' . $id),
+		'title' => 'COM_JOOMLEAGUE_PREDICTIONGAMES_TITLE',
+		'description' => 'COM_JOOMLEAGUE_PREDICTIONGAMES_DESC',
+		'count' => null,
+		'icon' => 'icon-star',
+		'tone' => 'rose',
+		'future' => false,
+	],
+	[
 		'url' => '',
 		'title' => 'COM_JOOMLEAGUE_PROJECT_EXPORT',
 		'description' => 'COM_JOOMLEAGUE_PROJECT_EXPORT_DESC',

@@ -6,7 +6,7 @@
 	<creationDate>2026-06</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>0.35.4</version>
+	<version>0.40.0</version>
 	<description>MOD_JOOMLEAGUE_TICKER_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Ticker</namespace>
 	<files>
@@ -16,7 +16,9 @@
 	</files>
 	<languages>
 		<language tag="en-GB">language/en-GB/mod_joomleague_ticker.ini</language>
+		<language tag="de-DE">language/de-DE/mod_joomleague_ticker.ini</language>
 		<language tag="en-GB">language/en-GB/mod_joomleague_ticker.sys.ini</language>
+		<language tag="de-DE">language/de-DE/mod_joomleague_ticker.sys.ini</language>
 		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_ticker.ini</language>
 		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_ticker.sys.ini</language>
 	</languages>

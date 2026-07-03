@@ -25,10 +25,21 @@ class SiteHtmlView extends BaseHtmlView
 	public array $teamStats = [];
 	public array $teamPlayerStats = [];
 	public array $rivals = [];
+	public array $treeNodes = [];
+	public array $treeRounds = [];
+	public array $curve = [];
+	public array $divisions = [];
 	public array $clubPlaygrounds = [];
 	public array $matchSummary = [];
 	public array $headToHeadMatches = [];
+	public array $matchReferees = [];
+	public array $matchTeamComparison = [];
+	public array $predictionMatches = [];
+	public array $predictionTips = [];
+	public array $predictionRanking = [];
 	public object|null $item = null;
+	public object|null $tree = null;
+	public object|null $predictionGame = null;
 	public object|null $scheduleTeam = null;
 	public object|null $scheduleClub = null;
 
@@ -99,6 +110,16 @@ class SiteHtmlView extends BaseHtmlView
 			} else {
 				$this->matches = $projectId > 0 ? $model->getMatches($projectId) : [];
 			}
+		} elseif ($view === 'prediction') {
+			$gameId = (int) ($input->getInt('game_id') ?: $id);
+			$roundId = (int) $input->getInt('round_id');
+			$userId = (int) Factory::getApplication()->getIdentity()->id;
+			$this->predictionGame = $model->getPredictionGame($projectId, $gameId);
+			$this->project = $this->predictionGame ? $model->getProject((int) $this->predictionGame->project_id) : $this->project;
+			$this->rounds = $this->predictionGame ? $model->getRounds((int) $this->predictionGame->project_id) : [];
+			$this->predictionMatches = $this->predictionGame ? $model->getPredictionMatches((int) $this->predictionGame->id, $roundId) : [];
+			$this->predictionTips = $this->predictionGame && $userId > 0 ? $model->getPredictionTips((int) $this->predictionGame->id, $userId) : [];
+			$this->predictionRanking = $this->predictionGame ? $model->getPredictionRanking((int) $this->predictionGame->id, $roundId) : [];
 		} elseif ($view === 'teams') {
 			$this->teams = $projectId > 0 ? $model->getProjectTeams($projectId) : [];
 		} elseif ($view === 'team' || $view === 'roster') {
@@ -114,15 +135,48 @@ class SiteHtmlView extends BaseHtmlView
 		} elseif ($view === 'rivals') {
 			$this->item = $model->getTeam($id ?: $input->getInt('projectteam_id') ?: $input->getInt('tid'));
 			$this->rivals = $this->item ? $model->getTeamRivals((int) $this->item->project_id, (int) $this->item->id) : [];
+		} elseif ($view === 'treetonode') {
+			$treeId = $input->getInt('treeto_id') ?: $input->getInt('tnid') ?: $id;
+			$this->tree = $model->getTree($treeId, $projectId);
+			$this->project = $this->tree ? $model->getProject((int) $this->tree->project_id) : $this->project;
+			$this->treeNodes = $this->tree ? $model->getTreeNodes((int) $this->tree->id) : [];
+			$this->treeRounds = $this->tree ? $model->getTreeRounds((int) $this->tree->id) : [];
+		} elseif ($view === 'curve') {
+			$divisionId = (int) ($input->getInt('division_id') ?: $input->getInt('division'));
+			$this->divisions = $projectId > 0 ? $model->getProjectDivisions($projectId) : [];
+			$this->teams = $projectId > 0 ? $model->getProjectTeams($projectId, $divisionId) : [];
+			$this->rounds = $projectId > 0 ? $model->getRounds($projectId) : [];
+			$this->curve = $projectId > 0 ? $model->getRankingCurve(
+				$projectId,
+				$divisionId,
+				(int) ($input->getInt('projectteam1_id') ?: $input->getInt('tid1')),
+				(int) ($input->getInt('projectteam2_id') ?: $input->getInt('tid2'))
+			) : [];
 		} elseif ($view === 'matchreport') {
 			$this->item = $model->getMatch($id ?: $input->getInt('match_id'));
 			$this->items = $this->item ? $model->getMatchEvents((int) $this->item->id) : [];
 			$this->headToHeadMatches = $this->item ? $model->getHeadToHeadMatches((int) $this->item->projectteam1_id, (int) $this->item->projectteam2_id, (int) $this->item->id) : [];
+			$this->matchReferees = $this->item ? $model->getMatchReferees((int) $this->item->id) : [];
+			$this->matchTeamComparison = $this->item ? $model->getMatchTeamComparison($this->item) : [];
+		} elseif ($view === 'nextmatch') {
+			$this->item = $model->getNextMatch(
+				$projectId,
+				(int) ($input->getInt('division_id') ?: $input->getInt('division')),
+				(int) ($input->getInt('projectteam_id') ?: $input->getInt('ptid')),
+				(int) ($input->getInt('team_id') ?: $input->getInt('tid')),
+				$id ?: $input->getInt('match_id') ?: $input->getInt('mid')
+			);
+			$this->project = $this->item ? $model->getProject((int) $this->item->project_id) : $this->project;
+			$this->items = $this->item ? $model->getMatchEvents((int) $this->item->id) : [];
+			$this->headToHeadMatches = $this->item ? $model->getHeadToHeadMatches((int) $this->item->projectteam1_id, (int) $this->item->projectteam2_id, (int) $this->item->id) : [];
+			$this->matchReferees = $this->item ? $model->getMatchReferees((int) $this->item->id) : [];
+			$this->matchTeamComparison = $this->item ? $model->getMatchTeamComparison($this->item) : [];
 		} elseif ($view === 'person') {
 			$this->item = $model->getPerson($id ?: $input->getInt('person_id'));
 			$this->playerHistory = $this->item ? $model->getPlayerHistory((int) $this->item->id) : [];
 			$this->staffHistory = $this->item ? $model->getStaffHistory((int) $this->item->id) : [];
 			$this->refereeHistory = $this->item ? $model->getRefereeHistory((int) $this->item->id) : [];
+			$this->personStats = $this->item && method_exists($model, 'getPersonStats') ? $model->getPersonStats((int) $this->item->id) : [];
 		} elseif ($view === 'clubs') {
 			$this->items = $model->getClubs();
 		} elseif ($view === 'club') {

@@ -13,4 +13,5 @@ final class HtmlView extends SiteHtmlView
 	public array $playerHistory = [];
 	public array $staffHistory = [];
 	public array $refereeHistory = [];
+	public array $personStats = [];
 }

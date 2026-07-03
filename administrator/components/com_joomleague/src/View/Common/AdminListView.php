@@ -52,13 +52,13 @@ abstract class AdminListView extends HtmlView
 	{
 		$user = $this->getCurrentUser();
 		ToolbarHelper::title(Text::_($this->entity['title']), $this->entity['icon']);
-		if ($user->authorise('core.create', 'com_joomleague')) { ToolbarHelper::addNew($this->entity['singular'] . '.add'); }
-		if ($user->authorise('core.edit', 'com_joomleague')) { ToolbarHelper::editList($this->entity['singular'] . '.edit'); }
+		if (($this->entity['can_create'] ?? true) && $user->authorise('core.create', 'com_joomleague')) { ToolbarHelper::addNew($this->entity['singular'] . '.add'); }
+		if (($this->entity['can_edit'] ?? true) && $user->authorise('core.edit', 'com_joomleague')) { ToolbarHelper::editList($this->entity['singular'] . '.edit'); }
 		if (!empty($this->entity['state']) && $user->authorise('core.edit.state', 'com_joomleague')) {
 			ToolbarHelper::publish($this->entity['plural'] . '.publish', 'JTOOLBAR_PUBLISH', true);
 			ToolbarHelper::unpublish($this->entity['plural'] . '.unpublish', 'JTOOLBAR_UNPUBLISH', true);
 		}
-		if ($user->authorise('core.delete', 'com_joomleague')) { ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', $this->entity['plural'] . '.delete'); }
+		if (($this->entity['can_delete'] ?? true) && $user->authorise('core.delete', 'com_joomleague')) { ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', $this->entity['plural'] . '.delete'); }
 		foreach ($this->entity['toolbar_links'] ?? [] as $link) { ToolbarHelper::link($link['url'], Text::_($link['label']), $link['icon'] ?? 'link'); }
 		if ($user->authorise('core.admin', 'com_joomleague') || $user->authorise('core.options', 'com_joomleague')) { ToolbarHelper::preferences('com_joomleague'); }
 	}

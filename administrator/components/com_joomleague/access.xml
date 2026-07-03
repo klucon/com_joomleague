@@ -17,6 +17,7 @@
 	<section name="person"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
 	<section name="playground"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
 	<section name="position"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
+	<section name="predictiongame"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
 	<section name="project"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
 	<section name="projectreferee"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
 	<section name="projectteam"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>

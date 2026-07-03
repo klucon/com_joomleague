@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_SITE_NEXT_MATCH">
+		<message><![CDATA[COM_JOOMLEAGUE_SITE_NEXT_MATCH_DESC]]></message>
+	</layout>
+	<fields name="request">
+		<fieldset name="request">
+			<field name="project_id" type="number" label="COM_JOOMLEAGUE_SITE_PROJECT_ID" />
+			<field name="division_id" type="number" label="COM_JOOMLEAGUE_SITE_DIVISION_ID" />
+			<field name="projectteam_id" type="number" label="COM_JOOMLEAGUE_SITE_PROJECTTEAM_ID" />
+			<field name="team_id" type="number" label="COM_JOOMLEAGUE_SITE_TEAM_ID" />
+			<field name="match_id" type="number" label="COM_JOOMLEAGUE_SITE_MATCH_ID" />
+		</fieldset>
+	</fields>
+</metadata>

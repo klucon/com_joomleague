@@ -6,6 +6,7 @@
 - [[Struktura-repozitare]]
 - [[Komponenta]]
 - [[Frontend-prepis]]
+- [[Tipovaci-soutez]]
 - [[Moduly]]
 - [[Pluginy]]
 - [[Vyvojovy-workflow]]

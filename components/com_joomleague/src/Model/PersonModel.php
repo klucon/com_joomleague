@@ -137,4 +137,52 @@ final class PersonModel extends SiteModel
 
 		return $db->setQuery($query)->loadObjectList();
 	}
+
+	public function getPersonStats(int $personId): array
+	{
+		if ($personId < 1) {
+			return [];
+		}
+
+		$db = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select([
+				$db->quoteName('s.id', 'statistic_id'),
+				$db->quoteName('s.name', 'statistic_name'),
+				$db->quoteName('s.short', 'statistic_short'),
+				$db->quoteName('pt.id', 'projectteam_id'),
+				$db->quoteName('pt.project_id'),
+				$db->quoteName('t.name', 'team_name'),
+				$db->quoteName('p.name', 'project_name'),
+				$db->quoteName('l.name', 'league_name'),
+				$db->quoteName('se.name', 'season_name'),
+				'SUM(' . $db->quoteName('ms.value') . ') AS value',
+				'COUNT(DISTINCT ' . $db->quoteName('ms.match_id') . ') AS matches',
+			])
+			->from($db->quoteName('#__joomleague_match_statistic', 'ms'))
+			->join('INNER', $db->quoteName('#__joomleague_team_player', 'tp') . ' ON ' . $db->quoteName('tp.id') . ' = ' . $db->quoteName('ms.teamplayer_id'))
+			->join('INNER', $db->quoteName('#__joomleague_statistic', 's') . ' ON ' . $db->quoteName('s.id') . ' = ' . $db->quoteName('ms.statistic_id'))
+			->join('INNER', $db->quoteName('#__joomleague_project_team', 'pt') . ' ON ' . $db->quoteName('pt.id') . ' = ' . $db->quoteName('ms.projectteam_id'))
+			->join('INNER', $db->quoteName('#__joomleague_team', 't') . ' ON ' . $db->quoteName('t.id') . ' = ' . $db->quoteName('pt.team_id'))
+			->join('INNER', $db->quoteName('#__joomleague_project', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('pt.project_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_league', 'l') . ' ON ' . $db->quoteName('l.id') . ' = ' . $db->quoteName('p.league_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_season', 'se') . ' ON ' . $db->quoteName('se.id') . ' = ' . $db->quoteName('p.season_id'))
+			->where($db->quoteName('tp.person_id') . ' = :person_id')
+			->where($db->quoteName('s.published') . ' = 1')
+			->group([
+				$db->quoteName('s.id'),
+				$db->quoteName('s.name'),
+				$db->quoteName('s.short'),
+				$db->quoteName('pt.id'),
+				$db->quoteName('pt.project_id'),
+				$db->quoteName('t.name'),
+				$db->quoteName('p.name'),
+				$db->quoteName('l.name'),
+				$db->quoteName('se.name'),
+			])
+			->order($db->quoteName('p.id') . ' DESC, ' . $db->quoteName('s.ordering') . ' ASC, ' . $db->quoteName('s.name') . ' ASC')
+			->bind(':person_id', $personId, ParameterType::INTEGER);
+
+		return $db->setQuery($query)->loadObjectList();
+	}
 }

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.40.0 - 2026-07-03
+
+- Added the prediction game milestone with administrator management for games, tips, score recalculation and rankings.
+- Added prediction game database tables to fresh installs and update SQL, including uninstall cleanup.
+- Added German (`de-DE`) language files for the package, component, modules and plugins.
+- Registered German language files in package, component, module and plugin manifests.
+- Updated language documentation for the three supported locales.
+
 ## 0.35.4 - 2026-07-03
 
 - Added expanded Joomla 6 frontend views for team, club, schedule and match detail pages.

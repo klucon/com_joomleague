@@ -46,7 +46,7 @@ Instalační strategie:
 
 - Všechny XML manifesty modulů a pluginů jsou parsovatelné.
 - Všechny PHP soubory modulů a pluginů prošly `php -l` v Joomla/PHP kontejneru.
-- Jazykové soubory `cs-CZ` a `en-GB` jsou syntakticky parsovatelné.
+- Jazykové soubory `cs-CZ`, `en-GB` a `de-DE` jsou syntakticky parsovatelné.
 - Moduly a pluginy se neinstalují přes component manifest; instaluje je package manifest.
 
 ## Build

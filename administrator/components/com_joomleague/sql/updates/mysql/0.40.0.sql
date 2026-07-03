@@ -1,0 +1,2 @@
+-- Schema marker for the 0.40.0 release.
+-- Prediction game tables were introduced by the preceding unreleased update step.

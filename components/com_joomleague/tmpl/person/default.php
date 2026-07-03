@@ -128,6 +128,38 @@ if ($person) {
 	</div>
 
 	<?php $renderHistory('COM_JOOMLEAGUE_SITE_PLAYER_HISTORY', $this->playerHistory, true); ?>
+
+	<?php if ($this->personStats !== []) : ?>
+		<div class="jl-site-panel table-responsive mb-4">
+			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_PLAYER_STATS'); ?></h2>
+			<table class="table jl-site-table align-middle">
+				<thead>
+					<tr>
+						<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT'); ?></th>
+						<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM'); ?></th>
+						<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_STATISTIC'); ?></th>
+						<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_MATCHES'); ?></th>
+						<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_VALUE'); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($this->personStats as $stat) : ?>
+						<tr>
+							<td>
+								<a href="<?php echo Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $stat->project_id); ?>"><?php echo $this->escape($stat->project_name); ?></a>
+								<div class="jl-site-muted small"><?php echo $this->escape(trim((string) ($stat->league_name ?? '') . ' · ' . (string) ($stat->season_name ?? ''), ' ·')); ?></div>
+							</td>
+							<td><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $stat->projectteam_id); ?>"><?php echo $this->escape($stat->team_name); ?></a></td>
+							<td><?php echo $this->escape($stat->statistic_name); ?></td>
+							<td><?php echo (int) $stat->matches; ?></td>
+							<td><strong><?php echo $this->escape((string) $stat->value); ?></strong></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+	<?php endif; ?>
+
 	<?php $renderHistory('COM_JOOMLEAGUE_SITE_STAFF_HISTORY', $this->staffHistory); ?>
 	<?php $renderHistory('COM_JOOMLEAGUE_SITE_REFEREE_HISTORY', $this->refereeHistory); ?>
 </div>

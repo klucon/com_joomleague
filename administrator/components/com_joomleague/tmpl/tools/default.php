@@ -15,6 +15,7 @@ $cards = [
 	['view' => 'import', 'title' => 'COM_JOOMLEAGUE_IMPORT_TITLE', 'desc' => 'COM_JOOMLEAGUE_IMPORT_DESC', 'icon' => 'icon-upload', 'tone' => 'emerald'],
 	['view' => 'jlxmlexports', 'title' => 'COM_JOOMLEAGUE_EXPORT_TITLE', 'desc' => 'COM_JOOMLEAGUE_EXPORT_DESC', 'icon' => 'icon-download', 'tone' => 'orange'],
 	['view' => 'treetos', 'title' => 'COM_JOOMLEAGUE_TREES_TITLE', 'desc' => 'COM_JOOMLEAGUE_TREES_DESC', 'icon' => 'icon-tree-2', 'tone' => 'teal'],
+	['view' => 'predictiongames', 'title' => 'COM_JOOMLEAGUE_PREDICTIONGAMES_TITLE', 'desc' => 'COM_JOOMLEAGUE_PREDICTIONGAMES_DESC', 'icon' => 'icon-star', 'tone' => 'rose'],
 ];
 ?>
 <link rel="stylesheet" href="<?php echo htmlspecialchars($style, ENT_QUOTES, 'UTF-8'); ?>">

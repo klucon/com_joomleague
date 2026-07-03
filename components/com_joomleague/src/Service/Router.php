@@ -25,7 +25,15 @@ final class Router extends RouterBase
 		'teams' => 'teams',
 		'referees' => 'referees',
 		'stats' => 'stats',
+		'resultsmatrix' => 'resultsmatrix',
+		'resultsranking' => 'resultsranking',
+		'statsranking' => 'statsranking',
+		'eventsranking' => 'eventsranking',
+		'curve' => 'curve',
+		'nextmatch' => 'nextmatch',
 		'ical' => 'ical',
+		'prediction' => 'prediction',
+		'treetonode' => 'treetonode',
 	];
 
 	private const VIEW_ID_KEYS = [
@@ -36,6 +44,7 @@ final class Router extends RouterBase
 		'teams' => 'project_id',
 		'referees' => 'project_id',
 		'stats' => 'project_id',
+		'prediction' => 'project_id',
 		'club' => 'id',
 		'team' => 'id',
 		'roster' => 'id',
@@ -359,7 +368,7 @@ final class Router extends RouterBase
 	{
 		$preferred = match ($view) {
 			'club' => 'clubs',
-			'project', 'ranking', 'results', 'schedule', 'teams', 'team', 'roster', 'referees', 'stats', 'ical', 'matchreport', 'person' => 'projects',
+			'project', 'ranking', 'results', 'schedule', 'teams', 'team', 'roster', 'referees', 'stats', 'resultsmatrix', 'resultsranking', 'statsranking', 'eventsranking', 'curve', 'nextmatch', 'ical', 'prediction', 'treetonode', 'matchreport', 'person' => 'projects',
 			default => $view,
 		};
 
@@ -433,7 +442,7 @@ final class Router extends RouterBase
 
 	private function unsetJoomleagueQuery(array &$query): void
 	{
-		unset($query['view'], $query['project_id'], $query['pid'], $query['id'], $query['club_id'], $query['projectteam_id'], $query['match_id'], $query['playground_id'], $query['person_id']);
+		unset($query['view'], $query['project_id'], $query['pid'], $query['id'], $query['club_id'], $query['projectteam_id'], $query['match_id'], $query['playground_id'], $query['person_id'], $query['game_id']);
 	}
 
 	private function parseProjectRoute(int $projectId, array &$segments): array
@@ -704,7 +713,15 @@ final class Router extends RouterBase
 			'teams' => 'tymy',
 			'referees' => 'rozhodci',
 			'stats' => 'statistiky',
+			'resultsmatrix' => 'matice-vysledku',
+			'resultsranking' => 'vysledky-tabulka',
+			'statsranking' => 'poradi-statistik',
+			'eventsranking' => 'poradi-udalosti',
+			'curve' => 'krivka-poradi',
+			'nextmatch' => 'nejblizsi-zapas',
 			'ical' => 'ical',
+			'prediction' => 'tipovaci-soutez',
+			'treetonode' => 'turnajovy-strom',
 			default => $section,
 		};
 	}
@@ -718,7 +735,15 @@ final class Router extends RouterBase
 			$this->segment('COM_JOOMLEAGUE_ROUTE_TEAMS', 'tymy') => 'teams',
 			$this->segment('COM_JOOMLEAGUE_ROUTE_REFEREES', 'rozhodci') => 'referees',
 			$this->segment('COM_JOOMLEAGUE_ROUTE_STATS', 'statistiky') => 'stats',
+			$this->segment('COM_JOOMLEAGUE_ROUTE_RESULTSMATRIX', 'matice-vysledku') => 'resultsmatrix',
+			$this->segment('COM_JOOMLEAGUE_ROUTE_RESULTSRANKING', 'vysledky-tabulka') => 'resultsranking',
+			$this->segment('COM_JOOMLEAGUE_ROUTE_STATSRANKING', 'poradi-statistik') => 'statsranking',
+			$this->segment('COM_JOOMLEAGUE_ROUTE_EVENTSRANKING', 'poradi-udalosti') => 'eventsranking',
+			$this->segment('COM_JOOMLEAGUE_ROUTE_CURVE', 'krivka-poradi') => 'curve',
+			$this->segment('COM_JOOMLEAGUE_ROUTE_NEXTMATCH', 'nejblizsi-zapas') => 'nextmatch',
 			$this->segment('COM_JOOMLEAGUE_ROUTE_ICAL', 'ical') => 'ical',
+			$this->segment('COM_JOOMLEAGUE_ROUTE_PREDICTION', 'tipovaci-soutez') => 'prediction',
+			$this->segment('COM_JOOMLEAGUE_ROUTE_TREETONODE', 'turnajovy-strom') => 'treetonode',
 			default => 'project',
 		};
 	}

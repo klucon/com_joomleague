@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_SITE_PREDICTION">
+		<message><![CDATA[COM_JOOMLEAGUE_SITE_PREDICTION_DESC]]></message>
+	</layout>
+	<fields name="request">
+		<fieldset name="request">
+			<field name="project_id" type="number" label="COM_JOOMLEAGUE_SITE_PROJECT_ID" />
+			<field name="game_id" type="number" label="COM_JOOMLEAGUE_SITE_PREDICTION_GAME_ID" />
+		</fieldset>
+	</fields>
+</metadata>

@@ -76,8 +76,9 @@ $dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0
 		<?php foreach ($this->entity['columns'] as $column) : ?><th class="<?php echo $this->escape($column['class'] ?? ''); ?>"><?php echo !empty($column['sort']) ? HTMLHelper::_('searchtools.sort', $column['label'], $column['sort'], $listDirection, $listOrder) : Text::_($column['label']); ?></th><?php endforeach; ?>
 	</tr></thead><tbody>
 	<?php foreach ($this->items as $i => $item) :
-		$canEdit = $user->authorise('core.edit', 'com_joomleague');
-		$canCheckin = $user->authorise('core.manage', 'com_checkin') || (int) $item->checked_out === (int) $user->id || empty($item->checked_out);
+		$canEdit = ($this->entity['can_edit'] ?? true) && $user->authorise('core.edit', 'com_joomleague');
+		$checkedOut = (int) ($item->checked_out ?? 0);
+		$canCheckin = $user->authorise('core.manage', 'com_checkin') || $checkedOut === (int) $user->id || $checkedOut === 0;
 		$canChange = $user->authorise('core.edit.state', 'com_joomleague') && $canCheckin;
 	?><tr><td class="text-center"><?php echo HTMLHelper::_('grid.id', $i, $item->id, false, 'cid', 'cb', (string) $item->{$this->entity['primary']}); ?></td>
 		<?php if (!empty($this->entity['state'])) : ?><td class="text-center"><?php echo HTMLHelper::_('jgrid.published', $item->published, $i, $this->entity['plural'] . '.', $canChange); ?></td><?php endif; ?>
@@ -92,6 +93,8 @@ $dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0
 				<a href="<?php echo Route::_('index.php?option=com_joomleague&view=treetonodes&treeto_id=' . (int) $item->id); ?>"><?php echo (int) $value; ?> <span class="icon-tree-2" aria-hidden="true"></span></a>
 			<?php elseif (($column['type'] ?? '') === 'treetogenerate') : ?>
 				<a class="btn btn-sm btn-outline-secondary" href="<?php echo Route::_('index.php?option=com_joomleague&task=treeto.generate&id=' . (int) $item->id . '&' . Session::getFormToken() . '=1'); ?>"><?php echo Text::_('COM_JOOMLEAGUE_TREETO_GENERATE'); ?></a>
+			<?php elseif (($column['type'] ?? '') === 'predictionrecalculate') : ?>
+				<a class="btn btn-sm btn-outline-secondary" href="<?php echo Route::_('index.php?option=com_joomleague&task=predictiongame.recalculate&id=' . (int) $item->id . '&' . Session::getFormToken() . '=1'); ?>"><?php echo Text::_('COM_JOOMLEAGUE_PREDICTIONGAME_RECALCULATE'); ?></a>
 			<?php elseif (($column['type'] ?? '') === 'roundmove') : ?>
 				<div class="d-flex gap-1 align-items-center">
 					<input type="date" class="form-control form-control-sm" style="width:9.5rem" name="move_date[<?php echo (int) $item->id; ?>]" value="<?php echo $this->escape(substr((string) $value, 0, 10)); ?>">
@@ -120,7 +123,7 @@ $dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0
 				<?php $translatedValue = Text::_((string) $value); ?>
 				<?php if ($index === 0 && $canEdit) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&task=' . $this->entity['singular'] . '.edit&id=' . (int) $item->id); ?>"><?php echo $this->escape($translatedValue); ?></a><?php else : echo $this->escape($translatedValue); endif; ?>
 			<?php elseif ($index === 0) : ?>
-				<?php if ($item->checked_out) { echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, $this->entity['plural'] . '.', $canCheckin); } ?>
+				<?php if ($checkedOut) { echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor ?? '', $item->checked_out_time ?? null, $this->entity['plural'] . '.', $canCheckin); } ?>
 				<?php if ($canEdit) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&task=' . $this->entity['singular'] . '.edit&id=' . (int) $item->id); ?>"><?php echo $this->escape((string) $value); ?></a><?php else : echo $this->escape((string) $value); endif; ?>
 			<?php else : ?><?php echo $this->escape((string) $value); ?><?php endif; ?>
 		</<?php echo $index === 0 ? 'th' : 'td'; ?>><?php endforeach; ?>

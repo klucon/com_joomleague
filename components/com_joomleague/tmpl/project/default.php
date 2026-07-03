@@ -41,11 +41,14 @@ if ($project) {
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=resultsranking&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULTS_RANKING'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=resultsmatrix&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULT_MATRIX'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=schedule&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE'); ?></a>
+			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=nextmatch&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_NEXT_MATCH'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=teams&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAMS'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=referees&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_REFEREES'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=stats&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_STATS'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=statsranking&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_STATS_RANKING'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=eventsranking&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_EVENTS_RANKING'); ?></a>
+			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=curve&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CURVE'); ?></a>
+			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=treetonode&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TREE'); ?></a>
 		</nav>
 	</section>
 	<div class="jl-site-grid mb-4">

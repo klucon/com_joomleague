@@ -7,7 +7,7 @@
 	<creationDate>2026-06</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>0.35.4</version>
+	<version>0.40.0</version>
 	<description>PKG_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<changelogurl>https://github.com/klucon/com_joomleague/releases/latest/download/joomleague-changelog.xml</changelogurl>
 	<scriptfile>pkg_script.php</scriptfile>
@@ -15,7 +15,9 @@
 		<language tag="cs-CZ">cs-CZ/pkg_joomleague.ini</language>
 		<language tag="cs-CZ">cs-CZ/pkg_joomleague.sys.ini</language>
 		<language tag="en-GB">en-GB/pkg_joomleague.ini</language>
+		<language tag="de-DE">de-DE/pkg_joomleague.ini</language>
 		<language tag="en-GB">en-GB/pkg_joomleague.sys.ini</language>
+		<language tag="de-DE">de-DE/pkg_joomleague.sys.ini</language>
 	</languages>
 	<files folder="packages">
 		<file type="component" id="com_joomleague">com_joomleague.zip</file>

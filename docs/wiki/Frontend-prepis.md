@@ -49,26 +49,26 @@ Z toho plyne, že část starých samostatných pohledů se má slučovat do exi
 | `about` | nepřenášet jako komponentní view | informace patří do webu/dokumentace |
 | `backbutton` | nepřenášet | řešit layoutem nebo navigací šablony |
 | `footer` | nepřenášet | řešit šablonou webu |
-| `projectheading` | částečně pokryto | sdílený layout nebo metoda ve `SiteHtmlView` |
-| `clubinfo` | částečně pokryto | rozšířit `club` |
-| `teaminfo` | částečně pokryto | rozšířit `team` |
-| `clubplan` | částečně pokryto | základní klubový rozpis je v `schedule&club_id=` |
-| `teamplan` | částečně pokryto | základní týmový rozpis je v `schedule&projectteam_id=` |
-| `nextmatch` | částečně pokryto | preview a historie jsou doplněné do `matchreport` |
-| `matrix` | částečně pokryto | základ převzat do `resultsmatrix` |
+| `projectheading` | pokryto sloučením | projektová hlavička je součástí jednotlivých v6 hero sekcí |
+| `clubinfo` | pokryto sloučením | detail klubu je rozšířený ve `club` |
+| `teaminfo` | pokryto sloučením | detail týmu je rozšířený ve `team` |
+| `clubplan` | pokryto sloučením | klubový rozpis je v `schedule&club_id=` |
+| `teamplan` | pokryto sloučením | týmový rozpis je v `schedule&projectteam_id=` |
+| `nextmatch` | pokryto základním pohledem | nový v6 pohled `nextmatch` pro nejbližší zápas |
+| `matrix` | pokryto sloučením | základ převzat do `resultsmatrix` |
 | `resultsmatrix` | pokryto základním pohledem | nový v6 pohled `resultsmatrix` |
 | `resultsranking` | pokryto základním pohledem | nový v6 pohled `resultsranking` slučuje výsledky a tabulku |
 | `statsranking` | pokryto základním pohledem | nový v6 pohled `statsranking` pro pořadí podle hráčských statistik |
 | `teamstats` | pokryto základním pohledem | nový v6 pohled `teamstats` pro souhrn a statistiky týmu |
 | `eventsranking` | pokryto základním pohledem | nový v6 pohled `eventsranking` pro pořadí podle zápasových událostí |
 | `rivals` | pokryto základním pohledem | nový v6 pohled `rivals` pro soupeře a vzájemnou bilanci týmu |
-| `treetonode` | chybí | nový pohled pro turnajové stromy |
-| `curve` | chybí | odložit, historicky grafový výstup |
+| `treetonode` | pokryto základním pohledem | nový v6 pohled `treetonode` pro turnajové stromy |
+| `curve` | pokryto základním pohledem | nový v6 pohled `curve` pro vývoj pořadí po kolech |
 | `ical` | pokryto základním pohledem | nový v6 pohled `ical` a kalendářový blok v `schedule` |
-| tipovací soutěž | chybí | stará JoomLeague ji měla v core; pro v6 navrhnout po stabilizaci hlavních soutěžních výstupů |
-| `player` | slučovat | použít `person` s kontextem hráče |
-| `staff` | slučovat | použít `person` s kontextem realizačního týmu |
-| `referee` | slučovat | použít `person` nebo `referees` podle kontextu |
+| tipovací soutěž | rozpracováno | základ databáze a administrace je první krok; plná funkce je cílem milníku 0.40.0 |
+| `player` | pokryto sloučením | `person` obsahuje hráčskou historii a statistiky |
+| `staff` | pokryto sloučením | `person` obsahuje historii realizačního týmu |
+| `referee` | pokryto sloučením | `person` obsahuje historii rozhodčího, seznam je v `referees` |
 
 ## Doporučené pořadí práce
 
@@ -93,12 +93,12 @@ Přenést chování:
 
 ### 2. Rozpisy podle týmu a klubu
 
-Priorita:
+Stav:
 
 - `teamplan` -> `schedule`
 - `clubplan` -> `schedule`
 
-Důvod: rozpis je hlavní veřejný výstup soutěže. Stará komponenta měla samostatné pohledy, v6 má lepší cíl ve společném `schedule`.
+Rozpis je sloučený do společného `schedule` pohledu a podporuje týmový i klubový kontext.
 
 Přenést chování:
 
@@ -111,11 +111,12 @@ Přenést chování:
 
 ### 3. Nejbližší zápas a detail zápasu
 
-Priorita:
+Stav:
 
-- `nextmatch` -> `matchreport` nebo nový `nextmatch`
+- `nextmatch` -> nový v6 pohled `nextmatch`
+- `matchreport` -> detail zápasu
 
-Důvod: výstup je vhodný pro moduly i detailní frontend stránku.
+`nextmatch` umí najít konkrétní nebo nejbližší naplánovaný zápas a používá sdílený detail zápasu s preview, rozhodčími, porovnáním týmů a vzájemnými zápasy.
 
 Přenést chování:
 
@@ -166,18 +167,15 @@ Přenést chování:
 Priorita:
 
 - `rivals`
-- `treetonode`
 - `ical`
-- `curve`
-
 Důvod: mají užší použití a mohou počkat, dokud jsou stabilní hlavní soutěžní výstupy.
 
 Poznámky:
 
 - `rivals` má zůstat týmový pohled na soupeře a vzájemné zápasy.
-- `treetonode` patří k turnajovým stromům.
+- `treetonode` patří k turnajovým stromům a má základní veřejný bracket bez starých grafických spojnic.
 - `ical` má vzniknout až nad novým `schedule`, ne jako izolovaný port staré logiky.
-- `curve` je historicky grafový výstup a nemá se přenášet se starou grafovou knihovnou.
+- `curve` je přepsaný jako moderní vývoj pořadí po kolech bez staré grafové knihovny.
 
 ### 7. Tipovací soutěž
 
