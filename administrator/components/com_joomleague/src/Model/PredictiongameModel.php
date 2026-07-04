@@ -97,6 +97,8 @@ final class PredictiongameModel extends EntityAdminModel
 			$byRound[$roundId]['exact'] += ((int) $tip->home_score === (int) $tip->team1_result && (int) $tip->away_score === (int) $tip->team2_result) ? 1 : 0;
 			$byRound[$roundId]['tendency'] += $this->outcome((int) $tip->home_score, (int) $tip->away_score) === $this->outcome((int) $tip->team1_result, (int) $tip->team2_result) ? 1 : 0;
 
+			$tipId = (int) $tip->id;
+
 			$db->setQuery(
 				$db->getQuery(true)
 					->update($db->quoteName('#__joomleague_prediction_tip'))
@@ -104,7 +106,7 @@ final class PredictiongameModel extends EntityAdminModel
 					->set($db->quoteName('calculated') . ' = 1')
 					->where($db->quoteName('id') . ' = :id')
 					->bind(':points', $points, ParameterType::INTEGER)
-					->bind(':id', (int) $tip->id, ParameterType::INTEGER)
+					->bind(':id', $tipId, ParameterType::INTEGER)
 			)->execute();
 		}
 
@@ -120,6 +122,11 @@ final class PredictiongameModel extends EntityAdminModel
 		$now = Factory::getDate()->toSql();
 
 		foreach ($byRound as $roundId => $row) {
+			$tips = (int) $row['tips'];
+			$points = (int) $row['points'];
+			$exactHits = (int) $row['exact'];
+			$tendencyHits = (int) $row['tendency'];
+
 			$db->setQuery(
 				$db->getQuery(true)
 					->insert($db->quoteName('#__joomleague_prediction_score'))
@@ -128,10 +135,10 @@ final class PredictiongameModel extends EntityAdminModel
 					->bind(':game_id', $gameId, ParameterType::INTEGER)
 					->bind(':user_id', $userId, ParameterType::INTEGER)
 					->bind(':round_id', $roundId, ParameterType::INTEGER)
-					->bind(':tips', $row['tips'], ParameterType::INTEGER)
-					->bind(':points', $row['points'], ParameterType::INTEGER)
-					->bind(':exact_hits', $row['exact'], ParameterType::INTEGER)
-					->bind(':tendency_hits', $row['tendency'], ParameterType::INTEGER)
+					->bind(':tips', $tips, ParameterType::INTEGER)
+					->bind(':points', $points, ParameterType::INTEGER)
+					->bind(':exact_hits', $exactHits, ParameterType::INTEGER)
+					->bind(':tendency_hits', $tendencyHits, ParameterType::INTEGER)
 					->bind(':modified', $now)
 			)->execute();
 		}

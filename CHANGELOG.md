@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.40.2 - 2026-07-04
+
+- Fixed prediction ranking recalculation on the frontend by binding scalar variables instead of expressions.
+- Applied the same prediction recalculation fix to the administrator recalculation action.
+
 ## 0.40.1 - 2026-07-04
 
 - Added the public Powered by JoomLeague link to frontend component pages.
