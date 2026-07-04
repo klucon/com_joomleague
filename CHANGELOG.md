@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.40.3 - 2026-07-04
+
+- Made prediction game foreign key update SQL idempotent for repeated upgrade attempts.
+- Moved guarded prediction game foreign key creation into a dedicated update step.
+
 ## 0.40.2 - 2026-07-04
 
 - Fixed prediction ranking recalculation on the frontend by binding scalar variables instead of expressions.
