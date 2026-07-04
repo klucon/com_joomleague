@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.40.1 - 2026-07-04
+
+- Added the public Powered by JoomLeague link to frontend component pages.
+- Kept the iCalendar feed output clean without additional HTML footer markup.
+
 ## 0.40.0 - 2026-07-03
 
 - Added the prediction game milestone with administrator management for games, tips, score recalculation and rankings.

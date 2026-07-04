@@ -207,5 +207,9 @@ class SiteHtmlView extends BaseHtmlView
 		}
 
 		parent::display($tpl);
+
+		if ($view !== 'ical') {
+			echo '<div class="jl-site-powered">Powered by <a href="https://klucon.cz" target="_blank" rel="noopener noreferrer">JoomLeague</a></div>';
+		}
 	}
 }

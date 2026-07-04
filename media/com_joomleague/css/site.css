@@ -421,6 +421,24 @@ html[data-bs-theme="dark"] .com-joomleague-site {
 	color: var(--jl-site-accent);
 }
 
+.jl-site-powered {
+	margin-top: 1rem;
+	padding: .75rem 0;
+	color: var(--jl-site-muted);
+	font-size: .85rem;
+	text-align: center;
+}
+
+.jl-site-powered a {
+	color: var(--jl-site-accent);
+	font-weight: 750;
+	text-decoration: none;
+}
+
+.jl-site-powered a:hover {
+	text-decoration: underline;
+}
+
 @media (max-width: 767.98px) {
 	.jl-site-bracket {
 		display: flex;

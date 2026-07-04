@@ -6,7 +6,7 @@
 	<creationDate>2026-06</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>0.40.0</version>
+	<version>0.40.1</version>
 	<description>PLG_EXTENSION_JOOMLEAGUEESPORT_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Plugin\Extension\Joomleagueesport</namespace>
 	<files>
