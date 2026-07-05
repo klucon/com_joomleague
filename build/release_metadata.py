@@ -41,7 +41,7 @@ def changelog_sections() -> list[tuple[str, list[str]]]:
     content = CHANGELOG.read_text(encoding="utf-8")
     matches = list(
         re.finditer(
-            r"^##\s+(?P<version>\d+\.\d+\.\d+)\s+-\s+\d{4}-\d{2}-\d{2}\s*$"
+            r"^##\s+(?P<version>\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?)\s+-\s+\d{4}-\d{2}-\d{2}\s*$"
             r"(?P<body>.*?)(?=^##\s+|\Z)",
             content,
             re.MULTILINE | re.DOTALL,
