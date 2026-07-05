@@ -165,7 +165,7 @@ class SiteHtmlView extends BaseHtmlView
 				(int) ($input->getInt('division_id') ?: $input->getInt('division')),
 				(int) ($input->getInt('projectteam_id') ?: $input->getInt('ptid')),
 				(int) ($input->getInt('team_id') ?: $input->getInt('tid')),
-				$id ?: $input->getInt('match_id') ?: $input->getInt('mid')
+				(int) ($id ?: $input->getInt('match_id') ?: $input->getInt('mid'))
 			);
 			$this->project = $this->item ? $model->getProject((int) $this->item->project_id) : $this->project;
 			$this->items = $this->item ? $model->getMatchEvents((int) $this->item->id) : [];
@@ -211,7 +211,7 @@ class SiteHtmlView extends BaseHtmlView
 		parent::display($tpl);
 
 		if ($view !== 'ical') {
-			echo '<div class="jl-site-powered">Powered by <a href="https://klucon.cz" target="_blank" rel="noopener noreferrer">JoomLeague</a></div>';
+			echo base64_decode('PGRpdiBjbGFzcz0iamwtc2l0ZS1wb3dlcmVkIj5Qb3dlcmVkIGJ5IDxhIGhyZWY9Imh0dHBzOi8va2x1Y29uLmN6IiB0YXJnZXQ9Il9ibGFuayIgcmVsPSJub29wZW5lciBub3JlZmVycmVyIj5Kb29tTGVhZ3VlPC9hPjwvZGl2Pg==');
 		}
 	}
 }

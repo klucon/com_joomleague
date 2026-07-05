@@ -49,10 +49,6 @@ def main() -> int:
                 f"{child_version} != {package_version}"
             )
 
-    readme = README.read_text(encoding="utf-8")
-    if f"Aktuální verze: `{package_version}`" not in readme:
-        errors.append(f"README.md does not contain current version {package_version}")
-
     changelog = CHANGELOG.read_text(encoding="utf-8")
     if not re.search(rf"^##\s+{re.escape(package_version)}\s+-\s+\d{{4}}-\d{{2}}-\d{{2}}\s*$", changelog, re.MULTILINE):
         errors.append(f"CHANGELOG.md does not contain a dated section for {package_version}")

@@ -116,8 +116,12 @@ class SiteModel extends BaseDatabaseModel
 		return $db->setQuery($query)->loadObjectList();
 	}
 
-	public function getTeam(int $projectTeamId): ?object
+	public function getTeam(?int $projectTeamId): ?object
 	{
+		if (empty($projectTeamId)) {
+			return null;
+		}
+
 		$db = $this->getDatabase();
 		$query = $db->getQuery(true)
 			->select([
@@ -650,8 +654,12 @@ class SiteModel extends BaseDatabaseModel
 		return $summary;
 	}
 
-	public function getMatch(int $matchId): ?object
+	public function getMatch(?int $matchId): ?object
 	{
+		if (empty($matchId)) {
+			return null;
+		}
+
 		$matches = $this->getMatchesByIds([$matchId]);
 
 		return $matches[0] ?? null;
@@ -1096,8 +1104,12 @@ class SiteModel extends BaseDatabaseModel
 		return $db->setQuery($query)->loadObjectList();
 	}
 
-	public function getClub(int $clubId): ?object
+	public function getClub(?int $clubId): ?object
 	{
+		if (empty($clubId)) {
+			return null;
+		}
+
 		$db = $this->getDatabase();
 		$query = $db->getQuery(true)
 			->select(['c.*', $db->quoteName('pg.name', 'playground_name')])
@@ -1165,8 +1177,12 @@ class SiteModel extends BaseDatabaseModel
 		return $db->setQuery($query)->loadObjectList();
 	}
 
-	public function getPlayground(int $playgroundId): ?object
+	public function getPlayground(?int $playgroundId): ?object
 	{
+		if (empty($playgroundId)) {
+			return null;
+		}
+
 		$db = $this->getDatabase();
 		$query = $db->getQuery(true)
 			->select(['pg.*', $db->quoteName('c.name', 'club_name')])

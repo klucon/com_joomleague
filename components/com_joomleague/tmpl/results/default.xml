@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata><layout title="COM_JOOMLEAGUE_SITE_RESULTS"><message><![CDATA[COM_JOOMLEAGUE_SITE_RESULTS_DESC]]></message></layout><fields name="request"><fieldset name="request"><field name="project_id" type="number" label="COM_JOOMLEAGUE_SITE_PROJECT_ID" /></fieldset></fields></metadata>
+<metadata><layout title="COM_JOOMLEAGUE_SITE_RESULTS"><message><![CDATA[COM_JOOMLEAGUE_SITE_RESULTS_DESC]]></message></layout><fields name="request"><fieldset name="request"><field name="project_id" type="sql" label="COM_JOOMLEAGUE_SITE_PROJECT_ID"
+				query="SELECT id, name FROM #__joomleague_project ORDER BY name"
+				key_field="id" value_field="name">
+				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
+			</field></fieldset></fields></metadata>

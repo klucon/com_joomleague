@@ -3,9 +3,9 @@
 	<layout title="COM_JOOMLEAGUE_SITE_PERSON">
 		<message><![CDATA[COM_JOOMLEAGUE_SITE_PERSON_DESC]]></message>
 	</layout>
-	<fields name="request">
+	<fields name="request" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 		<fieldset name="request">
-			<field name="id" type="number" label="COM_JOOMLEAGUE_SITE_PERSON_ID" />
+			<field name="id" type="modal_person" label="COM_JOOMLEAGUE_SITE_PERSON" />
 		</fieldset>
 	</fields>
 </metadata>

@@ -1,2 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata><layout title="COM_JOOMLEAGUE_SITE_ROSTER"><message><![CDATA[COM_JOOMLEAGUE_SITE_ROSTER_DESC]]></message></layout><fields name="request"><fieldset name="request"><field name="id" type="number" label="COM_JOOMLEAGUE_SITE_PROJECTTEAM_ID" /></fieldset></fields></metadata>
+<metadata><layout title="COM_JOOMLEAGUE_SITE_ROSTER"><message><![CDATA[COM_JOOMLEAGUE_SITE_ROSTER_DESC]]></message></layout><fields name="request"><fieldset name="request"><field name="id" type="sql" label="COM_JOOMLEAGUE_SITE_PROJECTTEAM_ID"
+				query="SELECT pt.id, CONCAT(t.name, ' - ', p.name) AS name FROM #__joomleague_project_team AS pt INNER JOIN #__joomleague_team AS t ON t.id = pt.team_id INNER JOIN #__joomleague_project AS p ON p.id = pt.project_id ORDER BY p.name, t.name"
+				key_field="id" value_field="name">
+				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
+			</field></fieldset></fields></metadata>

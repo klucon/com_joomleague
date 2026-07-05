@@ -10,9 +10,9 @@ use Joomla\Database\ParameterType;
 
 final class PersonModel extends SiteModel
 {
-	public function getPerson(int $personId): ?object
+	public function getPerson(?int $personId): ?object
 	{
-		if ($personId < 1) {
+		if (empty($personId)) {
 			return null;
 		}
 

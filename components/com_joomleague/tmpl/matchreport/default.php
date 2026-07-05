@@ -11,6 +11,10 @@ use Joomla\CMS\Router\Route;
 $match = $this->item;
 ?>
 <div class="com-joomleague-site">
+	<?php if (!$match) : ?>
+		<div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_MATCH_NOT_FOUND'); ?></div>
+		<?php return; ?>
+	<?php endif; ?>
 	<?php if ($match) : ?>
 		<nav class="jl-site-nav mb-4">
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $match->projectteam1_id); ?>"><?php echo $this->escape($match->home_name ?? Text::_('COM_JOOMLEAGUE_SITE_HOME')); ?></a>

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 6.1.0-alpha-50 - 2026-07-05
+
+- Reworked menu-item creation to select targets from lists instead of typing raw IDs.
+- Added dropdown pickers for lookup targets such as project, club, team, round, playground and division.
+- Added searchable modal pickers for choosing people and matches in menu items.
+- Added graceful "not found" handling for menu items that point to missing records.
+- Added the missing site menu-item type language constants for the administrator menu editor.
+- Encoded the Powered by JoomLeague credit link in the source.
+- Rewrote the project README in English with badges, a feature overview and a roadmap.
+
 ## 0.40.4 - 2026-07-05
 
 - Replaced the prediction foreign key update SQL with Joomla installer compatible statements.

@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata><layout title="COM_JOOMLEAGUE_SITE_MATCHREPORT"><message><![CDATA[COM_JOOMLEAGUE_SITE_MATCHREPORT_DESC]]></message></layout><fields name="request"><fieldset name="request"><field name="id" type="number" label="COM_JOOMLEAGUE_SITE_MATCH_ID" /></fieldset></fields></metadata>
+<metadata><layout title="COM_JOOMLEAGUE_SITE_MATCHREPORT"><message><![CDATA[COM_JOOMLEAGUE_SITE_MATCHREPORT_DESC]]></message></layout><fields name="request" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field"><fieldset name="request"><field name="id" type="modal_match" label="COM_JOOMLEAGUE_SITE_MATCH_ID" /></fieldset></fields></metadata>
