@@ -82,6 +82,7 @@ class SiteHtmlView extends BaseHtmlView
 		} elseif ($view === 'resultsmatrix') {
 			$this->teams = $projectId > 0 ? $model->getProjectTeams($projectId) : [];
 			$this->matrix = $projectId > 0 ? $model->getResultMatrix($projectId) : [];
+			$this->divisions = $projectId > 0 ? $model->getProjectDivisions($projectId) : [];
 		} elseif ($view === 'schedule') {
 			$scheduleTeamId = (int) ($input->getInt('projectteam_id') ?? 0);
 			$scheduleClubId = (int) ($input->getInt('club_id') ?? 0);
@@ -177,6 +178,7 @@ class SiteHtmlView extends BaseHtmlView
 			$this->staffHistory = $this->item ? $model->getStaffHistory((int) $this->item->id) : [];
 			$this->refereeHistory = $this->item ? $model->getRefereeHistory((int) $this->item->id) : [];
 			$this->personStats = $this->item && method_exists($model, 'getPersonStats') ? $model->getPersonStats((int) $this->item->id) : [];
+			$this->playerMatches = $this->item && method_exists($model, 'getPlayerMatches') ? $model->getPlayerMatches((int) $this->item->id) : [];
 		} elseif ($view === 'clubs') {
 			$this->items = $model->getClubs();
 		} elseif ($view === 'club') {

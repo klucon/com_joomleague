@@ -450,3 +450,24 @@ html[data-bs-theme="dark"] .com-joomleague-site {
 		min-width: 0;
 	}
 }
+
+/* Rozpis (schedule) — vizuálně oddělená kola + pevné šířky sloupců */
+.jl-schedule-round {
+	margin-bottom: 1.5rem;
+	border: 1px solid var(--jl-site-line);
+	border-radius: .6rem;
+	overflow: hidden;
+}
+.jl-schedule-round__head {
+	padding: .55rem 1rem;
+	font-weight: 700;
+	color: var(--jl-site-ink);
+	background: var(--jl-site-soft);
+	border-left: 4px solid var(--jl-site-accent);
+	border-bottom: 1px solid var(--jl-site-line);
+}
+.jl-schedule-round .jl-site-table { margin-bottom: 0; }
+.jl-matches-table { table-layout: fixed; width: 100%; }
+.jl-matches-table td:nth-child(2),
+.jl-matches-table td:nth-child(4),
+.jl-matches-table td:nth-child(5) { overflow: hidden; text-overflow: ellipsis; }

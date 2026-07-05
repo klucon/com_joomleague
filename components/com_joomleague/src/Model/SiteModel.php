@@ -857,26 +857,62 @@ class SiteModel extends BaseDatabaseModel
 
 	public function getResultMatrix(int $projectId): array
 	{
+		$db    = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select([
+				$db->quoteName('m.id'),
+				$db->quoteName('m.projectteam1_id'),
+				$db->quoteName('m.projectteam2_id'),
+				$db->quoteName('m.team1_result', 'e1'),
+				$db->quoteName('m.team2_result', 'e2'),
+				$db->quoteName('m.match_result_type', 'rtype'),
+				$db->quoteName('m.alt_decision', 'decision'),
+				$db->quoteName('m.team1_result_decision', 'v1'),
+				$db->quoteName('m.team2_result_decision', 'v2'),
+				$db->quoteName('m.cancel'),
+				$db->quoteName('m.cancel_reason'),
+				$db->quoteName('m.new_match_id'),
+				$db->quoteName('m.count_result'),
+				$db->quoteName('m.match_date'),
+				$db->quoteName('r.id', 'round_id'),
+				$db->quoteName('r.name', 'round_name'),
+				$db->quoteName('r.roundcode', 'round_code'),
+			])
+			->from($db->quoteName('#__joomleague_match', 'm'))
+			->join('INNER', $db->quoteName('#__joomleague_round', 'r') . ' ON ' . $db->quoteName('r.id') . ' = ' . $db->quoteName('m.round_id'))
+			->where($db->quoteName('r.project_id') . ' = :project_id')
+			->where($db->quoteName('m.published') . ' = 1')
+			->bind(':project_id', $projectId, ParameterType::INTEGER)
+			->order($db->quoteName('r.ordering') . ' ASC, ' . $db->quoteName('r.roundcode') . ' ASC');
+
 		$matrix = [];
 
-		foreach ($this->getMatches($projectId) as $match) {
-			if ($match->team1_result === null || $match->team2_result === null || (int) ($match->count_result ?? 1) !== 1) {
-				continue;
-			}
-
-			$homeId = (int) $match->projectteam1_id;
-			$awayId = (int) $match->projectteam2_id;
+		foreach ($db->setQuery($query)->loadObjectList() as $m) {
+			$homeId = (int) $m->projectteam1_id;
+			$awayId = (int) $m->projectteam2_id;
 
 			if ($homeId <= 0 || $awayId <= 0) {
 				continue;
 			}
 
-			$matrix[$homeId][$awayId] = (object) [
-				'id' => (int) $match->id,
-				'home_result' => (float) $match->team1_result,
-				'away_result' => (float) $match->team2_result,
-				'match_date' => $match->match_date,
-				'round_name' => $match->round_name ?? '',
+			$played = $m->e1 !== null && $m->e2 !== null && (int) ($m->count_result ?? 1) === 1;
+
+			// více výsledků na buňku (např. dvojkolově) drží pole
+			$matrix[$homeId][$awayId][] = (object) [
+				'id'            => (int) $m->id,
+				'home_result'   => $m->e1,
+				'away_result'   => $m->e2,
+				'rtype'         => (int) $m->rtype,          // 1 = prodloužení, 2 = nájezdy
+				'decision'      => (int) $m->decision,       // != 0 = kontumace
+				'v1'            => $m->v1,
+				'v2'            => $m->v2,
+				'cancel'        => (int) $m->cancel,
+				'cancel_reason' => $m->cancel_reason,
+				'new_match_id'  => (int) $m->new_match_id,
+				'round_id'      => (int) $m->round_id,
+				'round_name'    => $m->round_name,
+				'round_code'    => $m->round_code,
+				'played'        => $played,
 			];
 		}
 

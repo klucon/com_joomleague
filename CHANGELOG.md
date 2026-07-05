@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.40.4 - 2026-07-05
+
+- Replaced the prediction foreign key update SQL with Joomla installer compatible statements.
+- Added frontend result matrix parity for multiple matches, cancelled matches, ruling decisions and division groups.
+- Added grouped match lists for team and schedule pages.
+- Added schedule display modes by round and by date, plus home/away filtering for team schedules.
+- Added player match history, photo/contact details and match participation data to person profiles.
+- Added a source-tree checklist for the latest frontend changes in `docs/com_joomleague_v6-checklist-2026-07-05.md`.
+
 ## 0.40.3 - 2026-07-04
 
 - Made prediction game foreign key update SQL idempotent for repeated upgrade attempts.

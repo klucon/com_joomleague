@@ -4,11 +4,19 @@ declare(strict_types=1);
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Uri\Uri;
 use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $team = $this->item;
 $jlFlagPath = JPATH_SITE . '/components/com_joomleague/layouts';
 $teamText = $team ? trim((string) ($team->team_info ?: $team->team_notes)) : '';
+
+// URL loga týmu (team_picture je cesta relativní ke kořeni Joomly)
+$teamLogo = null;
+if ($team && trim((string) ($team->team_picture ?? '')) !== '') {
+	$pic = trim((string) $team->team_picture);
+	$teamLogo = preg_match('#^https?://#i', $pic) ? $pic : Uri::root(true) . '/' . ltrim($pic, '/');
+}
 
 if ($team) {
 	StructuredDataHelper::add($this->getDocument(), [
@@ -33,8 +41,18 @@ if ($team) {
 <div class="com-joomleague-site">
 	<?php if (!$team) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_NOT_FOUND'); ?></div><?php return; endif; ?>
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo LayoutHelper::render('joomleague.flag', ['code' => $team->club_country ?? '', 'showName' => false, 'size' => 18], $jlFlagPath); ?> <?php echo $this->escape($team->club_name ?? ''); ?></div>
-		<h1 class="jl-site-title"><?php echo $this->escape($team->team_name); ?></h1>
+		<div class="d-flex align-items-center gap-3 flex-wrap">
+			<?php if ($teamLogo) : ?>
+				<img class="jl-team-logo" src="<?php echo $this->escape($teamLogo); ?>" alt="<?php echo $this->escape($team->team_name); ?>" loading="lazy" style="max-height:90px;width:auto;">
+			<?php endif; ?>
+			<div>
+				<div class="jl-site-eyebrow"><?php echo LayoutHelper::render('joomleague.flag', ['code' => $team->club_country ?? '', 'showName' => false, 'size' => 18], $jlFlagPath); ?> <?php echo $this->escape($team->club_name ?? ''); ?></div>
+				<h1 class="jl-site-title mb-0"><?php echo $this->escape($team->team_name); ?></h1>
+				<?php if (!empty($team->team_website)) : ?>
+					<p class="mb-0 mt-1"><a href="<?php echo $this->escape((string) $team->team_website); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_JOOMLEAGUE_SITE_WEBSITE'); ?></a></p>
+				<?php endif; ?>
+			</div>
+		</div>
 		<nav class="jl-site-nav mt-3">
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=roster&id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_ROSTER'); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=schedule&project_id=' . (int) $team->project_id . '&projectteam_id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE'); ?></a>
@@ -85,5 +103,5 @@ if ($team) {
 			</table>
 		</div>
 	<?php endif; ?>
-	<div class="jl-site-panel"><h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_MATCHES'); ?></h2><?php require JPATH_COMPONENT . '/tmpl/results/matches.php'; ?></div>
+	<div class="jl-site-panel"><h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_MATCHES'); ?></h2><?php require JPATH_COMPONENT . '/tmpl/results/matches_grouped.php'; ?></div>
 </div>
