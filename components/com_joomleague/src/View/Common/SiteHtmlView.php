@@ -139,7 +139,7 @@ class SiteHtmlView extends BaseHtmlView
 			$this->item = $model->getTeam($id ?: $input->getInt('projectteam_id') ?: $input->getInt('tid'));
 			$this->rivals = $this->item ? $model->getTeamRivals((int) $this->item->project_id, (int) $this->item->id) : [];
 		} elseif ($view === 'treetonode') {
-			$treeId = $input->getInt('treeto_id') ?: $input->getInt('tnid') ?: $id;
+			$treeId = (int) ($input->getInt('treeto_id') ?: $input->getInt('tnid') ?: $id);
 			$this->tree = $model->getTree($treeId, $projectId);
 			$this->project = $this->tree ? $model->getProject((int) $this->tree->project_id) : $this->project;
 			$this->treeNodes = $this->tree ? $model->getTreeNodes((int) $this->tree->id) : [];

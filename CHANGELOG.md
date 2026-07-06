@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 6.1.0-alpha-61 - 2026-07-06
+
+### Fixed
+
+- Fixed a fatal error on the tournament tree page for competitions that have no knockout tree (for example round-robin leagues). The page now shows a friendly "not found" message instead of failing.
+
 ## 6.1.0-alpha-60 - 2026-07-06
 
 ### Added
