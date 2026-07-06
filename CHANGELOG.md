@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## 6.1.0-alpha-60 - 2026-07-06
+
+### Added
+
+- **Anonymous, opt-in usage telemetry.** After installing the package a consent prompt is shown that lists the exact data that would be sent — the JoomLeague, Joomla and PHP version, the site language and a random installation identifier — before anything leaves the site. The prompt offers three choices: send once, send once a month automatically, or never. Nothing is transmitted without an explicit choice.
+- **Strict privacy boundaries for telemetry.** No domain, URL, IP address, site name or personal data is ever collected. Data is sent server-side (not from the browser) to a public, transparent statistics endpoint, and the monthly option uses a lightweight heartbeat driven by the administrator control panel.
+- **Telemetry option in the component configuration** so the choice can be changed or withdrawn at any time.
+- **Team statistics — visual charts.** A results overview bar (wins / draws / losses) and a goals chart (home and away, scored and conceded), rendered as self-contained, dependency-free graphics that replace the legacy Flash chart.
+- **Next match — recent form and preview.** The recent form of both teams (their last five results with win / draw / loss badges, opponent and score) and a match preview / annotation block.
+- **Club — logo and map links.** The club logo in the header and privacy-friendly "Show on map" links for the club and each of its venues, replacing the legacy embedded-map plugin dependency.
+
+### Changed
+
+- The post-installation consent card is a self-contained light card that stays readable on dark administrator themes, reports the real delivery outcome, and offers a "Continue to JoomLeague" button.
+
+### Notes
+
+- This completes the Joomla 6 frontend rewrite: the team statistics, next match and club views now reach feature parity with the classic component while dropping legacy Flash and third-party map dependencies.
+
 ## 6.1.0-alpha-50 - 2026-07-05
 
 - Reworked menu-item creation to select targets from lists instead of typing raw IDs.

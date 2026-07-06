@@ -35,6 +35,48 @@ foreach ($this->teamPlayerStats as $row) {
 		<div class="jl-site-card"><strong><?php echo $this->escape((string) ($stats['goal_difference'] ?? 0)); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_GOAL_DIFFERENCE'); ?></span></div>
 	</div>
 
+	<?php
+	$played = (int) ($stats['played'] ?? 0);
+	$wins   = (int) ($stats['wins'] ?? 0);
+	$draws  = (int) ($stats['draws'] ?? 0);
+	$losses = (int) ($stats['losses'] ?? 0);
+	$goalBars = [
+		[Text::_('COM_JOOMLEAGUE_SITE_HOME') . ' · ' . Text::_('COM_JOOMLEAGUE_SITE_GOALS_FOR'), (int) ($stats['home_goals_for'] ?? 0), 'for'],
+		[Text::_('COM_JOOMLEAGUE_SITE_HOME') . ' · ' . Text::_('COM_JOOMLEAGUE_SITE_GOALS_AGAINST'), (int) ($stats['home_goals_against'] ?? 0), 'against'],
+		[Text::_('COM_JOOMLEAGUE_SITE_AWAY') . ' · ' . Text::_('COM_JOOMLEAGUE_SITE_GOALS_FOR'), (int) ($stats['away_goals_for'] ?? 0), 'for'],
+		[Text::_('COM_JOOMLEAGUE_SITE_AWAY') . ' · ' . Text::_('COM_JOOMLEAGUE_SITE_GOALS_AGAINST'), (int) ($stats['away_goals_against'] ?? 0), 'against'],
+	];
+	$goalMax = max(1, ...array_map(static fn ($bar) => (int) $bar[1], $goalBars));
+	?>
+	<?php if ($played > 0) : ?>
+		<div class="jl-site-panel mb-4">
+			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_WIN_DRAW_LOSS'); ?></h2>
+			<div class="jl-ts-wdl" role="img" aria-label="<?php echo $wins . ' / ' . $draws . ' / ' . $losses; ?>">
+				<?php if ($wins > 0) : ?><span class="jl-ts-seg jl-ts-w" style="width:<?php echo round($wins / $played * 100, 2); ?>%;"><?php echo $wins; ?></span><?php endif; ?>
+				<?php if ($draws > 0) : ?><span class="jl-ts-seg jl-ts-d" style="width:<?php echo round($draws / $played * 100, 2); ?>%;"><?php echo $draws; ?></span><?php endif; ?>
+				<?php if ($losses > 0) : ?><span class="jl-ts-seg jl-ts-l" style="width:<?php echo round($losses / $played * 100, 2); ?>%;"><?php echo $losses; ?></span><?php endif; ?>
+			</div>
+			<div class="jl-ts-legend">
+				<span class="jl-ts-key jl-ts-w"><?php echo Text::_('COM_JOOMLEAGUE_SITE_WINS'); ?></span>
+				<span class="jl-ts-key jl-ts-d"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DRAWS'); ?></span>
+				<span class="jl-ts-key jl-ts-l"><?php echo Text::_('COM_JOOMLEAGUE_SITE_LOSSES'); ?></span>
+			</div>
+		</div>
+
+		<div class="jl-site-panel mb-4">
+			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_GOALS'); ?></h2>
+			<div class="jl-ts-bars">
+				<?php foreach ($goalBars as $bar) : ?>
+					<div class="jl-ts-bar-row">
+						<span class="jl-ts-bar-label"><?php echo $this->escape($bar[0]); ?></span>
+						<span class="jl-ts-bar"><span class="jl-ts-bar-fill jl-ts-<?php echo $bar[2]; ?>" style="width:<?php echo round((int) $bar[1] / $goalMax * 100, 2); ?>%;"></span></span>
+						<span class="jl-ts-bar-val"><?php echo (int) $bar[1]; ?></span>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	<?php endif; ?>
+
 	<div class="jl-site-panel table-responsive mb-4">
 		<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_HOME_AWAY'); ?></h2>
 		<table class="table jl-site-table align-middle">

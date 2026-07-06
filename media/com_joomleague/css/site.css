@@ -471,3 +471,42 @@ html[data-bs-theme="dark"] .com-joomleague-site {
 .jl-matches-table td:nth-child(2),
 .jl-matches-table td:nth-child(4),
 .jl-matches-table td:nth-child(5) { overflow: hidden; text-overflow: ellipsis; }
+
+/* teamstats — přehled výsledků + graf gólů (náhrada flashchartu) */
+.jl-ts-wdl { display: flex; height: 2.4rem; border-radius: 10px; overflow: hidden; font-weight: 700; font-size: .9rem; }
+.jl-ts-seg { display: flex; align-items: center; justify-content: center; color: #fff; min-width: 1.8rem; }
+.jl-ts-seg.jl-ts-w { background: #16a34a; }
+.jl-ts-seg.jl-ts-d { background: #94a3b8; }
+.jl-ts-seg.jl-ts-l { background: #dc2626; }
+.jl-ts-legend { display: flex; flex-wrap: wrap; gap: 1.1rem; margin-top: .6rem; font-size: .85rem; color: #475569; }
+.jl-ts-key { display: inline-flex; align-items: center; gap: .4rem; }
+.jl-ts-key::before { content: ""; width: .8rem; height: .8rem; border-radius: 3px; }
+.jl-ts-key.jl-ts-w::before { background: #16a34a; }
+.jl-ts-key.jl-ts-d::before { background: #94a3b8; }
+.jl-ts-key.jl-ts-l::before { background: #dc2626; }
+.jl-ts-bars { display: flex; flex-direction: column; gap: .6rem; }
+.jl-ts-bar-row { display: grid; grid-template-columns: minmax(6rem, 14rem) 1fr 2.5rem; align-items: center; gap: .75rem; font-size: .9rem; }
+.jl-ts-bar { background: rgba(15, 23, 42, .06); border-radius: 6px; height: 1.15rem; overflow: hidden; }
+.jl-ts-bar-fill { display: block; height: 100%; border-radius: 6px; min-width: 2px; }
+.jl-ts-for { background: #16a34a; }
+.jl-ts-against { background: #dc2626; }
+.jl-ts-bar-val { font-weight: 700; text-align: right; }
+@media (max-width: 560px) { .jl-ts-bar-row { grid-template-columns: 1fr; gap: .2rem; } .jl-ts-bar-val { text-align: left; } }
+
+/* nextmatch — poslední zápasy (forma) + preview */
+.jl-site-richtext { line-height: 1.6; }
+.jl-nm-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+@media (max-width: 560px) { .jl-nm-form-grid { grid-template-columns: 1fr; } }
+.jl-nm-form-col h3 { font-size: 1rem; margin: 0 0 .6rem; }
+.jl-nm-form-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .4rem; }
+.jl-nm-form-list li { display: grid; grid-template-columns: 1.7rem 1fr auto; align-items: center; gap: .6rem; font-size: .9rem; }
+.jl-nm-badge { display: inline-flex; align-items: center; justify-content: center; width: 1.7rem; height: 1.7rem; border-radius: 6px; color: #fff; font-weight: 700; font-size: .8rem; }
+.jl-nm-w { background: #16a34a; }
+.jl-nm-d { background: #94a3b8; }
+.jl-nm-l { background: #dc2626; }
+.jl-nm-opp { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* club — logo v hlavičce + akce u hřišť */
+.jl-club-head { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.jl-club-logo { max-height: 90px; width: auto; border-radius: 8px; }
+.jl-site-actions { display: flex; gap: .4rem; flex-wrap: wrap; }

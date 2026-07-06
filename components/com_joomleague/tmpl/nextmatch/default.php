@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
@@ -35,6 +36,39 @@ $comparison = $this->matchTeamComparison;
 		JPATH_SITE . '/components/com_joomleague/layouts'
 	);
 	?>
+
+	<?php if (!empty($match->preview)) : ?>
+		<div class="jl-site-panel mt-4">
+			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_PREVIEW'); ?></h2>
+			<div class="jl-site-richtext"><?php echo HTMLHelper::_('content.prepare', $match->preview); ?></div>
+		</div>
+	<?php endif; ?>
+
+	<?php if ($this->homeForm !== [] || $this->awayForm !== []) : ?>
+		<div class="jl-site-panel mt-4">
+			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_RECENT_FORM'); ?></h2>
+			<div class="jl-nm-form-grid">
+				<?php foreach ([[$match->home_name ?? Text::_('COM_JOOMLEAGUE_SITE_HOME'), $this->homeForm], [$match->away_name ?? Text::_('COM_JOOMLEAGUE_SITE_AWAY'), $this->awayForm]] as $block) : ?>
+					<div class="jl-nm-form-col">
+						<h3><?php echo $this->escape((string) $block[0]); ?></h3>
+						<?php if ($block[1] === []) : ?>
+							<p class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_NO_DATA'); ?></p>
+						<?php else : ?>
+							<ul class="jl-nm-form-list">
+								<?php foreach ($block[1] as $game) : ?>
+									<li>
+										<span class="jl-nm-badge jl-nm-<?php echo $this->escape($game->form_result); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_FORM_' . strtoupper($game->form_result)); ?></span>
+										<a class="jl-nm-opp" href="<?php echo Route::_('index.php?option=com_joomleague&view=matchreport&id=' . (int) $game->id); ?>"><?php echo $this->escape($game->form_opponent); ?></a>
+										<span class="jl-site-score"><?php echo $this->escape($game->form_score); ?></span>
+									</li>
+								<?php endforeach; ?>
+							</ul>
+						<?php endif; ?>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	<?php endif; ?>
 
 	<?php if ($comparison !== []) : ?>
 		<div class="jl-site-panel table-responsive mt-4">

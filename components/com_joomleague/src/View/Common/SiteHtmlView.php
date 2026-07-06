@@ -34,6 +34,8 @@ class SiteHtmlView extends BaseHtmlView
 	public array $headToHeadMatches = [];
 	public array $matchReferees = [];
 	public array $matchTeamComparison = [];
+	public array $homeForm = [];
+	public array $awayForm = [];
 	public array $predictionMatches = [];
 	public array $predictionTips = [];
 	public array $predictionRanking = [];
@@ -172,6 +174,8 @@ class SiteHtmlView extends BaseHtmlView
 			$this->headToHeadMatches = $this->item ? $model->getHeadToHeadMatches((int) $this->item->projectteam1_id, (int) $this->item->projectteam2_id, (int) $this->item->id) : [];
 			$this->matchReferees = $this->item ? $model->getMatchReferees((int) $this->item->id) : [];
 			$this->matchTeamComparison = $this->item ? $model->getMatchTeamComparison($this->item) : [];
+			$this->homeForm = $this->item ? $this->recentForm($model, (int) $this->item->project_id, (int) $this->item->projectteam1_id) : [];
+			$this->awayForm = $this->item ? $this->recentForm($model, (int) $this->item->project_id, (int) $this->item->projectteam2_id) : [];
 		} elseif ($view === 'person') {
 			$this->item = $model->getPerson($id ?: $input->getInt('person_id'));
 			$this->playerHistory = $this->item ? $model->getPlayerHistory((int) $this->item->id) : [];
@@ -213,5 +217,40 @@ class SiteHtmlView extends BaseHtmlView
 		if ($view !== 'ical') {
 			echo base64_decode('PGRpdiBjbGFzcz0iamwtc2l0ZS1wb3dlcmVkIj5Qb3dlcmVkIGJ5IDxhIGhyZWY9Imh0dHBzOi8va2x1Y29uLmN6IiB0YXJnZXQ9Il9ibGFuayIgcmVsPSJub29wZW5lciBub3JlZmVycmVyIj5Kb29tTGVhZ3VlPC9hPjwvZGl2Pg==');
 		}
+	}
+
+	/**
+	 * Posledních N odehraných zápasů projektového týmu (nejnovější první),
+	 * s pohledem daného týmu (skóre a výsledek W/D/L). Reużívá getMatches.
+	 *
+	 * @return  array<int, object>
+	 */
+	private function recentForm($model, int $projectId, int $projectTeamId, int $limit = 5): array
+	{
+		if ($projectId < 1 || $projectTeamId < 1) {
+			return [];
+		}
+
+		$played = [];
+
+		foreach ($model->getMatches($projectId, 0, $projectTeamId) as $match) {
+			if ($match->team1_result === null || $match->team2_result === null) {
+				continue;
+			}
+
+			$isHome  = (int) ($match->home_projectteam_id ?? 0) === $projectTeamId;
+			$own     = (int) ($isHome ? $match->team1_result : $match->team2_result);
+			$against = (int) ($isHome ? $match->team2_result : $match->team1_result);
+
+			$match->form_is_home  = $isHome;
+			$match->form_opponent = (string) ($isHome ? ($match->away_name ?? '') : ($match->home_name ?? ''));
+			$match->form_score    = $own . ':' . $against;
+			$match->form_result   = $own > $against ? 'w' : ($own < $against ? 'l' : 'd');
+			$played[] = $match;
+		}
+
+		usort($played, static fn ($a, $b) => strcmp((string) $b->match_date, (string) $a->match_date));
+
+		return array_slice($played, 0, $limit);
 	}
 }

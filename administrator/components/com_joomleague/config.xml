@@ -218,5 +218,25 @@
 				filter="path"
 			/>
 		</fieldset>
+		<fieldset name="telemetry" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_TELEMETRY">
+			<field
+				name="telemetry_note"
+				type="note"
+				label="COM_JOOMLEAGUE_CONFIG_TELEMETRY_NOTE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_TELEMETRY_NOTE_DESC"
+			/>
+			<field
+				name="telemetry_consent"
+				type="list"
+				label="COM_JOOMLEAGUE_CONFIG_TELEMETRY_CONSENT_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_TELEMETRY_CONSENT_DESC"
+				default=""
+			>
+				<option value="">COM_JOOMLEAGUE_CONFIG_TELEMETRY_UNSET</option>
+				<option value="once">COM_JOOMLEAGUE_CONFIG_TELEMETRY_ONCE</option>
+				<option value="monthly">COM_JOOMLEAGUE_CONFIG_TELEMETRY_MONTHLY</option>
+				<option value="never">COM_JOOMLEAGUE_CONFIG_TELEMETRY_NEVER</option>
+			</field>
+		</fieldset>
 	</fields>
 </config>

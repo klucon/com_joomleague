@@ -7,9 +7,39 @@ namespace Joomleague\Component\Joomleague\Administrator\Controller;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Session\Session;
+use Joomleague\Component\Joomleague\Administrator\Helper\TelemetryHelper;
 
 final class AjaxController extends BaseController
 {
+	/**
+	 * Uloží rozhodnutí uživatele o anonymní telemetrii a (při souhlasu) jednou odešle.
+	 * Volá se z výzvy zobrazené po instalaci balíčku.
+	 */
+	public function telemetryconsent(): void
+	{
+		$result = ['ok' => false, 'sent' => false];
+
+		if (Session::checkToken('request')) {
+			$mode = $this->input->getWord('mode', '');
+
+			if (\in_array($mode, ['once', 'monthly', 'never'], true)) {
+				TelemetryHelper::setConsent($mode);
+
+				if ($mode !== 'never') {
+					$result['sent'] = TelemetryHelper::send('install');
+				}
+
+				$result['ok'] = true;
+			}
+		}
+
+		$this->app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+		$this->app->sendHeaders();
+		echo json_encode($result);
+		$this->app->close();
+	}
+
 	public function projectteamsoptions(): void
 	{
 		$this->json($this->getModel('Ajax')->getProjectTeams($this->input->getInt('p'), $this->input->getInt('division')));

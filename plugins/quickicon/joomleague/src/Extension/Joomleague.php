@@ -15,6 +15,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\Event\SubscriberInterface;
 use Joomla\Module\Quickicon\Administrator\Event\QuickIconsEvent;
+use Joomleague\Component\Joomleague\Administrator\Helper\TelemetryHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -59,6 +60,11 @@ final class Joomleague extends CMSPlugin implements SubscriberInterface
 
         if (!$this->getApplication()->getIdentity()->authorise('core.manage', 'com_joomleague')) {
             return;
+        }
+
+        // Měsíční anonymní heartbeat (jen když uživatel zvolil "1× měsíčně").
+        if (class_exists(TelemetryHelper::class)) {
+            TelemetryHelper::maybeHeartbeat();
         }
 
         $result   = $event->getArgument('result', []);

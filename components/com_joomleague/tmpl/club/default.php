@@ -4,12 +4,23 @@ declare(strict_types=1);
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Uri\Uri;
 use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $club = $this->item;
 $jlFlagPath = JPATH_SITE . '/components/com_joomleague/layouts';
 $address = $club ? trim(($club->address ?? '') . ', ' . ($club->zipcode ?? '') . ' ' . ($club->location ?? ''), ' ,') : '';
 $clubText = $club ? trim((string) ($club->notes ?? '')) : '';
+
+// Logo klubu (cesta relativní ke kořeni Joomly, nebo absolutní URL).
+$clubLogo = '';
+if ($club) {
+	$logo = trim((string) ($club->logo_big ?: $club->logo_middle ?: $club->logo_small ?: ''));
+	if ($logo !== '') {
+		$clubLogo = preg_match('#^https?://#i', $logo) ? $logo : Uri::root(true) . '/' . ltrim($logo, '/');
+	}
+}
+$mapUrl = static fn (string $query): string => 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($query);
 
 if ($club) {
 	StructuredDataHelper::add($this->getDocument(), [
@@ -38,11 +49,17 @@ if ($club) {
 	<?php if (!$club) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CLUB_NOT_FOUND'); ?></div><?php return; endif; ?>
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CLUB'); ?></div>
-		<h1 class="jl-site-title"><?php echo $this->escape($club->name); ?></h1>
-		<p class="jl-site-muted mb-3"><?php echo $this->escape($address); ?></p>
-		<nav class="jl-site-nav">
+		<div class="jl-club-head">
+			<?php if ($clubLogo !== '') : ?><img class="jl-club-logo" src="<?php echo $this->escape($clubLogo); ?>" alt="<?php echo $this->escape($club->name); ?>" loading="lazy"><?php endif; ?>
+			<div>
+				<h1 class="jl-site-title mb-1"><?php echo $this->escape($club->name); ?></h1>
+				<?php if ($address !== '') : ?><p class="jl-site-muted mb-0"><?php echo $this->escape($address); ?></p><?php endif; ?>
+			</div>
+		</div>
+		<nav class="jl-site-nav mt-3">
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=schedule&club_id=' . (int) $club->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE'); ?></a>
 			<?php if ($club->standard_playground) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=playground&id=' . (int) $club->standard_playground); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PLAYGROUND'); ?></a><?php endif; ?>
+			<?php if ($address !== '') : ?><a href="<?php echo $this->escape($mapUrl($club->name . ', ' . $address)); ?>" target="_blank" rel="noopener"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SHOW_ON_MAP'); ?></a><?php endif; ?>
 		</nav>
 	</section>
 	<div class="jl-site-grid mb-4">
@@ -93,11 +110,15 @@ if ($club) {
 			<table class="table jl-site-table align-middle">
 				<tbody>
 					<?php foreach ($this->clubPlaygrounds as $playground) : ?>
+						<?php $pgAddress = trim(($playground->address ?? '') . ', ' . ($playground->zipcode ?? '') . ' ' . ($playground->city ?? ''), ' ,'); ?>
 						<tr>
 							<td><?php echo $this->escape($playground->name); ?></td>
-							<td><?php echo $this->escape(trim(($playground->address ?? '') . ', ' . ($playground->zipcode ?? '') . ' ' . ($playground->city ?? ''), ' ,')); ?></td>
+							<td><?php echo $this->escape($pgAddress); ?></td>
 							<td><?php echo $this->escape((string) ($playground->max_visitors ?? '')); ?></td>
-							<td><a class="jl-site-button" href="<?php echo Route::_('index.php?option=com_joomleague&view=playground&id=' . (int) $playground->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DETAIL'); ?></a></td>
+							<td class="jl-site-actions">
+								<?php if ($pgAddress !== '') : ?><a class="jl-site-button" href="<?php echo $this->escape($mapUrl($playground->name . ', ' . $pgAddress)); ?>" target="_blank" rel="noopener"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SHOW_ON_MAP'); ?></a><?php endif; ?>
+								<a class="jl-site-button" href="<?php echo Route::_('index.php?option=com_joomleague&view=playground&id=' . (int) $playground->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DETAIL'); ?></a>
+							</td>
 						</tr>
 					<?php endforeach; ?>
 				</tbody>
