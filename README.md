@@ -12,8 +12,8 @@ Manage leagues, seasons, clubs, teams, players, fixtures, results, standings, st
 [![Build](https://img.shields.io/github/actions/workflow/status/klucon/com_joomleague/build-package.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=build)](https://github.com/klucon/com_joomleague/actions)
 [![License](https://img.shields.io/github/license/klucon/com_joomleague?style=for-the-badge&color=blue)](LICENSE)
 
-[![Joomla 6](https://img.shields.io/badge/Joomla-6-5091CD?style=flat-square&logo=joomla&logoColor=white)](https://www.joomla.org)
-[![PHP 8.1+](https://img.shields.io/badge/PHP-8.1%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
+[![Joomla 6.1](https://img.shields.io/badge/Joomla-6.1-5091CD?style=flat-square&logo=joomla&logoColor=white)](https://www.joomla.org)
+[![PHP 8.3+](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
 [![Languages](https://img.shields.io/badge/i18n-EN%20%7C%20CS%20%7C%20DE-orange?style=flat-square)](#-languages)
 [![Last commit](https://img.shields.io/github/last-commit/klucon/com_joomleague?style=flat-square&logo=git&logoColor=white)](https://github.com/klucon/com_joomleague/commits)
 [![Issues](https://img.shields.io/github/issues/klucon/com_joomleague?style=flat-square&logo=github)](https://github.com/klucon/com_joomleague/issues)
@@ -83,8 +83,8 @@ The package ships as a single installable bundle containing the component, **16 
 
 | Requirement | Version |
 |-------------|---------|
-| Joomla      | **6.x** |
-| PHP         | **8.1 or newer** |
+| Joomla      | **6.1 or newer** |
+| PHP         | **8.3 or newer** |
 | Database    | MySQL 8.0+ / MariaDB 10.4+ |
 
 ---
