@@ -3,6 +3,7 @@ name: Build Joomla package
 on:
   pull_request:
     paths:
+      - ".github/workflows/**"
       - "administrator/**"
       - "components/**"
       - "images/**"
@@ -20,6 +21,7 @@ on:
     branches:
       - main
     paths:
+      - ".github/workflows/**"
       - "administrator/**"
       - "components/**"
       - "images/**"
