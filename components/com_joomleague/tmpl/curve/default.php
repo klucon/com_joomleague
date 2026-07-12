@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -18,20 +24,35 @@ $curveTeams = $this->curve['teams'] ?? [];
 $maxRank = max(1, (int) ($this->curve['max_rank'] ?? 1));
 $roundCount = max(1, count($rounds));
 $step = $roundCount > 1 ? 100 / ($roundCount - 1) : 0;
-$palette = ['#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c', '#0891b2', '#be123c', '#4f46e5'];
+$palette = [
+	'#2563eb',
+	'#dc2626',
+	'#16a34a',
+	'#9333ea',
+	'#ea580c',
+	'#0891b2',
+	'#be123c',
+	'#4f46e5',
+	'#ca8a04',
+	'#059669',
+	'#7c3aed',
+	'#db2777',
+	'#0f766e',
+	'#b45309',
+	'#1d4ed8',
+	'#65a30d',
+	'#c026d3',
+	'#e11d48',
+	'#0369a1',
+	'#4d7c0f',
+];
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$project) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT_NOT_FOUND'); ?></div><?php return; endif; ?>
 
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo $this->escape(trim(($project->league_name ?? '') . ' · ' . ($project->season_name ?? ''), ' ·')); ?></div>
+		<div class="jl-site-eyebrow"><?php echo $this->escape($project->name); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CURVE'); ?></h1>
-		<p class="jl-site-muted mb-3"><?php echo $this->escape($project->name); ?></p>
-		<nav class="jl-site-nav">
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT'); ?></a>
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=ranking&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RANKING'); ?></a>
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=resultsranking&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULTS_RANKING'); ?></a>
-		</nav>
 	</section>
 
 	<form class="jl-site-panel jl-site-filter mb-4" method="get" action="<?php echo Route::_('index.php'); ?>">
@@ -97,12 +118,12 @@ $palette = ['#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c', '#0891b2', '#
 						<?php endforeach; ?>
 						<?php if ($points !== []) : ?>
 							<polyline points="<?php echo $this->escape(implode(' ', $points)); ?>" />
-							<?php foreach ($points as $point) : ?>
-								<?php [$pointX, $pointY] = explode(',', $point); ?>
-								<circle cx="<?php echo $this->escape($pointX); ?>" cy="<?php echo $this->escape($pointY); ?>" r="1.8" vector-effect="non-scaling-stroke" />
-							<?php endforeach; ?>
 						<?php endif; ?>
 					</svg>
+					<?php foreach ($points as $point) : ?>
+						<?php [$pointX, $pointY] = explode(',', $point); ?>
+						<span class="jl-site-curve-dot" style="--jl-curve-color: <?php echo $this->escape($color); ?>; left: <?php echo $this->escape($pointX); ?>%; top: <?php echo $this->escape($pointY); ?>%;" aria-hidden="true"></span>
+					<?php endforeach; ?>
 				<?php endforeach; ?>
 			</div>
 		</div>
@@ -113,25 +134,44 @@ $palette = ['#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c', '#0891b2', '#
 		</div>
 	</div>
 
-	<div class="jl-site-panel table-responsive">
+	<div class="jl-site-panel">
 		<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_CURVE_TABLE'); ?></h2>
-		<table class="table jl-site-table align-middle">
-			<thead>
-				<tr>
-					<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM'); ?></th>
-					<?php foreach ($rounds as $round) : ?><th><?php echo $this->escape($round->name); ?></th><?php endforeach; ?>
-				</tr>
-			</thead>
-			<tbody>
-				<?php foreach ($curveTeams as $team) : ?>
+		<div class="jl-site-curve-table-grid" style="--jl-curve-rounds: <?php echo $roundCount; ?>;">
+			<table class="table jl-site-table jl-site-curve-teams-table align-middle">
+				<thead>
 					<tr>
-						<th><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->projectteam_id); ?>"><?php echo $this->escape($team->team_name); ?></a></th>
-						<?php foreach ($rounds as $round) : ?>
-							<td><?php echo isset($team->positions[(int) $round->id]) ? (int) $team->positions[(int) $round->id] : Text::_('COM_JOOMLEAGUE_SITE_NOT_PLAYED'); ?></td>
-						<?php endforeach; ?>
+						<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM'); ?></th>
 					</tr>
-				<?php endforeach; ?>
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					<?php foreach ($curveTeams as $team) : ?>
+						<tr>
+							<th><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->projectteam_id); ?>"><?php echo $this->escape($team->team_name); ?></a></th>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+			<div class="jl-site-curve-rounds-scroll">
+				<table class="table jl-site-table jl-site-curve-rounds-table align-middle">
+					<colgroup>
+						<?php foreach ($rounds as $round) : ?><col class="jl-site-curve-round-col"><?php endforeach; ?>
+					</colgroup>
+					<thead>
+						<tr>
+							<?php foreach ($rounds as $round) : ?><th><?php echo $this->escape($round->name); ?></th><?php endforeach; ?>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($curveTeams as $team) : ?>
+							<tr>
+								<?php foreach ($rounds as $round) : ?>
+									<td><?php echo isset($team->positions[(int) $round->id]) ? (int) $team->positions[(int) $round->id] : Text::_('COM_JOOMLEAGUE_SITE_NOT_PLAYED'); ?></td>
+								<?php endforeach; ?>
+							</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 </div>

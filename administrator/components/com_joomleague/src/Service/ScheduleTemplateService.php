@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -87,12 +93,12 @@ final class ScheduleTemplateService
 			throw new RuntimeException('COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_INVALID_JSON');
 		}
 
-		$this->assertTemplate($template);
+		$this->validateTemplate($template);
 
 		return $template;
 	}
 
-	private function assertTemplate(mixed $template): void
+	private function validateTemplate(mixed $template): void
 	{
 		if (!is_object($template)) {
 			throw new RuntimeException('COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_INVALID');

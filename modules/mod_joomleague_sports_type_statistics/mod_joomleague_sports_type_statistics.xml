@@ -3,10 +3,11 @@
 	<name>mod_joomleague_sports_type_statistics</name>
 	<author>Ondřej Klučka (https://klucon.cz)</author>
 	<authorEmail>info@klucon.cz</authorEmail>
-	<creationDate>2026-06</creationDate>
+	<authorUrl>https://klucon.cz</authorUrl>
+	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-61</version>
+	<version>6.1.0-alpha-150</version>
 	<description>MOD_JOOMLEAGUE_SPORTS_TYPE_STATISTICS_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\SportsTypeStatistics</namespace>
 	<files>
@@ -24,7 +25,7 @@
 	</languages>
 	<config>
 		<fields name="params">
-			<fieldset name="basic" addfieldpath="/administrator/components/com_joomleague/models/fields">
+			<fieldset name="basic">
 				<field name="sportstypes" type="sql" default="1" required="true" label="MOD_JOOMLEAGUE_SPORTS_TYPE_STATISTICS_SPORTS_TYPE_LABEL" description="MOD_JOOMLEAGUE_SPORTS_TYPE_STATISTICS_SPORTS_TYPE_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_sports_type ORDER BY name, id" key_field="value" value_field="text" multiple="true" />
 				<field name="show_icon" type="radio" default="1" label="MOD_JOOMLEAGUE_SPORTS_TYPE_STATISTICS_SHOW_ICON_LABEL" description="MOD_JOOMLEAGUE_SPORTS_TYPE_STATISTICS_SHOW_ICON_LABEL_DESC">
 					<option value="0">JNO</option>

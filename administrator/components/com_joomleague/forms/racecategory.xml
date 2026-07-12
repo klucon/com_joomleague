@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset name="details">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
+		<field name="project_id" type="sql" label="COM_JOOMLEAGUE_FIELD_PROJECT" query="SELECT id,name FROM #__joomleague_project WHERE project_type='RUNNING_RACE' ORDER BY name" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_RACE_FIELD_PROJECT_DESC" />
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME" required="true" description="COM_JOOMLEAGUE_RACECATEGORY_FIELD_NAME_DESC" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" />
+		<field name="sex" type="list" label="COM_JOOMLEAGUE_RACE_FIELD_SEX" default="ANY" required="true" description="COM_JOOMLEAGUE_RACECATEGORY_FIELD_SEX_DESC">
+			<option value="ANY">COM_JOOMLEAGUE_RACE_SEX_ANY</option>
+			<option value="M">COM_JOOMLEAGUE_RACE_SEX_MALE</option>
+			<option value="F">COM_JOOMLEAGUE_RACE_SEX_FEMALE</option>
+			<option value="X">COM_JOOMLEAGUE_RACE_SEX_OTHER</option>
+		</field>
+		<field name="age_min" type="number" label="COM_JOOMLEAGUE_RACECATEGORY_FIELD_AGE_MIN" min="0" />
+		<field name="age_max" type="number" label="COM_JOOMLEAGUE_RACECATEGORY_FIELD_AGE_MAX" min="0" />
+	</fieldset>
+	<fieldset name="publishing">
+		<field name="published" type="list" label="JSTATUS" default="1">
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+		</field>
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" />
+	</fieldset>
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" validate="rules" component="com_joomleague" section="racecategory" />
+	</fieldset>
+</form>

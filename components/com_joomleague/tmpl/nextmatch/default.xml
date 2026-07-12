@@ -1,31 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-	<layout title="COM_JOOMLEAGUE_SITE_NEXT_MATCH">
-		<message><![CDATA[COM_JOOMLEAGUE_SITE_NEXT_MATCH_DESC]]></message>
+	<layout title="COM_JOOMLEAGUE_ADMIN_MENUTYPE_NEXT_MATCH">
+		<message><![CDATA[COM_JOOMLEAGUE_ADMIN_MENUTYPE_NEXT_MATCH_DESC]]></message>
 	</layout>
 	<fields name="request" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 		<fieldset name="request">
-			<field name="project_id" type="sql" label="COM_JOOMLEAGUE_SITE_PROJECT_ID"
+			<field name="project_id" type="sql" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_PROJECT_ID"
 				query="SELECT id, name FROM #__joomleague_project ORDER BY name"
-				key_field="id" value_field="name">
+				key_field="id" value_field="name"
+				required="true">
 				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
 			</field>
-			<field name="division_id" type="sql" label="COM_JOOMLEAGUE_SITE_DIVISION_ID"
-				query="SELECT id, name FROM #__joomleague_division ORDER BY name"
-				key_field="id" value_field="name">
+			<field name="division_id" type="dynamicoptions" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_DIVISION_ID"
+				task="projectdivisionsoptions"
+				parent="project_id">
 				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
 			</field>
-			<field name="projectteam_id" type="sql" label="COM_JOOMLEAGUE_SITE_PROJECTTEAM_ID"
-				query="SELECT pt.id, CONCAT(t.name, ' - ', p.name) AS name FROM #__joomleague_project_team AS pt INNER JOIN #__joomleague_team AS t ON t.id = pt.team_id INNER JOIN #__joomleague_project AS p ON p.id = pt.project_id ORDER BY p.name, t.name"
-				key_field="id" value_field="name">
+			<field name="projectteam_id" type="dynamicoptions" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_PROJECTTEAM_ID"
+				task="projectteamsoptions"
+				parent="project_id">
 				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
 			</field>
-			<field name="team_id" type="sql" label="COM_JOOMLEAGUE_SITE_TEAM_ID"
-				query="SELECT id, name FROM #__joomleague_team ORDER BY name"
-				key_field="id" value_field="name">
+			<field name="team_id" type="dynamicoptions" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_TEAM_ID"
+				task="projectteamsbaseoptions"
+				parent="project_id">
 				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
 			</field>
-			<field name="match_id" type="modal_match" label="COM_JOOMLEAGUE_SITE_MATCH_ID" />
+			<field name="match_id" type="dynamicoptions" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_MATCH_ID"
+				task="matchesoptions"
+				parent="project_id">
+				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
+			</field>
 		</fieldset>
 	</fields>
 </metadata>

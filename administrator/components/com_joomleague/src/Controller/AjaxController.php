@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -42,12 +48,42 @@ final class AjaxController extends BaseController
 
 	public function projectteamsoptions(): void
 	{
-		$this->json($this->getModel('Ajax')->getProjectTeams($this->input->getInt('p'), $this->input->getInt('division')));
+		$this->json($this->getModel('Ajax')->getProjectTeams($this->input->getInt('p'), $this->input->getInt('division', 0)));
+	}
+
+	public function projectteamsbaseoptions(): void
+	{
+		$this->json($this->getModel('Ajax')->getProjectBaseTeams($this->input->getInt('p')));
 	}
 
 	public function projectdivisionsoptions(): void
 	{
 		$this->json($this->getModel('Ajax')->getProjectDivisions($this->input->getInt('p')));
+	}
+
+	public function projectclubsoptions(): void
+	{
+		$this->json($this->getModel('Ajax')->getProjectClubs($this->input->getInt('p')));
+	}
+
+	public function projecteventtypesoptions(): void
+	{
+		$this->json($this->getModel('Ajax')->getProjectEventTypes($this->input->getInt('p')));
+	}
+
+	public function projectstatisticsoptions(): void
+	{
+		$this->json($this->getModel('Ajax')->getProjectStatistics($this->input->getInt('p')));
+	}
+
+	public function projecttreesoptions(): void
+	{
+		$this->json($this->getModel('Ajax')->getProjectTrees($this->input->getInt('p')));
+	}
+
+	public function projectpredictiongamesoptions(): void
+	{
+		$this->json($this->getModel('Ajax')->getProjectPredictionGames($this->input->getInt('p')));
 	}
 
 	public function roundsoptions(): void
@@ -57,12 +93,17 @@ final class AjaxController extends BaseController
 
 	public function matchesoptions(): void
 	{
-		$this->json($this->getModel('Ajax')->getMatches($this->input->getInt('p')));
+		$this->json($this->getModel('Ajax')->getMatches($this->input->getInt('p'), $this->input->getInt('pt')));
 	}
 
 	public function persons(): void
 	{
 		$this->json($this->getModel('Ajax')->searchPersons($this->input->getString('q', $this->input->getString('query', ''))));
+	}
+
+	public function clubs(): void
+	{
+		$this->json($this->getModel('Ajax')->searchClubs($this->input->getString('q', $this->input->getString('query', ''))));
 	}
 
 	public function playground(): void

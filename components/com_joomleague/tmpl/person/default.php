@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -43,7 +49,13 @@ $pictureUrl = static function (?string $picture): ?string {
 	return Uri::root(true) . '/' . ltrim($picture, '/');
 };
 
-$renderHistory = function (string $title, array $items, bool $showNumber = false): void {
+$translateValue = static function (?string $value): string {
+	$value = trim((string) $value);
+
+	return $value === '' ? '' : Text::_($value);
+};
+
+$renderHistory = function (string $title, array $items, bool $showNumber = false) use ($translateValue): void {
 	?>
 	<div class="jl-site-panel table-responsive mb-4">
 		<h2><?php echo Text::_($title); ?></h2>
@@ -81,7 +93,7 @@ $renderHistory = function (string $title, array $items, bool $showNumber = false
 									<?php echo $this->escape((string) ($item->team_name ?? '')); ?>
 								<?php endif; ?>
 							</td>
-							<td><?php echo $this->escape((string) ($item->position_name ?? '')); ?></td>
+							<td><?php echo $this->escape($translateValue($item->position_name ?? '')); ?></td>
 							<?php if ($showNumber) : ?>
 								<td class="text-end"><?php echo $this->escape((string) ($item->jerseynumber ?? '')); ?></td>
 							<?php endif; ?>
@@ -106,7 +118,7 @@ if ($person) {
 		'birthDate' => $person->birthday ?? null,
 		'height' => !empty($person->height) ? (int) $person->height . ' cm' : null,
 		'weight' => !empty($person->weight) ? (int) $person->weight . ' kg' : null,
-		'jobTitle' => $person->default_position_name ?? null,
+		'jobTitle' => $translateValue($person->default_position_name ?? ''),
 	]);
 }
 ?>
@@ -136,7 +148,7 @@ if ($person) {
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_PERSON_PROFILE'); ?></h2>
 			<dl class="row mb-0">
 				<dt class="col-sm-4"><?php echo Text::_('COM_JOOMLEAGUE_SITE_POSITION'); ?></dt>
-				<dd class="col-sm-8"><?php echo $this->escape((string) ($person->default_position_name ?: Text::_('COM_JOOMLEAGUE_SITE_NOT_SET'))); ?></dd>
+				<dd class="col-sm-8"><?php echo $this->escape(!empty($person->default_position_name) ? $translateValue($person->default_position_name) : Text::_('COM_JOOMLEAGUE_SITE_NOT_SET')); ?></dd>
 				<dt class="col-sm-4"><?php echo Text::_('COM_JOOMLEAGUE_SITE_BIRTHDAY'); ?></dt>
 				<dd class="col-sm-8">
 					<?php if (!empty($person->birthday) && strpos((string) $person->birthday, '0000-00-00') !== 0) : ?>
@@ -248,7 +260,7 @@ if ($person) {
 									<div class="jl-site-muted small"><?php echo $this->escape((string) $g->round_name); ?></div>
 								<?php endif; ?>
 							</td>
-							<td><?php echo $this->escape((string) ($g->position_name ?? '')); ?></td>
+							<td><?php echo $this->escape($translateValue($g->position_name ?? '')); ?></td>
 							<td class="small">
 								<?php if ((int) $g->came_in > 0) : ?><span class="text-success" title="<?php echo Text::_('COM_JOOMLEAGUE_SITE_SUB_IN'); ?>">&#9650; <?php echo (int) $g->came_in; ?>'</span> <?php endif; ?>
 								<?php if ((int) $g->out > 0) : ?><span class="text-danger" title="<?php echo Text::_('COM_JOOMLEAGUE_SITE_SUB_OUT'); ?>">&#9660; <?php echo (int) $g->out; ?>'</span> <?php endif; ?>

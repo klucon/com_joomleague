@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -34,6 +40,7 @@ final class Router extends RouterBase
 		'ical' => 'ical',
 		'prediction' => 'prediction',
 		'treetonode' => 'treetonode',
+		'raceresults' => 'raceresults',
 	];
 
 	private const VIEW_ID_KEYS = [
@@ -44,13 +51,43 @@ final class Router extends RouterBase
 		'teams' => 'project_id',
 		'referees' => 'project_id',
 		'stats' => 'project_id',
+		'resultsmatrix' => 'project_id',
+		'resultsranking' => 'project_id',
+		'statsranking' => 'project_id',
+		'eventsranking' => 'project_id',
+		'curve' => 'project_id',
+		'nextmatch' => 'project_id',
+		'ical' => 'project_id',
 		'prediction' => 'project_id',
+		'treetonode' => 'project_id',
+		'raceresults' => 'project_id',
+		'rivals' => 'projectteam_id',
+		'teamstats' => 'projectteam_id',
 		'club' => 'id',
 		'team' => 'id',
 		'roster' => 'id',
 		'matchreport' => 'id',
 		'person' => 'id',
 		'playground' => 'id',
+	];
+
+	private const PROJECT_SECTION_ROUTE_ALIASES = [
+		'ranking' => ['standings', 'tabelle'],
+		'results' => ['results', 'ergebnisse'],
+		'schedule' => ['schedule', 'spielplan'],
+		'teams' => ['teams'],
+		'referees' => ['referees', 'schiedsrichter'],
+		'stats' => ['statistics', 'statistiken'],
+		'resultsmatrix' => ['result-matrix', 'ergebnismatrix'],
+		'resultsranking' => ['results-standings', 'ergebnisse-tabelle'],
+		'statsranking' => ['statistics-ranking', 'statistikrangliste'],
+		'eventsranking' => ['events-ranking', 'ereignisrangliste'],
+		'curve' => ['ranking-curve', 'ranglistenverlauf'],
+		'nextmatch' => ['next-match', 'naechstes-spiel'],
+		'ical' => ['ical'],
+		'prediction' => ['prediction-game', 'prediction', 'tippspiel'],
+		'treetonode' => ['tournament-tree', 'turnierbaum'],
+		'raceresults' => ['race-results', 'laufergebnisse'],
 	];
 
 	public function __construct(
@@ -76,7 +113,7 @@ final class Router extends RouterBase
 			return $query;
 		}
 
-		$item = $this->findExactMenuItem($query);
+		$item = $this->shouldUseCanonicalRoute($query) ? null : $this->findExactMenuItem($query);
 
 		if ($item !== null) {
 			$query['Itemid'] = $item->id;
@@ -124,6 +161,7 @@ final class Router extends RouterBase
 
 		if (array_key_exists($view, self::PROJECT_SECTION_VIEWS)) {
 			$projectId = (int) ($query['project_id'] ?? $query['pid'] ?? 0);
+			$projectId = $projectId > 0 ? $projectId : $this->lookupProjectIdFromProjectSectionQuery($view, $query);
 
 			if ($projectId > 0) {
 				if ($this->activeMenuView($query) !== 'projects') {
@@ -131,6 +169,19 @@ final class Router extends RouterBase
 				}
 
 				$segments[] = $this->getAlias('project', $projectId);
+
+				$section = self::PROJECT_SECTION_VIEWS[$view];
+
+				if ($section !== '') {
+					$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_' . strtoupper($section), $this->defaultSectionSegment($section));
+				}
+
+				$this->appendProjectSectionFilterSegments($segments, $query, $view, $projectId);
+				unset($query['view'], $query['project_id'], $query['pid']);
+			} else {
+				if ($this->activeMenuView($query) !== 'projects') {
+					$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_COMPETITIONS', 'souteze');
+				}
 
 				$section = self::PROJECT_SECTION_VIEWS[$view];
 
@@ -148,8 +199,8 @@ final class Router extends RouterBase
 			$id = (int) ($query['id'] ?? $query['club_id'] ?? 0);
 
 			if ($id > 0) {
-				if ($this->activeMenuView($query) !== 'clubs') {
-					$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_CLUBS', 'kluby');
+				if ($this->activeMenuView($query) !== 'club') {
+					$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_CLUB', 'klub');
 				}
 
 				$segments[] = $this->getAlias('club', $id);
@@ -180,7 +231,32 @@ final class Router extends RouterBase
 					$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_ROSTER', 'soupiska');
 				}
 
-				unset($query['view'], $query['id'], $query['projectteam_id']);
+				unset($query['view'], $query['id'], $query['projectteam_id'], $query['project_id'], $query['pid']);
+			}
+
+			return $segments;
+		}
+
+		if ($view === 'rivals' || $view === 'teamstats') {
+			$id = (int) ($query['id'] ?? $query['projectteam_id'] ?? $query['tid'] ?? 0);
+
+			if ($id > 0) {
+				$projectId = $this->lookupProjectIdByProjectTeam($id);
+
+				if ($projectId > 0 && $this->activeMenuView($query) !== 'projects') {
+					$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_COMPETITIONS', 'souteze');
+				}
+
+				if ($projectId > 0) {
+					$segments[] = $this->getAlias('project', $projectId);
+				}
+
+				$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_TEAMS', 'tymy');
+				$segments[] = $this->getAlias('projectteam', $id);
+				$segments[] = $view === 'rivals'
+					? $this->segment('COM_JOOMLEAGUE_ROUTE_RIVALS', 'souperi')
+					: $this->segment('COM_JOOMLEAGUE_ROUTE_TEAMSTATS', 'statistiky-tymu');
+				unset($query['view'], $query['id'], $query['projectteam_id'], $query['tid'], $query['project_id'], $query['pid']);
 			}
 
 			return $segments;
@@ -202,7 +278,7 @@ final class Router extends RouterBase
 
 				$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_MATCHES', 'zapasy');
 				$segments[] = $this->getAlias('match', $id);
-				unset($query['view'], $query['id'], $query['match_id']);
+				unset($query['view'], $query['id'], $query['match_id'], $query['project_id'], $query['pid']);
 			}
 
 			return $segments;
@@ -235,7 +311,10 @@ final class Router extends RouterBase
 			$id = (int) ($query['id'] ?? $query['playground_id'] ?? 0);
 
 			if ($id > 0) {
-				$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_PLAYGROUNDS', 'stadiony');
+				if ($this->activeMenuView($query) !== 'playground') {
+					$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_PLAYGROUNDS', 'stadiony');
+				}
+
 				$segments[] = $this->getAlias('playground', $id);
 				unset($query['view'], $query['id'], $query['playground_id']);
 			}
@@ -258,9 +337,20 @@ final class Router extends RouterBase
 		$first = $this->normaliseSegment((string) array_shift($segments));
 		$activeView = $this->activeMenuView([]);
 
-		if ($first === $this->segment('COM_JOOMLEAGUE_ROUTE_COMPETITIONS', 'souteze')) {
+		if ($this->routeMatches($first, 'COM_JOOMLEAGUE_ROUTE_COMPETITIONS', 'souteze', ['competitions', 'wettbewerbe'])) {
 			if ($segments === []) {
 				return ['view' => 'projects'];
+			}
+
+			$section = $this->normaliseSegment((string) ($segments[0] ?? ''));
+			$sectionView = $this->viewByProjectSection($section);
+
+			if ($sectionView !== 'project') {
+				array_shift($segments);
+				$vars = ['view' => $sectionView];
+				$this->parseProjectSectionFilterSegments($vars, $segments, 0);
+
+				return $vars;
 			}
 
 			$projectId = $this->getIdByAlias('project', (string) array_shift($segments));
@@ -273,6 +363,15 @@ final class Router extends RouterBase
 		}
 
 		if ($activeView === 'projects') {
+			$sectionView = $this->viewByProjectSection($first);
+
+			if ($sectionView !== 'project') {
+				$vars = ['view' => $sectionView];
+				$this->parseProjectSectionFilterSegments($vars, $segments, 0);
+
+				return $vars;
+			}
+
 			array_unshift($segments, $first);
 			$projectId = $this->getIdByAlias('project', (string) array_shift($segments));
 
@@ -283,7 +382,14 @@ final class Router extends RouterBase
 			return $this->parseProjectRoute($projectId, $segments);
 		}
 
-		if ($first === $this->segment('COM_JOOMLEAGUE_ROUTE_CLUBS', 'kluby')) {
+		if ($this->routeMatches($first, 'COM_JOOMLEAGUE_ROUTE_CLUB', 'klub', ['club', 'verein'])) {
+			return [
+				'view' => 'club',
+				'id' => $segments !== [] ? $this->getIdByAlias('club', (string) array_shift($segments)) : 0,
+			];
+		}
+
+		if ($this->routeMatches($first, 'COM_JOOMLEAGUE_ROUTE_CLUBS', 'kluby', ['clubs', 'vereine'])) {
 			if ($segments === []) {
 				return ['view' => 'clubs'];
 			}
@@ -301,31 +407,31 @@ final class Router extends RouterBase
 			];
 		}
 
-		if ($first === $this->segment('COM_JOOMLEAGUE_ROUTE_TEAMS', 'tymy')) {
+		if ($this->routeMatches($first, 'COM_JOOMLEAGUE_ROUTE_TEAMS', 'tymy', ['teams'])) {
 			$id = $segments !== [] ? $this->getIdByAlias('projectteam', (string) array_shift($segments)) : 0;
 			$section = $segments[0] ?? '';
 
 			return [
-				'view' => $this->normaliseSegment((string) $section) === $this->segment('COM_JOOMLEAGUE_ROUTE_ROSTER', 'soupiska') ? 'roster' : 'team',
+				'view' => $this->routeMatches((string) $section, 'COM_JOOMLEAGUE_ROUTE_ROSTER', 'soupiska', ['roster', 'kader']) ? 'roster' : 'team',
 				'id' => $id,
 			];
 		}
 
-		if ($first === $this->segment('COM_JOOMLEAGUE_ROUTE_MATCHES', 'zapasy')) {
+		if ($this->routeMatches($first, 'COM_JOOMLEAGUE_ROUTE_MATCHES', 'zapasy', ['matches', 'spiele'])) {
 			return [
 				'view' => 'matchreport',
 				'id' => $segments !== [] ? $this->getIdByAlias('match', (string) array_shift($segments)) : 0,
 			];
 		}
 
-		if ($first === $this->segment('COM_JOOMLEAGUE_ROUTE_PERSONS', 'osoby')) {
+		if ($this->routeMatches($first, 'COM_JOOMLEAGUE_ROUTE_PERSONS', 'osoby', ['people', 'persons', 'personen'])) {
 			return [
 				'view' => 'person',
 				'id' => $segments !== [] ? $this->getIdByAlias('person', (string) array_shift($segments)) : 0,
 			];
 		}
 
-		if ($first === $this->segment('COM_JOOMLEAGUE_ROUTE_PLAYGROUNDS', 'stadiony')) {
+		if ($this->routeMatches($first, 'COM_JOOMLEAGUE_ROUTE_PLAYGROUNDS', 'stadiony', ['venues', 'playgrounds', 'spielstaetten'])) {
 			return [
 				'view' => 'playground',
 				'id' => $segments !== [] ? $this->getIdByAlias('playground', (string) array_shift($segments)) : 0,
@@ -367,10 +473,15 @@ final class Router extends RouterBase
 	private function findBaseMenuItem(string $view): ?object
 	{
 		$preferred = match ($view) {
-			'club' => 'clubs',
-			'project', 'ranking', 'results', 'schedule', 'teams', 'team', 'roster', 'referees', 'stats', 'resultsmatrix', 'resultsranking', 'statsranking', 'eventsranking', 'curve', 'nextmatch', 'ical', 'prediction', 'treetonode', 'matchreport', 'person' => 'projects',
+			'club' => 'club',
+			'playground' => 'playground',
+			'project', 'ranking', 'results', 'schedule', 'teams', 'team', 'roster', 'rivals', 'teamstats', 'referees', 'stats', 'resultsmatrix', 'resultsranking', 'statsranking', 'eventsranking', 'curve', 'nextmatch', 'ical', 'prediction', 'treetonode', 'matchreport', 'person' => 'projects',
 			default => $view,
 		};
+
+		if ($preferred === '') {
+			return null;
+		}
 
 		$items = (array) $this->menu->getItems(['component'], ['com_joomleague']);
 
@@ -386,6 +497,10 @@ final class Router extends RouterBase
 	private function isExactMenuQuery(array $query): bool
 	{
 		if (empty($query['Itemid'])) {
+			return false;
+		}
+
+		if ($this->shouldUseCanonicalRoute($query)) {
 			return false;
 		}
 
@@ -437,12 +552,70 @@ final class Router extends RouterBase
 			}
 		}
 
+		foreach (self::VIEW_ID_KEYS as $view => $idKey) {
+			if (($menuQuery['view'] ?? '') !== $view) {
+				continue;
+			}
+
+			$aliases = $this->identityKeysForView($view, $idKey);
+
+			foreach ($aliases as $alias) {
+				if (array_key_exists($alias, $query) && !array_key_exists($alias, $menuQuery)) {
+					return false;
+				}
+			}
+		}
+
 		return true;
+	}
+
+	private function identityKeysForView(string $view, string $idKey): array
+	{
+		return match ($view) {
+			'project', 'ranking', 'results', 'schedule', 'teams', 'referees', 'stats', 'resultsmatrix', 'resultsranking', 'statsranking', 'eventsranking', 'curve', 'nextmatch', 'ical', 'prediction', 'treetonode', 'raceresults' => ['project_id', 'pid'],
+			'club' => ['id', 'club_id'],
+			'team', 'roster', 'rivals', 'teamstats' => ['id', 'projectteam_id', 'tid'],
+			'matchreport' => ['id', 'match_id'],
+			'person' => ['id', 'person_id'],
+			'playground' => ['id', 'playground_id'],
+			default => [$idKey],
+		};
+	}
+
+	private function shouldUseCanonicalProjectRoute(array $query): bool
+	{
+		$view = (string) ($query['view'] ?? '');
+
+		if (!array_key_exists($view, self::PROJECT_SECTION_VIEWS)) {
+			return false;
+		}
+
+		return $view !== 'project'
+			|| (int) ($query['project_id'] ?? $query['pid'] ?? 0) > 0
+			|| $this->lookupProjectIdFromProjectSectionQuery($view, $query) > 0;
+	}
+
+	private function shouldUseCanonicalRoute(array $query): bool
+	{
+		if ($this->shouldUseCanonicalProjectRoute($query)) {
+			return true;
+		}
+
+		$view = (string) ($query['view'] ?? '');
+
+		return match ($view) {
+			'club' => (int) ($query['id'] ?? $query['club_id'] ?? 0) > 0,
+			'team', 'roster', 'rivals', 'teamstats' => (int) ($query['id'] ?? $query['projectteam_id'] ?? $query['tid'] ?? 0) > 0,
+			'matchreport' => (int) ($query['id'] ?? $query['match_id'] ?? 0) > 0,
+			'person' => (int) ($query['id'] ?? $query['person_id'] ?? 0) > 0,
+			'playground' => (int) ($query['id'] ?? $query['playground_id'] ?? 0) > 0,
+			default => false,
+		};
 	}
 
 	private function unsetJoomleagueQuery(array &$query): void
 	{
-		unset($query['view'], $query['project_id'], $query['pid'], $query['id'], $query['club_id'], $query['projectteam_id'], $query['match_id'], $query['playground_id'], $query['person_id'], $query['game_id']);
+		unset($query['view'], $query['project_id'], $query['pid'], $query['id'], $query['club_id'], $query['projectteam_id'], $query['tid'], $query['match_id'], $query['playground_id'], $query['person_id'], $query['game_id']);
 	}
 
 	private function parseProjectRoute(int $projectId, array &$segments): array
@@ -459,7 +632,7 @@ final class Router extends RouterBase
 
 		array_shift($segments);
 
-		if ($section === $this->segment('COM_JOOMLEAGUE_ROUTE_TEAMS', 'tymy')) {
+		if ($this->routeMatches($section, 'COM_JOOMLEAGUE_ROUTE_TEAMS', 'tymy', ['teams'])) {
 			if ($segments === []) {
 				$vars['view'] = 'teams';
 
@@ -468,10 +641,29 @@ final class Router extends RouterBase
 
 			$vars['id'] = $this->getIdByAlias('projectteam', (string) array_shift($segments), $projectId);
 			$next = $segments[0] ?? '';
-			$isRoster = $this->normaliseSegment((string) $next) === $this->segment('COM_JOOMLEAGUE_ROUTE_ROSTER', 'soupiska');
+			$next = $this->normaliseSegment((string) $next);
+			$isRoster = $this->routeMatches($next, 'COM_JOOMLEAGUE_ROUTE_ROSTER', 'soupiska', ['roster', 'kader']);
 
 			if ($isRoster) {
 				array_shift($segments);
+			}
+
+			if ($this->routeMatches($next, 'COM_JOOMLEAGUE_ROUTE_RIVALS', 'souperi', ['rivals', 'rivalen'])) {
+				array_shift($segments);
+				$vars['view'] = 'rivals';
+				$vars['projectteam_id'] = $vars['id'];
+				unset($vars['id']);
+
+				return $vars;
+			}
+
+			if ($this->routeMatches($next, 'COM_JOOMLEAGUE_ROUTE_TEAMSTATS', 'statistiky-tymu', ['team-statistics', 'teamstatistiken'])) {
+				array_shift($segments);
+				$vars['view'] = 'teamstats';
+				$vars['projectteam_id'] = $vars['id'];
+				unset($vars['id']);
+
+				return $vars;
 			}
 
 			$vars['view'] = $isRoster ? 'roster' : 'team';
@@ -479,14 +671,14 @@ final class Router extends RouterBase
 			return $vars;
 		}
 
-		if ($section === $this->segment('COM_JOOMLEAGUE_ROUTE_MATCHES', 'zapasy')) {
+		if ($this->routeMatches($section, 'COM_JOOMLEAGUE_ROUTE_MATCHES', 'zapasy', ['matches', 'spiele'])) {
 			$vars['view'] = 'matchreport';
 			$vars['id'] = $segments !== [] ? $this->getIdByAlias('match', (string) array_shift($segments), $projectId) : 0;
 
 			return $vars;
 		}
 
-		if ($section === $this->segment('COM_JOOMLEAGUE_ROUTE_PERSONS', 'osoby')) {
+		if ($this->routeMatches($section, 'COM_JOOMLEAGUE_ROUTE_PERSONS', 'osoby', ['people', 'persons', 'personen'])) {
 			$vars['view'] = 'person';
 			$vars['id'] = $segments !== [] ? $this->getIdByAlias('person', (string) array_shift($segments), $projectId) : 0;
 
@@ -494,8 +686,217 @@ final class Router extends RouterBase
 		}
 
 		$vars['view'] = $this->viewByProjectSection($section);
+		$this->parseProjectSectionFilterSegments($vars, $segments, $projectId);
 
 		return $vars;
+	}
+
+	private function appendProjectSectionFilterSegments(array &$segments, array &$query, string $view, int $projectId): void
+	{
+		if ($view === 'ranking') {
+			$scope = (string) ($query['scope'] ?? '');
+
+			if ($scope !== '' && $scope !== 'total') {
+				$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_SCOPE', 'rozsah');
+				$segments[] = $this->rankingScopeSegment($scope);
+			}
+
+			unset($query['scope']);
+
+			return;
+		}
+
+		if ($view === 'schedule' || $view === 'ical') {
+			$clubId = (int) ($query['club_id'] ?? 0);
+			$projectTeamId = (int) ($query['projectteam_id'] ?? $query['ptid'] ?? 0);
+
+			if ($clubId > 0) {
+				$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_CLUB', 'klub');
+				$segments[] = $this->getAlias('club', $clubId);
+			} elseif ($projectTeamId > 0) {
+				$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_TEAM', 'tym');
+				$segments[] = $this->getAlias('projectteam', $projectTeamId);
+			}
+
+			unset($query['club_id'], $query['projectteam_id'], $query['ptid']);
+
+			if ($view === 'schedule') {
+				$this->appendScheduleDisplaySegments($segments, $query);
+			}
+
+			return;
+		}
+
+		if (in_array($view, ['statsranking', 'eventsranking', 'nextmatch'], true)) {
+			$projectTeamId = (int) ($query['projectteam_id'] ?? $query['ptid'] ?? 0);
+
+			if ($projectTeamId > 0) {
+				$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_TEAM', 'tym');
+				$segments[] = $this->getAlias('projectteam', $projectTeamId);
+			}
+
+			unset($query['projectteam_id'], $query['ptid']);
+
+			if ($view === 'nextmatch' && $projectTeamId > 0) {
+				unset($query['team_id'], $query['tid']);
+			}
+
+			return;
+		}
+
+		if ($view === 'curve') {
+			$team1Id = (int) ($query['projectteam1_id'] ?? $query['tid1'] ?? 0);
+			$team2Id = (int) ($query['projectteam2_id'] ?? $query['tid2'] ?? 0);
+
+			if ($team1Id > 0) {
+				$segments[] = $this->getAlias('projectteam', $team1Id);
+			}
+
+			if ($team2Id > 0) {
+				$segments[] = $this->getAlias('projectteam', $team2Id);
+			}
+
+			unset($query['projectteam1_id'], $query['projectteam2_id'], $query['tid1'], $query['tid2']);
+		}
+	}
+
+	private function appendScheduleDisplaySegments(array &$segments, array &$query): void
+	{
+		$plan = $this->normaliseSegment((string) ($query['plan'] ?? ''));
+		$filter = $this->normaliseSegment((string) ($query['filter'] ?? ''));
+
+		if ($plan === 'date') {
+			$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_SCHEDULE_BY_DATE', 'podle-data');
+		}
+
+		if ($filter === 'home') {
+			$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_SCHEDULE_HOME', 'doma');
+		} elseif ($filter === 'away') {
+			$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_SCHEDULE_AWAY', 'venku');
+		}
+
+		unset($query['plan'], $query['filter']);
+	}
+
+	private function rankingScopeSegment(string $scope): string
+	{
+		return match ($this->normaliseSegment($scope)) {
+			'home' => $this->segment('COM_JOOMLEAGUE_ROUTE_SCOPE_HOME', 'doma'),
+			'away' => $this->segment('COM_JOOMLEAGUE_ROUTE_SCOPE_AWAY', 'venku'),
+			default => $this->segment('COM_JOOMLEAGUE_ROUTE_SCOPE_TOTAL', 'celkem'),
+		};
+	}
+
+	private function parseProjectSectionFilterSegments(array &$vars, array &$segments, int $projectId): void
+	{
+		$view = (string) ($vars['view'] ?? '');
+		$first = $segments[0] ?? '';
+		$first = $this->normaliseSegment((string) $first);
+
+		if ($view === 'ranking' && $this->routeMatches($first, 'COM_JOOMLEAGUE_ROUTE_SCOPE', 'rozsah', ['scope', 'bereich'])) {
+			array_shift($segments);
+			$scope = $segments !== [] ? $this->normaliseSegment((string) array_shift($segments)) : '';
+			$scope = $this->rankingScopeFromSegment($scope);
+
+			if ($scope !== '') {
+				$vars['scope'] = $scope;
+			}
+
+			return;
+		}
+
+		$isClubFilter = $this->routeMatches($first, 'COM_JOOMLEAGUE_ROUTE_CLUB', 'klub', ['club', 'verein']);
+		$isTeamFilter = $this->routeMatches($first, 'COM_JOOMLEAGUE_ROUTE_TEAM', 'tym', ['team']);
+
+		if (($view === 'schedule' || $view === 'ical') && ($isClubFilter || $isTeamFilter)) {
+			array_shift($segments);
+			$value = $segments !== [] ? (string) array_shift($segments) : '';
+
+			if ($isClubFilter) {
+				$vars['club_id'] = $this->getIdByAlias('club', $value);
+			} else {
+				$vars['projectteam_id'] = $this->getIdByAlias('projectteam', $value, $projectId);
+			}
+		}
+
+		if ($view === 'schedule') {
+			$this->parseScheduleDisplaySegments($vars, $segments);
+		}
+
+		if ($view === 'schedule' || $view === 'ical') {
+			return;
+		}
+
+		if (in_array($view, ['statsranking', 'eventsranking', 'nextmatch'], true) && $isTeamFilter) {
+			array_shift($segments);
+			$vars['projectteam_id'] = $segments !== [] ? $this->getIdByAlias('projectteam', (string) array_shift($segments), $projectId) : 0;
+
+			return;
+		}
+
+		if ($view === 'curve') {
+			if ($segments !== []) {
+				$vars['projectteam1_id'] = $this->getIdByAlias('projectteam', (string) array_shift($segments), $projectId);
+			}
+
+			if ($segments !== []) {
+				$vars['projectteam2_id'] = $this->getIdByAlias('projectteam', (string) array_shift($segments), $projectId);
+			}
+		}
+	}
+
+	private function parseScheduleDisplaySegments(array &$vars, array &$segments): void
+	{
+		while ($segments !== []) {
+			$segment = $this->normaliseSegment((string) $segments[0]);
+
+			if ($this->routeMatches($segment, 'COM_JOOMLEAGUE_ROUTE_SCHEDULE_BY_DATE', 'podle-data', ['by-date', 'nach-datum'])) {
+				$vars['plan'] = 'date';
+				array_shift($segments);
+
+				continue;
+			}
+
+			if ($this->routeMatches($segment, 'COM_JOOMLEAGUE_ROUTE_SCHEDULE_BY_ROUND', 'podle-kol', ['by-round', 'nach-runden'])) {
+				$vars['plan'] = 'round';
+				array_shift($segments);
+
+				continue;
+			}
+
+			if ($this->routeMatches($segment, 'COM_JOOMLEAGUE_ROUTE_SCHEDULE_HOME', 'doma', ['home', 'heim'])) {
+				$vars['filter'] = 'home';
+				array_shift($segments);
+
+				continue;
+			}
+
+			if ($this->routeMatches($segment, 'COM_JOOMLEAGUE_ROUTE_SCHEDULE_AWAY', 'venku', ['away', 'auswaerts'])) {
+				$vars['filter'] = 'away';
+				array_shift($segments);
+
+				continue;
+			}
+
+			break;
+		}
+	}
+
+	private function rankingScopeFromSegment(string $segment): string
+	{
+		if ($this->routeMatches($segment, 'COM_JOOMLEAGUE_ROUTE_SCOPE_HOME', 'doma', ['home', 'heim'])) {
+			return 'home';
+		}
+
+		if ($this->routeMatches($segment, 'COM_JOOMLEAGUE_ROUTE_SCOPE_AWAY', 'venku', ['away', 'auswaerts'])) {
+			return 'away';
+		}
+
+		if ($this->routeMatches($segment, 'COM_JOOMLEAGUE_ROUTE_SCOPE_TOTAL', 'celkem', ['total', 'gesamt'])) {
+			return 'total';
+		}
+
+		return '';
 	}
 
 	private function getAlias(string $type, int $id): string
@@ -602,6 +1003,23 @@ final class Router extends RouterBase
 			->where($this->db->quoteName('id') . ' = ' . (int) $projectTeamId);
 
 		return (int) $this->db->setQuery($query, 0, 1)->loadResult();
+	}
+
+	private function lookupProjectIdFromProjectSectionQuery(string $view, array $query): int
+	{
+		foreach (['projectteam_id', 'ptid', 'projectteam1_id', 'tid1', 'projectteam2_id', 'tid2'] as $key) {
+			$projectTeamId = (int) ($query[$key] ?? 0);
+
+			if ($projectTeamId > 0) {
+				$projectId = $this->lookupProjectIdByProjectTeam($projectTeamId);
+
+				if ($projectId > 0) {
+					return $projectId;
+				}
+			}
+		}
+
+		return 0;
 	}
 
 	private function lookupProjectIdByMatch(int $matchId): int
@@ -722,30 +1140,59 @@ final class Router extends RouterBase
 			'ical' => 'ical',
 			'prediction' => 'tipovaci-soutez',
 			'treetonode' => 'turnajovy-strom',
+			'raceresults' => 'vysledky-behu',
 			default => $section,
 		};
 	}
 
 	private function viewByProjectSection(string $section): string
 	{
-		return match ($section) {
-			$this->segment('COM_JOOMLEAGUE_ROUTE_RANKING', 'tabulka') => 'ranking',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_RESULTS', 'vysledky') => 'results',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_SCHEDULE', 'rozpis') => 'schedule',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_TEAMS', 'tymy') => 'teams',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_REFEREES', 'rozhodci') => 'referees',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_STATS', 'statistiky') => 'stats',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_RESULTSMATRIX', 'matice-vysledku') => 'resultsmatrix',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_RESULTSRANKING', 'vysledky-tabulka') => 'resultsranking',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_STATSRANKING', 'poradi-statistik') => 'statsranking',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_EVENTSRANKING', 'poradi-udalosti') => 'eventsranking',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_CURVE', 'krivka-poradi') => 'curve',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_NEXTMATCH', 'nejblizsi-zapas') => 'nextmatch',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_ICAL', 'ical') => 'ical',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_PREDICTION', 'tipovaci-soutez') => 'prediction',
-			$this->segment('COM_JOOMLEAGUE_ROUTE_TREETONODE', 'turnajovy-strom') => 'treetonode',
-			default => 'project',
-		};
+		$section = $this->normaliseSegment($section);
+
+		foreach (self::PROJECT_SECTION_VIEWS as $view => $routeSection) {
+			if ($routeSection === '') {
+				continue;
+			}
+
+			if (\in_array($section, $this->projectSectionRouteAliases($routeSection), true)) {
+				return $view;
+			}
+		}
+
+		return 'project';
+	}
+
+	/**
+	 * Accept translated route constants plus stable canonical aliases when parsing SEF URLs.
+	 */
+	private function projectSectionRouteAliases(string $section): array
+	{
+		$aliases = [
+			$this->segment('COM_JOOMLEAGUE_ROUTE_' . strtoupper($section), $this->defaultSectionSegment($section)),
+			$this->normaliseSegment($this->defaultSectionSegment($section)),
+			$this->normaliseSegment($section),
+		];
+
+		foreach (self::PROJECT_SECTION_ROUTE_ALIASES[$section] ?? [] as $alias) {
+			$aliases[] = $this->normaliseSegment($alias);
+		}
+
+		return array_values(array_unique(array_filter($aliases)));
+	}
+
+	private function routeMatches(string $segment, string $constant, string $fallback, array $aliases = []): bool
+	{
+		$segment = $this->normaliseSegment($segment);
+		$valid = [
+			$this->segment($constant, $fallback),
+			$this->normaliseSegment($fallback),
+		];
+
+		foreach ($aliases as $alias) {
+			$valid[] = $this->normaliseSegment((string) $alias);
+		}
+
+		return \in_array($segment, array_values(array_unique(array_filter($valid))), true);
 	}
 
 	private function normaliseSegment(string $value): string

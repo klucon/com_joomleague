@@ -1,3 +1,9 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 declare(strict_types=1); namespace Joomleague\Component\Joomleague\Administrator\Model; \defined('_JEXEC') or die; use Joomla\Database\QueryInterface;
 final class PositionsModel extends EntityListModel { protected function buildQuery():QueryInterface{$d=$this->getDatabase();return $d->createQuery()->select('a.*,'.$d->quoteName('s.name','sport').','.$d->quoteName('p.name','parent_name').','.$d->quoteName('u.name','editor'))->from($d->quoteName('#__joomleague_position','a'))->join('LEFT',$d->quoteName('#__joomleague_sports_type','s'),$d->quoteName('s.id').'='.$d->quoteName('a.sports_type_id'))->join('LEFT',$d->quoteName('#__joomleague_position','p'),$d->quoteName('p.id').'='.$d->quoteName('a.parent_id'))->join('LEFT',$d->quoteName('#__users','u'),$d->quoteName('u.id').'='.$d->quoteName('a.checked_out'));}}

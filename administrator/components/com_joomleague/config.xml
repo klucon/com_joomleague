@@ -113,43 +113,6 @@
 			</field>
 		</fieldset>
 
-		<fieldset name="import" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_IMPORT">
-			<field
-				name="import_mode"
-				type="list"
-				label="COM_JOOMLEAGUE_CONFIG_IMPORT_MODE_LABEL"
-				description="COM_JOOMLEAGUE_CONFIG_IMPORT_MODE_DESC"
-				default="manual"
-			>
-				<option value="manual">COM_JOOMLEAGUE_CONFIG_IMPORT_MODE_MANUAL</option>
-				<option value="staging">COM_JOOMLEAGUE_CONFIG_IMPORT_MODE_STAGING</option>
-			</field>
-			<field
-				name="import_allow_legacy_ids"
-				type="radio"
-				layout="joomla.form.field.radio.switcher"
-				label="COM_JOOMLEAGUE_CONFIG_IMPORT_LEGACY_IDS_LABEL"
-				description="COM_JOOMLEAGUE_CONFIG_IMPORT_LEGACY_IDS_DESC"
-				default="1"
-				filter="integer"
-			>
-				<option value="0">JNO</option>
-				<option value="1">JYES</option>
-			</field>
-			<field
-				name="import_validate_foreign_keys"
-				type="radio"
-				layout="joomla.form.field.radio.switcher"
-				label="COM_JOOMLEAGUE_CONFIG_IMPORT_VALIDATE_FK_LABEL"
-				description="COM_JOOMLEAGUE_CONFIG_IMPORT_VALIDATE_FK_DESC"
-				default="1"
-				filter="integer"
-			>
-				<option value="0">JNO</option>
-				<option value="1">JYES</option>
-			</field>
-		</fieldset>
-
 		<fieldset name="sports_bootstrap" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_SPORTS_BOOTSTRAP">
 			<field
 				name="sports_bootstrap_profile"
@@ -159,6 +122,7 @@
 				default=""
 			>
 				<option value="">JNONE</option>
+				<option value="all">COM_JOOMLEAGUE_CONFIG_SPORT_ALL</option>
 				<option value="football">COM_JOOMLEAGUE_CONFIG_SPORT_FOOTBALL</option>
 				<option value="ice_hockey">COM_JOOMLEAGUE_CONFIG_SPORT_ICE_HOCKEY</option>
 				<option value="basketball">COM_JOOMLEAGUE_CONFIG_SPORT_BASKETBALL</option>

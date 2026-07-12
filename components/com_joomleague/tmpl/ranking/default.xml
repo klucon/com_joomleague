@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata><layout title="COM_JOOMLEAGUE_SITE_RANKING"><message><![CDATA[COM_JOOMLEAGUE_SITE_RANKING_DESC]]></message></layout><fields name="request"><fieldset name="request"><field name="project_id" type="sql" label="COM_JOOMLEAGUE_SITE_PROJECT_ID"
+<metadata><layout title="COM_JOOMLEAGUE_ADMIN_MENUTYPE_RANKING"><message><![CDATA[COM_JOOMLEAGUE_ADMIN_MENUTYPE_RANKING_DESC]]></message></layout><fields name="request"><fieldset name="request"><field name="project_id" type="sql" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_PROJECT_ID"
 				query="SELECT id, name FROM #__joomleague_project ORDER BY name"
-				key_field="id" value_field="name">
+				key_field="id" value_field="name"
+				required="true">
 				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
-			</field></fieldset></fields></metadata>
+			</field>
+			<field name="scope" type="list" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_RANKING_SCOPE" default="total">
+				<option value="total">COM_JOOMLEAGUE_ADMIN_MENUFIELD_RANKING_SCOPE_TOTAL</option>
+				<option value="home">COM_JOOMLEAGUE_ADMIN_MENUFIELD_RANKING_SCOPE_HOME</option>
+				<option value="away">COM_JOOMLEAGUE_ADMIN_MENUFIELD_RANKING_SCOPE_AWAY</option>
+			</field>
+		</fieldset></fields></metadata>

@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -112,7 +118,7 @@ $cards = [
 			<p class="jl-dashboard-eyebrow mb-2"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_PANEL_EYEBROW'); ?></p>
 			<h1 class="mb-2"><?php echo $this->escape($this->project->name); ?></h1>
 			<p class="mb-0">
-				<?php echo $this->escape(trim(($this->project->league ?? '') . ' · ' . ($this->project->season ?? '') . ' · ' . ($this->project->sport ?? ''), " \t\n\r\0\x0B·")); ?>
+				<?php echo $this->escape(trim(($this->project->league ?? '') . ' · ' . ($this->project->season ?? '') . ' · ' . ($this->project->sport ?? ''), " \t\n\r " . chr(11) . '·')); ?>
 			</p>
 		</div>
 		<div class="jl-dashboard-total" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_PROJECT_PANEL_TOTAL_LABEL'); ?>">

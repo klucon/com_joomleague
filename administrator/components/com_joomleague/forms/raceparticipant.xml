@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset name="details">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
+		<field name="project_id" type="sql" label="COM_JOOMLEAGUE_FIELD_PROJECT" query="SELECT id,name FROM #__joomleague_project WHERE project_type='RUNNING_RACE' ORDER BY name" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_RACE_FIELD_PROJECT_DESC" />
+		<field name="person_id" type="sql" label="COM_JOOMLEAGUE_RACEPARTICIPANT_FIELD_PERSON" query="SELECT id, CONCAT_WS(' ', firstname, lastname) AS name FROM #__joomleague_person ORDER BY lastname, firstname, id" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_RACEPARTICIPANT_FIELD_PERSON_DESC" />
+		<field name="category_id" type="sql" label="COM_JOOMLEAGUE_RACECATEGORY" query="SELECT id,name FROM #__joomleague_race_category ORDER BY project_id, ordering, name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_RACEPARTICIPANT_FIELD_CATEGORY_DESC">
+			<option value="">JOPTION_SELECT_CATEGORY</option>
+		</field>
+		<field name="bib_number" type="text" label="COM_JOOMLEAGUE_RACE_FIELD_BIB_NUMBER" required="true" description="COM_JOOMLEAGUE_RACE_FIELD_BIB_NUMBER_DESC" />
+		<field name="sex" type="list" label="COM_JOOMLEAGUE_RACE_FIELD_SEX" default="" description="COM_JOOMLEAGUE_RACEPARTICIPANT_FIELD_SEX_DESC">
+			<option value="">JOPTION_DO_NOT_USE</option>
+			<option value="M">COM_JOOMLEAGUE_RACE_SEX_MALE</option>
+			<option value="F">COM_JOOMLEAGUE_RACE_SEX_FEMALE</option>
+			<option value="X">COM_JOOMLEAGUE_RACE_SEX_OTHER</option>
+		</field>
+		<field name="date_of_birth" type="calendar" label="COM_JOOMLEAGUE_RACEPARTICIPANT_FIELD_DOB" format="%Y-%m-%d" showtime="false" />
+		<field name="country" type="text" label="COM_JOOMLEAGUE_FIELD_COUNTRY" maxlength="3" />
+	</fieldset>
+	<fieldset name="relations" label="COM_JOOMLEAGUE_FIELDSET_RELATIONS">
+		<field name="club_id" type="sql" label="COM_JOOMLEAGUE_MENU_CLUBS" query="SELECT id,name FROM #__joomleague_club ORDER BY name" key_field="id" value_field="name">
+			<option value="">JNONE</option>
+		</field>
+		<field name="team_id" type="sql" label="COM_JOOMLEAGUE_MENU_TEAMS" query="SELECT id,name FROM #__joomleague_team ORDER BY name" key_field="id" value_field="name">
+			<option value="">JNONE</option>
+		</field>
+	</fieldset>
+	<fieldset name="notes" label="COM_JOOMLEAGUE_FIELDSET_NOTES">
+		<field name="note" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES" rows="5" filter="safehtml" />
+	</fieldset>
+	<fieldset name="publishing">
+		<field name="published" type="list" label="JSTATUS" default="1">
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+		</field>
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" />
+	</fieldset>
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" validate="rules" component="com_joomleague" section="raceparticipant" />
+	</fieldset>
+</form>

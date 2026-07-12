@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -223,9 +229,30 @@ return new class implements InstallerScriptInterface {
 			['#__joomleague_statistic', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
 			['#__joomleague_division', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
 			['#__joomleague_sports_type', 'periods', 'TINYINT NOT NULL DEFAULT 2', 'name'],
+			['#__joomleague_sports_type', 'published', 'TINYINT NOT NULL DEFAULT 1', 'icon'],
 			['#__joomleague_match', 'article_id', 'INT NULL DEFAULT NULL', null],
 		] as [$table, $column, $definition, $after]) {
 			$this->addColumnIfMissing($db, $table, $column, $definition, $after);
+		}
+
+		$this->normaliseSportsTypeTable($db);
+	}
+
+	private function normaliseSportsTypeTable(DatabaseInterface $db): void
+	{
+		foreach ([
+			'ALTER TABLE ' . $db->quoteName('#__joomleague_sports_type') . ' ENGINE=InnoDB',
+			'ALTER TABLE ' . $db->quoteName('#__joomleague_sports_type') . ' CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci',
+			'ALTER TABLE ' . $db->quoteName('#__joomleague_sports_type') . ' MODIFY ' . $db->quoteName('name') . ' VARCHAR(255) NOT NULL DEFAULT ' . $db->quote(''),
+			'ALTER TABLE ' . $db->quoteName('#__joomleague_sports_type') . ' MODIFY ' . $db->quoteName('periods') . ' TINYINT NOT NULL DEFAULT 2',
+			'ALTER TABLE ' . $db->quoteName('#__joomleague_sports_type') . ' MODIFY ' . $db->quoteName('icon') . ' VARCHAR(255) NOT NULL DEFAULT ' . $db->quote(''),
+			'UPDATE ' . $db->quoteName('#__joomleague_sports_type') . ' SET ' . $db->quoteName('published') . ' = 1 WHERE ' . $db->quoteName('published') . ' IS NULL',
+		] as $query) {
+			try {
+				$db->setQuery($query)->execute();
+			} catch (\Throwable $exception) {
+				// Schema normalisation is best-effort; missing table on fresh install is handled by install SQL.
+			}
 		}
 	}
 

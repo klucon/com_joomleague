@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -8,6 +14,7 @@ namespace Joomleague\Component\Joomleague\Administrator\Model;
 
 use Joomla\CMS\Application\AdministratorApplication;
 use Joomla\CMS\Date\Date;
+use Joomla\CMS\Form\Form;
 use Joomla\Registry\Registry;
 
 final class TemplateModel extends EntityAdminModel
@@ -20,6 +27,30 @@ final class TemplateModel extends EntityAdminModel
 		$this->application = $application;
 	}
 
+	public function getForm($data = [], $loadData = true): Form|false
+	{
+		$form = parent::getForm($data, $loadData);
+
+		if ($form === false) {
+			return false;
+		}
+
+		$form->removeField('params');
+
+		$template = $this->resolveTemplateName($data);
+		$schema = JPATH_COMPONENT_ADMINISTRATOR . '/forms/templates/' . $template . '.xml';
+
+		if ($template !== '' && is_file($schema)) {
+			$form->loadFile($schema, false);
+
+			if ($loadData) {
+				$form->bind($this->loadFormData());
+			}
+		}
+
+		return $form;
+	}
+
 	protected function loadFormData(): object
 	{
 		$item = $this->getItem();
@@ -29,7 +60,12 @@ final class TemplateModel extends EntityAdminModel
 			$item->project_id = $projectId ?: (int) $this->application->getUserState('com_joomleague.templates.project_id');
 		}
 
-		$item->params = $this->normaliseParamsForEditing($item->params ?? '');
+		$template = $this->resolveTemplateName($item);
+		$params = $this->normaliseParamsForEditing($item->params ?? '');
+
+		$item->params = $this->hasSchema($template)
+			? (json_decode($params, true) ?: [])
+			: $params;
 
 		return $item;
 	}
@@ -59,13 +95,15 @@ final class TemplateModel extends EntityAdminModel
 			return json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: $params;
 		}
 
-		$decoded = @parse_ini_string($params, false, INI_SCANNER_TYPED);
+		// Imported Joomla 3 template configurations are converted on their first
+		// administrator edit. New and subsequently saved values are JSON only.
+		$legacyParams = parse_ini_string($params, false, INI_SCANNER_RAW);
 
-		if (is_array($decoded)) {
-			return json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '{}';
+		if (is_array($legacyParams)) {
+			return json_encode($legacyParams, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '{}';
 		}
 
-		return $params;
+		return '{}';
 	}
 
 	private function normaliseParamsForStorage(mixed $params): string
@@ -82,7 +120,7 @@ final class TemplateModel extends EntityAdminModel
 			return json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: $params;
 		}
 
-		return $params;
+		return '{}';
 	}
 
 	private function paramsToString(mixed $params): string
@@ -96,5 +134,25 @@ final class TemplateModel extends EntityAdminModel
 		}
 
 		return trim((string) $params);
+	}
+
+	private function resolveTemplateName(mixed $data): string
+	{
+		if (is_array($data) && isset($data['template'])) {
+			return preg_replace('/[^a-z0-9_]/', '', strtolower((string) $data['template'])) ?: '';
+		}
+
+		if (is_object($data) && isset($data->template)) {
+			return preg_replace('/[^a-z0-9_]/', '', strtolower((string) $data->template)) ?: '';
+		}
+
+		$item = $this->getItem();
+
+		return preg_replace('/[^a-z0-9_]/', '', strtolower((string) ($item->template ?? ''))) ?: '';
+	}
+
+	private function hasSchema(string $template): bool
+	{
+		return $template !== '' && is_file(JPATH_COMPONENT_ADMINISTRATOR . '/forms/templates/' . $template . '.xml');
 	}
 }

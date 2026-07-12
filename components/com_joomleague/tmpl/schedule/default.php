@@ -125,12 +125,6 @@ $colgroup = '<colgroup>'
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo $this->escape($eyebrow); ?></div>
 		<h1 class="jl-site-title"><?php echo $this->escape($title); ?></h1>
-		<nav class="jl-site-nav mt-3">
-			<?php if ($this->project) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $this->project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT'); ?></a><?php endif; ?>
-			<?php if ($this->scheduleTeam) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $this->scheduleTeam->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM'); ?></a><?php endif; ?>
-			<?php if ($this->scheduleClub) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=club&id=' . (int) $this->scheduleClub->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CLUB'); ?></a><?php endif; ?>
-			<?php if ($this->project) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=results&project_id=' . (int) $this->project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULTS'); ?></a><?php endif; ?>
-		</nav>
 	</section>
 
 	<div class="jl-site-grid mb-4">

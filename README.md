@@ -40,6 +40,16 @@ The package has been **rebuilt from the ground up for Joomla 6**, using a modern
 
 > 👀 **See it in action:** [joomleague.klucon.cz](https://joomleague.klucon.cz) — a live demo available in **English, Czech and German**.
 
+## 🧭 Current Alpha
+
+The current public alpha line focuses on production-ready Joomla 6 packaging, multilingual frontend routing and menu-driven publishing.
+
+- Current package version: **6.1.0-alpha-150**
+- Release assets: package ZIP, Joomla update XML and changelog XML
+- Public update channel: GitHub Releases and the registered Joomla update server
+- Supported frontend URL languages: Czech, English and German route segments
+- Demo and download hub: [joomleague.klucon.cz](https://joomleague.klucon.cz)
+
 ---
 
 ## ✨ Features
@@ -55,10 +65,11 @@ The package has been **rebuilt from the ground up for Joomla 6**, using a modern
 - Project, team, club, person, playground and referee pages
 - League **standings**, **results** and combined results/standings views
 - **Result matrix** with full parity — played, upcoming, cancelled and forfeited matches, with division grouping
-- **Smart schedule** — switch between *by round* and *by date*, plus *all / home / away* filtering for teams
+- **Smart schedule** — switch between *by round* and *by date*, plus *all / home / away* filtering for teams with clean SEF path segments
 - Rich **match detail** pages and **player profiles** with photo, contact details and full match history
 - **Rivals** head-to-head team comparison
 - Event, statistics and team-statistics **rankings**
+- Multilingual SEF URLs for project sections, team details, club details, standings scope and schedule filters
 
 ### 🎯 Engagement &amp; integrations
 - **Prediction game** — tipping competitions with automatic score recalculation and tipster leaderboards
@@ -76,6 +87,7 @@ The package ships as a single installable bundle containing the component, **16 
 - Safe HTML filtering on user-supplied content
 - Multilingual: **English, Czech and German**
 - Signed, verifiable releases via the Joomla update server (SHA-256 package integrity)
+- Canonical links for translated public URLs to keep search engines focused on the generated canonical route
 
 ---
 
@@ -108,6 +120,18 @@ Once installed, JoomLeague registers a Joomla **update site**, so future version
 - `com_joomleague` — administration &amp; frontend
 
 </details>
+
+## 🔎 SEO and SEF routing
+
+JoomLeague generates clean, project-aware URLs for the modern frontend views. A competition route can expose the same content through translated route segments while keeping a stable canonical link for search engines.
+
+Examples:
+
+- Czech: `/souteze/{project}/tabulka`, `/souteze/{project}/rozpis/podle-data`, `/souteze/{project}/tymy/{team}/soupiska`
+- English: `/competitions/{project}/standings`, `/competitions/{project}/schedule/by-date`, `/competitions/{project}/teams/{team}/roster`
+- German: `/wettbewerbe/{project}/tabelle`, `/wettbewerbe/{project}/spielplan/nach-datum`, `/wettbewerbe/{project}/teams/{team}/kader`
+
+Legacy query-style links remain parseable where practical, but newly generated frontend links prefer SEF path segments.
 
 <details>
 <summary><strong>16 site modules</strong></summary>
@@ -149,6 +173,10 @@ Actively in development for upcoming releases:
   - searchable modal pickers for people and matches, even across thousands of records
 - **Required target fields** — menu items can't be saved without a selected target
 - **Graceful "not found" handling** for menu items that point to missing records
+- **Language constant refactor** — make every text context use its own translation key:
+  - separate administrator UI, site UI, menu item type labels, descriptions and router/URL labels
+  - avoid sharing one constant between multiple screens just because the current wording happens to match
+  - migrate menu item layout labels from generic site keys such as `COM_JOOMLEAGUE_SITE_RACE_RESULTS` to dedicated keys such as `COM_JOOMLEAGUE_ADMIN_MENUTYPE_RACE_RESULTS`
 - **Completion of the remaining frontend view rewrites** (upcoming match, club detail, team statistics and additional rankings)
 - **Continuous responsive polish** across mobile and desktop
 

@@ -1,1 +1,8 @@
-<?php declare(strict_types=1); namespace Joomleague\Component\Joomleague\Administrator\View\Projectpanel; \defined('_JEXEC') or die; use Joomla\CMS\Language\Text; use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView; use Joomla\CMS\Toolbar\ToolbarHelper; use RuntimeException; final class HtmlView extends BaseHtmlView {public object $project;public function display($tpl=null):void{$p=$this->getModel()->getProject();if(!$p)throw new RuntimeException(Text::_('COM_JOOMLEAGUE_PROJECT_NOT_FOUND'),404);$this->project=$p;ToolbarHelper::title($p->name,'grid-2');parent::display($tpl);}}
+<?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+declare(strict_types=1); namespace Joomleague\Component\Joomleague\Administrator\View\Projectpanel; \defined('_JEXEC') or die; use Joomla\CMS\Language\Text; use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView; use Joomla\CMS\Toolbar\ToolbarHelper; use RuntimeException; final class HtmlView extends BaseHtmlView {public object $project;public function display($tpl=null):void{$p=$this->getModel()->getProject();if(!$p)throw new RuntimeException(Text::_('COM_JOOMLEAGUE_PROJECT_NOT_FOUND'),404);$this->project=$p;ToolbarHelper::title($p->name,'grid-2');parent::display($tpl);}}

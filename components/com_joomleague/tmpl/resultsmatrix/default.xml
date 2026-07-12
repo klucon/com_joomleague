@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-	<layout title="COM_JOOMLEAGUE_SITE_RESULT_MATRIX">
-		<message><![CDATA[COM_JOOMLEAGUE_SITE_RESULT_MATRIX_DESC]]></message>
+	<layout title="COM_JOOMLEAGUE_ADMIN_MENUTYPE_RESULT_MATRIX">
+		<message><![CDATA[COM_JOOMLEAGUE_ADMIN_MENUTYPE_RESULT_MATRIX_DESC]]></message>
 	</layout>
 	<fields name="request">
 		<fieldset name="request">
-			<field name="project_id" type="sql" label="COM_JOOMLEAGUE_SITE_PROJECT_ID"
+			<field name="project_id" type="sql" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_PROJECT_ID"
 				query="SELECT id, name FROM #__joomleague_project ORDER BY name"
-				key_field="id" value_field="name">
+				key_field="id" value_field="name"
+				required="true">
 				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
 			</field>
 		</fieldset>

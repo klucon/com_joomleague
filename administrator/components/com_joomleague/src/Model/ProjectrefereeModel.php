@@ -1,1 +1,8 @@
-<?php declare(strict_types=1);namespace Joomleague\Component\Joomleague\Administrator\Model;\defined('_JEXEC')or die;final class ProjectrefereeModel extends EntityAdminModel{protected string $entityName='projectreferee';protected function prepareTable($t):void{$t->project_id=(int)$t->project_id;$t->person_id=(int)$t->person_id;$t->project_position_id=(int)$t->project_position_id?:null;$t->published=(int)$t->published;foreach(['notes','picture','extended','alias']as$f)$t->$f=trim((string)$t->$f);parent::prepareTable($t);}}
+<?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+declare(strict_types=1);namespace Joomleague\Component\Joomleague\Administrator\Model;\defined('_JEXEC')or die;final class ProjectrefereeModel extends EntityAdminModel{protected string $entityName='projectreferee';protected function prepareTable($t):void{$t->project_id=(int)$t->project_id;$t->person_id=(int)$t->person_id;$t->project_position_id=(int)$t->project_position_id?:null;$t->published=(int)$t->published;foreach(['notes','picture','extended','alias']as$f)$t->$f=trim((string)$t->$f);parent::prepareTable($t);}}

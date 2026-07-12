@@ -267,11 +267,17 @@ html[data-bs-theme="dark"] .com-joomleague-site {
 	vector-effect: non-scaling-stroke;
 }
 
-.jl-site-curve-line circle {
-	fill: var(--jl-curve-color);
-	stroke: var(--jl-site-surface);
-	stroke-width: .8;
-	vector-effect: non-scaling-stroke;
+.jl-site-curve-dot {
+	position: absolute;
+	z-index: 2;
+	width: .5rem;
+	height: .5rem;
+	background: var(--jl-curve-color);
+	border: 2px solid var(--jl-site-surface);
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px color-mix(in srgb, var(--jl-curve-color) 42%, transparent);
+	pointer-events: none;
+	transform: translate(-50%, -50%);
 }
 
 .jl-site-curve-legend {
@@ -299,6 +305,66 @@ html[data-bs-theme="dark"] .com-joomleague-site {
 	height: .65rem;
 	background: var(--jl-curve-color);
 	border-radius: 999px;
+}
+
+.jl-site-curve-table-grid {
+	display: grid;
+	grid-template-columns: minmax(13rem, 17rem) minmax(0, 1fr);
+	margin-top: .75rem;
+	border: 1px solid var(--jl-site-line);
+	border-radius: .85rem;
+	overflow: hidden;
+}
+
+.jl-site-curve-table-grid .jl-site-table {
+	--bs-table-bg: var(--jl-site-surface);
+	background-color: var(--jl-site-surface);
+}
+
+.jl-site-curve-table-grid th,
+.jl-site-curve-table-grid td {
+	height: 2.9rem;
+	padding-block: .55rem;
+	white-space: nowrap;
+	background-color: var(--jl-site-surface);
+}
+
+.jl-site-curve-table-grid thead th {
+	height: 3.2rem;
+	background-color: var(--jl-site-soft);
+}
+
+.jl-site-curve-teams-table {
+	position: relative;
+	z-index: 2;
+	border-right: 1px solid var(--jl-site-line);
+	box-shadow: .35rem 0 .5rem rgb(16 24 40 / 8%);
+	table-layout: fixed;
+}
+
+.jl-site-curve-teams-table th {
+	overflow: hidden;
+	text-align: left;
+	text-overflow: ellipsis;
+}
+
+.jl-site-curve-rounds-scroll {
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+.jl-site-curve-rounds-table {
+	min-width: calc(var(--jl-curve-rounds, 1) * 4.25rem);
+	table-layout: fixed;
+}
+
+.jl-site-curve-rounds-table th,
+.jl-site-curve-rounds-table td {
+	text-align: center;
+}
+
+.jl-site-curve-round-col {
+	width: 4.25rem;
 }
 
 .jl-site-bracket {

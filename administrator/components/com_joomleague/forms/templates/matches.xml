@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fields name="params">
+		<fieldset name="display" label="COM_JOOMLEAGUE_TEMPLATE_FIELDSET_DISPLAY">
+			<field name="show_title" type="radio" default="1" label="COM_JOOMLEAGUE_TEMPLATE_MATCHES_SHOW_TITLE" class="btn-group btn-group-yesno">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
+			<field name="show_date" type="radio" default="1" label="COM_JOOMLEAGUE_TEMPLATE_MATCHES_SHOW_DATE" class="btn-group btn-group-yesno">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
+			<field name="show_time" type="radio" default="1" label="COM_JOOMLEAGUE_TEMPLATE_MATCHES_SHOW_TIME" class="btn-group btn-group-yesno">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
+			<field name="show_referees" type="radio" default="1" label="COM_JOOMLEAGUE_TEMPLATE_MATCHES_SHOW_REFEREES" class="btn-group btn-group-yesno">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
+		</fieldset>
+	</fields>
+</form>

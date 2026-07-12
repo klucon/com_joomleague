@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -18,8 +24,8 @@ final class HtmlView extends AdminFormView
 			'icon' => 'palette',
 			'singular' => 'template',
 			'details' => 'COM_JOOMLEAGUE_TEMPLATE_FIELDSET_DETAILS',
-			'main' => ['project_id', 'template', 'func', 'title', 'params'],
-			'side' => [],
+			'main' => ['project_id', 'template', 'title'],
+			'side' => ['display' => 'COM_JOOMLEAGUE_TEMPLATE_FIELDSET_DISPLAY'],
 			'publishing' => ['published'],
 		];
 	}

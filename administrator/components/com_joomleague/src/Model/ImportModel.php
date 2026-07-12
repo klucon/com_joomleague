@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -60,7 +66,8 @@ final class ImportModel extends BaseDatabaseModel
 		$fields = [];
 
 		foreach (($header ?: []) as $index => $name) {
-			$name = preg_replace('/^\xEF\xBB\xBF/', '', trim((string) $name));
+			$name = trim((string) $name);
+			$name = str_starts_with($name, "\u{FEFF}") ? substr($name, 3) : $name;
 
 			if (in_array($name, $allowed, true)) {
 				$fields[$index] = $name;

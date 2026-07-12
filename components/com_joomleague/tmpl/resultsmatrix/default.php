@@ -105,15 +105,8 @@ if (count($divisions) > 1) {
 	<?php endif; ?>
 
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo $this->escape(trim(($project->league_name ?? '') . ' · ' . ($project->season_name ?? ''), ' ·')); ?></div>
+		<div class="jl-site-eyebrow"><?php echo $this->escape($project->name); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULT_MATRIX'); ?></h1>
-		<p class="jl-site-muted mb-3"><?php echo $this->escape($project->name); ?></p>
-		<nav class="jl-site-nav">
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT'); ?></a>
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=ranking&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RANKING'); ?></a>
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=results&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULTS'); ?></a>
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=schedule&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE'); ?></a>
-		</nav>
 	</section>
 
 	<?php if (!$this->teams) : ?>

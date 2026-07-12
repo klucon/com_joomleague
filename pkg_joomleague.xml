@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="package" method="upgrade">
-	<name>pkg_joomleague</name>
+	<name>JoomLeague</name>
 	<packagename>joomleague</packagename>
 	<author>Ondřej Klučka (https://klucon.cz)</author>
 	<authorEmail>info@klucon.cz</authorEmail>
-	<creationDate>2026-06</creationDate>
+	<authorUrl>https://klucon.cz</authorUrl>
+	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-61</version>
+	<version>6.1.0-alpha-150</version>
 	<description>PKG_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<changelogurl>https://github.com/klucon/com_joomleague/releases/latest/download/joomleague-changelog.xml</changelogurl>
 	<scriptfile>pkg_script.php</scriptfile>
 	<languages folder="language">
+		<language tag="cs-CZ">cs-CZ/joomleague.ini</language>
+		<language tag="cs-CZ">cs-CZ/joomleague.sys.ini</language>
 		<language tag="cs-CZ">cs-CZ/pkg_joomleague.ini</language>
 		<language tag="cs-CZ">cs-CZ/pkg_joomleague.sys.ini</language>
+		<language tag="en-GB">en-GB/joomleague.ini</language>
+		<language tag="en-GB">en-GB/joomleague.sys.ini</language>
 		<language tag="en-GB">en-GB/pkg_joomleague.ini</language>
+		<language tag="de-DE">de-DE/joomleague.ini</language>
+		<language tag="de-DE">de-DE/joomleague.sys.ini</language>
 		<language tag="de-DE">de-DE/pkg_joomleague.ini</language>
 		<language tag="en-GB">en-GB/pkg_joomleague.sys.ini</language>
 		<language tag="de-DE">de-DE/pkg_joomleague.sys.ini</language>
@@ -42,6 +49,7 @@
 		<file type="plugin" id="joomleagueesport" group="extension">plg_extension_joomleagueesport.zip</file>
 		<file type="plugin" id="joomleague" group="finder">plg_finder_joomleague.zip</file>
 		<file type="plugin" id="joomleague" group="quickicon">plg_quickicon_joomleague.zip</file>
+		<file type="plugin" id="joomleaguesefaliases" group="system">plg_system_joomleaguesefaliases.zip</file>
 	</files>
 	<updateservers>
 		<server type="extension" priority="1" name="JoomLeague">https://github.com/klucon/com_joomleague/releases/latest/download/joomleague-update.xml</server>

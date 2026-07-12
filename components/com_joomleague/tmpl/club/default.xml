@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-	<layout title="COM_JOOMLEAGUE_SITE_CLUB">
-		<message><![CDATA[COM_JOOMLEAGUE_SITE_CLUB_DESC]]></message>
+	<layout title="COM_JOOMLEAGUE_ADMIN_MENUTYPE_CLUB">
+		<message><![CDATA[COM_JOOMLEAGUE_ADMIN_MENUTYPE_CLUB_DESC]]></message>
 	</layout>
-	<fields name="request">
+	<fields name="request" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 		<fieldset name="request">
-			<field name="id" type="sql"
-				label="COM_JOOMLEAGUE_SITE_CLUB"
-				query="SELECT id, name FROM #__joomleague_club ORDER BY name"
-				key_field="id" value_field="name">
-				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
-			</field>
+			<field name="id" type="club" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_CLUB" />
 		</fieldset>
 	</fields>
 </metadata>

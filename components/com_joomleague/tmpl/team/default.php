@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 declare(strict_types=1);
 \defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
@@ -10,6 +16,12 @@ use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 $team = $this->item;
 $jlFlagPath = JPATH_SITE . '/components/com_joomleague/layouts';
 $teamText = $team ? trim((string) ($team->team_info ?: $team->team_notes)) : '';
+$translateLegacyName = static function ($value): string {
+	$value = trim((string) $value);
+
+	return preg_match('/^(COM|JLM)_[A-Z0-9_-]+$/', $value) ? Text::_($value) : $value;
+};
+$sportName = $this->project ? $translateLegacyName($this->project->sport_name ?? '') : '';
 
 // URL loga týmu (team_picture je cesta relativní ke kořeni Joomly)
 $teamLogo = null;
@@ -26,7 +38,7 @@ if ($team) {
 		'name' => (string) $team->team_name,
 		'alternateName' => $team->team_short_name ?? null,
 		'url' => StructuredDataHelper::absoluteUrl($team->team_website ?? null),
-		'sport' => $this->project->sport_name ?? null,
+		'sport' => $sportName !== '' ? $sportName : null,
 		'parentOrganization' => $team->club_name ? [
 			'@type' => 'SportsOrganization',
 			'name' => (string) $team->club_name,

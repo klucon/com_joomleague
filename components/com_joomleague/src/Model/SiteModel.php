@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -13,6 +19,34 @@ use Joomla\Database\ParameterType;
 
 class SiteModel extends BaseDatabaseModel
 {
+	public function getTemplateParameters(int $projectId, string $template): array
+	{
+		if ($projectId < 1 || !preg_match('/^[a-z0-9_]+$/', $template)) {
+			return [];
+		}
+
+		$db = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select($db->quoteName('params'))
+			->from($db->quoteName('#__joomleague_template_config'))
+			->where($db->quoteName('project_id') . ' = :project_id')
+			->where($db->quoteName('template') . ' = :template')
+			->where($db->quoteName('published') . ' = 1')
+			->order($db->quoteName('id') . ' DESC')
+			->bind(':project_id', $projectId, ParameterType::INTEGER)
+			->bind(':template', $template);
+
+		$params = (string) $db->setQuery($query, 0, 1)->loadResult();
+
+		if ($params === '' || !json_validate($params)) {
+			return [];
+		}
+
+		$decoded = json_decode($params, true);
+
+		return is_array($decoded) ? $decoded : [];
+	}
+
 	public function getProject(int $projectId = 0): ?object
 	{
 		$db = $this->getDatabase();
@@ -520,6 +554,82 @@ class SiteModel extends BaseDatabaseModel
 			->where($db->quoteName('published') . ' = 1')
 			->bind(':project_id', $projectId, ParameterType::INTEGER)
 			->order($db->quoteName('roundcode') . ' ASC, ' . $db->quoteName('id') . ' ASC');
+
+		return $db->setQuery($query)->loadObjectList();
+	}
+
+	public function getRaceCategories(int $projectId): array
+	{
+		$db = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select('*')
+			->from($db->quoteName('#__joomleague_race_category'))
+			->where($db->quoteName('project_id') . ' = :project_id')
+			->where($db->quoteName('published') . ' = 1')
+			->bind(':project_id', $projectId, ParameterType::INTEGER)
+			->order($db->quoteName('ordering') . ' ASC, ' . $db->quoteName('name') . ' ASC');
+
+		return $db->setQuery($query)->loadObjectList();
+	}
+
+	public function getRaceResults(int $projectId, int $roundId = 0, int $categoryId = 0, string $sex = '', string $status = ''): array
+	{
+		$db = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select([
+				'rr.*',
+				$db->quoteName('rp.sex'),
+				$db->quoteName('rp.country'),
+				$db->quoteName('rp.date_of_birth'),
+				'TRIM(CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . ')) AS runner_name',
+				$db->quoteName('p.alias', 'person_alias'),
+				$db->quoteName('rc.name', 'category_name'),
+				$db->quoteName('r.name', 'round_name'),
+				$db->quoteName('c.name', 'club_name'),
+				$db->quoteName('t.name', 'team_name'),
+			])
+			->from($db->quoteName('#__joomleague_race_result', 'rr'))
+			->join('INNER', $db->quoteName('#__joomleague_race_participant', 'rp') . ' ON ' . $db->quoteName('rp.id') . ' = ' . $db->quoteName('rr.participant_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('rr.person_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_race_category', 'rc') . ' ON ' . $db->quoteName('rc.id') . ' = ' . $db->quoteName('rr.category_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_round', 'r') . ' ON ' . $db->quoteName('r.id') . ' = ' . $db->quoteName('rr.round_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_club', 'c') . ' ON ' . $db->quoteName('c.id') . ' = ' . $db->quoteName('rp.club_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_team', 't') . ' ON ' . $db->quoteName('t.id') . ' = ' . $db->quoteName('rp.team_id'))
+			->where($db->quoteName('rr.project_id') . ' = :project_id')
+			->where($db->quoteName('rr.published') . ' = 1')
+			->where($db->quoteName('rp.published') . ' = 1')
+			->bind(':project_id', $projectId, ParameterType::INTEGER);
+
+		if ($roundId > 0) {
+			$query->where($db->quoteName('rr.round_id') . ' = :round_id')
+				->bind(':round_id', $roundId, ParameterType::INTEGER);
+		}
+
+		if ($categoryId > 0) {
+			$query->where($db->quoteName('rr.category_id') . ' = :category_id')
+				->bind(':category_id', $categoryId, ParameterType::INTEGER);
+		}
+
+		$sex = strtoupper(trim($sex));
+
+		if (in_array($sex, ['M', 'F', 'X'], true)) {
+			$query->where($db->quoteName('rp.sex') . ' = :sex')
+				->bind(':sex', $sex);
+		}
+
+		$status = strtoupper(trim($status));
+
+		if (in_array($status, ['FINISHED', 'DNS', 'DNF', 'DSQ', 'NC'], true)) {
+			$query->where($db->quoteName('rr.status') . ' = :status')
+				->bind(':status', $status);
+		}
+
+		$query->order([
+			$db->quoteName('rr.overall_place') . ' = 0 ASC',
+			$db->quoteName('rr.overall_place') . ' ASC',
+			$db->quoteName('rr.duration_ms') . ' ASC',
+			$db->quoteName('rr.id') . ' ASC',
+		]);
 
 		return $db->setQuery($query)->loadObjectList();
 	}
@@ -1415,8 +1525,9 @@ class SiteModel extends BaseDatabaseModel
 		return $db->setQuery($query)->loadObjectList();
 	}
 
-	public function getStandings(int $projectId): array
+	public function getStandings(int $projectId, string $scope = 'total'): array
 	{
+		$scope = in_array($scope, ['total', 'home', 'away'], true) ? $scope : 'total';
 		$teams = [];
 
 		foreach ($this->getProjectTeams($projectId) as $team) {
@@ -1449,26 +1560,12 @@ class SiteModel extends BaseDatabaseModel
 			$homeGoals = (float) $match->team1_result;
 			$awayGoals = (float) $match->team2_result;
 
-			$teams[$homeId]->played++;
-			$teams[$awayId]->played++;
-			$teams[$homeId]->goals_for += $homeGoals;
-			$teams[$homeId]->goals_against += $awayGoals;
-			$teams[$awayId]->goals_for += $awayGoals;
-			$teams[$awayId]->goals_against += $homeGoals;
+			if ($scope !== 'away') {
+				$this->applyStandingResult($teams[$homeId], $homeGoals, $awayGoals);
+			}
 
-			if ($homeGoals > $awayGoals) {
-				$teams[$homeId]->won++;
-				$teams[$awayId]->lost++;
-				$teams[$homeId]->points += 3;
-			} elseif ($homeGoals < $awayGoals) {
-				$teams[$awayId]->won++;
-				$teams[$homeId]->lost++;
-				$teams[$awayId]->points += 3;
-			} else {
-				$teams[$homeId]->drawn++;
-				$teams[$awayId]->drawn++;
-				$teams[$homeId]->points++;
-				$teams[$awayId]->points++;
+			if ($scope !== 'home') {
+				$this->applyStandingResult($teams[$awayId], $awayGoals, $homeGoals);
 			}
 		}
 
@@ -1484,6 +1581,29 @@ class SiteModel extends BaseDatabaseModel
 		);
 
 		return $list;
+	}
+
+	private function applyStandingResult(object $team, float $goalsFor, float $goalsAgainst): void
+	{
+		$team->played++;
+		$team->goals_for += $goalsFor;
+		$team->goals_against += $goalsAgainst;
+
+		if ($goalsFor > $goalsAgainst) {
+			$team->won++;
+			$team->points += 3;
+
+			return;
+		}
+
+		if ($goalsFor < $goalsAgainst) {
+			$team->lost++;
+
+			return;
+		}
+
+		$team->drawn++;
+		$team->points++;
 	}
 
 	public function getPredictionGame(int $projectId = 0, int $gameId = 0): ?object

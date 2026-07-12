@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -29,7 +35,7 @@ $dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0
 		<div class="jl-section-panel__content">
 			<p class="jl-dashboard-eyebrow mb-2"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_CONTEXT'); ?></p>
 			<h2 class="h4 mb-1"><?php echo $this->escape($project->name); ?></h2>
-			<p class="mb-2"><?php echo $this->escape(trim(($project->league ?? '') . ' · ' . ($project->season ?? '') . ' · ' . ($project->sport ?? ''), " \t\n\r\0\x0B·")); ?></p>
+			<p class="mb-2"><?php echo $this->escape(trim(($project->league ?? '') . ' · ' . ($project->season ?? '') . ' · ' . ($project->sport ?? ''), " \t\n\r " . chr(11) . '·')); ?></p>
 			<a class="jl-section-back" href="<?php echo Route::_('index.php?option=com_joomleague&view=projectpanel&project_id=' . (int) $project->id); ?>">
 				<span class="icon-arrow-left" aria-hidden="true"></span>
 				<?php echo Text::_('COM_JOOMLEAGUE_BACK_TO_PROJECT_PANEL'); ?>

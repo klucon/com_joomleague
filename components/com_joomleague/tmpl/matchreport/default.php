@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -9,13 +15,15 @@ use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 
 $match = $this->item;
+$params = $this->templateParams;
+$show = static fn (string $name, bool $default = true): bool => array_key_exists($name, $params) ? (bool) $params[$name] : $default;
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$match) : ?>
 		<div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_MATCH_NOT_FOUND'); ?></div>
 		<?php return; ?>
 	<?php endif; ?>
-	<?php if ($match) : ?>
+	<?php if ($match && $show('show_navigation')) : ?>
 		<nav class="jl-site-nav mb-4">
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $match->projectteam1_id); ?>"><?php echo $this->escape($match->home_name ?? Text::_('COM_JOOMLEAGUE_SITE_HOME')); ?></a>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $match->projectteam2_id); ?>"><?php echo $this->escape($match->away_name ?? Text::_('COM_JOOMLEAGUE_SITE_AWAY')); ?></a>
@@ -31,13 +39,13 @@ $match = $this->item;
 			'match'    => $match,
 			'events'   => $this->items,
 			'referees' => $this->matchReferees,
-			'options'  => ['link' => false, 'heading' => 'h1'],
+			'options'  => ['link' => false, 'heading' => 'h1', 'meta' => $show('show_meta'), 'split' => $show('show_split_results'), 'preview' => $show('show_preview'), 'summary' => $show('show_summary'), 'referees' => $show('show_referees'), 'events' => $show('show_events')],
 		],
 		JPATH_SITE . '/components/com_joomleague/layouts'
 	);
 	?>
 
-	<?php if ($match && $this->headToHeadMatches) : ?>
+	<?php if ($match && $show('show_head_to_head') && $this->headToHeadMatches) : ?>
 		<div class="jl-site-panel table-responsive mt-4">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_HEAD_TO_HEAD'); ?></h2>
 			<table class="table jl-site-table align-middle">

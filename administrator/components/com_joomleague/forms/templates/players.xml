@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fields name="params">
+		<fieldset name="display" label="COM_JOOMLEAGUE_TEMPLATE_FIELDSET_DISPLAY">
+			<field name="show_title" type="radio" default="1" label="COM_JOOMLEAGUE_TEMPLATE_PLAYERS_SHOW_TITLE" class="btn-group btn-group-yesno">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
+			<field name="show_positions" type="radio" default="1" label="COM_JOOMLEAGUE_TEMPLATE_PLAYERS_SHOW_POSITIONS" class="btn-group btn-group-yesno">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
+			<field name="show_birthdays" type="radio" default="1" label="COM_JOOMLEAGUE_TEMPLATE_PLAYERS_SHOW_BIRTHDAYS" class="btn-group btn-group-yesno">
+				<option value="1">JYES</option>
+				<option value="0">JNO</option>
+			</field>
+		</fieldset>
+	</fields>
+</form>

@@ -50,13 +50,45 @@ $jlTableHead = '<thead><tr>'
 
 $jlByRound = [];
 foreach ($this->matches as $jlM) {
-	$jlByRound[(string) ($jlM->round_name ?? '')][] = $jlM;
+	$jlRoundKey = (string) ((int) ($jlM->round_id ?? 0) ?: ($jlM->roundcode ?? $jlM->round_name ?? ''));
+	$jlRoundName = trim((string) ($jlM->round_name ?? ''));
+	$jlRoundCode = (int) ($jlM->roundcode ?? 0);
+	$jlMatchDate = (string) ($jlM->match_date ?? '');
+	$jlMatchTime = $jlMatchDate !== '' && strpos($jlMatchDate, '0000-00-00') !== 0 ? strtotime($jlMatchDate) : false;
+
+	if (!isset($jlByRound[$jlRoundKey])) {
+		$jlByRound[$jlRoundKey] = [
+			'name' => $jlRoundName,
+			'code' => $jlRoundCode,
+			'sort' => $jlMatchTime !== false ? (int) $jlMatchTime : PHP_INT_MAX,
+			'matches' => [],
+		];
+	}
+
+	if ($jlMatchTime !== false) {
+		$jlByRound[$jlRoundKey]['sort'] = min((int) $jlByRound[$jlRoundKey]['sort'], (int) $jlMatchTime);
+	}
+
+	$jlByRound[$jlRoundKey]['matches'][] = $jlM;
 }
+
+uasort($jlByRound, static function (array $a, array $b): int {
+	$codeA = (int) ($a['sort'] ?? PHP_INT_MAX);
+	$codeB = (int) ($b['sort'] ?? PHP_INT_MAX);
+
+	if ($codeA !== $codeB) {
+		return $codeA <=> $codeB;
+	}
+
+	return ((int) ($a['code'] ?? 0) <=> (int) ($b['code'] ?? 0))
+		?: strnatcasecmp((string) ($a['name'] ?? ''), (string) ($b['name'] ?? ''));
+});
 ?>
 <?php if (!$this->matches) : ?>
 	<div class="alert alert-info"><?php echo Text::_('COM_JOOMLEAGUE_SITE_NO_MATCHES'); ?></div>
 <?php else : ?>
-	<?php foreach ($jlByRound as $jlRoundName => $jlRoundMatches) : ?>
+	<?php foreach ($jlByRound as $jlRound) : ?>
+		<?php $jlRoundName = (string) ($jlRound['name'] ?? ''); ?>
 		<div class="jl-schedule-round">
 			<?php if ($jlRoundName !== '') : ?>
 				<div class="jl-schedule-round__head"><?php echo $this->escape($jlRoundName); ?></div>
@@ -65,7 +97,7 @@ foreach ($this->matches as $jlM) {
 				<table class="table jl-site-table jl-matches-table align-middle mb-0">
 					<?php echo $jlColgroup; ?>
 					<?php echo $jlTableHead; ?>
-					<tbody><?php foreach ($jlRoundMatches as $jlM) { $jlMatchRow($jlM); } ?></tbody>
+					<tbody><?php foreach (($jlRound['matches'] ?? []) as $jlM) { $jlMatchRow($jlM); } ?></tbody>
 				</table>
 			</div>
 		</div>

@@ -1,1 +1,8 @@
-<?php declare(strict_types=1); namespace Joomleague\Component\Joomleague\Administrator\View\Project; \defined('_JEXEC') or die; use Joomleague\Component\Joomleague\Administrator\View\Common\AdminFormView; final class HtmlView extends AdminFormView {protected function configure():array{return ['new'=>'COM_JOOMLEAGUE_PROJECT_NEW','edit'=>'COM_JOOMLEAGUE_PROJECT_EDIT','icon'=>'grid-2','singular'=>'project','details'=>'COM_JOOMLEAGUE_FIELDSET_DETAILS','main'=>['name','alias','sports_type_id','league_id','season_id','project_type','master_template','extension','extended'],'side'=>['schedule'=>'COM_JOOMLEAGUE_PROJECT_FIELDSET_SCHEDULE','ruleset'=>'COM_JOOMLEAGUE_PROJECT_FIELDSET_RULES','appearance'=>'COM_JOOMLEAGUE_PROJECT_FIELDSET_APPEARANCE'],'publishing'=>['published','ordering']];}}
+<?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+declare(strict_types=1); namespace Joomleague\Component\Joomleague\Administrator\View\Project; \defined('_JEXEC') or die; use Joomleague\Component\Joomleague\Administrator\View\Common\AdminFormView; final class HtmlView extends AdminFormView {protected function configure():array{return ['new'=>'COM_JOOMLEAGUE_PROJECT_NEW','edit'=>'COM_JOOMLEAGUE_PROJECT_EDIT','icon'=>'grid-2','singular'=>'project','details'=>'COM_JOOMLEAGUE_FIELDSET_DETAILS','main'=>['name','alias','sports_type_id','league_id','season_id','project_type','master_template','extension','extended'],'side'=>['schedule'=>'COM_JOOMLEAGUE_PROJECT_FIELDSET_SCHEDULE','ruleset'=>'COM_JOOMLEAGUE_PROJECT_FIELDSET_RULES','appearance'=>'COM_JOOMLEAGUE_PROJECT_FIELDSET_APPEARANCE'],'publishing'=>['published','ordering']];}}

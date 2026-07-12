@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fields name="params">
+		<fieldset name="display" label="COM_JOOMLEAGUE_TEMPLATE_FIELDSET_DISPLAY">
+			<field type="note" label="COM_JOOMLEAGUE_FES_PARAMS_GROUP_PAGE_ELEMENTS" description="COM_JOOMLEAGUE_FES_PARAMS_DESCR_PAGE_ELEMENTS" />
+			<field name="show_sectionheader" type="radio" default="1" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_SHOW_HEADER" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_SHOW_HEADER">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field name="show_matrix" type="radio" default="1" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_SHOW_MATRIX" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_SHOW_MATRIX">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field type="note" label="COM_JOOMLEAGUE_FES_PARAMS_GROUP_OPTIONS" description="COM_JOOMLEAGUE_FES_PARAMS_DESCR_OPTIONS" />
+			<field name="page_title_format" type="list" default="0" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_PAGE_TITLE_FORMAT" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_PAGE_TITLE_FORMAT">
+				<option value="0">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_PROJECT</option>
+				<option value="1">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_PROJECT_LEAGUE</option>
+				<option value="2">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_PROJECT_LEAGUE_SEASON</option>
+				<option value="3">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_PROJECT_SEASON</option>
+				<option value="4">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_LEAGUE</option>
+				<option value="5">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_LEAGUE_SEASON</option>
+				<option value="6">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_SEASON</option>
+				<option value="7">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_NONE</option>
+			</field>
+			<field name="show_picture" type="list" default="logo_small" label="COM_JOOMLEAGUE_FES_MATCHREPORT_SHOW_PICTURE" description="COM_JOOMLEAGUE_FES_MATCHREPORT_SHOW_PICTURE_DESC">
+				<option value="team_picture">COM_JOOMLEAGUE_FES_MATCHREPORT_TEAM_PICTURE</option>
+				<option value="projectteam_picture">COM_JOOMLEAGUE_FES_MATCHREPORT_PROJECTTEAM_PICTURE</option>
+				<option value="logo_small">COM_JOOMLEAGUE_FES_MATCHREPORT_CLUB_LOGO_SMALL</option>
+				<option value="logo_middle">COM_JOOMLEAGUE_FES_MATCHREPORT_CLUB_LOGO_MIDDLE</option>
+				<option value="logo_big">COM_JOOMLEAGUE_FES_MATCHREPORT_CLUB_LOGO_BIG</option>
+			</field>
+			<field name="picture_width" type="text" default="0" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_TEAM_PICTURE_WIDTH" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_TEAM_PICTURE_WIDTH" />
+			<field name="picture_height" type="text" default="21" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_TEAM_PICTURE_HEIGHT" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_TEAM_PICTURE_HEIGHT" />
+			<field name="crosstable_icons_horizontal" type="radio" default="0" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_SHOW_HORZ_ICONS" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_SHOW_HORZ_ICONS">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field name="crosstable_icons_vertical" type="radio" default="0" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_SHOW_VERT_ICONS" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_SHOW_VERT_ICONS">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field name="link_teams" type="radio" default="1" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_LINK_TEAMNAMES" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_LINK_TEAMNAMES">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field name="which_link" type="list" default="1" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_WHICH_LINK" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_WHICH_LINK">
+				<option value="0">COM_JOOMLEAGUE_FES_MATRIX_PARAM_OPTION0_WHICH_LINK</option>
+				<option value="1">COM_JOOMLEAGUE_FES_MATRIX_PARAM_OPTION1_WHICH_LINK</option>
+				<option value="2">COM_JOOMLEAGUE_FES_MATRIX_PARAM_OPTION2_WHICH_LINK</option>
+			</field>
+			<field name="highlight_fav_team" type="list" default="0" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_HIGHLIGHT_FAVTEAM" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_HIGHLIGHT_FAVTEAM">
+				<option value="0">COM_JOOMLEAGUE_FES_MATRIX_PARAM_OPTION0_HIGHLIGHT_FAVTEAM</option>
+				<option value="1">COM_JOOMLEAGUE_FES_MATRIX_PARAM_OPTION1_HIGHLIGHT_FAVTEAM</option>
+				<option value="2">COM_JOOMLEAGUE_FES_MATRIX_PARAM_OPTION2_HIGHLIGHT_FAVTEAM</option>
+			</field>
+			<field name="show_help" type="radio" default="0" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_SHOW_HELP" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_SHOW_HELP">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field type="note" label="COM_JOOMLEAGUE_FES_PARAMS_GROUP_ADVANCED_OPTIONS" description="COM_JOOMLEAGUE_FES_PARAMS_DESCR_ADVANCED_OPTIONS" />
+			<field name="style_class1" type="text" default="sectiontableentry1" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_STYLE_ODD" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_STYLE_ODD" />
+			<field name="style_class2" type="text" default="sectiontableentry2" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_STYLE_EVEN" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_STYLE_EVEN" />
+			<field name="color_draw" type="color" default="#FF9933" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_COLOR_DRAW" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_COLOR_DRAW" />
+			<field name="color_loss" type="color" default="#FF0000" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_COLOR_LOSS" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_COLOR_LOSS" />
+			<field name="color_win" type="color" default="#00CC00" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_COLOR_WIN" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_COLOR_WIN" />
+		</fieldset>
+	</fields>
+</form>

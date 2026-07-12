@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="plugin" group="system" method="upgrade">
+	<name>plg_system_joomleaguesefaliases</name>
+	<author>Ondřej Klučka (https://klucon.cz)</author>
+	<authorEmail>info@klucon.cz</authorEmail>
+	<authorUrl>https://klucon.cz</authorUrl>
+	<creationDate>2026-07</creationDate>
+	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>6.1.0-alpha-150</version>
+	<description>PLG_SYSTEM_JOOMLEAGUESEFALIASES_XML_DESCRIPTION</description>
+	<namespace path="src">Joomleague\Plugin\System\Joomleaguesefaliases</namespace>
+	<files>
+		<folder plugin="joomleaguesefaliases">services</folder>
+		<folder>src</folder>
+	</files>
+	<languages>
+		<language tag="cs-CZ">language/cs-CZ/plg_system_joomleaguesefaliases.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/plg_system_joomleaguesefaliases.sys.ini</language>
+		<language tag="en-GB">language/en-GB/plg_system_joomleaguesefaliases.ini</language>
+		<language tag="en-GB">language/en-GB/plg_system_joomleaguesefaliases.sys.ini</language>
+		<language tag="de-DE">language/de-DE/plg_system_joomleaguesefaliases.ini</language>
+		<language tag="de-DE">language/de-DE/plg_system_joomleaguesefaliases.sys.ini</language>
+	</languages>
+</extension>

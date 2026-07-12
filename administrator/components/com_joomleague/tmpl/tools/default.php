@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -13,6 +19,7 @@ $cards = [
 	['view' => 'databasetools', 'title' => 'COM_JOOMLEAGUE_DBTOOLS_TITLE', 'desc' => 'COM_JOOMLEAGUE_DBTOOLS_DESC', 'icon' => 'icon-database', 'tone' => 'cyan'],
 	['view' => 'updates', 'title' => 'COM_JOOMLEAGUE_UPDATES_TITLE', 'desc' => 'COM_JOOMLEAGUE_UPDATES_DESC', 'icon' => 'icon-refresh', 'tone' => 'violet'],
 	['view' => 'import', 'title' => 'COM_JOOMLEAGUE_IMPORT_TITLE', 'desc' => 'COM_JOOMLEAGUE_IMPORT_DESC', 'icon' => 'icon-upload', 'tone' => 'emerald'],
+	['view' => 'sqlimport', 'title' => 'COM_JOOMLEAGUE_SQLIMPORT_TITLE', 'desc' => 'COM_JOOMLEAGUE_SQLIMPORT_CARD_DESC', 'icon' => 'icon-database', 'tone' => 'cyan'],
 	['view' => 'jlxmlexports', 'title' => 'COM_JOOMLEAGUE_EXPORT_TITLE', 'desc' => 'COM_JOOMLEAGUE_EXPORT_DESC', 'icon' => 'icon-download', 'tone' => 'orange'],
 	['view' => 'treetos', 'title' => 'COM_JOOMLEAGUE_TREES_TITLE', 'desc' => 'COM_JOOMLEAGUE_TREES_DESC', 'icon' => 'icon-tree-2', 'tone' => 'teal'],
 	['view' => 'predictiongames', 'title' => 'COM_JOOMLEAGUE_PREDICTIONGAMES_TITLE', 'desc' => 'COM_JOOMLEAGUE_PREDICTIONGAMES_DESC', 'icon' => 'icon-star', 'tone' => 'rose'],

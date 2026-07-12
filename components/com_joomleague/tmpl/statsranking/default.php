@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -17,14 +23,8 @@ foreach ($this->items as $row) {
 <div class="com-joomleague-site">
 	<?php if (!$project) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT_NOT_FOUND'); ?></div><?php return; endif; ?>
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo $this->escape(trim(($project->league_name ?? '') . ' · ' . ($project->season_name ?? ''), ' ·')); ?></div>
+		<div class="jl-site-eyebrow"><?php echo $this->escape($project->name); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_STATS_RANKING'); ?></h1>
-		<p class="jl-site-muted mb-3"><?php echo $this->escape($project->name); ?></p>
-		<nav class="jl-site-nav">
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT'); ?></a>
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=stats&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_STATS'); ?></a>
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=eventsranking&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_EVENTS_RANKING'); ?></a>
-		</nav>
 	</section>
 
 	<?php foreach ($this->statistics as $statistic) : ?>

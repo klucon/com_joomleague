@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 declare(strict_types=1);
 \defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
@@ -11,6 +17,12 @@ $club = $this->item;
 $jlFlagPath = JPATH_SITE . '/components/com_joomleague/layouts';
 $address = $club ? trim(($club->address ?? '') . ', ' . ($club->zipcode ?? '') . ' ' . ($club->location ?? ''), ' ,') : '';
 $clubText = $club ? trim((string) ($club->notes ?? '')) : '';
+$translateLegacyName = static function ($value): string {
+	$value = trim((string) $value);
+
+	return preg_match('/^(COM|JLM)_[A-Z0-9_-]+$/', $value) ? Text::_($value) : $value;
+};
+$sportName = $club ? $translateLegacyName($club->sport_name ?? '') : '';
 
 // Logo klubu (cesta relativní ke kořeni Joomly, nebo absolutní URL).
 $clubLogo = '';
@@ -30,7 +42,7 @@ if ($club) {
 		'name' => (string) $club->name,
 		'url' => StructuredDataHelper::absoluteUrl($club->website ?? null),
 		'email' => $club->email ?: null,
-		'sport' => $club->sport_name ?? null,
+		'sport' => $sportName !== '' ? $sportName : null,
 		'address' => [
 			'@type' => 'PostalAddress',
 			'streetAddress' => $club->address ?? null,

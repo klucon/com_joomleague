@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -11,12 +17,18 @@ use Joomla\Database\DatabaseInterface;
 
 final class SportsBootstrapService
 {
+	private const ALL_PROFILE = 'all';
+
 	public function __construct(private readonly DatabaseInterface $database)
 	{
 	}
 
 	public function create(string $profile, bool $createPositions, bool $createEvents, bool $createStatistics): array
 	{
+		if ($profile === self::ALL_PROFILE) {
+			return $this->createAll($createPositions, $createEvents, $createStatistics);
+		}
+
 		$definition = $this->loadDefinition($profile);
 		$created = [
 			'sports' => 0,
@@ -65,6 +77,49 @@ final class SportsBootstrapService
 		}
 
 		return $created;
+	}
+
+	private function createAll(bool $createPositions, bool $createEvents, bool $createStatistics): array
+	{
+		$total = [
+			'sports' => 0,
+			'positions' => 0,
+			'events' => 0,
+			'statistics' => 0,
+			'position_events' => 0,
+			'position_statistics' => 0,
+		];
+
+		foreach ($this->getAvailableProfiles() as $profile) {
+			$result = $this->create($profile, $createPositions, $createEvents, $createStatistics);
+
+			foreach ($total as $key => $value) {
+				$total[$key] += (int) ($result[$key] ?? 0);
+			}
+		}
+
+		return $total;
+	}
+
+	private function getAvailableProfiles(): array
+	{
+		$componentPath = \defined('JPATH_COMPONENT_ADMINISTRATOR')
+			? \JPATH_COMPONENT_ADMINISTRATOR
+			: JPATH_ADMINISTRATOR . '/components/com_joomleague';
+		$files = glob($componentPath . '/resources/sports/*.json') ?: [];
+		$profiles = [];
+
+		foreach ($files as $file) {
+			$profile = basename($file, '.json');
+
+			if ($profile !== self::ALL_PROFILE) {
+				$profiles[] = $profile;
+			}
+		}
+
+		sort($profiles, SORT_STRING);
+
+		return $profiles;
 	}
 
 	private function loadDefinition(string $profile): array

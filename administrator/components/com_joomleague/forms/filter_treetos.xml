@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fields name="filter">
+		<field name="search" type="text" label="JSEARCH_FILTER" hint="JSEARCH_FILTER" />
+		<field name="published" type="status" label="JOPTION_SELECT_PUBLISHED" onchange="this.form.submit();">
+			<option value="">JOPTION_SELECT_PUBLISHED</option>
+		</field>
+	</fields>
+	<fields name="list">
+		<field name="fullordering" type="list" label="JGLOBAL_SORT_BY" onchange="this.form.submit();" default="a.id DESC">
+			<option value="a.name ASC">JGLOBAL_TITLE_ASC</option>
+			<option value="a.name DESC">JGLOBAL_TITLE_DESC</option>
+			<option value="p.name ASC">COM_JOOMLEAGUE_MENU_PROJECTS</option>
+			<option value="a.tree_i ASC">COM_JOOMLEAGUE_TREETO_FIELD_DEPTH</option>
+			<option value="a.id DESC">JGRID_HEADING_ID_DESC</option>
+			<option value="a.id ASC">JGRID_HEADING_ID_ASC</option>
+		</field>
+		<field name="limit" type="limitbox" label="JGLOBAL_LIST_LIMIT" />
+	</fields>
+</form>

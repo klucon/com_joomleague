@@ -12,6 +12,7 @@
 			<option value="DIVISIONS_LEAGUE">COM_JOOMLEAGUE_PROJECT_TYPE_DIVISIONS</option>
 			<option value="TOURNAMENT_MODE">COM_JOOMLEAGUE_PROJECT_TYPE_TOURNAMENT</option>
 			<option value="FRIENDLY_MATCHES">COM_JOOMLEAGUE_PROJECT_TYPE_FRIENDLY</option>
+			<option value="RUNNING_RACE">COM_JOOMLEAGUE_PROJECT_TYPE_RUNNING_RACE</option>
 		</field>
 		<field name="master_template" type="sql" label="COM_JOOMLEAGUE_PROJECT_FIELD_MASTER" description="COM_JOOMLEAGUE_PROJECT_FIELD_MASTER_DESCRIPTION" query="SELECT id,name FROM #__joomleague_project WHERE master_template IS NULL ORDER BY name" key_field="id" value_field="name">
 			<option value="">JNONE</option>

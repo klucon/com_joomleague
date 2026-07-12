@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fields name="params">
+		<fieldset name="display" label="COM_JOOMLEAGUE_TEMPLATE_FIELDSET_DISPLAY">
+			<field type="note" label="COM_JOOMLEAGUE_FES_PARAMS_GROUP_PAGE_ELEMENTS" description="COM_JOOMLEAGUE_FES_PARAMS_DESCR_PAGE_ELEMENTS" />
+			<field name="show_sectionheader" type="radio" default="1" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_SHOW_SECTIONHEADER" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_SHOW_SECTIONHEADER">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field name="show_referees" type="radio" default="1" label="COM_JOOMLEAGUE_FES_REFEREES_PARAM_LABEL_SHOW_REFEREES" description="COM_JOOMLEAGUE_FES_REFEREES_PARAM_DESCR_SHOW_REFEREES">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field type="note" label="COM_JOOMLEAGUE_FES_PARAMS_GROUP_OPTIONS" description="COM_JOOMLEAGUE_FES_PARAMS_DESCR_OPTIONS" />
+			<field name="page_title_format" type="list" default="0" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_PAGE_TITLE_FORMAT" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_PAGE_TITLE_FORMAT">
+				<option value="0">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_PROJECT</option>
+				<option value="1">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_PROJECT_LEAGUE</option>
+				<option value="2">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_PROJECT_LEAGUE_SEASON</option>
+				<option value="3">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_PROJECT_SEASON</option>
+				<option value="4">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_LEAGUE</option>
+				<option value="5">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_LEAGUE_SEASON</option>
+				<option value="6">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_SEASON</option>
+				<option value="7">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_NONE</option>
+			</field>
+			<field name="name_format" type="list" default="0" label="COM_JOOMLEAGUE_FES_REFEREES_PARAM_LABEL_NAME_FORMAT" description="COM_JOOMLEAGUE_FES_REFEREES_PARAM_DESCR_NAME_FORMAT">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_FIRST_NICK_LAST</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_LAST_NICK_FIRST</option>
+				<option value="2">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_LAST_FIRST_NICK</option>
+				<option value="3">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_FIRST_LAST</option>
+				<option value="4">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_LAST_FIRST</option>
+				<option value="5">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_NICK_FIRST_LAST</option>
+				<option value="6">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_NICK_LAST_FIRST</option>
+				<option value="7">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_FIRST_LAST_NICK</option>
+				<option value="8">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_FIRST_LAST2</option>
+				<option value="9">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_LAST_FIRST2</option>
+				<option value="10">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_LAST</option>
+				<option value="11">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_FIRST_NICK_LAST2</option>
+				<option value="12">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_NICK</option>
+				<option value="13">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_FIRST_LAST3</option>
+				<option value="14">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_LAST2_FIRST</option>
+				<option value="15">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_LAST_NEWLINE_FIRST</option>
+				<option value="16">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_FIRST_NEWLINE_LAST</option>
+				<option value="17">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_LAST_FIRST_NICK</option>
+				<option value="18">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_LAST_FIRSTNAME_FIRST_CHAR_DOT</option>
+			</field>
+			<field name="show_birthday" type="list" default="1" label="COM_JOOMLEAGUE_FES_REFEREES_PARAM_LABEL_SHOW_BIRTHDAY" description="COM_JOOMLEAGUE_FES_REFEREES_PARAM_DESCR_SHOW_BIRTHDAY">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_FES_REFEREES_PARAM_OPTION1_SHOW_BIRTHDAY</option>
+				<option value="2">COM_JOOMLEAGUE_FES_REFEREES_PARAM_OPTION2_SHOW_BIRTHDAY</option>
+				<option value="3">COM_JOOMLEAGUE_FES_REFEREES_PARAM_OPTION3_SHOW_BIRTHDAY</option>
+				<option value="4">COM_JOOMLEAGUE_FES_REFEREES_PARAM_OPTION4_SHOW_BIRTHDAY</option>
+			</field>
+			<field name="show_icon" type="radio" default="1" label="COM_JOOMLEAGUE_FES_REFEREES_PARAM_LABEL_SHOW_ICON" description="COM_JOOMLEAGUE_FES_REFEREES_PARAM_DESCR_SHOW_ICON">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field name="referee_picture_width" type="text" default="40" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_REF_PICTURE_WIDTH" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_REF_PICTURE_WIDTH" />
+			<field name="referee_picture_height" type="text" default="0" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_REF_PICTURE_HEIGHT" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_REF_PICTURE_HEIGHT" />
+			<field name="link_name" type="radio" default="1" label="COM_JOOMLEAGUE_FES_REFEREES_PARAM_LABEL_LINK_NAME" description="COM_JOOMLEAGUE_FES_REFEREES_PARAM_DESCR_LINK_NAME">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field name="show_games_count" type="radio" default="1" label="COM_JOOMLEAGUE_FES_REFEREES_PARAM_LABEL_SHOW_GAMES_COUNT" description="COM_JOOMLEAGUE_FES_REFEREES_PARAM_DESCR_SHOW_GAMES_COUNT">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field type="note" label="COM_JOOMLEAGUE_FES_PARAMS_GROUP_ADVANCED_OPTIONS" description="COM_JOOMLEAGUE_FES_PARAMS_DESCR_ADVANCED_OPTIONS" />
+			<field name="style_class1" type="text" default="sectiontableentry1" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_STYLE_ODD" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_STYLE_ODD" />
+			<field name="style_class2" type="text" default="sectiontableentry2" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_STYLE_EVEN" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_STYLE_EVEN" />
+		</fieldset>
+	</fields>
+</form>

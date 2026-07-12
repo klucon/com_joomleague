@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 declare(strict_types=1);
 namespace Joomleague\Component\Joomleague\Administrator\Table;
 \defined('_JEXEC') or die;
@@ -15,7 +21,7 @@ final class ProjectTable extends Table
   $this->normalizeMediaField('picture');
   if($this->name===''){return $this->fail('COM_JOOMLEAGUE_PROJECT_ERROR_NAME_REQUIRED');}
   foreach(['league_id','season_id','sports_type_id'] as $f){if((int)$this->$f<1)return $this->fail('COM_JOOMLEAGUE_PROJECT_ERROR_RELATIONS_REQUIRED');}
-  if(!in_array($this->project_type,['SIMPLE_LEAGUE','DIVISIONS_LEAGUE','TOURNAMENT_MODE','FRIENDLY_MATCHES'],true))return $this->fail('COM_JOOMLEAGUE_PROJECT_ERROR_TYPE_INVALID');
+  if(!in_array($this->project_type,['SIMPLE_LEAGUE','DIVISIONS_LEAGUE','TOURNAMENT_MODE','FRIENDLY_MATCHES','RUNNING_RACE'],true))return $this->fail('COM_JOOMLEAGUE_PROJECT_ERROR_TYPE_INVALID');
   if(!preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/',(string)$this->start_time))return $this->fail('COM_JOOMLEAGUE_PROJECT_ERROR_TIME_INVALID');
   foreach(['points_after_regular_time','points_after_add_time','points_after_penalty'] as $f){if(!preg_match('/^\d+,\d+,\d+$/',(string)$this->$f))return $this->fail('COM_JOOMLEAGUE_PROJECT_ERROR_POINTS_INVALID');}
   foreach(['game_regular_time','game_parts','halftime','add_time'] as $f){if((int)$this->$f<0)return $this->fail('COM_JOOMLEAGUE_PROJECT_ERROR_DURATION_INVALID');}

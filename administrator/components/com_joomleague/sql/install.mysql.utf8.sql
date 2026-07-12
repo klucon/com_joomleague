@@ -495,7 +495,7 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_project` (
 	`sub_template_id` INT NULL DEFAULT NULL,
 	`extension` varchar(80) DEFAULT NULL,
 	`timezone` varchar(50) NOT NULL DEFAULT 'Europe/Amsterdam',
-	`project_type` enum('SIMPLE_LEAGUE','DIVISIONS_LEAGUE','TOURNAMENT_MODE','FRIENDLY_MATCHES') NOT NULL DEFAULT 'SIMPLE_LEAGUE',
+	`project_type` enum('SIMPLE_LEAGUE','DIVISIONS_LEAGUE','TOURNAMENT_MODE','FRIENDLY_MATCHES','RUNNING_RACE') NOT NULL DEFAULT 'SIMPLE_LEAGUE',
 	`teams_as_referees` TINYINT NOT NULL DEFAULT 0,
 	`sports_type_id` INT NULL DEFAULT NULL,
 	`start_date` DATE NULL DEFAULT NULL,
@@ -565,7 +565,7 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_project_position` (
 CREATE TABLE IF NOT EXISTS `#__joomleague_project_referee` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`project_id` INT NULL DEFAULT NULL,
-	`person_id` INT NULL DEFAULT NULL,
+	`person_id` INT NOT NULL,
 	`project_position_id` INT DEFAULT NULL,
 	`notes` text NULL,
 	`picture` varchar(128) NOT NULL DEFAULT '',
@@ -1571,6 +1571,118 @@ INSERT IGNORE INTO `#__joomleague_country` (`code`, `name`) VALUES
 	('za', 'COM_JOOMLEAGUE_COUNTRY_ZA'),
 	('zm', 'COM_JOOMLEAGUE_COUNTRY_ZM'),
 	('zw', 'COM_JOOMLEAGUE_COUNTRY_ZW');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `#__joomleague_race_category`
+--
+
+CREATE TABLE IF NOT EXISTS `#__joomleague_race_category` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`project_id` INT NOT NULL,
+	`name` varchar(100) NOT NULL DEFAULT '',
+	`alias` varchar(255) NOT NULL DEFAULT '',
+	`sex` enum('ANY','M','F','X') NOT NULL DEFAULT 'ANY',
+	`age_min` SMALLINT NULL DEFAULT NULL,
+	`age_max` SMALLINT NULL DEFAULT NULL,
+	`ordering` INT NOT NULL DEFAULT 0,
+	`published` TINYINT NOT NULL DEFAULT 1,
+	`checked_out` INT NULL DEFAULT NULL,
+	`checked_out_time` DATETIME NULL DEFAULT NULL,
+	`created` DATETIME NULL DEFAULT NULL,
+	`created_by` INT NULL DEFAULT NULL,
+	`modified` DATETIME NULL DEFAULT NULL,
+	`modified_by` INT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	KEY `idx_race_category_project` (`project_id`),
+	KEY `idx_race_category_alias` (`alias`),
+	CONSTRAINT `fk_jl_race_category_project` FOREIGN KEY (`project_id`) REFERENCES `#__joomleague_project` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `#__joomleague_race_participant`
+--
+
+CREATE TABLE IF NOT EXISTS `#__joomleague_race_participant` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`project_id` INT NOT NULL,
+	`person_id` INT NULL DEFAULT NULL,
+	`category_id` INT NULL DEFAULT NULL,
+	`bib_number` varchar(32) NOT NULL DEFAULT '',
+	`club_id` INT NULL DEFAULT NULL,
+	`team_id` INT NULL DEFAULT NULL,
+	`country` char(3) NOT NULL DEFAULT '',
+	`sex` char(1) NOT NULL DEFAULT '',
+	`date_of_birth` DATE NULL DEFAULT NULL,
+	`note` TEXT NULL DEFAULT NULL,
+	`ordering` INT NOT NULL DEFAULT 0,
+	`published` TINYINT NOT NULL DEFAULT 1,
+	`checked_out` INT NULL DEFAULT NULL,
+	`checked_out_time` DATETIME NULL DEFAULT NULL,
+	`created` DATETIME NULL DEFAULT NULL,
+	`created_by` INT NULL DEFAULT NULL,
+	`modified` DATETIME NULL DEFAULT NULL,
+	`modified_by` INT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `idx_race_participant_bib` (`project_id`, `bib_number`),
+	KEY `idx_race_participant_person` (`person_id`),
+	KEY `idx_race_participant_category` (`category_id`),
+	KEY `idx_race_participant_club` (`club_id`),
+	KEY `idx_race_participant_team` (`team_id`),
+	CONSTRAINT `fk_jl_race_participant_project` FOREIGN KEY (`project_id`) REFERENCES `#__joomleague_project` (`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_jl_race_participant_person` FOREIGN KEY (`person_id`) REFERENCES `#__joomleague_person` (`id`) ON DELETE SET NULL,
+	CONSTRAINT `fk_jl_race_participant_category` FOREIGN KEY (`category_id`) REFERENCES `#__joomleague_race_category` (`id`) ON DELETE SET NULL,
+	CONSTRAINT `fk_jl_race_participant_club` FOREIGN KEY (`club_id`) REFERENCES `#__joomleague_club` (`id`) ON DELETE SET NULL,
+	CONSTRAINT `fk_jl_race_participant_team` FOREIGN KEY (`team_id`) REFERENCES `#__joomleague_team` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `#__joomleague_race_result`
+--
+
+CREATE TABLE IF NOT EXISTS `#__joomleague_race_result` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`project_id` INT NOT NULL,
+	`round_id` INT NULL DEFAULT NULL,
+	`participant_id` INT NOT NULL,
+	`person_id` INT NULL DEFAULT NULL,
+	`category_id` INT NULL DEFAULT NULL,
+	`overall_place` INT NULL DEFAULT NULL,
+	`category_place` INT NULL DEFAULT NULL,
+	`sex_place` INT NULL DEFAULT NULL,
+	`bib_number` varchar(32) NOT NULL DEFAULT '',
+	`start_time` DATETIME NULL DEFAULT NULL,
+	`finish_time` DATETIME NULL DEFAULT NULL,
+	`duration_ms` BIGINT NULL DEFAULT NULL,
+	`duration_text` varchar(32) NOT NULL DEFAULT '',
+	`status` enum('FINISHED','DNS','DNF','DSQ','NC') NOT NULL DEFAULT 'FINISHED',
+	`status_note` varchar(255) NOT NULL DEFAULT '',
+	`ordering` INT NOT NULL DEFAULT 0,
+	`published` TINYINT NOT NULL DEFAULT 1,
+	`checked_out` INT NULL DEFAULT NULL,
+	`checked_out_time` DATETIME NULL DEFAULT NULL,
+	`created` DATETIME NULL DEFAULT NULL,
+	`created_by` INT NULL DEFAULT NULL,
+	`modified` DATETIME NULL DEFAULT NULL,
+	`modified_by` INT NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	UNIQUE KEY `idx_race_result_round_participant` (`round_id`, `participant_id`),
+	KEY `idx_race_result_project` (`project_id`),
+	KEY `idx_race_result_participant` (`participant_id`),
+	KEY `idx_race_result_person` (`person_id`),
+	KEY `idx_race_result_category` (`category_id`),
+	KEY `idx_race_result_duration` (`status`, `duration_ms`),
+	CONSTRAINT `fk_jl_race_result_project` FOREIGN KEY (`project_id`) REFERENCES `#__joomleague_project` (`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_jl_race_result_round` FOREIGN KEY (`round_id`) REFERENCES `#__joomleague_round` (`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_jl_race_result_participant` FOREIGN KEY (`participant_id`) REFERENCES `#__joomleague_race_participant` (`id`) ON DELETE CASCADE,
+	CONSTRAINT `fk_jl_race_result_person` FOREIGN KEY (`person_id`) REFERENCES `#__joomleague_person` (`id`) ON DELETE SET NULL,
+	CONSTRAINT `fk_jl_race_result_category` FOREIGN KEY (`category_id`) REFERENCES `#__joomleague_race_category` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `#__joomleague_version` (`major`, `minor`, `build`, `count`, `revision`, `file`, `version`)
 VALUES (0, 35, 2, 0, '', 'install.mysql.utf8.sql', '0.35.2');

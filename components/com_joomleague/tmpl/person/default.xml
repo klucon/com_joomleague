@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-	<layout title="COM_JOOMLEAGUE_SITE_PERSON">
-		<message><![CDATA[COM_JOOMLEAGUE_SITE_PERSON_DESC]]></message>
+	<layout title="COM_JOOMLEAGUE_ADMIN_MENUTYPE_PERSON">
+		<message><![CDATA[COM_JOOMLEAGUE_ADMIN_MENUTYPE_PERSON_DESC]]></message>
 	</layout>
 	<fields name="request" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 		<fieldset name="request">
-			<field name="id" type="modal_person" label="COM_JOOMLEAGUE_SITE_PERSON" />
+			<field name="id" type="modal_person" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_PERSON" />
 		</fieldset>
 	</fields>
 </metadata>

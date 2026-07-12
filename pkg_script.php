@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -31,6 +37,11 @@ return new class () implements InstallerScriptInterface {
 		['folder' => 'quickicon', 'element' => 'joomleague'],
 	];
 
+	/** Pluginy nutné pro správné směrování balíčku; zapínají se i při update. */
+	private const REQUIRED_PLUGINS = [
+		['folder' => 'system', 'element' => 'joomleaguesefaliases'],
+	];
+
 	public function install(InstallerAdapter $adapter): bool
 	{
 		return true;
@@ -59,6 +70,8 @@ return new class () implements InstallerScriptInterface {
 		if ($type === 'install') {
 			$this->enablePlugins();
 		}
+
+		$this->enableRequiredPlugins();
 
 		$this->renderTelemetryConsent();
 
@@ -221,10 +234,20 @@ return new class () implements InstallerScriptInterface {
 
 	private function enablePlugins(): void
 	{
+		$this->enablePluginList(self::PLUGINS);
+	}
+
+	private function enableRequiredPlugins(): void
+	{
+		$this->enablePluginList(self::REQUIRED_PLUGINS);
+	}
+
+	private function enablePluginList(array $plugins): void
+	{
 		try {
 			$db = Factory::getContainer()->get(DatabaseInterface::class);
 
-			foreach (self::PLUGINS as $plugin) {
+			foreach ($plugins as $plugin) {
 				$folder  = $plugin['folder'];
 				$element = $plugin['element'];
 
@@ -240,7 +263,7 @@ return new class () implements InstallerScriptInterface {
 				$db->setQuery($query)->execute();
 			}
 		} catch (\Throwable $exception) {
-			// Auto-zapnutí je nice-to-have; případná chyba nesmí shodit instalaci.
+			// Auto-zapnutí nesmí shodit instalaci.
 		}
 	}
 };

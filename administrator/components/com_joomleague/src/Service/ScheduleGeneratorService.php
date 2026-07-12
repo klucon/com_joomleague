@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -37,7 +43,7 @@ final class ScheduleGeneratorService
 		string $templateId = self::ROUND_ROBIN_FIRST_HALF
 	): array {
 		$project = $this->getProject($projectId);
-		$this->assertProjectHasNoRounds($projectId);
+		$this->ensureProjectHasNoRounds($projectId);
 
 		$teams = $this->getProjectTeamIds($projectId);
 
@@ -141,7 +147,7 @@ final class ScheduleGeneratorService
 		return $project;
 	}
 
-	private function assertProjectHasNoRounds(int $projectId): void
+	private function ensureProjectHasNoRounds(int $projectId): void
 	{
 		$query = $this->database->createQuery()
 			->select('COUNT(*)')

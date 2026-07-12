@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 declare(strict_types=1);
 
@@ -15,82 +21,82 @@ final class TemplateConfigBootstrapService
 		[
 			'template' => 'projectheading',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_PROJECTHEADING',
-			'params' => "layout=default\nshow_title=1\nshow_project_logo=1\nshow_project_name=1",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_project_logo' => true, 'show_project_name' => true],
 		],
 		[
 			'template' => 'ranking',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_RANKING',
-			'params' => "layout=default\nshow_title=1\nshow_logo=1\nshow_form=1\nshow_points=1",
+			'params' => ['layout' => 'default', 'scope' => 'total', 'show_rank' => true, 'show_played' => true, 'show_won' => true, 'show_drawn' => true, 'show_lost' => true, 'show_goals' => true, 'show_goal_difference' => true, 'show_points' => true],
 		],
 		[
 			'template' => 'results',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_RESULTS',
-			'params' => "layout=default\nshow_title=1\nshow_match_number=1\nshow_venue=1",
+			'params' => ['layout' => 'default', 'show_date' => true, 'show_round' => true, 'show_score' => true, 'show_venue' => true, 'show_detail_link' => true],
 		],
 		[
 			'template' => 'matches',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_MATCHES',
-			'params' => "layout=default\nshow_title=1\nshow_date=1\nshow_time=1\nshow_referees=1",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_date' => true, 'show_time' => true, 'show_referees' => true],
 		],
 		[
 			'template' => 'matchreport',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_MATCHREPORT',
-			'params' => "layout=default\nshow_title=1\nshow_lineups=1\nshow_events=1\nshow_statistics=1",
+			'params' => ['layout' => 'default', 'show_navigation' => true, 'show_meta' => true, 'show_split_results' => true, 'show_preview' => true, 'show_summary' => true, 'show_referees' => true, 'show_events' => true, 'show_head_to_head' => true],
 		],
 		[
 			'template' => 'teaminfo',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_TEAMINFO',
-			'params' => "layout=default\nshow_title=1\nshow_logo=1\nshow_club=1\nshow_stadium=1",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_logo' => true, 'show_club' => true, 'show_stadium' => true],
 		],
 		[
 			'template' => 'teamplan',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_TEAMPLAN',
-			'params' => "layout=default\nshow_title=1\nshow_home_away=1\nshow_results=1",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_home_away' => true, 'show_results' => true],
 		],
 		[
 			'template' => 'teamstats',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_TEAMSTATS',
-			'params' => "layout=default\nshow_title=1\nshow_events=1\nshow_statistics=1",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_events' => true, 'show_statistics' => true],
 		],
 		[
 			'template' => 'roster',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_ROSTER',
-			'params' => "layout=default\nshow_title=1\nshow_positions=1\nshow_staff=1",
+			'params' => ['layout' => 'table', 'show_jersey_number' => true, 'show_country_flag' => true, 'show_position' => true],
 		],
 		[
 			'template' => 'players',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_PLAYERS',
-			'params' => "layout=default\nshow_title=1\nshow_positions=1\nshow_birthdays=1",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_positions' => true, 'show_birthdays' => true],
 		],
 		[
 			'template' => 'staff',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_STAFF',
-			'params' => "layout=default\nshow_title=1\nshow_positions=1",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_positions' => true],
 		],
 		[
 			'template' => 'playground',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_PLAYGROUND',
-			'params' => "layout=default\nshow_title=1\nshow_address=1\nshow_map=0",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_address' => true, 'show_map' => false],
 		],
 		[
 			'template' => 'stats',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_STATS',
-			'params' => "layout=default\nshow_title=1\nshow_player_stats=1\nshow_team_stats=1",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_player_stats' => true, 'show_team_stats' => true],
 		],
 		[
 			'template' => 'matrix',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_MATRIX',
-			'params' => "layout=default\nshow_title=1\nshow_results=1",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_results' => true],
 		],
 		[
 			'template' => 'nextmatch',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_NEXTMATCH',
-			'params' => "layout=default\nshow_title=1\nshow_countdown=0\nshow_venue=1",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_countdown' => false, 'show_venue' => true],
 		],
 		[
 			'template' => 'overall',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_OVERALL',
-			'params' => "layout=default\nshow_title=1\nshow_ranking=1\nshow_results=1\nshow_nextmatch=1",
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_ranking' => true, 'show_results' => true, 'show_nextmatch' => true],
 		],
 	];
 
@@ -136,7 +142,7 @@ final class TemplateConfigBootstrapService
 				'template' => $definition['template'],
 				'func' => '',
 				'title' => $definition['title'],
-				'params' => $definition['params'],
+				'params' => json_encode($definition['params'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
 				'published' => 1,
 				'checked_out' => null,
 				'checked_out_time' => null,

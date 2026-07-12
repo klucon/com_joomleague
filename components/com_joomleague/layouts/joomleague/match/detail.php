@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 
 /**
  * Sdílený layout detailu zápasu – používá ho frontend view (matchreport) i
@@ -25,15 +31,26 @@ $options = $displayData['options'] ?? [];
 
 $showSummary = $options['summary'] ?? true;
 $showEvents  = $options['events'] ?? true;
+$showMeta    = $options['meta'] ?? true;
+$showSplit   = $options['split'] ?? true;
+$showPreview = $options['preview'] ?? true;
+$showReferees = $options['referees'] ?? true;
 $showLink    = $options['link'] ?? false;
 $headingTag  = \in_array($options['heading'] ?? 'h2', ['h1', 'h2', 'h3'], true) ? $options['heading'] : 'h2';
 $escape      = static fn ($v): string => htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
+$translateLegacyName = static function ($value): string {
+	$value = trim((string) $value);
+
+	return preg_match('/^(COM|JLM)_[A-Z0-9_-]+$/', $value) ? Text::_($value) : $value;
+};
 
 if (!$match) {
 	echo '<div class="alert alert-warning">' . Text::_('COM_JOOMLEAGUE_SITE_MATCH_NOT_FOUND') . '</div>';
 
 	return;
 }
+
+$sportName = $translateLegacyName($match->sport_name ?? '');
 
 // Strukturovaná data pro vyhledávače (jednou za zápas na stránce).
 if (class_exists(StructuredDataHelper::class)) {
@@ -43,7 +60,7 @@ if (class_exists(StructuredDataHelper::class)) {
 		'name'        => trim((string) ($match->home_name ?? '') . ' - ' . (string) ($match->away_name ?? '')),
 		'startDate'   => !empty($match->match_date) ? date('c', strtotime((string) $match->match_date)) : null,
 		'eventStatus' => !empty($match->cancel) ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
-		'sport'       => $match->sport_name ?? null,
+		'sport'       => $sportName !== '' ? $sportName : null,
 		'location'    => !empty($match->playground_name) ? ['@type' => 'SportsActivityLocation', 'name' => (string) $match->playground_name] : null,
 		'homeTeam'    => !empty($match->home_name) ? ['@type' => 'SportsOrganization', 'name' => (string) $match->home_name] : null,
 		'awayTeam'    => !empty($match->away_name) ? ['@type' => 'SportsOrganization', 'name' => (string) $match->away_name] : null,
@@ -70,18 +87,18 @@ for ($i = 0, $n = max(\count($splitHome), \count($splitAway)); $i < $n; $i++) {
 				? Text::_('COM_JOOMLEAGUE_SITE_NOT_PLAYED')
 				: $escape((string) (float) $match->team1_result . ' : ' . (string) (float) $match->team2_result); ?></span>
 		</p>
-		<?php if ($splitParts !== []) : ?>
+		<?php if ($showSplit && $splitParts !== []) : ?>
 			<p class="jl-site-muted mb-0"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SPLIT'); ?>: <?php echo $escape(implode(' · ', $splitParts)); ?></p>
 		<?php endif; ?>
 	</section>
 
-	<div class="jl-site-grid mb-4">
+	<?php if ($showMeta) : ?><div class="jl-site-grid mb-4">
 		<div class="jl-site-card"><strong><?php echo $escape($match->match_date ? date('d.m.Y H:i', strtotime((string) $match->match_date)) : Text::_('COM_JOOMLEAGUE_SITE_DATE_NOT_SET')); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DATE'); ?></span></div>
 		<div class="jl-site-card"><strong><?php echo $escape($match->playground_name ?? Text::_('COM_JOOMLEAGUE_SITE_NOT_SET')); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PLAYGROUND'); ?></span></div>
 		<div class="jl-site-card"><strong><?php echo (int) ($match->crowd ?? 0); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_ATTENDANCE'); ?></span></div>
-	</div>
+	</div><?php endif; ?>
 
-	<?php if (trim((string) ($match->preview ?? '')) !== '') : ?>
+	<?php if ($showPreview && trim((string) ($match->preview ?? '')) !== '') : ?>
 		<div class="jl-site-panel mb-4"><h3><?php echo Text::_('COM_JOOMLEAGUE_SITE_PREVIEW'); ?></h3><?php echo HTMLHelper::_('content.prepare', (string) $match->preview); ?></div>
 	<?php endif; ?>
 
@@ -89,7 +106,7 @@ for ($i = 0, $n = max(\count($splitHome), \count($splitAway)); $i < $n; $i++) {
 		<div class="jl-site-panel mb-4"><h3><?php echo Text::_('COM_JOOMLEAGUE_SITE_SUMMARY'); ?></h3><?php echo $match->summary; ?></div>
 	<?php endif; ?>
 
-	<?php if ($referees !== []) : ?>
+	<?php if ($showReferees && $referees !== []) : ?>
 		<div class="jl-site-panel table-responsive mb-4">
 			<h3><?php echo Text::_('COM_JOOMLEAGUE_SITE_REFEREES'); ?></h3>
 			<table class="table jl-site-table">
@@ -120,7 +137,7 @@ for ($i = 0, $n = max(\count($splitHome), \count($splitAway)); $i < $n; $i++) {
 					<thead><tr><th><?php echo Text::_('COM_JOOMLEAGUE_SITE_MINUTE'); ?></th><th><?php echo Text::_('COM_JOOMLEAGUE_SITE_EVENT'); ?></th><th><?php echo Text::_('COM_JOOMLEAGUE_SITE_PERSON'); ?></th><th><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM'); ?></th></tr></thead>
 					<tbody>
 						<?php foreach ($events as $event) : ?>
-							<tr><td><?php echo $escape($event->event_time); ?></td><td><?php echo $escape($event->event_name ?? ''); ?></td><td><?php echo $escape($event->person_name ?? ''); ?></td><td><?php echo $escape($event->team_name ?? ''); ?></td></tr>
+							<tr><td><?php echo $escape($event->event_time); ?></td><td><?php echo $escape($translateLegacyName($event->event_name ?? '')); ?></td><td><?php echo $escape($event->person_name ?? ''); ?></td><td><?php echo $escape($event->team_name ?? ''); ?></td></tr>
 						<?php endforeach; ?>
 					</tbody>
 				</table>

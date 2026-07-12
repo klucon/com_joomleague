@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-	<layout title="COM_JOOMLEAGUE_SITE_RESULTS_RANKING">
-		<message><![CDATA[COM_JOOMLEAGUE_SITE_RESULTS_RANKING_DESC]]></message>
+	<layout title="COM_JOOMLEAGUE_ADMIN_MENUTYPE_RESULTS_RANKING">
+		<message><![CDATA[COM_JOOMLEAGUE_ADMIN_MENUTYPE_RESULTS_RANKING_DESC]]></message>
 	</layout>
-	<fields name="request">
+	<fields name="request" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 		<fieldset name="request">
-			<field name="project_id" type="sql" label="COM_JOOMLEAGUE_SITE_PROJECT_ID"
+			<field name="project_id" type="sql" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_PROJECT_ID"
 				query="SELECT id, name FROM #__joomleague_project ORDER BY name"
-				key_field="id" value_field="name">
+				key_field="id" value_field="name"
+				required="true">
 				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
 			</field>
-			<field name="round_id" type="sql" label="COM_JOOMLEAGUE_SITE_ROUND"
-				query="SELECT r.id, CONCAT(r.name, ' (', p.name, ')') AS name FROM #__joomleague_round AS r INNER JOIN #__joomleague_project AS p ON p.id = r.project_id ORDER BY p.name, r.roundcode"
-				key_field="id" value_field="name">
+			<field name="round_id" type="dynamicoptions" label="COM_JOOMLEAGUE_ADMIN_MENUFIELD_ROUND"
+				task="roundsoptions"
+				parent="project_id">
 				<option value="">JGLOBAL_SELECT_AN_OPTION</option>
 			</field>
 		</fieldset>

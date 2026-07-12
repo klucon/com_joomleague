@@ -1,9 +1,15 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 declare(strict_types=1);
 \defined('_JEXEC') or die;
 use Joomla\CMS\HTML\HTMLHelper; use Joomla\CMS\Language\Text; use Joomla\CMS\Layout\LayoutHelper; use Joomla\CMS\Router\Route;
 $this->getDocument()->getWebAssetManager()->useScript('multiselect');$user=$this->getCurrentUser();$order=$this->escape($this->state->get('list.ordering'));$direction=$this->escape($this->state->get('list.direction'));
-$types=['SIMPLE_LEAGUE'=>'COM_JOOMLEAGUE_PROJECT_TYPE_LEAGUE','DIVISIONS_LEAGUE'=>'COM_JOOMLEAGUE_PROJECT_TYPE_DIVISIONS','TOURNAMENT_MODE'=>'COM_JOOMLEAGUE_PROJECT_TYPE_TOURNAMENT','FRIENDLY_MATCHES'=>'COM_JOOMLEAGUE_PROJECT_TYPE_FRIENDLY'];
+$types=['SIMPLE_LEAGUE'=>'COM_JOOMLEAGUE_PROJECT_TYPE_LEAGUE','DIVISIONS_LEAGUE'=>'COM_JOOMLEAGUE_PROJECT_TYPE_DIVISIONS','TOURNAMENT_MODE'=>'COM_JOOMLEAGUE_PROJECT_TYPE_TOURNAMENT','FRIENDLY_MATCHES'=>'COM_JOOMLEAGUE_PROJECT_TYPE_FRIENDLY','RUNNING_RACE'=>'COM_JOOMLEAGUE_PROJECT_TYPE_RUNNING_RACE'];
 ?>
 <form action="<?php echo Route::_('index.php?option=com_joomleague&view=projects'); ?>" method="post" name="adminForm" id="adminForm"><div id="j-main-container" class="j-main-container">
 <?php echo LayoutHelper::render('joomla.searchtools.default',['view'=>$this]); ?>

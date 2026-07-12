@@ -3,10 +3,11 @@
 	<name>plg_extension_joomleagueesport</name>
 	<author>Ondřej Klučka (https://klucon.cz)</author>
 	<authorEmail>info@klucon.cz</authorEmail>
-	<creationDate>2026-06</creationDate>
+	<authorUrl>https://klucon.cz</authorUrl>
+	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-61</version>
+	<version>6.1.0-alpha-150</version>
 	<description>PLG_EXTENSION_JOOMLEAGUEESPORT_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Plugin\Extension\Joomleagueesport</namespace>
 	<files>

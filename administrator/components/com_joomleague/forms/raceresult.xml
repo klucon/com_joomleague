@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fieldset name="details">
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
+		<field name="project_id" type="sql" label="COM_JOOMLEAGUE_FIELD_PROJECT" query="SELECT id,name FROM #__joomleague_project WHERE project_type='RUNNING_RACE' ORDER BY name" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_RACE_FIELD_PROJECT_DESC" />
+		<field name="round_id" type="sql" label="COM_JOOMLEAGUE_PROJECT_ROUNDS" query="SELECT id, CONCAT(project_id, ' — ', name) AS name FROM #__joomleague_round ORDER BY project_id, roundcode, id" key_field="id" value_field="name">
+			<option value="">JNONE</option>
+		</field>
+		<field name="participant_id" type="sql" label="COM_JOOMLEAGUE_RACEPARTICIPANT" query="SELECT rp.id, CONCAT(rp.bib_number, ' — ', COALESCE(NULLIF(CONCAT_WS(' ', p.firstname, p.lastname), ''), CONCAT('ID ', rp.id))) AS name FROM #__joomleague_race_participant AS rp LEFT JOIN #__joomleague_person AS p ON p.id = rp.person_id ORDER BY rp.project_id, rp.bib_number" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_RACERESULT_FIELD_PARTICIPANT_DESC" />
+		<field name="status" type="list" label="COM_JOOMLEAGUE_RACE_FIELD_STATUS" default="FINISHED" required="true">
+			<option value="FINISHED">COM_JOOMLEAGUE_RACE_STATUS_FINISHED</option>
+			<option value="DNS">COM_JOOMLEAGUE_RACE_STATUS_DNS</option>
+			<option value="DNF">COM_JOOMLEAGUE_RACE_STATUS_DNF</option>
+			<option value="DSQ">COM_JOOMLEAGUE_RACE_STATUS_DSQ</option>
+			<option value="NC">COM_JOOMLEAGUE_RACE_STATUS_NC</option>
+		</field>
+		<field name="duration_text" type="text" label="COM_JOOMLEAGUE_RACERESULT_FIELD_DURATION_TEXT" description="COM_JOOMLEAGUE_RACERESULT_FIELD_DURATION_TEXT_DESC" />
+		<field name="duration_ms" type="number" label="COM_JOOMLEAGUE_RACERESULT_FIELD_DURATION_MS" min="0" />
+	</fieldset>
+	<fieldset name="ranking" label="COM_JOOMLEAGUE_RACERESULT_FIELDSET_RANKING">
+		<field name="overall_place" type="number" label="COM_JOOMLEAGUE_RACERESULT_FIELD_OVERALL_PLACE" min="0" />
+		<field name="category_place" type="number" label="COM_JOOMLEAGUE_RACERESULT_FIELD_CATEGORY_PLACE" min="0" />
+		<field name="sex_place" type="number" label="COM_JOOMLEAGUE_RACERESULT_FIELD_SEX_PLACE" min="0" />
+		<field name="bib_number" type="text" label="COM_JOOMLEAGUE_RACE_FIELD_BIB_NUMBER" />
+	</fieldset>
+	<fieldset name="timing" label="COM_JOOMLEAGUE_RACERESULT_FIELDSET_TIMING">
+		<field name="start_time" type="calendar" label="COM_JOOMLEAGUE_RACERESULT_FIELD_START_TIME" format="%Y-%m-%d %H:%M:%S" showtime="true" />
+		<field name="finish_time" type="calendar" label="COM_JOOMLEAGUE_RACERESULT_FIELD_FINISH_TIME" format="%Y-%m-%d %H:%M:%S" showtime="true" />
+		<field name="status_note" type="text" label="COM_JOOMLEAGUE_RACE_FIELD_STATUS_NOTE" />
+	</fieldset>
+	<fieldset name="publishing">
+		<field name="published" type="list" label="JSTATUS" default="1">
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+		</field>
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" />
+	</fieldset>
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL">
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" validate="rules" component="com_joomleague" section="raceresult" />
+	</fieldset>
+</form>

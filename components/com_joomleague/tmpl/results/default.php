@@ -1,4 +1,10 @@
 <?php
+/**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
 declare(strict_types=1);
 \defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
@@ -8,5 +14,5 @@ use Joomla\CMS\Language\Text;
 		<div class="jl-site-eyebrow"><?php echo $this->project ? $this->escape($this->project->name) : ''; ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULTS'); ?></h1>
 	</section>
-	<div class="jl-site-panel"><?php require __DIR__ . '/matches.php'; ?></div>
+	<?php require __DIR__ . '/matches_grouped.php'; ?>
 </div>

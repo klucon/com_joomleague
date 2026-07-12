@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" method="upgrade">
-	<name>com_joomleague</name>
+	<name>JoomLeague</name>
 	<author>Ondřej Klučka (https://klucon.cz)</author>
 	<authorEmail>info@klucon.cz</authorEmail>
-	<creationDate>2026-06</creationDate>
+	<authorUrl>https://klucon.cz</authorUrl>
+	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-61</version>
+	<version>6.1.0-alpha-150</version>
 	<description>COM_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Component\Joomleague</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -38,6 +39,7 @@
 	<files folder="components/com_joomleague">
 		<folder>src</folder>
 		<folder>tmpl</folder>
+		<folder>layouts</folder>
 	</files>
 
 	<languages folder="components/com_joomleague">
@@ -47,23 +49,24 @@
 	</languages>
 
 	<administration>
-		<menu link="option=com_joomleague&amp;view=dashboard" view="dashboard" img="class:joomla">
-			COM_JOOMLEAGUE
-		</menu>
+		<menu link="option=com_joomleague&amp;view=dashboard" img="class:joomla">JoomLeague</menu>
 		<submenu>
-			<menu link="option=com_joomleague&amp;view=dashboard" view="dashboard">COM_JOOMLEAGUE_MENU_DASHBOARD</menu>
-			<menu link="option=com_joomleague&amp;view=projects" view="projects">COM_JOOMLEAGUE_MENU_PROJECTS</menu>
-			<menu link="option=com_joomleague&amp;view=sportstypes" view="sportstypes">COM_JOOMLEAGUE_MENU_SPORTS_TYPES</menu>
-			<menu link="option=com_joomleague&amp;view=leagues" view="leagues">COM_JOOMLEAGUE_MENU_LEAGUES</menu>
-			<menu link="option=com_joomleague&amp;view=seasons" view="seasons">COM_JOOMLEAGUE_MENU_SEASONS</menu>
-			<menu link="option=com_joomleague&amp;view=clubs" view="clubs">COM_JOOMLEAGUE_MENU_CLUBS</menu>
-			<menu link="option=com_joomleague&amp;view=teams" view="teams">COM_JOOMLEAGUE_MENU_TEAMS</menu>
-			<menu link="option=com_joomleague&amp;view=persons" view="persons">COM_JOOMLEAGUE_MENU_PERSONS</menu>
-			<menu link="option=com_joomleague&amp;view=eventtypes" view="eventtypes">COM_JOOMLEAGUE_MENU_EVENT_TYPES</menu>
-			<menu link="option=com_joomleague&amp;view=statistics" view="statistics">COM_JOOMLEAGUE_MENU_STATISTICS</menu>
-			<menu link="option=com_joomleague&amp;view=positions" view="positions">COM_JOOMLEAGUE_MENU_POSITIONS</menu>
-			<menu link="option=com_joomleague&amp;view=stadiums" view="stadiums">COM_JOOMLEAGUE_MENU_STADIUMS</menu>
-			<menu link="option=com_joomleague&amp;view=tools" view="tools">COM_JOOMLEAGUE_TOOLS_TITLE</menu>
+			<menu link="option=com_joomleague&amp;view=dashboard">COM_JOOMLEAGUE_MENU_DASHBOARD</menu>
+			<menu link="option=com_joomleague&amp;view=projects">COM_JOOMLEAGUE_MENU_PROJECTS</menu>
+			<menu link="option=com_joomleague&amp;view=sportstypes">COM_JOOMLEAGUE_MENU_SPORTS_TYPES</menu>
+			<menu link="option=com_joomleague&amp;view=leagues">COM_JOOMLEAGUE_MENU_LEAGUES</menu>
+			<menu link="option=com_joomleague&amp;view=seasons">COM_JOOMLEAGUE_MENU_SEASONS</menu>
+			<menu link="option=com_joomleague&amp;view=clubs">COM_JOOMLEAGUE_MENU_CLUBS</menu>
+			<menu link="option=com_joomleague&amp;view=teams">COM_JOOMLEAGUE_MENU_TEAMS</menu>
+			<menu link="option=com_joomleague&amp;view=persons">COM_JOOMLEAGUE_MENU_PERSONS</menu>
+			<menu link="option=com_joomleague&amp;view=eventtypes">COM_JOOMLEAGUE_MENU_EVENT_TYPES</menu>
+			<menu link="option=com_joomleague&amp;view=statistics">COM_JOOMLEAGUE_MENU_STATISTICS</menu>
+			<menu link="option=com_joomleague&amp;view=positions">COM_JOOMLEAGUE_MENU_POSITIONS</menu>
+			<menu link="option=com_joomleague&amp;view=stadiums">COM_JOOMLEAGUE_MENU_STADIUMS</menu>
+			<menu link="option=com_joomleague&amp;view=racecategories">COM_JOOMLEAGUE_MENU_RACE_CATEGORIES</menu>
+			<menu link="option=com_joomleague&amp;view=raceparticipants">COM_JOOMLEAGUE_MENU_RACE_PARTICIPANTS</menu>
+			<menu link="option=com_joomleague&amp;view=raceresults">COM_JOOMLEAGUE_MENU_RACE_RESULTS</menu>
+			<menu link="option=com_joomleague&amp;view=tools">COM_JOOMLEAGUE_TOOLS_TITLE</menu>
 		</submenu>
 		<files folder="administrator/components/com_joomleague">
 			<filename>joomleague.xml</filename>
