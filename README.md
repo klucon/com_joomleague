@@ -1,10 +1,10 @@
 <div align="center">
 
-# ⚽ JoomLeague for Joomla 6
+# JoomLeague for Joomla 6
 
-**A complete sports league &amp; competition management suite for Joomla 6.**
+**Sports league and competition management for Joomla 6.**
 
-Manage leagues, seasons, clubs, teams, players, fixtures, results, standings, statistics and more — all from a single, modern Joomla 6 component.
+JoomLeague helps clubs, leagues and tournament organizers manage seasons, competitions, clubs, teams, people, fixtures, results, standings, statistics, calendars and frontend publishing from one Joomla package.
 
 <br>
 
@@ -14,219 +14,222 @@ Manage leagues, seasons, clubs, teams, players, fixtures, results, standings, st
 
 [![Joomla 6.1](https://img.shields.io/badge/Joomla-6.1-5091CD?style=flat-square&logo=joomla&logoColor=white)](https://www.joomla.org)
 [![PHP 8.3+](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
-[![Languages](https://img.shields.io/badge/i18n-EN%20%7C%20CS%20%7C%20DE-orange?style=flat-square)](#-languages)
-[![Last commit](https://img.shields.io/github/last-commit/klucon/com_joomleague?style=flat-square&logo=git&logoColor=white)](https://github.com/klucon/com_joomleague/commits)
-[![Issues](https://img.shields.io/github/issues/klucon/com_joomleague?style=flat-square&logo=github)](https://github.com/klucon/com_joomleague/issues)
-[![Stars](https://img.shields.io/github/stars/klucon/com_joomleague?style=flat-square&logo=github)](https://github.com/klucon/com_joomleague/stargazers)
+[![Languages](https://img.shields.io/badge/languages-EN%20%7C%20CS%20%7C%20DE-orange?style=flat-square)](#languages)
 
 <br>
 
-### 🔗 Quick links
-
 [![Website](https://img.shields.io/badge/Website-klucon.cz-111827?style=for-the-badge&logo=googlechrome&logoColor=white)](https://klucon.cz)
-[![Live Demo](https://img.shields.io/badge/Live_Demo-joomleague.klucon.cz-2ea44f?style=for-the-badge&logo=serverfault&logoColor=white)](https://joomleague.klucon.cz)
-[![GitHub](https://img.shields.io/badge/Source-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/klucon/com_joomleague)
-[![Wiki](https://img.shields.io/badge/Docs-Wiki-0969DA?style=for-the-badge&logo=readthedocs&logoColor=white)](https://github.com/klucon/com_joomleague/wiki)
+[![Download](https://img.shields.io/badge/Download-latest_package-2ea44f?style=for-the-badge&logo=icloud&logoColor=white)](https://klucon.cz/downloads)
+[![Documentation](https://img.shields.io/badge/Docs-docs.klucon.cz-0969DA?style=for-the-badge&logo=readthedocs&logoColor=white)](https://docs.klucon.cz)
+[![Forum](https://img.shields.io/badge/Forum-forum.klucon.cz-7C3AED?style=for-the-badge&logo=discourse&logoColor=white)](https://forum.klucon.cz)
+[![Demo](https://img.shields.io/badge/Live_Demo-joomleague.klucon.cz-0F766E?style=for-the-badge&logo=serverfault&logoColor=white)](https://joomleague.klucon.cz)
 
 </div>
 
 ---
 
-## 📖 About
+## About
 
-**JoomLeague** is a full-featured sports management system for the [Joomla 6](https://www.joomla.org) CMS. Whether you run a single football club, a regional league, or a multi-division tournament, JoomLeague gives you everything you need to publish a rich, always up-to-date sports website — no third-party services required.
+JoomLeague is a Joomla 6 package for publishing sports competitions on a Joomla website. It is built around the `com_joomleague` component and includes site modules, content plugins, Smart Search integration and administrator helpers.
 
-The package has been **rebuilt from the ground up for Joomla 6**, using a modern namespaced MVC architecture, tighter security, and a clean, responsive frontend.
+The current development line is a Joomla 6 modernization of the classic JoomLeague concept. It uses namespaced Joomla MVC code, Joomla 6 form APIs, administrator menu item configuration, multilingual SEF routing and frontend templates designed for modern Joomla sites.
 
-> 👀 **See it in action:** [joomleague.klucon.cz](https://joomleague.klucon.cz) — a live demo available in **English, Czech and German**.
+Live demo: [joomleague.klucon.cz](https://joomleague.klucon.cz)
 
-## 🧭 Current Alpha
+## Current Release
 
-The current public alpha line focuses on production-ready Joomla 6 packaging, multilingual frontend routing and menu-driven publishing.
+| Item | Value |
+|------|-------|
+| Current version | `6.1.0-alpha-151` |
+| Release date | 2026-07-15 |
+| Joomla support | Joomla 6.1 or newer |
+| PHP support | PHP 8.3 or newer |
+| Update channel | GitHub Releases and Joomla update server |
+| Package asset | `pkg_joomleague-6.1.0-alpha-151.zip` |
 
-- Current package version: **6.1.0-alpha-151**
-- Release assets: package ZIP, Joomla update XML and changelog XML
-- Public update channel: GitHub Releases and the registered Joomla update server
-- Supported frontend URL languages: Czech, English and German route segments
-- Demo and download hub: [joomleague.klucon.cz](https://joomleague.klucon.cz)
+This is an alpha release. Test upgrades, menu items, imported data and frontend output on a staging copy before updating a live site.
 
----
+Release notes:
 
-## ✨ Features
+- [Latest GitHub release](https://github.com/klucon/com_joomleague/releases/latest)
+- [Public changelog](https://klucon.cz/changelog)
+- [Documentation changelog](https://docs.klucon.cz/changelog)
 
-### 🏆 Competition management
-- Sport types, leagues, seasons and competition projects
-- Clubs, teams and people (players, staff, referees)
-- Rounds, matches, results and squad rosters
+## Main Features
+
+### Competition Management
+
+- Sports, leagues, seasons and competition projects
+- Clubs, teams, players, staff, referees and other people
+- Rounds, matches, results, rosters and lineups
 - Event types, playing positions and statistics
-- Playgrounds / stadiums and tournament trees (brackets)
+- Playgrounds, stadiums and tournament trees
+- Prediction games with scoring and rankings
+- Running-race groundwork with categories, participants and results
 
-### 📊 Frontend for your visitors
-- Project, team, club, person, playground and referee pages
-- League **standings**, **results** and combined results/standings views
-- **Result matrix** with full parity — played, upcoming, cancelled and forfeited matches, with division grouping
-- **Smart schedule** — switch between *by round* and *by date*, plus *all / home / away* filtering for teams with clean SEF path segments
-- Rich **match detail** pages and **player profiles** with photo, contact details and full match history
-- **Rivals** head-to-head team comparison
-- Event, statistics and team-statistics **rankings**
-- Multilingual SEF URLs for project sections, team details, club details, standings scope and schedule filters
+### Frontend Pages
 
-### 🎯 Engagement &amp; integrations
-- **Prediction game** — tipping competitions with automatic score recalculation and tipster leaderboards
-- **iCal calendar feed** with one-click subscription for Google, Apple, Outlook.com and Office 365
-- `{jlmatch}` **content shortcode** to embed any match directly inside an article
-- Native Joomla **Custom Fields** support for clubs, teams and people
-- **Country flags &amp; picker** with a built-in lookup of 254 countries
-- **Smart Search** integration for site-wide match &amp; person indexing
+- Competition overview pages
+- Standings, results, results-and-standings and result matrix
+- Schedule views by round or by date
+- Team lists, team detail pages, rosters, rivals and team statistics
+- Club, person, playground, referee and match report pages
+- Event rankings, statistics rankings and ranking curves
+- iCal calendar feeds for external calendar clients
 
-### 🧩 Included extensions
-The package ships as a single installable bundle containing the component, **16 site modules** and **5 integration plugins** (see [What's included](#-whats-included)).
+### Administrator Experience
 
-### 🔒 Built for production
-- Access-control (ACL) and record ownership checks throughout
-- Safe HTML filtering on user-supplied content
-- Multilingual: **English, Czech and German**
-- Signed, verifiable releases via the Joomla update server (SHA-256 package integrity)
-- Canonical links for translated public URLs to keep search engines focused on the generated canonical route
+- Project-scoped menu item configuration
+- Dependent selectors for project teams, matches, rounds, statistics and event types
+- AJAX autocomplete for large club lists
+- Template configuration forms for frontend views
+- SQL maintenance tooling
+- Geocoding and map helper groundwork
+- Joomla Smart Search indexing support
 
----
+## SEO and SEF URLs
 
-## ✅ Requirements
-
-| Requirement | Version |
-|-------------|---------|
-| Joomla      | **6.1 or newer** |
-| PHP         | **8.3 or newer** |
-| Database    | MySQL 8.0+ / MariaDB 10.4+ |
-
----
-
-## 🚀 Installation
-
-1. Download the latest **package ZIP** from the [**Releases**](https://github.com/klucon/com_joomleague/releases/latest) page.
-2. In your Joomla administrator, go to **System → Install → Extensions**.
-3. Drag &amp; drop the ZIP onto the **Upload Package File** area.
-4. Open **Components → JoomLeague** from the admin menu and start building your league. 🎉
-
-Once installed, JoomLeague registers a Joomla **update site**, so future versions can be installed with one click from **System → Update → Extensions**.
-
----
-
-## 📦 What's included
-
-<details>
-<summary><strong>Component</strong></summary>
-
-- `com_joomleague` — administration &amp; frontend
-
-</details>
-
-## 🔎 SEO and SEF routing
-
-JoomLeague generates clean, project-aware URLs for the modern frontend views. A competition route can expose the same content through translated route segments while keeping a stable canonical link for search engines.
+JoomLeague generates project-aware SEF URLs for public views and keeps canonical links focused on the generated route.
 
 Examples:
 
-- Czech: `/souteze/{project}/tabulka`, `/souteze/{project}/rozpis/podle-data`, `/souteze/{project}/tymy/{team}/soupiska`
-- English: `/competitions/{project}/standings`, `/competitions/{project}/schedule/by-date`, `/competitions/{project}/teams/{team}/roster`
-- German: `/wettbewerbe/{project}/tabelle`, `/wettbewerbe/{project}/spielplan/nach-datum`, `/wettbewerbe/{project}/teams/{team}/kader`
+| Language | Example |
+|----------|---------|
+| English | `/competitions/{project}/standings` |
+| English | `/competitions/{project}/schedule/by-date` |
+| English | `/competitions/{project}/teams/{team}/roster` |
+| Czech | `/souteze/{project}/tabulka` |
+| Czech | `/souteze/{project}/rozpis/podle-data` |
+| German | `/wettbewerbe/{project}/tabelle` |
+| German | `/wettbewerbe/{project}/spielplan/nach-datum` |
 
-Legacy query-style links remain parseable where practical, but newly generated frontend links prefer SEF path segments.
+Legacy query-style links remain parseable where practical, but newly generated frontend links prefer clean path segments.
 
-<details>
-<summary><strong>16 site modules</strong></summary>
+## Requirements
 
-`mod_joomleague_ranking` · `mod_joomleague_results` · `mod_joomleague_matches` · `mod_joomleague_eventsranking` · `mod_joomleague_statranking` · `mod_joomleague_teamstats_ranking` · `mod_joomleague_sports_type_statistics` · `mod_joomleague_teamplayers` · `mod_joomleague_teamstaffs` · `mod_joomleague_calendar` · `mod_joomleague_birthday` · `mod_joomleague_randomplayer` · `mod_joomleague_playgroundplan` · `mod_joomleague_navigation_menu` · `mod_joomleague_ticker` · `mod_joomleague_logo`
+| Requirement | Version |
+|-------------|---------|
+| Joomla | 6.1 or newer |
+| PHP | 8.3 or newer |
+| Database | MySQL 8.0+ or MariaDB 10.4+ |
 
-</details>
+## Installation
 
-<details>
-<summary><strong>5 integration plugins</strong></summary>
+1. Download the latest package from [klucon.cz/downloads](https://klucon.cz/downloads) or from [GitHub Releases](https://github.com/klucon/com_joomleague/releases/latest).
+2. Open the Joomla administrator.
+3. Go to **System** -> **Install** -> **Extensions**.
+4. Upload `pkg_joomleague-6.1.0-alpha-151.zip`.
+5. Open **Components** -> **JoomLeague** and configure your first project.
 
-- `content/joomleaguematch` — the `{jlmatch}` match shortcode
-- `content/joomleagueperson` — person embedding
-- `extension/joomleagueesport` — e-sport extension
-- `finder/joomleague` — Joomla Smart Search indexing
-- `quickicon/joomleague` — admin control-panel quick icon
+After installation, the package registers a Joomla update site. Future releases can be installed from **System** -> **Update** -> **Extensions**.
 
-</details>
+## Package Contents
 
----
+### Component
 
-## 🌍 Languages
+- `com_joomleague`
 
-JoomLeague ships fully translated in:
+### Site Modules
 
-| 🇬🇧 English (`en-GB`) | 🇨🇿 Čeština (`cs-CZ`) | 🇩🇪 Deutsch (`de-DE`) |
-|---|---|---|
+- `mod_joomleague_birthday`
+- `mod_joomleague_calendar`
+- `mod_joomleague_eventsranking`
+- `mod_joomleague_logo`
+- `mod_joomleague_matches`
+- `mod_joomleague_navigation_menu`
+- `mod_joomleague_playgroundplan`
+- `mod_joomleague_randomplayer`
+- `mod_joomleague_ranking`
+- `mod_joomleague_results`
+- `mod_joomleague_sports_type_statistics`
+- `mod_joomleague_statranking`
+- `mod_joomleague_teamplayers`
+- `mod_joomleague_teamstaffs`
+- `mod_joomleague_teamstats_ranking`
+- `mod_joomleague_ticker`
 
-Translations cover the component, all modules and plugins on both the site and administrator side.
+### Plugins
 
----
+- `content/joomleaguematch`
+- `content/joomleagueperson`
+- `extension/joomleagueesport`
+- `finder/joomleague`
+- `quickicon/joomleague`
+- `system/joomleaguesefaliases`
 
-## 🗺️ Roadmap
+Bundled integration plugins are enabled automatically during package installation where required by the package.
 
-Actively in development for upcoming releases:
+## Languages
 
-- **Modernised menu-item setup** — no more typing raw IDs:
-  - dropdown pickers for lookups (project, club, team, round, playground, division…)
-  - searchable modal pickers for people and matches, even across thousands of records
-- **Required target fields** — menu items can't be saved without a selected target
-- **Graceful "not found" handling** for menu items that point to missing records
-- **Language constant refactor** — make every text context use its own translation key:
-  - separate administrator UI, site UI, menu item type labels, descriptions and router/URL labels
-  - avoid sharing one constant between multiple screens just because the current wording happens to match
-  - migrate menu item layout labels from generic site keys such as `COM_JOOMLEAGUE_SITE_RACE_RESULTS` to dedicated keys such as `COM_JOOMLEAGUE_ADMIN_MENUTYPE_RACE_RESULTS`
-- **Completion of the remaining frontend view rewrites** (upcoming match, club detail, team statistics and additional rankings)
-- **Continuous responsive polish** across mobile and desktop
+The package includes language files for:
 
----
+| Language | Tag |
+|----------|-----|
+| English | `en-GB` |
+| Czech | `cs-CZ` |
+| German | `de-DE` |
 
-## 📚 Documentation
+Translations cover the component, modules and plugins on both the site and administrator side.
 
-Full documentation lives in the [**GitHub Wiki**](https://github.com/klucon/com_joomleague/wiki), including frontend view guides and configuration references.
+## Documentation
 
----
+- Documentation: [docs.klucon.cz](https://docs.klucon.cz)
+- GitHub Wiki: [github.com/klucon/com_joomleague/wiki](https://github.com/klucon/com_joomleague/wiki)
+- Public website: [klucon.cz](https://klucon.cz)
+- Forum: [forum.klucon.cz](https://forum.klucon.cz)
+- Demo: [joomleague.klucon.cz](https://joomleague.klucon.cz)
 
-## 🤝 Contributing
+## Development
 
-Contributions, bug reports and feature requests are welcome!
-
-- 🐛 [Open an issue](https://github.com/klucon/com_joomleague/issues)
-- 📖 Read the [Contributing guide](CONTRIBUTING.md)
-- 🔐 Review the [Security policy](SECURITY.md) for responsible disclosure
-
----
-
-## 🛠️ Building from source
-
-The source tree keeps each extension unpacked for development. To build the installable package (requires **Python 3**):
+The source tree keeps the package extensions unpacked for development. To build the installable package:
 
 ```bash
+python3 build/validate_versions.py
 python3 build/package.py
+python3 build/validate_package.py
 ```
 
-This produces the child-extension ZIPs and the final package in `dist/`.
+Build output is written to `dist/`.
 
----
+Useful release metadata commands:
 
-## 📄 License
+```bash
+python3 build/release_metadata.py
+```
 
-Released under the **[GNU General Public License v2.0 or later](LICENSE)**.
+This generates the Joomla update XML and changelog XML files used by the release process.
 
----
+## Roadmap
 
-## 👤 Author
+Planned work for upcoming alpha releases:
 
-**Ondřej Klučka**
-🌐 [klucon.cz](https://klucon.cz) · ✉️ [info@klucon.cz](mailto:info@klucon.cz)
+- Continue replacing legacy frontend layouts with shared Joomla 6 helpers and templates.
+- Expand administrator template configuration coverage.
+- Improve import and migration tooling for older JoomLeague installations.
+- Refine map, venue and geocoding workflows.
+- Continue the language constant cleanup so each UI context has its own translation key.
+- Broaden automated validation for routing, menu item configuration and package metadata.
+
+## Contributing
+
+Bug reports, testing feedback and feature requests are welcome.
+
+- Issues: [github.com/klucon/com_joomleague/issues](https://github.com/klucon/com_joomleague/issues)
+- Forum: [forum.klucon.cz](https://forum.klucon.cz)
+- Security policy: [SECURITY.md](SECURITY.md)
+
+## License
+
+JoomLeague is released under the [GNU General Public License v2.0 or later](LICENSE).
+
+## Author
+
+Ondřej Klučka<br>
+[klucon.cz](https://klucon.cz)<br>
+[info@klucon.cz](mailto:info@klucon.cz)
 
 <div align="center">
 
-⭐ **If JoomLeague helps your club or league, consider starring the repository!** ⭐
-
-[![Website](https://img.shields.io/badge/klucon.cz-111827?style=flat-square&logo=googlechrome&logoColor=white)](https://klucon.cz)
-[![Demo](https://img.shields.io/badge/Live_Demo-2ea44f?style=flat-square&logo=serverfault&logoColor=white)](https://joomleague.klucon.cz)
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/klucon/com_joomleague)
+[Website](https://klucon.cz) · [Download](https://klucon.cz/downloads) · [Documentation](https://docs.klucon.cz) · [Forum](https://forum.klucon.cz) · [Demo](https://joomleague.klucon.cz) · [GitHub](https://github.com/klucon/com_joomleague)
 
 </div>
