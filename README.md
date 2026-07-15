@@ -19,24 +19,9 @@ JoomLeague helps clubs, leagues and tournament organizers manage seasons, compet
 
 **Public ecosystem**
 
-<table>
-  <tr>
-    <td align="left" width="50%">
-      <strong>Project</strong><br>
-      <a href="https://klucon.cz">Website</a><br>
-      <a href="https://klucon.cz/downloads">Downloads</a><br>
-      <a href="https://docs.klucon.cz">Documentation</a><br>
-      <a href="https://joomleague.klucon.cz">Live demo</a>
-    </td>
-    <td align="left" width="50%">
-      <strong>Services</strong><br>
-      <a href="https://stats.klucon.cz">Public statistics</a><br>
-      <a href="https://migrate.klucon.cz">Migration tool</a><br>
-      <a href="https://forum.klucon.cz">Community forum</a><br>
-      <a href="https://github.com/klucon/com_joomleague/releases/latest">Latest release</a>
-    </td>
-  </tr>
-</table>
+**Project:** [Website](https://klucon.cz) · [Downloads](https://klucon.cz/downloads) · [Documentation](https://docs.klucon.cz) · [Live demo](https://joomleague.klucon.cz)
+
+**Services:** [Public statistics](https://stats.klucon.cz) · [Migration tool](https://migrate.klucon.cz) · [Community forum](https://forum.klucon.cz) · [Latest release](https://github.com/klucon/com_joomleague/releases/latest)
 
 </div>
 
