@@ -19,9 +19,17 @@ JoomLeague helps clubs, leagues and tournament organizers manage seasons, compet
 
 **Public ecosystem**
 
-**Project:** [Website](https://klucon.cz) · [Downloads](https://klucon.cz/downloads) · [Documentation](https://docs.klucon.cz) · [Live demo](https://joomleague.klucon.cz)
+**Project**<br>
+[![Website](https://img.shields.io/badge/website-klucon.cz-111827?style=flat-square)](https://klucon.cz)
+[![Downloads](https://img.shields.io/badge/downloads-package-2ea44f?style=flat-square)](https://klucon.cz/downloads)
+[![Documentation](https://img.shields.io/badge/docs-docs.klucon.cz-0969da?style=flat-square)](https://docs.klucon.cz)
+[![Demo](https://img.shields.io/badge/demo-joomleague.klucon.cz-0f766e?style=flat-square)](https://joomleague.klucon.cz)
 
-**Services:** [Public statistics](https://stats.klucon.cz) · [Migration tool](https://migrate.klucon.cz) · [Community forum](https://forum.klucon.cz) · [Latest release](https://github.com/klucon/com_joomleague/releases/latest)
+**Services**<br>
+[![Statistics](https://img.shields.io/badge/stats-stats.klucon.cz-7c3aed?style=flat-square)](https://stats.klucon.cz)
+[![Migration](https://img.shields.io/badge/migration-migrate.klucon.cz-d97706?style=flat-square)](https://migrate.klucon.cz)
+[![Forum](https://img.shields.io/badge/forum-forum.klucon.cz-475569?style=flat-square)](https://forum.klucon.cz)
+[![Latest release](https://img.shields.io/badge/release-latest-2ea44f?style=flat-square)](https://github.com/klucon/com_joomleague/releases/latest)
 
 </div>
 
