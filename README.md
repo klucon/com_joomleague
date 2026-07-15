@@ -174,7 +174,6 @@ Translations cover the component, modules and plugins on both the site and admin
 ## Documentation
 
 - Documentation: [docs.klucon.cz](https://docs.klucon.cz)
-- GitHub Wiki: [github.com/klucon/com_joomleague/wiki](https://github.com/klucon/com_joomleague/wiki)
 - Public website: [klucon.cz](https://klucon.cz)
 - Forum: [forum.klucon.cz](https://forum.klucon.cz)
 - Demo: [joomleague.klucon.cz](https://joomleague.klucon.cz)
