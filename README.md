@@ -8,21 +8,24 @@ JoomLeague helps clubs, leagues and tournament organizers manage seasons, compet
 
 <br>
 
-[![Latest release](https://img.shields.io/github/v/release/klucon/com_joomleague?style=for-the-badge&logo=github&color=2ea44f)](https://github.com/klucon/com_joomleague/releases/latest)
-[![Build](https://img.shields.io/github/actions/workflow/status/klucon/com_joomleague/build-package.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=build)](https://github.com/klucon/com_joomleague/actions)
-[![License](https://img.shields.io/github/license/klucon/com_joomleague?style=for-the-badge&color=blue)](LICENSE)
-
-[![Joomla 6.1](https://img.shields.io/badge/Joomla-6.1-5091CD?style=flat-square&logo=joomla&logoColor=white)](https://www.joomla.org)
-[![PHP 8.3+](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
-[![Languages](https://img.shields.io/badge/languages-EN%20%7C%20CS%20%7C%20DE-orange?style=flat-square)](#languages)
+[![Release](https://img.shields.io/github/v/release/klucon/com_joomleague?style=flat-square&logo=github&label=release&color=2ea44f)](https://github.com/klucon/com_joomleague/releases/latest)
+[![Build](https://img.shields.io/github/actions/workflow/status/klucon/com_joomleague/build-package.yml?style=flat-square&logo=githubactions&logoColor=white&label=build)](https://github.com/klucon/com_joomleague/actions)
+[![License](https://img.shields.io/github/license/klucon/com_joomleague?style=flat-square&label=license&color=2563eb)](LICENSE)
+[![Joomla](https://img.shields.io/badge/Joomla-6.1%2B-5091CD?style=flat-square&logo=joomla&logoColor=white)](https://www.joomla.org)
+[![PHP](https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net)
+[![Languages](https://img.shields.io/badge/languages-EN%20%7C%20CS%20%7C%20DE-f59e0b?style=flat-square)](#languages)
 
 <br>
 
-[![Website](https://img.shields.io/badge/Website-klucon.cz-111827?style=for-the-badge&logo=googlechrome&logoColor=white)](https://klucon.cz)
-[![Download](https://img.shields.io/badge/Download-latest_package-2ea44f?style=for-the-badge&logo=icloud&logoColor=white)](https://klucon.cz/downloads)
-[![Documentation](https://img.shields.io/badge/Docs-docs.klucon.cz-0969DA?style=for-the-badge&logo=readthedocs&logoColor=white)](https://docs.klucon.cz)
-[![Forum](https://img.shields.io/badge/Forum-forum.klucon.cz-7C3AED?style=for-the-badge&logo=discourse&logoColor=white)](https://forum.klucon.cz)
-[![Demo](https://img.shields.io/badge/Live_Demo-joomleague.klucon.cz-0F766E?style=for-the-badge&logo=serverfault&logoColor=white)](https://joomleague.klucon.cz)
+**Public ecosystem**
+
+[![Website](https://img.shields.io/badge/website-klucon.cz-111827?style=flat-square)](https://klucon.cz)
+[![Downloads](https://img.shields.io/badge/downloads-package-2ea44f?style=flat-square)](https://klucon.cz/downloads)
+[![Documentation](https://img.shields.io/badge/docs-docs.klucon.cz-0969da?style=flat-square)](https://docs.klucon.cz)
+[![Demo](https://img.shields.io/badge/demo-joomleague.klucon.cz-0f766e?style=flat-square)](https://joomleague.klucon.cz)
+[![Statistics](https://img.shields.io/badge/stats-stats.klucon.cz-7c3aed?style=flat-square)](https://stats.klucon.cz)
+[![Migration](https://img.shields.io/badge/migration-migrate.klucon.cz-d97706?style=flat-square)](https://migrate.klucon.cz)
+[![Forum](https://img.shields.io/badge/forum-forum.klucon.cz-475569?style=flat-square)](https://forum.klucon.cz)
 
 </div>
 
@@ -177,6 +180,8 @@ Translations cover the component, modules and plugins on both the site and admin
 - Public website: [klucon.cz](https://klucon.cz)
 - Forum: [forum.klucon.cz](https://forum.klucon.cz)
 - Demo: [joomleague.klucon.cz](https://joomleague.klucon.cz)
+- Public statistics: [stats.klucon.cz](https://stats.klucon.cz)
+- Migration tool: [migrate.klucon.cz](https://migrate.klucon.cz)
 
 ## Development
 
@@ -229,6 +234,6 @@ Ondřej Klučka<br>
 
 <div align="center">
 
-[Website](https://klucon.cz) · [Download](https://klucon.cz/downloads) · [Documentation](https://docs.klucon.cz) · [Forum](https://forum.klucon.cz) · [Demo](https://joomleague.klucon.cz) · [GitHub](https://github.com/klucon/com_joomleague)
+[Website](https://klucon.cz) · [Downloads](https://klucon.cz/downloads) · [Documentation](https://docs.klucon.cz) · [Demo](https://joomleague.klucon.cz) · [Statistics](https://stats.klucon.cz) · [Migration tool](https://migrate.klucon.cz) · [Forum](https://forum.klucon.cz)
 
 </div>
