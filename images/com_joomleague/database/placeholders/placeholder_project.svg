@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+	<title id="title">Project picture placeholder</title>
+	<rect x="20" y="35" width="216" height="180" rx="28" fill="currentColor" opacity=".08"/>
+	<path fill="currentColor" opacity=".2" d="M20 63c0-15 13-28 28-28h160c15 0 28 13 28 28v30H20z"/>
+	<circle cx="56" cy="64" r="9" fill="currentColor" opacity=".42"/>
+	<circle cx="86" cy="64" r="9" fill="currentColor" opacity=".26"/>
+	<circle cx="116" cy="64" r="9" fill="currentColor" opacity=".26"/>
+	<rect x="58" y="122" width="132" height="16" rx="8" fill="currentColor" opacity=".32"/>
+	<rect x="58" y="154" width="92" height="16" rx="8" fill="currentColor" opacity=".24"/>
+	<path fill="currentColor" opacity=".4" d="m179 168 18 18 42-52 14 12-56 69-33-33z"/>
+</svg>

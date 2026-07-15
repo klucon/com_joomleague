@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
@@ -23,7 +24,7 @@ $this->getDocument()->getWebAssetManager()->useScript('multiselect');
 $user = $this->getCurrentUser();
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirection = $this->escape($this->state->get('list.direction'));
-$dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.6';
+$dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.9';
 ?>
 <?php if ((property_exists($this, 'projectContext') && $this->projectContext) || (property_exists($this, 'roundContext') && $this->roundContext)) : ?>
 <link rel="stylesheet" href="<?php echo htmlspecialchars($dashboardStyle, ENT_QUOTES, 'UTF-8'); ?>">
@@ -89,7 +90,14 @@ $dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0
 	?><tr><td class="text-center"><?php echo HTMLHelper::_('grid.id', $i, $item->id, false, 'cid', 'cb', (string) $item->{$this->entity['primary']}); ?></td>
 		<?php if (!empty($this->entity['state'])) : ?><td class="text-center"><?php echo HTMLHelper::_('jgrid.published', $item->published, $i, $this->entity['plural'] . '.', $canChange); ?></td><?php endif; ?>
 		<?php foreach ($this->entity['columns'] as $index => $column) : $value = $item->{$column['field']} ?? ''; ?><<?php echo $index === 0 ? 'th scope="row"' : 'td'; ?> class="<?php echo $this->escape($column['class'] ?? ''); ?>">
-			<?php if (($column['type'] ?? '') === 'image') : $image = HTMLHelper::cleanImageURL((string) $value); $src = $image->url === '' ? '' : Uri::root(true) . '/' . ltrim($image->url, '/'); ?>
+			<?php if (($column['type'] ?? '') === 'image') :
+				$imageSource = (string) $value;
+				if (trim($imageSource) === '' && !empty($column['image_placeholder'])) {
+					$imageSource = (string) ComponentHelper::getParams('com_joomleague')->get('placeholder_' . $column['image_placeholder'], '');
+				}
+				$image = HTMLHelper::cleanImageURL($imageSource);
+				$src = $image->url === '' ? '' : Uri::root(true) . '/' . ltrim($image->url, '/');
+			?>
 				<?php if ($src !== '') : ?><img src="<?php echo $this->escape($src); ?>" alt="" width="32" height="32" loading="lazy" class="rounded object-fit-contain"><?php else : ?><span class="icon-image text-muted" aria-hidden="true"></span><?php endif; ?>
 			<?php elseif (($column['type'] ?? '') === 'matchdata') : ?>
 				<a href="<?php echo Route::_('index.php?option=com_joomleague&view=matchdata&match_id=' . (int) $item->id . '&section=' . $column['section']); ?>"><?php echo (int) $value; ?> <span class="icon-edit" aria-hidden="true"></span></a>
@@ -108,6 +116,22 @@ $dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0
 				</div>
 			<?php elseif (($column['type'] ?? '') === 'matchdatetime') : ?>
 				<input type="datetime-local" class="form-control form-control-sm jl-match-date" data-jl-match-date data-id="<?php echo (int) $item->id; ?>" value="<?php echo $this->escape($value === '' || $value === null ? '' : str_replace(' ', 'T', substr((string) $value, 0, 16))); ?>">
+			<?php elseif (($column['type'] ?? '') === 'matchresult') : ?>
+				<?php
+				$fmtResult = static function ($v) {
+					if ($v === null || $v === '') {
+						return '';
+					}
+					$v = (float) $v;
+
+					return fmod($v, 1.0) === 0.0 ? (string) (int) $v : (string) $v;
+				};
+				?>
+				<div class="d-flex align-items-center gap-1">
+					<input type="number" step="any" min="0" class="form-control form-control-sm jl-match-result" style="width:4.5rem" data-jl-match-result data-side="1" data-id="<?php echo (int) $item->id; ?>" value="<?php echo $this->escape($fmtResult($item->team1_result ?? null)); ?>">
+					<span>:</span>
+					<input type="number" step="any" min="0" class="form-control form-control-sm jl-match-result" style="width:4.5rem" data-jl-match-result data-side="2" data-id="<?php echo (int) $item->id; ?>" value="<?php echo $this->escape($fmtResult($item->team2_result ?? null)); ?>">
+				</div>
 			<?php elseif (($column['type'] ?? '') === 'articlesync') : $hasArticle = !empty($item->has_article); ?>
 				<a class="btn btn-sm <?php echo $hasArticle ? 'btn-warning' : 'btn-success'; ?>" href="<?php echo Route::_('index.php?option=com_joomleague&task=match.syncarticle&id=' . (int) $item->id . '&' . Session::getFormToken() . '=1'); ?>"><span class="icon-file-2" aria-hidden="true"></span> <?php echo Text::_($hasArticle ? 'COM_JOOMLEAGUE_MATCH_UPDATE_ARTICLE' : 'COM_JOOMLEAGUE_MATCH_CREATE_ARTICLE'); ?></a>
 			<?php elseif (($column['type'] ?? '') === 'splitscore') : ?>
@@ -181,6 +205,58 @@ $dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0
 							previous[id] = input.value;
 						} else if (res.message) {
 							alert(res.message);
+						}
+					})
+					.catch(function () { input.classList.add('is-invalid'); });
+			});
+		})();
+	</script>
+<?php endif; ?>
+<?php if (in_array('matchresult', array_column($this->entity['columns'], 'type'), true)) : ?>
+	<script>
+		(function () {
+			var previous = {};
+
+			function key(id, side) { return id + ':' + side; }
+
+			// Zapamatuj hodnotu při vstupu do pole
+			document.addEventListener('focusin', function (event) {
+				var input = event.target.closest('[data-jl-match-result]');
+				if (input) { previous[key(input.getAttribute('data-id'), input.getAttribute('data-side'))] = input.value; }
+			});
+			// Ulož až při opuštění pole (kliknutí jinam) a jen když se hodnota změnila – posílá se
+			// vždy aktuální hodnota OBOU polí (domácí i hosté) najednou, ať se výsledek uloží celý.
+			document.addEventListener('focusout', function (event) {
+				var input = event.target.closest('[data-jl-match-result]');
+				if (!input) { return; }
+				var id = input.getAttribute('data-id');
+				var k = key(id, input.getAttribute('data-side'));
+				if (previous[k] === input.value) { return; }
+				var team1Input = document.querySelector('[data-jl-match-result][data-id="' + id + '"][data-side="1"]');
+				var team2Input = document.querySelector('[data-jl-match-result][data-id="' + id + '"][data-side="2"]');
+				var data = new FormData();
+				data.append('id', id);
+				data.append('team1_result', team1Input ? team1Input.value : '');
+				data.append('team2_result', team2Input ? team2Input.value : '');
+				data.append(Joomla.getOptions('csrf.token'), '1');
+				input.classList.remove('is-valid', 'is-invalid');
+				fetch('index.php?option=com_joomleague&task=match.saveresult', {
+					method: 'POST',
+					body: data,
+					headers: { 'X-Requested-With': 'XMLHttpRequest' }
+				})
+					.then(function (response) { return response.json(); })
+					.then(function (res) {
+						if (res.success) {
+							// Zeleně se označí jen pole, které uživatel právě opustil – to druhé
+							// se jen tiše dorovná (může se přeformátovat), ať nevypadá jako
+							// potvrzené, i když do něj uživatel ještě nic nenapsal.
+							if (team1Input) { team1Input.value = res.team1; previous[key(id, '1')] = res.team1; }
+							if (team2Input) { team2Input.value = res.team2; previous[key(id, '2')] = res.team2; }
+							input.classList.add('is-valid');
+						} else {
+							input.classList.add('is-invalid');
+							if (res.message) { alert(res.message); }
 						}
 					})
 					.catch(function () { input.classList.add('is-invalid'); });

@@ -21,7 +21,7 @@ final class TreetonodeController extends EntityFormController
 	{
 		$append = parent::getRedirectToListAppend();
 		$form = $this->input->post->get('jform', [], 'array');
-		$treeId = (int) ($form['treeto_id'] ?? $this->input->getInt('treeto_id'));
+		$treeId = (int) ($form['treeto_id'] ?? $this->input->getInt('treeto_id', 0));
 
 		return $treeId > 0 ? $append . '&treeto_id=' . $treeId : $append;
 	}

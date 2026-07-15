@@ -30,7 +30,7 @@ final class TreetonodeModel extends EntityAdminModel
 		$item = $this->getItem();
 
 		if (empty($item->treeto_id)) {
-			$item->treeto_id = $this->application->getInput()->getInt('treeto_id') ?: (int) $this->application->getUserState('com_joomleague.treetonodes.treeto_id');
+			$item->treeto_id = $this->application->getInput()->getInt('treeto_id', 0) ?: (int) $this->application->getUserState('com_joomleague.treetonodes.treeto_id');
 		}
 
 		return $item;

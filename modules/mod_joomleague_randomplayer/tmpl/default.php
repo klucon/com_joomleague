@@ -12,6 +12,7 @@
  * @var  \Joomla\Registry\Registry  $params  Module parameters.
  */
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
@@ -22,10 +23,15 @@ if (empty($item)) {
 
     return;
 }
+
+$personPicture = trim((string) ($item->person_picture ?? ''));
+if ($personPicture === '') {
+    $personPicture = trim((string) ComponentHelper::getParams('com_joomleague')->get('placeholder_person_picture', ''));
+}
 ?>
 <div class="jl-module jl-randomplayer text-center">
-	<?php if (!empty($item->person_picture)) : ?>
-		<img class="jl-player-photo img-fluid mb-2" src="<?php echo htmlspecialchars($item->person_picture, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($item->person_name, ENT_QUOTES, 'UTF-8'); ?>">
+	<?php if ($personPicture !== '') : ?>
+		<img class="jl-player-photo img-fluid mb-2" src="<?php echo htmlspecialchars($personPicture, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($item->person_name, ENT_QUOTES, 'UTF-8'); ?>">
 	<?php endif; ?>
 	<div class="jl-player-name fw-bold">
 		<a href="<?php echo Route::_('index.php?option=com_joomleague&view=person&id=' . (int) $item->person_id); ?>">

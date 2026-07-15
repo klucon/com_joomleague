@@ -7,11 +7,11 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_treeoverlib" type="radio" default="1" label="COM_JOOMLEAGUE_FES_TREE_PARAM_LABEL_SHOW_OVERLIB" description="COM_JOOMLEAGUE_FES_TREE_PARAM_DESCR_SHOW_OVERLIB">
+			<field name="show_treeoverlib" type="radio" default="1" label="COM_JOOMLEAGUE_FES_TREE_PARAM_LABEL_SHOW_OVERLIB" description="COM_JOOMLEAGUE_FES_TREE_PARAM_DESCR_SHOW_OVERLIB" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_treeheader" type="radio" default="0" label="COM_JOOMLEAGUE_FES_TREE_PARAM_LABEL_SHOW_TREEHEADER" description="COM_JOOMLEAGUE_FES_TREE_PARAM_DESCR_SHOW_TREEHEADER">
+			<field name="show_treeheader" type="radio" default="0" label="COM_JOOMLEAGUE_FES_TREE_PARAM_LABEL_SHOW_TREEHEADER" description="COM_JOOMLEAGUE_FES_TREE_PARAM_DESCR_SHOW_TREEHEADER" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -44,7 +44,7 @@
 				<option value="1">COM_JOOMLEAGUE_FES_TREE_PARAM_OPTION_TEAMNAME_LINK_TEAMINFO</option>
 				<option value="2">COM_JOOMLEAGUE_FES_TREE_PARAM_OPTION_TEAMNAME_LINK_TEAMSTATS</option>
 			</field>
-			<field name="highlight_fav" type="radio" default="1" label="COM_JOOMLEAGUE_FES_RESULTS_PARAM_LABEL_HIGHLIGHT_FAV" description="COM_JOOMLEAGUE_FES_RESULTS_PARAM_DESCR_HIGHLIGHT_FAV">
+			<field name="highlight_fav" type="radio" default="1" label="COM_JOOMLEAGUE_FES_RESULTS_PARAM_LABEL_HIGHLIGHT_FAV" description="COM_JOOMLEAGUE_FES_RESULTS_PARAM_DESCR_HIGHLIGHT_FAV" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -78,7 +78,7 @@
 				<option value="0">COM_JOOMLEAGUE_FES_TREE_PARAM_OPTION_SHOW_OVERLIB_BA_BELOW</option>
 				<option value="1">COM_JOOMLEAGUE_FES_TREE_PARAM_OPTION_SHOW_OVERLIB_BA_ABOVE</option>
 			</field>
-			<field name="show_overlib_seed" type="radio" default="0" label="COM_JOOMLEAGUE_FES_TREE_PARAM_LABEL_SHOW_OVERLIB_SEED" description="COM_JOOMLEAGUE_FES_TREE_PARAM_DESCR_SHOW_OVERLIB_SEED">
+			<field name="show_overlib_seed" type="radio" default="0" label="COM_JOOMLEAGUE_FES_TREE_PARAM_LABEL_SHOW_OVERLIB_SEED" description="COM_JOOMLEAGUE_FES_TREE_PARAM_DESCR_SHOW_OVERLIB_SEED" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -91,7 +91,7 @@
 				<option value="1">COM_JOOMLEAGUE_FES_TREE_PARAM_OPTION_LENGTHNAME_MIDDLE</option>
 				<option value="2">COM_JOOMLEAGUE_FES_TREE_PARAM_OPTION_LENGTHNAME_LONG</option>
 			</field>
-			<field name="show_playground" type="radio" default="0" label="COM_JOOMLEAGUE_FES_RESULTS_PARAM_LABEL_SHOW_PLAYGROUND" description="COM_JOOMLEAGUE_FES_RESULTS_PARAM_DESCR_SHOW_PLAYGROUND">
+			<field name="show_playground" type="radio" default="0" label="COM_JOOMLEAGUE_FES_RESULTS_PARAM_LABEL_SHOW_PLAYGROUND" description="COM_JOOMLEAGUE_FES_RESULTS_PARAM_DESCR_SHOW_PLAYGROUND" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>

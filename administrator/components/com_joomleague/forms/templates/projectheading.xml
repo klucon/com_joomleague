@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fields name="params">
+		<fieldset name="display" label="COM_JOOMLEAGUE_TEMPLATE_FIELDSET_DISPLAY">
+			<field name="show_title" type="radio" default="1" label="COM_JOOMLEAGUE_FES_PROJECTHEADING_PARAM_LABEL_SHOW_TITLE" description="COM_JOOMLEAGUE_FES_PROJECTHEADING_PARAM_DESCR_SHOW_TITLE" class="btn-group btn-group-yesno">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field name="show_project_logo" type="radio" default="1" label="COM_JOOMLEAGUE_FES_PROJECTHEADING_PARAM_LABEL_SHOW_LOGO" description="COM_JOOMLEAGUE_FES_PROJECTHEADING_PARAM_DESCR_SHOW_LOGO" class="btn-group btn-group-yesno">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field name="show_project_name" type="radio" default="1" label="COM_JOOMLEAGUE_FES_PROJECTHEADING_PARAM_LABEL_SHOW_NAME" description="COM_JOOMLEAGUE_FES_PROJECTHEADING_PARAM_DESCR_SHOW_NAME" class="btn-group btn-group-yesno">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+		</fieldset>
+	</fields>
+</form>

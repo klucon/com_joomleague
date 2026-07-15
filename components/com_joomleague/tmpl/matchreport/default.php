@@ -17,6 +17,14 @@ use Joomla\CMS\Router\Route;
 $match = $this->item;
 $params = $this->templateParams;
 $show = static fn (string $name, bool $default = true): bool => array_key_exists($name, $params) ? (bool) $params[$name] : $default;
+
+$favTeamIds = array_map(
+	'intval',
+	array_filter(
+		array_map('trim', explode(',', (string) ($this->project->fav_team ?? ''))),
+		static fn (string $v): bool => $v !== '' && ctype_digit($v)
+	)
+);
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$match) : ?>
@@ -36,10 +44,59 @@ $show = static fn (string $name, bool $default = true): bool => array_key_exists
 	echo LayoutHelper::render(
 		'joomleague.match.detail',
 		[
-			'match'    => $match,
-			'events'   => $this->items,
+			'match' => $match,
+			'events' => $this->items,
 			'referees' => $this->matchReferees,
-			'options'  => ['link' => false, 'heading' => 'h1', 'meta' => $show('show_meta'), 'split' => $show('show_split_results'), 'preview' => $show('show_preview'), 'summary' => $show('show_summary'), 'referees' => $show('show_referees'), 'events' => $show('show_events')],
+			'roster' => $this->matchRoster,
+			'staff' => $this->matchStaffList,
+			'statistics' => $this->matchPlayerStatistics,
+			'favTeamIds' => $favTeamIds,
+			'options' => [
+				'link' => false,
+				'heading' => 'h1',
+				'meta' => $show('show_meta'),
+				'details' => $show('show_details'),
+				'split' => $show('show_split_results') && $show('show_period_result'),
+				'preview' => $show('show_preview'),
+				'summary' => $show('show_summary'),
+				'referees' => $show('show_referees'),
+				'matchReferees' => $show('show_match_referees'),
+				'refereePosition' => $show('show_referee_position', false),
+				'events' => $show('show_events'),
+				'sectionHeader' => $show('show_sectionheader'),
+				'result' => $show('show_result'),
+				'extended' => $show('show_extended'),
+				'timeline' => $show('show_timeline', false),
+				'overtimeResult' => $show('show_overtime_result'),
+				'shotoutResult' => $show('show_shotout_result'),
+				'matchDate' => $show('show_match_date'),
+				'matchTime' => $show('show_match_time'),
+				'timeSuffix' => $show('show_time_suffix'),
+				'matchNumber' => $show('show_match_number', false),
+				'matchPlayground' => $show('show_match_playground'),
+				'matchCrowd' => $show('show_match_crowd'),
+				'eventMinute' => $show('show_event_minute'),
+				'eventSum' => $show('show_event_sum', false),
+				'eventNotice' => $show('show_event_notice'),
+				'eventLinkPlayer' => $show('event_link_player'),
+				'eventTeamName' => $show('show_event_team_name'),
+				'sortEventsDesc' => $show('sort_events_desc'),
+				'teamNameField' => (string) ($params['names'] ?? 'name'),
+				'showTeamLogo' => $show('show_team_logo'),
+				'picture' => (string) ($params['show_picture'] ?? 'logo_big'),
+				'pictureWidth' => (int) ($params['team_picture_width'] ?? 150),
+				'pictureHeight' => (int) ($params['team_picture_height'] ?? 0),
+				'roster' => $show('show_roster'),
+				'substitutions' => $show('show_substitutions'),
+				'stats' => $show('show_stats'),
+				'playerNameFormat' => (string) ($params['name_format'] ?? '3'),
+				'playerProfileLink' => (string) ($params['show_player_profile_link'] ?? '1'),
+				'playerPicture' => $show('show_player_picture'),
+				'playerPictureWidth' => (int) ($params['player_picture_width'] ?? 0),
+				'playerPictureHeight' => (int) ($params['player_picture_height'] ?? 40),
+				'styleClass1' => (string) ($params['style_class1'] ?? ''),
+				'styleClass2' => (string) ($params['style_class2'] ?? ''),
+			],
 		],
 		JPATH_SITE . '/components/com_joomleague/layouts'
 	);

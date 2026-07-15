@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+	<title id="title">Stadium photo placeholder</title>
+	<rect x="16" y="24" width="224" height="208" rx="28" fill="currentColor" opacity=".06"/>
+	<path fill="currentColor" opacity=".16" d="M34 78h188l24 60H10z"/>
+	<path fill="currentColor" opacity=".3" d="M52 42h152l30 36H22z"/>
+	<path fill="currentColor" opacity=".18" d="M32 138h192v78H32z"/>
+	<path fill="currentColor" opacity=".34" d="M58 158h140v40H58z"/>
+	<path fill="currentColor" opacity=".46" d="M82 173h92v12H82z"/>
+</svg>

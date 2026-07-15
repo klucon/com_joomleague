@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+	<title id="title">Project team picture placeholder</title>
+	<path fill="currentColor" opacity=".08" d="M128 10 232 49v80c0 62-39 102-104 126C63 231 24 191 24 129V49z"/>
+	<path fill="currentColor" opacity=".22" d="M128 40 198 66v61c0 43-23 73-70 94-47-21-70-51-70-94V66z"/>
+	<circle cx="128" cy="91" r="34" fill="currentColor" opacity=".32"/>
+	<path fill="currentColor" opacity=".3" d="M78 178c10-37 27-56 50-56s40 19 50 56z"/>
+	<rect x="82" y="195" width="92" height="16" rx="8" fill="currentColor" opacity=".28"/>
+	<rect x="86" y="68" width="84" height="16" rx="8" fill="currentColor" opacity=".36"/>
+</svg>

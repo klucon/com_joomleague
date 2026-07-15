@@ -12,6 +12,6 @@
 			<option value="a.name ASC">JGLOBAL_TITLE_ASC</option>
 			<option value="a.id DESC">JGRID_HEADING_ID_DESC</option>
 		</field>
-		<field name="limit" type="limitbox" label="JGLOBAL_LIST_LIMIT" />
+		<field name="limit" type="limitbox" label="JGLOBAL_LIST_LIMIT" class="js-select-submit-on-change"/>
 	</fields>
 </form>

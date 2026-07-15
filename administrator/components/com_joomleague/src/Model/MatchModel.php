@@ -8,7 +8,7 @@
 declare(strict_types=1);
 namespace Joomleague\Component\Joomleague\Administrator\Model;
 \defined('_JEXEC') or die;
-use Joomla\CMS\Application\AdministratorApplication;use Joomla\CMS\Date\Date;use Joomla\CMS\Form\Form;use Joomla\CMS\MVC\Model\AdminModel;use Joomla\CMS\Table\Table;use Joomla\Database\ParameterType;
+use Joomla\CMS\Application\AdministratorApplication;use Joomla\CMS\Component\ComponentHelper;use Joomla\CMS\Date\Date;use Joomla\CMS\Form\Form;use Joomla\CMS\MVC\Model\AdminModel;use Joomla\CMS\Table\Table;use Joomla\Database\ParameterType;
 final class MatchModel extends AdminModel
 {
  private AdministratorApplication $application;public function setApplication(AdministratorApplication $a):void{$this->application=$a;}
@@ -111,10 +111,11 @@ final class MatchModel extends AdminModel
 		}
 
 		$logo = trim((string) $row->picture) ?: (trim((string) $row->logo_small) ?: trim((string) $row->logo_middle));
+		$logo = $logo ?: trim((string) ComponentHelper::getParams('com_joomleague')->get('placeholder_team_picture', ''));
 
 		return (object) ['name' => (string) $row->name, 'logo' => $logo];
 	}
- private function getRoundIdFromInput():int{$input=$this->application->getInput();$id=$input->getInt('round_id');if(!$id){$rid=$input->get('rid',[],'array');$id=(int)($rid[0]??0);}return $id;}
+ private function getRoundIdFromInput():int{$input=$this->application->getInput();$id=$input->getInt('round_id', 0);if(!$id){$rid=$input->get('rid',[],'array');$id=(int)($rid[0]??0);}return $id;}
  private function getProjectIdByRound(int $roundId):int{$db=$this->getDatabase();$q=$db->createQuery()->select('project_id')->from('#__joomleague_round')->where('id=:id')->bind(':id',$roundId,ParameterType::INTEGER);return (int)$db->setQuery($q)->loadResult();}
  protected function prepareTable($t):void{foreach(['round_id','projectteam1_id','projectteam2_id','crowd','published','cancel','count_result','show_report','match_result_type'] as $f)$t->$f=(int)$t->$f;$t->playground_id=(int)$t->playground_id?:null;foreach(['team1_result','team2_result','team1_result_ot','team2_result_ot','team1_result_so','team2_result_so'] as $f)$t->$f=$t->$f===''?null:(float)$t->$f;foreach(['summary','preview','cancel_reason','decision_info','extended','match_number','match_result_detail'] as $f)$t->$f=trim((string)$t->$f);$t->match_date=trim((string)$t->match_date)?:null;$t->modified=(new Date())->toSql();$t->modified_by=(int)$this->getCurrentUser()->id?:null;}
 
@@ -214,5 +215,70 @@ final class MatchModel extends AdminModel
 		$db->setQuery($query)->execute();
 
 		return $stored === null ? '' : str_replace(' ', 'T', substr($stored, 0, 16));
+	}
+
+	/**
+	 * Inline AJAX uložení hlavního výsledku zápasu (team1_result/team2_result) ze
+	 * seznamu zápasů. Prázdná hodnota = NULL (zápas zatím neodehrán / smazaný výsledek).
+	 *
+	 * @return array{team1: string, team2: string, result: string}
+	 */
+	public function saveResult(int $id, string $team1Value, string $team2Value): array
+	{
+		if ($id < 1) {
+			throw new \RuntimeException('COM_JOOMLEAGUE_MATCH_RESULT_INVALID');
+		}
+
+		$parse = static function (string $value): ?float {
+			$value = trim(str_replace(',', '.', $value));
+
+			if ($value === '') {
+				return null;
+			}
+
+			if (!is_numeric($value) || (float) $value < 0) {
+				throw new \RuntimeException('COM_JOOMLEAGUE_MATCH_RESULT_INVALID');
+			}
+
+			return (float) $value;
+		};
+
+		$team1 = $parse($team1Value);
+		$team2 = $parse($team2Value);
+
+		$db = $this->getDatabase();
+		$modified = (new Date())->toSql();
+		$modifiedBy = (int) $this->getCurrentUser()->id ?: null;
+
+		$query = $db->createQuery()
+			->update($db->quoteName('#__joomleague_match'))
+			->set($db->quoteName('modified') . ' = :mod')
+			->set($db->quoteName('modified_by') . ' = :mb')
+			->where($db->quoteName('id') . ' = :id')
+			->bind(':mod', $modified)
+			->bind(':mb', $modifiedBy, ParameterType::INTEGER)
+			->bind(':id', $id, ParameterType::INTEGER);
+
+		if ($team1 === null) {
+			$query->set($db->quoteName('team1_result') . ' = NULL');
+		} else {
+			$query->set($db->quoteName('team1_result') . ' = :t1')->bind(':t1', $team1, ParameterType::STRING);
+		}
+
+		if ($team2 === null) {
+			$query->set($db->quoteName('team2_result') . ' = NULL');
+		} else {
+			$query->set($db->quoteName('team2_result') . ' = :t2')->bind(':t2', $team2, ParameterType::STRING);
+		}
+
+		$db->setQuery($query)->execute();
+
+		$fmt = static fn (?float $v): string => $v === null ? '' : (fmod($v, 1.0) === 0.0 ? (string) (int) $v : (string) $v);
+
+		return [
+			'team1' => $fmt($team1),
+			'team2' => $fmt($team2),
+			'result' => ($team1 === null ? '-' : $fmt($team1)) . ' : ' . ($team2 === null ? '-' : $fmt($team2)),
+		];
 	}
 }

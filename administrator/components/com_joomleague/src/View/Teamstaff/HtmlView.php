@@ -12,6 +12,7 @@ namespace Joomleague\Component\Joomleague\Administrator\View\Teamstaff;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Uri\Uri;
 use Joomleague\Component\Joomleague\Administrator\View\Common\AdminFormView;
 
 final class HtmlView extends AdminFormView
@@ -31,5 +32,12 @@ final class HtmlView extends AdminFormView
 			],
 			'publishing' => ['published', 'ordering'],
 		];
+	}
+
+	public function display($tpl = null): void
+	{
+		// Provázání: po výběru týmu se seznam pozic přenačte jen na pozice jeho projektu.
+		$this->getDocument()->addScript(Uri::root(true) . '/media/com_joomleague/js/teamstaff-edit.js?v=1.0.0', [], ['defer' => true]);
+		parent::display($tpl);
 	}
 }

@@ -8,6 +8,7 @@
 		<field name="tree_i" type="number" label="COM_JOOMLEAGUE_TREETO_FIELD_DEPTH" min="1" max="8" default="3" description="COM_JOOMLEAGUE_TREETO_FIELD_DEPTH_DESC" />
 		<field name="global_bestof" type="number" label="COM_JOOMLEAGUE_TREETO_FIELD_BESTOF" min="1" default="1" />
 		<field name="global_matchday" type="number" label="COM_JOOMLEAGUE_TREETO_FIELD_MATCHDAY" min="0" default="0" />
+		<field name="trophypic" type="media" label="COM_JOOMLEAGUE_FIELD_IMAGE" directory="com_joomleague/treetos" preview="tooltip" description="COM_JOOMLEAGUE_FIELD_IMAGE_DESCRIPTION" />
 	</fieldset>
 	<fieldset name="flags" label="COM_JOOMLEAGUE_TREETO_FIELDSET_FLAGS">
 		<field name="global_known" type="radio" label="COM_JOOMLEAGUE_TREETO_FIELD_KNOWN" layout="joomla.form.field.radio.switcher" default="0"><option value="0">JNO</option><option value="1">JYES</option></field>

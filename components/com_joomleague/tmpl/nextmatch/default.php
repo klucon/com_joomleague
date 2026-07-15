@@ -17,11 +17,21 @@ use Joomla\CMS\Router\Route;
 
 $match = $this->item;
 $comparison = $this->matchTeamComparison;
+
+$params = $this->templateParams;
+$show = static fn (string $name, bool $default = true): bool => array_key_exists($name, $params) && $params[$name] !== '' ? (bool) $params[$name] : $default;
+$param = static fn (string $name, $default = null) => array_key_exists($name, $params) && $params[$name] !== '' ? $params[$name] : $default;
+
+$nameFormat = (string) $param('name_format', '0');
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$match) : ?>
 		<div class="alert alert-info"><?php echo Text::_('COM_JOOMLEAGUE_SITE_NEXT_MATCH_NOT_FOUND'); ?></div>
 		<?php return; ?>
+	<?php endif; ?>
+
+	<?php if ($show('show_sectionheader')) : ?>
+		<h1 class="jl-site-title mb-3"><?php echo Text::_('COM_JOOMLEAGUE_SITE_NEXT_MATCH'); ?></h1>
 	<?php endif; ?>
 
 	<nav class="jl-site-nav mb-4">
@@ -37,20 +47,42 @@ $comparison = $this->matchTeamComparison;
 			'match'    => $match,
 			'events'   => $this->items,
 			'referees' => $this->matchReferees,
-			'options'  => ['events' => false, 'heading' => 'h1'],
+			'options'  => [
+				'events' => false,
+				'heading' => 'h2',
+				'sectionHeader' => $show('show_nextmatch'),
+				'details' => $show('show_details'),
+				'matchDate' => $show('show_match_date'),
+				'matchTime' => $show('show_match_time'),
+				'timeSuffix' => $show('show_time_suffix'),
+				'matchNumber' => $show('show_match_number', false),
+				'matchPlayground' => $show('show_match_playground'),
+				'matchCrowd' => false,
+				'referees' => $show('show_match_referees'),
+				'matchReferees' => $show('show_match_referees'),
+				'refereePosition' => true,
+				'refereeNameFormat' => $nameFormat,
+				'showTeamLogo' => $show('show_logo'),
+				'picture' => (string) $param('show_picture', 'logo_big'),
+				'pictureWidth' => (int) $param('team_picture_width', 150),
+				'pictureHeight' => (int) $param('team_picture_height', 0),
+				'preview' => false,
+				'roster' => false,
+				'stats' => false,
+			],
 		],
 		JPATH_SITE . '/components/com_joomleague/layouts'
 	);
 	?>
 
-	<?php if (!empty($match->preview)) : ?>
+	<?php if ($show('show_preview') && !empty($match->preview)) : ?>
 		<div class="jl-site-panel mt-4">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_PREVIEW'); ?></h2>
 			<div class="jl-site-richtext"><?php echo HTMLHelper::_('content.prepare', $match->preview); ?></div>
 		</div>
 	<?php endif; ?>
 
-	<?php if ($this->homeForm !== [] || $this->awayForm !== []) : ?>
+	<?php if ($show('show_previousx') && ($this->homeForm !== [] || $this->awayForm !== [])) : ?>
 		<div class="jl-site-panel mt-4">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_RECENT_FORM'); ?></h2>
 			<div class="jl-nm-form-grid">
@@ -76,7 +108,20 @@ $comparison = $this->matchTeamComparison;
 		</div>
 	<?php endif; ?>
 
-	<?php if ($comparison !== []) : ?>
+	<?php if ($show('show_stats') && $comparison !== []) : ?>
+		<?php
+		$homeSide = $comparison['home'];
+		$awaySide = $comparison['away'];
+		$formatRecord = static fn (?array $r): string => $r !== null ? $r['won'] . ' / ' . $r['drawn'] . ' / ' . $r['lost'] : Text::_('COM_JOOMLEAGUE_SITE_NOT_SET');
+		$formatRecordMatch = function (?object $m) use ($match): string {
+			if ($m === null) {
+				return '----';
+			}
+			$label = $this->escape((string) $m->home_name) . ' ' . (int) $m->team1_result . ':' . (int) $m->team2_result . ' ' . $this->escape((string) $m->away_name);
+
+			return '<a href="' . Route::_('index.php?option=com_joomleague&view=matchreport&id=' . (int) $m->id) . '">' . $label . '</a>';
+		};
+		?>
 		<div class="jl-site-panel table-responsive mt-4">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_COMPARISON'); ?></h2>
 			<table class="table jl-site-table align-middle">
@@ -88,32 +133,105 @@ $comparison = $this->matchTeamComparison;
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td><?php echo $comparison['home']['rank'] ?? Text::_('COM_JOOMLEAGUE_SITE_NOT_SET'); ?></td>
-						<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_RANKING'); ?></th>
-						<td><?php echo $comparison['away']['rank'] ?? Text::_('COM_JOOMLEAGUE_SITE_NOT_SET'); ?></td>
-					</tr>
-					<tr>
-						<td><?php echo (int) ($comparison['home']['stats']['played'] ?? 0); ?></td>
-						<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_PLAYED_MATCHES'); ?></th>
-						<td><?php echo (int) ($comparison['away']['stats']['played'] ?? 0); ?></td>
-					</tr>
-					<tr>
-						<td><?php echo (int) ($comparison['home']['stats']['wins'] ?? 0); ?> / <?php echo (int) ($comparison['home']['stats']['draws'] ?? 0); ?> / <?php echo (int) ($comparison['home']['stats']['losses'] ?? 0); ?></td>
-						<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_WIN_DRAW_LOSS'); ?></th>
-						<td><?php echo (int) ($comparison['away']['stats']['wins'] ?? 0); ?> / <?php echo (int) ($comparison['away']['stats']['draws'] ?? 0); ?> / <?php echo (int) ($comparison['away']['stats']['losses'] ?? 0); ?></td>
-					</tr>
-					<tr>
-						<td><?php echo $this->escape((string) ($comparison['home']['stats']['goals_for'] ?? 0) . ':' . (string) ($comparison['home']['stats']['goals_against'] ?? 0)); ?></td>
-						<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_GOALS'); ?></th>
-						<td><?php echo $this->escape((string) ($comparison['away']['stats']['goals_for'] ?? 0) . ':' . (string) ($comparison['away']['stats']['goals_against'] ?? 0)); ?></td>
-					</tr>
+					<?php if ($show('show_chances') && $homeSide['chance'] !== null) : ?>
+						<tr>
+							<td><?php echo $this->escape((string) $homeSide['chance']); ?> %</td>
+							<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_CHANCES'); ?></th>
+							<td><?php echo $this->escape((string) $awaySide['chance']); ?> %</td>
+						</tr>
+					<?php endif; ?>
+					<?php if ($show('show_current_rank')) : ?>
+						<tr>
+							<td><?php echo $homeSide['rank'] ?? Text::_('COM_JOOMLEAGUE_SITE_NOT_SET'); ?></td>
+							<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_RANKING'); ?></th>
+							<td><?php echo $awaySide['rank'] ?? Text::_('COM_JOOMLEAGUE_SITE_NOT_SET'); ?></td>
+						</tr>
+					<?php endif; ?>
+					<?php if ($show('show_match_count')) : ?>
+						<tr>
+							<td><?php echo (int) ($homeSide['stats']['played'] ?? 0); ?></td>
+							<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_PLAYED_MATCHES'); ?></th>
+							<td><?php echo (int) ($awaySide['stats']['played'] ?? 0); ?></td>
+						</tr>
+					<?php endif; ?>
+					<?php if ($show('show_match_total')) : ?>
+						<tr>
+							<td><?php echo (int) ($homeSide['stats']['wins'] ?? 0); ?> / <?php echo (int) ($homeSide['stats']['draws'] ?? 0); ?> / <?php echo (int) ($homeSide['stats']['losses'] ?? 0); ?></td>
+							<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_WIN_DRAW_LOSS'); ?></th>
+							<td><?php echo (int) ($awaySide['stats']['wins'] ?? 0); ?> / <?php echo (int) ($awaySide['stats']['draws'] ?? 0); ?> / <?php echo (int) ($awaySide['stats']['losses'] ?? 0); ?></td>
+						</tr>
+					<?php endif; ?>
+					<?php if ($show('show_match_total_home')) : ?>
+						<tr>
+							<td><?php echo $this->escape($formatRecord($homeSide['home_split'])); ?></td>
+							<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_HOME_RECORD'); ?></th>
+							<td><?php echo $this->escape($formatRecord($awaySide['home_split'])); ?></td>
+						</tr>
+					<?php endif; ?>
+					<?php if ($show('show_match_total_away')) : ?>
+						<tr>
+							<td><?php echo $this->escape($formatRecord($homeSide['away_split'])); ?></td>
+							<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_AWAY_RECORD'); ?></th>
+							<td><?php echo $this->escape($formatRecord($awaySide['away_split'])); ?></td>
+						</tr>
+					<?php endif; ?>
+					<?php if ($show('show_match_points')) : ?>
+						<tr>
+							<td><?php echo $homeSide['points'] ?? Text::_('COM_JOOMLEAGUE_SITE_NOT_SET'); ?></td>
+							<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_POINTS'); ?></th>
+							<td><?php echo $awaySide['points'] ?? Text::_('COM_JOOMLEAGUE_SITE_NOT_SET'); ?></td>
+						</tr>
+					<?php endif; ?>
+					<?php if ($show('show_match_goals')) : ?>
+						<tr>
+							<td><?php echo $this->escape((string) ($homeSide['stats']['goals_for'] ?? 0) . ':' . (string) ($homeSide['stats']['goals_against'] ?? 0)); ?></td>
+							<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_GOALS'); ?></th>
+							<td><?php echo $this->escape((string) ($awaySide['stats']['goals_for'] ?? 0) . ':' . (string) ($awaySide['stats']['goals_against'] ?? 0)); ?></td>
+						</tr>
+					<?php endif; ?>
+					<?php if ($show('show_match_diff')) : ?>
+						<tr>
+							<td><?php echo $this->escape((string) ($homeSide['stats']['goal_difference'] ?? 0)); ?></td>
+							<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_GOAL_DIFFERENCE'); ?></th>
+							<td><?php echo $this->escape((string) ($awaySide['stats']['goal_difference'] ?? 0)); ?></td>
+						</tr>
+					<?php endif; ?>
+					<?php if ($show('show_match_highest_stats')) : ?>
+						<?php if ($show('show_match_highest_won')) : ?>
+							<tr>
+								<td><?php echo $formatRecordMatch($homeSide['records']['highest_home_win'] ?? null); ?></td>
+								<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_HIGHEST_WIN_HOME'); ?></th>
+								<td><?php echo $formatRecordMatch($awaySide['records']['highest_home_win'] ?? null); ?></td>
+							</tr>
+						<?php endif; ?>
+						<?php if ($show('show_match_highest_loss')) : ?>
+							<tr>
+								<td><?php echo $formatRecordMatch($homeSide['records']['highest_home_loss'] ?? null); ?></td>
+								<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_HIGHEST_LOSS_HOME'); ?></th>
+								<td><?php echo $formatRecordMatch($awaySide['records']['highest_home_loss'] ?? null); ?></td>
+							</tr>
+						<?php endif; ?>
+						<?php if ($show('show_match_highest_won_away')) : ?>
+							<tr>
+								<td><?php echo $formatRecordMatch($homeSide['records']['highest_away_win'] ?? null); ?></td>
+								<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_HIGHEST_WIN_AWAY'); ?></th>
+								<td><?php echo $formatRecordMatch($awaySide['records']['highest_away_win'] ?? null); ?></td>
+							</tr>
+						<?php endif; ?>
+						<?php if ($show('show_match_highest_loss_away')) : ?>
+							<tr>
+								<td><?php echo $formatRecordMatch($homeSide['records']['highest_away_loss'] ?? null); ?></td>
+								<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_HIGHEST_LOSS_AWAY'); ?></th>
+								<td><?php echo $formatRecordMatch($awaySide['records']['highest_away_loss'] ?? null); ?></td>
+							</tr>
+						<?php endif; ?>
+					<?php endif; ?>
 				</tbody>
 			</table>
 		</div>
 	<?php endif; ?>
 
-	<?php if ($this->headToHeadMatches) : ?>
+	<?php if ($show('show_history') && $this->headToHeadMatches) : ?>
 		<div class="jl-site-panel table-responsive mt-4">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_HEAD_TO_HEAD'); ?></h2>
 			<table class="table jl-site-table align-middle">

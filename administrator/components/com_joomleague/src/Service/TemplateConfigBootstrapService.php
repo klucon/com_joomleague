@@ -76,7 +76,7 @@ final class TemplateConfigBootstrapService
 		[
 			'template' => 'playground',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_PLAYGROUND',
-			'params' => ['layout' => 'default', 'show_title' => true, 'show_address' => true, 'show_map' => false],
+			'params' => ['layout' => 'default', 'show_title' => true, 'show_address' => true, 'show_map' => false, 'show_map_embed' => true],
 		],
 		[
 			'template' => 'stats',
@@ -96,7 +96,81 @@ final class TemplateConfigBootstrapService
 		[
 			'template' => 'overall',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_OVERALL',
-			'params' => ['layout' => 'default', 'show_title' => true, 'show_ranking' => true, 'show_results' => true, 'show_nextmatch' => true],
+			// Pozn.: overall.xml je legacy sada obecných voleb (ochrana e-mailu, časové pásmo,
+			// obrázky projektu/divize atd.), ne přepínače pro sekce žebříček/výsledky/příští
+			// zápas – žádná z nich zatím není na frontendu nikde čtená (viz projectheading pro
+			// skutečné záhlaví domovské stránky projektu).
+			'params' => ['show_project_heading' => true, 'show_project_country' => false, 'show_project_picture' => false, 'show_project_text' => false],
+		],
+		[
+			'template' => 'clubinfo',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_CLUBINFO',
+			'params' => ['show_sectionheader' => true, 'show_description' => true, 'show_maps' => true, 'show_map_embed' => true, 'show_teams_of_club' => true, 'show_club_logo' => true, 'show_playgrounds_of_club' => true],
+		],
+		[
+			'template' => 'clubplan',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_CLUBPLAN',
+			'params' => ['show_sectionheader' => true, 'show_playground' => true, 'show_ical_link' => true],
+		],
+		[
+			'template' => 'tree',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_TREE',
+			'params' => ['show_sectionheader' => true, 'show_teamname_link' => '1', 'name_team_type' => '2'],
+		],
+		[
+			'template' => 'resultsranking',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_RESULTSRANKING',
+			'params' => ['show_sectionheader' => true, 'show_results' => true, 'show_ranking' => true],
+		],
+		[
+			'template' => 'clubs',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_CLUBS',
+			'params' => ['show_sectionheader' => true, 'show_address' => true, 'show_club_teams' => true, 'show_small_logo' => true, 'show_medium_logo' => false, 'show_big_logo' => false],
+		],
+		[
+			'template' => 'curve',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_CURVE',
+			'params' => ['show_sectionheader' => true, 'show_curve' => true, 'show_colorlegend' => true],
+		],
+		[
+			'template' => 'rivals',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_RIVALS',
+			'params' => ['show_sectionheader' => true, 'show_team_link' => true, 'show_teamstats_link' => true, 'show_plan_link' => true],
+		],
+		[
+			'template' => 'teams',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_TEAMS',
+			'params' => ['show_sectionheader' => true, 'show_team_picture' => true, 'show_club_picture' => true],
+		],
+		[
+			'template' => 'referees',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_REFEREES',
+			'params' => ['show_sectionheader' => true, 'link_name' => true],
+		],
+		[
+			'template' => 'eventsranking',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_EVENTSRANKING',
+			'params' => ['show_sectionheader' => true, 'max_events' => '20', 'link_to_player' => true, 'link_to_team' => true],
+		],
+		[
+			'template' => 'statsranking',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_STATSRANKING',
+			'params' => ['show_sectionheader' => true, 'max_stats' => '20', 'link_to_player' => true, 'link_to_team' => true],
+		],
+		[
+			'template' => 'projects',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_PROJECTS',
+			'params' => ['show_sectionheader' => true],
+		],
+		[
+			'template' => 'prediction',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_PREDICTION',
+			'params' => ['show_sectionheader' => true],
+		],
+		[
+			'template' => 'raceresults',
+			'title' => 'COM_JOOMLEAGUE_TEMPLATE_RACERESULTS',
+			'params' => ['show_sectionheader' => true],
 		],
 	];
 
@@ -121,13 +195,9 @@ final class TemplateConfigBootstrapService
 		return $created;
 	}
 
-	public function seedProject(int $projectId): int
+	public function seedGlobalDefaults(): int
 	{
-		if ($projectId <= 0) {
-			return 0;
-		}
-
-		$existing = $this->getExistingTemplates($projectId);
+		$existing = $this->getExistingTemplates(null);
 		$created = 0;
 
 		foreach (self::DEFAULT_TEMPLATES as $definition) {
@@ -138,7 +208,7 @@ final class TemplateConfigBootstrapService
 			}
 
 			$row = (object) [
-				'project_id' => $projectId,
+				'project_id' => null,
 				'template' => $definition['template'],
 				'func' => '',
 				'title' => $definition['title'],
@@ -157,16 +227,85 @@ final class TemplateConfigBootstrapService
 		return $created;
 	}
 
-	private function getExistingTemplates(int $projectId): array
+	public function seedProject(int $projectId): int
+	{
+		if ($projectId <= 0) {
+			return 0;
+		}
+
+		$existing = $this->getExistingTemplates($projectId);
+		$globalParams = $this->getGlobalParams();
+		$created = 0;
+
+		foreach (self::DEFAULT_TEMPLATES as $definition) {
+			$key = $definition['template'] . ':';
+
+			if (isset($existing[$key])) {
+				continue;
+			}
+
+			$row = (object) [
+				'project_id' => $projectId,
+				'template' => $definition['template'],
+				'func' => '',
+				'title' => $definition['title'],
+				// Nový projekt dědí aktuální centrální (globální) nastavení; teprve pokud
+				// pro danou šablonu žádné globální nastavení neexistuje, použije se
+				// vestavěný PHP default jako záchranná síť.
+				'params' => json_encode($globalParams[$definition['template']] ?? $definition['params'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+				'published' => 1,
+				'checked_out' => null,
+				'checked_out_time' => null,
+				'modified' => null,
+				'modified_by' => null,
+			];
+
+			$this->database->insertObject('#__joomleague_template_config', $row);
+			$created++;
+		}
+
+		return $created;
+	}
+
+	/**
+	 * @return  array<string, array<string, mixed>>
+	 */
+	private function getGlobalParams(): array
+	{
+		$query = $this->database->createQuery()
+			->select([$this->database->quoteName('template'), $this->database->quoteName('params')])
+			->from($this->database->quoteName('#__joomleague_template_config'))
+			->where($this->database->quoteName('project_id') . ' IS NULL')
+			->where($this->database->quoteName('published') . ' = 1');
+
+		$rows = (array) $this->database->setQuery($query)->loadAssocList();
+		$params = [];
+
+		foreach ($rows as $row) {
+			$decoded = json_validate((string) $row['params']) ? json_decode((string) $row['params'], true) : null;
+
+			if (is_array($decoded)) {
+				$params[(string) $row['template']] = $decoded;
+			}
+		}
+
+		return $params;
+	}
+
+	private function getExistingTemplates(?int $projectId): array
 	{
 		$query = $this->database->createQuery()
 			->select([
 				$this->database->quoteName('template'),
 				$this->database->quoteName('func'),
 			])
-			->from($this->database->quoteName('#__joomleague_template_config'))
-			->where($this->database->quoteName('project_id') . ' = :project_id')
-			->bind(':project_id', $projectId, ParameterType::INTEGER);
+			->from($this->database->quoteName('#__joomleague_template_config'));
+
+		if ($projectId === null) {
+			$query->where($this->database->quoteName('project_id') . ' IS NULL');
+		} else {
+			$query->where($this->database->quoteName('project_id') . ' = :project_id')->bind(':project_id', $projectId, ParameterType::INTEGER);
+		}
 
 		$rows = (array) $this->database->setQuery($query)->loadAssocList();
 		$existing = [];

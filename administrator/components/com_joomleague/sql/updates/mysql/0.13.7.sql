@@ -1,1 +1,0 @@
--- Schema guard: column `asset_id` on `#__joomleague_division` is added by script.php only when missing.

@@ -1,1 +1,153 @@
-{"profile":"ice_hockey","sport":{"name":"Lední hokej","icon":""},"positions":[{"name":"Brankář","personType":1},{"name":"Levý obránce","personType":1},{"name":"Pravý obránce","personType":1},{"name":"Levé křídlo","personType":1},{"name":"Centr","personType":1},{"name":"Pravé křídlo","personType":1},{"name":"Hlavní trenér","personType":2},{"name":"Asistent trenéra","personType":2},{"name":"Trenér brankářů","personType":2},{"name":"Vedoucí mužstva","personType":2},{"name":"Hlavní rozhodčí","personType":3},{"name":"Čárový rozhodčí","personType":3},{"name":"Videorozhodčí","personType":3},{"name":"Časoměřič","personType":4},{"name":"Zapisovatel","personType":4}],"events":[{"name":"Gól","icon":""},{"name":"Asistence","icon":""},{"name":"Vyloučení 2 minuty","icon":"","suspension":1},{"name":"Vyloučení 5 minut","icon":"","suspension":1},{"name":"Osobní trest","icon":"","suspension":1},{"name":"Trest do konce utkání","icon":"","suspension":1},{"name":"Samostatný nájezd proměněný","icon":""},{"name":"Samostatný nájezd neproměněný","icon":""}],"statistics":[{"name":"Odehrané minuty","short":"MIN"},{"name":"Góly","short":"G"},{"name":"Asistence","short":"A"},{"name":"Střely na branku","short":"SOG"},{"name":"Trestné minuty","short":"TM"},{"name":"Plus/minus","short":"+/-"},{"name":"Vhazování celkem","short":"VH"},{"name":"Vyhraná vhazování","short":"VHV"},{"name":"Zákroky brankáře","short":"ZAK"},{"name":"Inkasované góly","short":"IG"},{"name":"Úspěšnost zákroků","short":"SV%"}]}
+{
+  "profile": "ice_hockey",
+  "sport": {
+    "name": "COM_JOOMLEAGUE_ST_ICEHOCKEY",
+    "icon": ""
+  },
+  "positions": [
+    {
+      "name": "COM_JOOMLEAGUE_P_ICE_HOCKEY_GOALTENDER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_ICE_HOCKEY_LEFT_DEFENSEMAN",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_ICE_HOCKEY_RIGHT_DEFENSEMAN",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_ICE_HOCKEY_LEFT_WING",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_ICE_HOCKEY_CENTER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_ICE_HOCKEY_RIGHT_WING",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_HEAD_COACH",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_ASSISTANT_COACH",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_GOALKEEPER_COACH",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_TEAM_MANAGER",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_HEAD_REFEREE",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_LINESMAN",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_VIDEO_UMPIRE",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_TIMEKEEPER",
+      "personType": 4
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_SCOREKEEPER",
+      "personType": 4
+    }
+  ],
+  "events": [
+    {
+      "name": "COM_JOOMLEAGUE_E_GOAL",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_ASSISTS",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_ICE_HOCKEY_MINOR_PENALTY",
+      "icon": "",
+      "suspension": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_ICE_HOCKEY_MAJOR_PENALTY",
+      "icon": "",
+      "suspension": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_ICE_HOCKEY_MISCONDUCT_PENALTY",
+      "icon": "",
+      "suspension": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_ICE_HOCKEY_GAME_MISCONDUCT",
+      "icon": "",
+      "suspension": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_ICE_HOCKEY_SHOOTOUT_GOAL",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_ICE_HOCKEY_SHOOTOUT_MISS",
+      "icon": ""
+    }
+  ],
+  "statistics": [
+    {
+      "name": "COM_JOOMLEAGUE_S_MINUTES_PLAYED",
+      "short": "MIN"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ICE_HOCKEY_GOALS",
+      "short": "G"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ASSISTS",
+      "short": "A"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ICE_HOCKEY_SHOTS_ON_GOAL",
+      "short": "SOG"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ICE_HOCKEY_PENALTY_MINUTES",
+      "short": "TM"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ICE_HOCKEY_PLUS_MINUS",
+      "short": "+/-"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ICE_HOCKEY_FACEOFFS_TOTAL",
+      "short": "VH"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ICE_HOCKEY_FACEOFFS_WON",
+      "short": "VHV"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ICE_HOCKEY_GOALTENDER_SAVES",
+      "short": "ZAK"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ICE_HOCKEY_GOALS_CONCEDED",
+      "short": "IG"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ICE_HOCKEY_SAVE_PERCENTAGE",
+      "short": "SV%"
+    }
+  ]
+}

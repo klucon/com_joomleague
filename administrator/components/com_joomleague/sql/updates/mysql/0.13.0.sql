@@ -1,1 +1,0 @@
--- Schema guard: column `published` on `#__joomleague_round` is added by script.php only when missing.

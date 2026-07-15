@@ -26,7 +26,7 @@ final class QuickaddController extends BaseController
 			throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
 		}
 
-		$name = trim($this->input->post->getString('name'));
+		$name = trim($this->input->post->getString('name', ''));
 		$parts = preg_split('/\s+/', $name) ?: [];
 		$db = $this->app->getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$row = (object) [
@@ -46,7 +46,7 @@ final class QuickaddController extends BaseController
 			throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
 		}
 
-		$name = trim($this->input->post->getString('name'));
+		$name = trim($this->input->post->getString('name', ''));
 		$db = $this->app->getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 		$row = (object) ['name' => $name, 'middle_name' => $name, 'short_name' => $name, 'published' => 1];
 		$db->insertObject('#__joomleague_team', $row, 'id');

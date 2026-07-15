@@ -88,6 +88,36 @@ html[data-bs-theme="dark"] .com-joomleague-site {
 	text-decoration: none;
 }
 
+.jl-site-tab.jl-site-tab--active {
+	color: #fff;
+	background: var(--jl-site-accent);
+	border-color: var(--jl-site-accent);
+}
+
+.jl-site-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem 1.25rem;
+	margin: 1rem 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.jl-site-legend li {
+	display: inline-flex;
+	align-items: center;
+	gap: .45rem;
+	color: var(--jl-site-muted);
+	font-size: .82rem;
+}
+
+.jl-site-legend__swatch {
+	width: .85rem;
+	height: .85rem;
+	border: 1px solid var(--jl-site-line);
+	border-radius: .25rem;
+}
+
 .jl-site-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
@@ -180,6 +210,202 @@ html[data-bs-theme="dark"] .com-joomleague-site {
 	height: 2rem;
 	object-fit: contain;
 	border-radius: .35rem;
+}
+
+/* Výchozí hodnoty polí style_class1/style_class2 (COM_JOOMLEAGUE_FES_PARAM_LABEL_STYLE_ODD/EVEN)
+   – vlastní barevné zóny/oblíbený tým mají přednost (inline style vyhrává nad třídou). */
+.sectiontableentry1 {
+	background: var(--jl-site-surface);
+}
+
+.sectiontableentry2 {
+	background: var(--jl-site-soft);
+}
+
+.jl-site-nav--tabs {
+	gap: 0;
+	border-bottom: 1px solid var(--jl-site-line);
+}
+
+.jl-site-nav--tabs .jl-site-tab {
+	border: 0;
+	border-bottom: 2px solid transparent;
+	border-radius: 0;
+	background: transparent;
+	padding-bottom: .7rem;
+}
+
+.jl-site-nav--tabs .jl-site-tab.jl-site-tab--active {
+	color: var(--jl-site-accent);
+	background: transparent;
+	border-bottom-color: var(--jl-site-accent);
+}
+
+.jl-site-rank-prev {
+	display: block;
+	margin-top: .1rem;
+	color: var(--jl-site-muted);
+	font-size: .72rem;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.jl-site-team-cell {
+	display: inline-flex;
+	align-items: center;
+	gap: .5rem;
+	flex-wrap: wrap;
+}
+
+.jl-site-team-links {
+	display: inline-flex;
+	align-items: center;
+	gap: .3rem;
+}
+
+.jl-site-team-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.5rem;
+	height: 1.5rem;
+	color: var(--jl-site-muted);
+	border-radius: .4rem;
+}
+
+.jl-site-team-link:hover {
+	color: var(--jl-site-accent);
+	background: var(--jl-site-soft);
+	text-decoration: none;
+}
+
+.jl-site-sort-link {
+	color: inherit;
+	text-decoration: none;
+}
+
+.jl-site-sort-link:hover {
+	color: var(--jl-site-accent);
+}
+
+.jl-site-form {
+	display: inline-flex;
+	gap: .25rem;
+}
+
+.jl-site-form__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.4rem;
+	height: 1.4rem;
+	color: #fff;
+	border-radius: .35rem;
+	font-size: .68rem;
+	font-weight: 800;
+	text-decoration: none;
+}
+
+.jl-site-form__icon:hover {
+	color: #fff;
+	opacity: .85;
+}
+
+.jl-site-form__icon--w {
+	background: #2f9e44;
+}
+
+.jl-site-form__icon--d {
+	background: #868e96;
+}
+
+.jl-site-form__icon--l {
+	background: #e03131;
+}
+
+.jl-site-round-nav {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+}
+
+.jl-site-round-nav__arrow {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	color: var(--jl-site-ink);
+	background: var(--jl-site-surface);
+	border: 1px solid var(--jl-site-line);
+	border-radius: .6rem;
+	font-size: 1.1rem;
+	text-decoration: none;
+}
+
+.jl-site-round-nav__arrow:hover {
+	color: var(--jl-site-accent);
+	border-color: color-mix(in srgb, var(--jl-site-accent) 40%, var(--jl-site-line));
+	text-decoration: none;
+}
+
+.jl-site-round-nav__arrow.is-disabled {
+	pointer-events: none;
+	opacity: .35;
+}
+
+.jl-site-round-nav__select select {
+	padding: .5rem .7rem;
+	color: var(--jl-site-ink);
+	background: var(--jl-site-surface);
+	border: 1px solid var(--jl-site-line);
+	border-radius: .6rem;
+}
+
+.jl-site-round-nav__current {
+	margin-inline-start: .4rem;
+	color: var(--jl-site-accent);
+	font-size: .85rem;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.jl-site-round-nav__current:hover {
+	text-decoration: underline;
+}
+
+.jl-site-round-pager {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .35rem;
+}
+
+.jl-site-round-pager__item {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.9rem;
+	height: 1.9rem;
+	padding: 0 .4rem;
+	color: var(--jl-site-ink);
+	background: var(--jl-site-surface);
+	border: 1px solid var(--jl-site-line);
+	border-radius: .5rem;
+	font-size: .8rem;
+	text-decoration: none;
+}
+
+.jl-site-round-pager__item:hover {
+	color: var(--jl-site-accent);
+	border-color: color-mix(in srgb, var(--jl-site-accent) 40%, var(--jl-site-line));
+	text-decoration: none;
+}
+
+.jl-site-round-pager__item.is-active {
+	color: #fff;
+	background: var(--jl-site-accent);
+	border-color: var(--jl-site-accent);
+	font-weight: 700;
 }
 
 .jl-site-filter {
@@ -576,3 +802,90 @@ html[data-bs-theme="dark"] .com-joomleague-site {
 .jl-club-head { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
 .jl-club-logo { max-height: 90px; width: auto; border-radius: 8px; }
 .jl-site-actions { display: flex; gap: .4rem; flex-wrap: wrap; }
+
+/* results — živý zápas, události, upozornění na hřiště */
+.jl-site-live {
+	display: inline-block;
+	margin-bottom: .2rem;
+	padding: .05rem .4rem;
+	border-radius: .3rem;
+	background: #dc2626;
+	color: #fff;
+	font-size: .7rem;
+	font-weight: 700;
+	letter-spacing: .03em;
+}
+.jl-site-live--blink { animation: jl-site-live-blink 1.4s ease-in-out infinite; }
+@keyframes jl-site-live-blink {
+	50% { opacity: .35; }
+}
+.jl-site-alert { margin-left: .3rem; color: #dc2626; cursor: help; }
+.jl-site-events-row td { background: var(--jl-site-soft); padding: .4rem 1rem; }
+.jl-site-events-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .2rem; font-size: .85rem; }
+.jl-site-events-minute { font-weight: 700; margin-right: .3rem; }
+
+/* matchreport — scoreboard hlavička (logo+název domácích, skóre uprostřed, logo+název hostů),
+   sestava/statistiky ve dvou sloupcích, časová osa */
+.jl-scoreboard {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: clamp(.75rem, 3vw, 2rem);
+	flex-wrap: wrap;
+	margin: .25rem 0 .5rem;
+	font-size: 1rem;
+	font-weight: inherit;
+}
+.jl-scoreboard-side {
+	display: inline-flex;
+	align-items: center;
+	gap: .6rem;
+	flex: 1 1 12rem;
+	min-width: 0;
+}
+.jl-scoreboard-home { justify-content: flex-end; text-align: right; }
+.jl-scoreboard-away { justify-content: flex-start; text-align: left; }
+.jl-scoreboard-logo { max-height: 48px; width: auto; flex-shrink: 0; }
+.jl-scoreboard-home .jl-scoreboard-logo { order: 2; }
+.jl-scoreboard-name {
+	font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+	font-weight: 800;
+	letter-spacing: -.02em;
+	line-height: 1.15;
+}
+.jl-scoreboard-center {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	gap: .2rem;
+	flex: 0 0 auto;
+}
+.jl-scoreboard-score {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 5rem;
+	padding: .35rem .9rem;
+	background: var(--jl-site-soft);
+	border: 1px solid var(--jl-site-line);
+	border-radius: .75rem;
+	font-size: clamp(1.3rem, 3vw, 1.9rem);
+	font-weight: 800;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+.jl-scoreboard-vs { color: var(--jl-site-muted); font-size: 1.5rem; font-weight: 400; }
+.jl-scoreboard-extra { font-size: .72rem; font-weight: 600; color: var(--jl-site-muted); white-space: nowrap; }
+@media (max-width: 560px) {
+	.jl-scoreboard-side { flex: 1 1 100%; justify-content: center !important; text-align: center !important; }
+	.jl-scoreboard-home .jl-scoreboard-logo { order: 0; }
+	.jl-scoreboard-center { order: 3; flex-basis: 100%; }
+}
+.jl-match-roster-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media (max-width: 640px) {
+	.jl-match-roster-grid { grid-template-columns: 1fr; }
+}
+.jl-match-timeline { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--jl-site-line); }
+.jl-match-timeline li { position: relative; padding: 0 0 .8rem 1.2rem; font-size: .9rem; }
+.jl-match-timeline__dot { position: absolute; left: -.4rem; top: .2rem; width: .6rem; height: .6rem; border-radius: 50%; background: var(--jl-site-accent); }
+.jl-match-timeline__minute { font-weight: 700; margin-right: .4rem; }

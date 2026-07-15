@@ -1,1 +1,0 @@
--- Unified extension manifest version release.

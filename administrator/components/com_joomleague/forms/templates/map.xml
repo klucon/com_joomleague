@@ -18,7 +18,7 @@
 				<option value="Large">COM_JOOMLEAGUE_FES_MAP_PARAM_OPTION3_ZOOM</option>
 				<option value="Small">COM_JOOMLEAGUE_FES_MAP_PARAM_OPTION4_ZOOM</option>
 			</field>
-			<field name="zoom_wheel" description="COM_JOOMLEAGUE_FES_MAP_PARAM_DESCR_ZOOM_WHEEL" label="COM_JOOMLEAGUE_FES_MAP_PARAM_LABEL_ZOOM_WHEEL" default="0" type="radio">
+			<field name="zoom_wheel" description="COM_JOOMLEAGUE_FES_MAP_PARAM_DESCR_ZOOM_WHEEL" label="COM_JOOMLEAGUE_FES_MAP_PARAM_LABEL_ZOOM_WHEEL" default="0" type="radio" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>

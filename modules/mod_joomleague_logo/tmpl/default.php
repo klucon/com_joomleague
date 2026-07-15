@@ -12,6 +12,7 @@
  * @var  \Joomla\Registry\Registry  $params  Module parameters.
  */
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
@@ -24,7 +25,7 @@ if (empty($list)) {
 }
 
 $row  = $list[0];
-$logo = $row->logo_big ?: ($row->logo_middle ?: ($row->logo_small ?: $row->team_picture));
+$logo = $row->logo_big ?: ($row->logo_middle ?: ($row->logo_small ?: ($row->team_picture ?: ComponentHelper::getParams('com_joomleague')->get('placeholder_club_logo', ''))));
 $url  = Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $row->projectteam_id);
 ?>
 <div class="jl-module jl-logo text-center">

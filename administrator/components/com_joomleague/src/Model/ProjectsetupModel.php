@@ -69,6 +69,7 @@ final class ProjectsetupModel extends BaseDatabaseModel
 				'0 AS persontype',
 				'pt.ordering',
 				'pt.id AS assignment_id',
+				'pt.picture',
 				'CASE WHEN pt.id IS NULL THEN 0 ELSE 1 END AS selected',
 			])
 			->from('#__joomleague_team t')
@@ -89,6 +90,7 @@ final class ProjectsetupModel extends BaseDatabaseModel
 				'TRIM(CONCAT_WS(" ", p.firstname, p.lastname)) AS name',
 				'3 AS persontype',
 				'pr.id AS assignment_id',
+				'pr.picture',
 				'CASE WHEN pr.id IS NULL THEN 0 ELSE 1 END AS selected',
 			])
 			->from('#__joomleague_person p')

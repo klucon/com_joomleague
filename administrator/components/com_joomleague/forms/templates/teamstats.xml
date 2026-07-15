@@ -7,23 +7,19 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_general_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_LABEL_SHOW_GENERAL_STATS" description="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_DESCR_SHOW_GENERAL_STATS">
+			<field name="show_general_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_LABEL_SHOW_GENERAL_STATS" description="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_DESCR_SHOW_GENERAL_STATS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_goals_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_LABEL_SHOW_GOAL_STATS" description="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_DESCR_SHOW_GOAL_STATS">
+			<field name="show_goals_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_LABEL_SHOW_GOAL_STATS" description="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_DESCR_SHOW_GOAL_STATS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="home_away_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_LABEL_SHOW_HA_STATS" description="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_DESCR_SHOW_HA_STATS">
+			<field name="home_away_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_LABEL_SHOW_HA_STATS" description="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_DESCR_SHOW_HA_STATS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_attendance_stats" type="radio" default="0" label="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_LABEL_SHOW_ATTENDANCE_STATS" description="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_DESCR_SHOW_ATTENDANCE_STATS">
-				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
-				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
-			</field>
-			<field name="show_goals_stats_flash" type="radio" default="1" label="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_LABEL_SHOW_FLASH" description="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_DESCR_SHOW_FLASH">
+			<field name="show_attendance_stats" type="radio" default="0" label="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_LABEL_SHOW_ATTENDANCE_STATS" description="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_DESCR_SHOW_ATTENDANCE_STATS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -38,8 +34,6 @@
 				<option value="6">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_SEASON</option>
 				<option value="7">COM_JOOMLEAGUE_FES_PARAM_PAGE_TITLE_NONE</option>
 			</field>
-			<field type="note" label="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAMS_GROUP_FLASH_OPTIONS" description="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAMS_DESCR_FLASH_OPTIONS" />
-			<field name="y_axis_steps" type="text" default="1" label="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_LABEL_Y_STEPS" description="COM_JOOMLEAGUE_FES_TEAMSTATS_PARAM_DESCR_Y_STEPS" />
 		</fieldset>
 	</fields>
 </form>

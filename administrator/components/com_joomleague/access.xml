@@ -21,6 +21,9 @@
 	<section name="project"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
 	<section name="projectreferee"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
 	<section name="projectteam"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
+	<section name="racecategory"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
+	<section name="raceparticipant"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
+	<section name="raceresult"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
 	<section name="round"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
 	<section name="season"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>
 	<section name="sportstype"><action name="core.delete" title="JACTION_DELETE" /><action name="core.edit" title="JACTION_EDIT" /><action name="core.edit.state" title="JACTION_EDITSTATE" /></section>

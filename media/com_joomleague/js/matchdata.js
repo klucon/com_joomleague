@@ -43,6 +43,57 @@
 		form.submit();
 	};
 
+	// Filtruje "Osoba"/"Druhá osoba" v řádku podle vybraného týmu (select .jl-matchdata-team-select) –
+	// zabraňuje výběru hráče z druhého týmu, pokud je u řádku nastaven konkrétní tým.
+	const filterPersonSelects = (row) => {
+		const teamSelect = row.querySelector('.jl-matchdata-team-select');
+
+		if (!teamSelect) {
+			return;
+		}
+
+		const teamId = teamSelect.value;
+
+		row.querySelectorAll('.jl-matchdata-person-select').forEach((select) => {
+			const currentValue = select.value;
+			let currentStillValid = false;
+
+			Array.prototype.forEach.call(select.options, (option) => {
+				if (option.value === '') {
+					return;
+				}
+
+				const matches = !teamId || option.dataset.team === teamId;
+				option.hidden = !matches;
+				option.disabled = !matches;
+
+				if (matches && option.value === currentValue) {
+					currentStillValid = true;
+				}
+			});
+
+			if (!currentStillValid) {
+				select.value = '';
+			}
+		});
+	};
+
+	document.addEventListener('change', (event) => {
+		if (!event.target.classList.contains('jl-matchdata-team-select')) {
+			return;
+		}
+
+		const row = event.target.closest('tr');
+
+		if (row) {
+			filterPersonSelects(row);
+		}
+	});
+
+	document.addEventListener('DOMContentLoaded', () => {
+		document.querySelectorAll('#jl-matchdata-table tbody tr').forEach(filterPersonSelects);
+	});
+
 	document.addEventListener('click', (event) => {
 		const removeButton = event.target.closest('.jl-matchdata-remove');
 
@@ -88,6 +139,7 @@
 		});
 
 		body.appendChild(clone);
+		filterPersonSelects(clone);
 		table.dataset.nextIndex = String(index + 1);
 	});
 }());

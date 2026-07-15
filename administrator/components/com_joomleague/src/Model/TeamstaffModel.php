@@ -13,6 +13,7 @@ namespace Joomleague\Component\Joomleague\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Application\AdministratorApplication;
+use Joomla\CMS\Form\Form;
 
 final class TeamstaffModel extends EntityAdminModel
 {
@@ -30,7 +31,7 @@ final class TeamstaffModel extends EntityAdminModel
 		$item = $this->getItem();
 
 		if ((int) $item->projectteam_id < 1) {
-			$projectteamId = $this->application->getInput()->getInt('projectteam_id');
+			$projectteamId = $this->application->getInput()->getInt('projectteam_id', 0);
 
 			if ($projectteamId > 0) {
 				$this->application->setUserState('com_joomleague.teamstaffs.projectteam_id', $projectteamId);
@@ -42,6 +43,66 @@ final class TeamstaffModel extends EntityAdminModel
 		}
 
 		return $item;
+	}
+
+	public function getForm($data = [], $loadData = true): Form|false
+	{
+		$form = parent::getForm($data, $loadData);
+
+		if ($form instanceof Form) {
+			$this->scopeProjectTeamField($form);
+		}
+
+		return $form;
+	}
+
+	/**
+	 * Pole "Týmy projektu" ve formuláři je jinak statický seznam VŠECH týmů napříč
+	 * celým systémem (stovky položek). Pokud je z kontextu (URL, editovaný záznam
+	 * nebo zapamatovaný filtr seznamu) známý konkrétní projekt, zúží se nabídka jen
+	 * na jeho přiřazené týmy.
+	 */
+	private function scopeProjectTeamField(Form $form): void
+	{
+		$projectId = $this->resolveProjectId();
+
+		if ($projectId < 1) {
+			return;
+		}
+
+		$db = $this->getDatabase();
+		$query = $db->createQuery()
+			->select('pt.id, t.name AS title')
+			->from('#__joomleague_project_team pt')
+			->join('INNER', '#__joomleague_team t ON t.id = pt.team_id')
+			->where('pt.project_id = ' . $projectId)
+			->order('pt.ordering ASC, t.name ASC');
+
+		$form->setFieldAttribute('projectteam_id', 'query', (string) $query);
+	}
+
+	private function resolveProjectId(): int
+	{
+		$db = $this->getDatabase();
+		$itemId = $this->application->getInput()->getInt('id', 0);
+
+		if ($itemId > 0) {
+			return (int) $db->setQuery(
+				'SELECT pt.project_id FROM #__joomleague_team_staff ts'
+				. ' JOIN #__joomleague_project_team pt ON pt.id = ts.projectteam_id'
+				. ' WHERE ts.id = ' . $itemId
+			)->loadResult();
+		}
+
+		$projectteamId = (int) $this->application->getUserState('com_joomleague.teamstaffs.projectteam_id');
+
+		if ($projectteamId > 0) {
+			return (int) $db->setQuery(
+				'SELECT project_id FROM #__joomleague_project_team WHERE id = ' . $projectteamId
+			)->loadResult();
+		}
+
+		return (int) $this->application->getUserState('com_joomleague.teamstaffs.project_id');
 	}
 
 	protected function prepareTable($table): void

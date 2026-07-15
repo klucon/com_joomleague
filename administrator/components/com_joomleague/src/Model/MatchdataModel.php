@@ -12,6 +12,7 @@ namespace Joomleague\Component\Joomleague\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Throwable;
 
@@ -45,34 +46,116 @@ final class MatchdataModel extends BaseDatabaseModel
 		return $this->getDatabase()->setQuery('SELECT * FROM #__joomleague_match_referee WHERE match_id=' . (int) $m . ' ORDER BY ordering,id')->loadObjectList();
 	}
 
+	public function getMatchStaff(int $m): array
+	{
+		return $this->getDatabase()->setQuery('SELECT * FROM #__joomleague_match_staff WHERE match_id=' . (int) $m . ' ORDER BY ordering,id')->loadObjectList();
+	}
+
 	public function getEventTypes(int $p): array
 	{
-		return $this->getDatabase()->setQuery('SELECT e.id,e.name FROM #__joomleague_eventtype e JOIN #__joomleague_project p ON p.sports_type_id=e.sports_type_id WHERE p.id=' . (int) $p . ' AND e.published=1 ORDER BY e.ordering,e.name')->loadObjectList();
+		$rows = $this->getDatabase()->setQuery('SELECT e.id,e.name FROM #__joomleague_eventtype e JOIN #__joomleague_project p ON p.sports_type_id=e.sports_type_id WHERE p.id=' . (int) $p . ' AND e.published=1')->loadObjectList();
+
+		return $this->sortByTranslatedName($rows);
 	}
 
 	public function getStatisticsTypes(int $p): array
 	{
-		return $this->getDatabase()->setQuery('SELECT s.id,s.name FROM #__joomleague_statistic s JOIN #__joomleague_project p ON p.sports_type_id=s.sports_type_id WHERE p.id=' . (int) $p . ' AND s.published=1 ORDER BY s.ordering,s.name')->loadObjectList();
+		$rows = $this->getDatabase()->setQuery('SELECT s.id,s.name FROM #__joomleague_statistic s JOIN #__joomleague_project p ON p.sports_type_id=s.sports_type_id WHERE p.id=' . (int) $p . ' AND s.published=1')->loadObjectList();
+
+		return $this->sortByTranslatedName($rows);
 	}
 
 	public function getPlayers(int $m): array
 	{
-		return $this->getDatabase()->setQuery('SELECT tp.id,pt.id AS projectteam_id,CONCAT(t.name," · ",COALESCE(tp.jerseynumber,"-")," · ",TRIM(CONCAT_WS(" ",pe.firstname,pe.lastname))) AS name FROM #__joomleague_match x JOIN #__joomleague_team_player tp ON tp.projectteam_id IN (x.projectteam1_id,x.projectteam2_id) JOIN #__joomleague_person pe ON pe.id=tp.person_id JOIN #__joomleague_project_team pt ON pt.id=tp.projectteam_id JOIN #__joomleague_team t ON t.id=pt.team_id WHERE x.id=' . (int) $m . ' AND tp.published=1 ORDER BY pt.id,tp.ordering,pe.lastname,pe.firstname')->loadObjectList();
+		$rows = $this->getDatabase()->setQuery('SELECT tp.id,pt.id AS projectteam_id,pe.lastname,pe.firstname,CONCAT(t.name," · ",COALESCE(tp.jerseynumber,"-")," · ",TRIM(CONCAT_WS(" ",pe.lastname,pe.firstname))) AS name FROM #__joomleague_match x JOIN #__joomleague_team_player tp ON tp.projectteam_id IN (x.projectteam1_id,x.projectteam2_id) JOIN #__joomleague_person pe ON pe.id=tp.person_id JOIN #__joomleague_project_team pt ON pt.id=tp.projectteam_id JOIN #__joomleague_team t ON t.id=pt.team_id WHERE x.id=' . (int) $m . ' AND tp.published=1')->loadObjectList();
+
+		return $this->sortCzechNames($rows, true);
+	}
+
+	/**
+	 * Řadí podle příjmení/jména správnou českou abecední kolací (Š je samostatné písmeno
+	 * za S, "ch" samostatné písmeno za H) přes PHP intl Collator – MariaDB kolace pro
+	 * utf8mb4 (unicode_ci i czech_ci) tohle neumí správně, zejména spřežku "ch", proto se
+	 * řadí až tady, ne v SQL ORDER BY.
+	 *
+	 * @param object[] $rows  musí mít vlastnosti lastname, firstname (a projectteam_id, pokud $byTeamFirst)
+	 * @return object[]
+	 */
+	private function sortCzechNames(array $rows, bool $byTeamFirst = false): array
+	{
+		$collator = new \Collator('cs_CZ');
+		usort($rows, static function (object $a, object $b) use ($collator, $byTeamFirst): int {
+			if ($byTeamFirst) {
+				$teamCmp = ((int) ($a->projectteam_id ?? 0)) <=> ((int) ($b->projectteam_id ?? 0));
+
+				if ($teamCmp !== 0) {
+					return $teamCmp;
+				}
+			}
+
+			$lastCmp = $collator->compare((string) ($a->lastname ?? ''), (string) ($b->lastname ?? ''));
+
+			return $lastCmp !== 0 ? $lastCmp : $collator->compare((string) ($a->firstname ?? ''), (string) ($b->firstname ?? ''));
+		});
+
+		return $rows;
+	}
+
+	/**
+	 * Přeloží konstantu ve vlastnosti name a teprve podle přeloženého textu seřadí českou
+	 * kolací – řazení podle syrové konstanty (COM_JOOMLEAGUE_...) ani podle sloupce
+	 * ordering (pořadí vytvoření) neodpovídá abecednímu pořadí, které admin očekává
+	 * v rozbalovacích seznamech (typ události, pozice, statistika).
+	 *
+	 * @param object[] $rows  musí mít vlastnost name
+	 * @return object[]
+	 */
+	private function sortByTranslatedName(array $rows): array
+	{
+		$collator = new \Collator('cs_CZ');
+
+		foreach ($rows as $row) {
+			$row->name = Text::_((string) $row->name);
+		}
+
+		usort($rows, static fn (object $a, object $b): int => $collator->compare((string) $a->name, (string) $b->name));
+
+		return $rows;
 	}
 
 	public function getPlayerPositions(int $p): array
 	{
-		return $this->getDatabase()->setQuery('SELECT pp.id,po.name FROM #__joomleague_project_position pp JOIN #__joomleague_position po ON po.id=pp.position_id WHERE pp.project_id=' . (int) $p . ' AND po.persontype=1 ORDER BY po.ordering,po.name')->loadObjectList();
+		$rows = $this->getDatabase()->setQuery('SELECT pp.id,po.name FROM #__joomleague_project_position pp JOIN #__joomleague_position po ON po.id=pp.position_id WHERE pp.project_id=' . (int) $p . ' AND po.persontype=1')->loadObjectList();
+
+		return $this->sortByTranslatedName($rows);
 	}
 
 	public function getProjectReferees(int $p): array
 	{
-		return $this->getDatabase()->setQuery('SELECT pr.id,CONCAT_WS(" ",pe.firstname,pe.lastname) AS name FROM #__joomleague_project_referee pr JOIN #__joomleague_person pe ON pe.id=pr.person_id WHERE pr.project_id=' . (int) $p . ' ORDER BY pe.lastname')->loadObjectList();
+		$rows = $this->getDatabase()->setQuery('SELECT pr.id,pe.lastname,pe.firstname,CONCAT_WS(" ",pe.lastname,pe.firstname) AS name FROM #__joomleague_project_referee pr JOIN #__joomleague_person pe ON pe.id=pr.person_id WHERE pr.project_id=' . (int) $p)->loadObjectList();
+
+		return $this->sortCzechNames($rows);
 	}
 
 	public function getRefereePositions(int $p): array
 	{
-		return $this->getDatabase()->setQuery('SELECT pp.id,po.name FROM #__joomleague_project_position pp JOIN #__joomleague_position po ON po.id=pp.position_id WHERE pp.project_id=' . (int) $p . ' AND po.persontype=3 ORDER BY po.ordering')->loadObjectList();
+		$rows = $this->getDatabase()->setQuery('SELECT pp.id,po.name FROM #__joomleague_project_position pp JOIN #__joomleague_position po ON po.id=pp.position_id WHERE pp.project_id=' . (int) $p . ' AND po.persontype=3')->loadObjectList();
+
+		return $this->sortByTranslatedName($rows);
+	}
+
+	public function getStaff(int $m): array
+	{
+		$rows = $this->getDatabase()->setQuery('SELECT ts.id,pt.id AS projectteam_id,pe.lastname,pe.firstname,CONCAT(t.name," · ",TRIM(CONCAT_WS(" ",pe.lastname,pe.firstname))) AS name FROM #__joomleague_match x JOIN #__joomleague_team_staff ts ON ts.projectteam_id IN (x.projectteam1_id,x.projectteam2_id) JOIN #__joomleague_person pe ON pe.id=ts.person_id JOIN #__joomleague_project_team pt ON pt.id=ts.projectteam_id JOIN #__joomleague_team t ON t.id=pt.team_id WHERE x.id=' . (int) $m . ' AND ts.published=1')->loadObjectList();
+
+		return $this->sortCzechNames($rows, true);
+	}
+
+	public function getStaffPositions(int $p): array
+	{
+		$rows = $this->getDatabase()->setQuery('SELECT pp.id,po.name FROM #__joomleague_project_position pp JOIN #__joomleague_position po ON po.id=pp.position_id WHERE pp.project_id=' . (int) $p . ' AND po.persontype IN (2,4)')->loadObjectList();
+
+		return $this->sortByTranslatedName($rows);
 	}
 
 	public function replace(int $match, string $section, array $rows): void
@@ -82,6 +165,7 @@ final class MatchdataModel extends BaseDatabaseModel
 			'players' => '#__joomleague_match_player',
 			'statistics' => '#__joomleague_match_statistic',
 			'referees' => '#__joomleague_match_referee',
+			'staff' => '#__joomleague_match_staff',
 		][$section] ?? throw new \InvalidArgumentException();
 
 		if ($match < 1) {
@@ -98,6 +182,7 @@ final class MatchdataModel extends BaseDatabaseModel
 			$seenEvents = [];
 			$seenStatistics = [];
 			$seenReferees = [];
+			$seenStaff = [];
 
 			foreach ($rows as $r) {
 				if (!is_array($r)) {
@@ -191,6 +276,22 @@ final class MatchdataModel extends BaseDatabaseModel
 					$row = (object) [
 						'match_id' => $match,
 						'project_referee_id' => $projectRefereeId,
+						'project_position_id' => $this->nullableInt($r['project_position_id'] ?? null),
+						'ordering' => ++$order,
+					];
+				}
+
+				if ($section === 'staff' && !empty($r['team_staff_id'])) {
+					$teamStaffId = (int) $r['team_staff_id'];
+
+					if (isset($seenStaff[$teamStaffId])) {
+						continue;
+					}
+
+					$seenStaff[$teamStaffId] = true;
+					$row = (object) [
+						'match_id' => $match,
+						'team_staff_id' => $teamStaffId,
 						'project_position_id' => $this->nullableInt($r['project_position_id'] ?? null),
 						'ordering' => ++$order,
 					];

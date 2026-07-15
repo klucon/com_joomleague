@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+	<title id="title">Team player photo placeholder</title>
+	<rect x="18" y="18" width="220" height="220" rx="28" fill="currentColor" opacity=".06"/>
+	<circle cx="128" cy="58" r="38" fill="currentColor" opacity=".26"/>
+	<path fill="currentColor" opacity=".3" d="m53 114 46-36h58l46 36-25 52-30-17v89h-40v-89l-30 17z"/>
+	<rect x="110" y="168" width="36" height="14" rx="7" fill="currentColor" opacity=".4"/>
+	<rect x="121" y="151" width="14" height="48" rx="7" fill="currentColor" opacity=".4"/>
+	<circle cx="199" cy="208" r="29" fill="currentColor" opacity=".16"/>
+	<rect x="178" y="201" width="42" height="14" rx="7" fill="currentColor" opacity=".28"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+	<title id="title">Project referee photo placeholder</title>
+	<rect x="18" y="18" width="220" height="220" rx="28" fill="currentColor" opacity=".06"/>
+	<path fill="currentColor" opacity=".3" d="M56 70 96 39h64l40 31-24 48-28-16v118h-40V102l-28 16z"/>
+	<path fill="currentColor" opacity=".42" d="M96 39h64l-32 48z"/>
+	<rect x="118" y="92" width="20" height="106" rx="10" fill="currentColor" opacity=".18"/>
+	<rect x="35" y="151" width="42" height="60" rx="8" fill="currentColor" opacity=".22"/>
+	<rect x="179" y="151" width="42" height="60" rx="8" fill="currentColor" opacity=".36"/>
+</svg>

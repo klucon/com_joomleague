@@ -41,6 +41,7 @@ final class HtmlView extends AdminListView
 			],
 			'columns' => [
 				['field' => 'name', 'label' => 'COM_JOOMLEAGUE_FIELD_NAME', 'sort' => 'a.name'],
+				['field' => 'picture', 'label' => 'COM_JOOMLEAGUE_FIELD_IMAGE', 'type' => 'image', 'image_placeholder' => 'division_picture'],
 				['field' => 'shortname', 'label' => 'COM_JOOMLEAGUE_DIVISION_FIELD_SHORTNAME', 'sort' => 'a.shortname'],
 				['field' => 'parent_name', 'label' => 'COM_JOOMLEAGUE_FIELD_PARENT', 'sort' => 'parent_name'],
 				['field' => 'ordering', 'label' => 'JFIELD_ORDERING_LABEL', 'sort' => 'a.ordering'],

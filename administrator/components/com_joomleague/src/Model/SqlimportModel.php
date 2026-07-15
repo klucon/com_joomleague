@@ -25,6 +25,12 @@ final class SqlimportModel extends BaseDatabaseModel
 	/** Tables that must never be overwritten by an imported dump. */
 	private const SKIP_TABLES = ['version'];
 
+	/** Upper bound for an uploaded dump; analyze() reads it whole into memory. */
+	private const MAX_UPLOAD_BYTES = 64 * 1024 * 1024;
+
+	/** Job directories older than this are swept on the next analyze() call. */
+	private const STALE_JOB_SECONDS = 24 * 60 * 60;
+
 	private function baseDir(): string
 	{
 		$tmp = (string) Factory::getApplication()->get('tmp_path');
@@ -40,6 +46,34 @@ final class SqlimportModel extends BaseDatabaseModel
 	}
 
 	/**
+	 * Left-over job directories accumulate on disk if an admin never finishes
+	 * an import (no cleanupjob call). Sweep anything older than a day whenever
+	 * a new job starts, so uploaded dump contents don't linger in tmp/ forever.
+	 */
+	private function pruneStaleJobs(): void
+	{
+		$base = $this->baseDir();
+
+		if (!is_dir($base)) {
+			return;
+		}
+
+		$cutoff = time() - self::STALE_JOB_SECONDS;
+
+		foreach (glob($base . '/*', GLOB_ONLYDIR) ?: [] as $dir) {
+			if ((@filemtime($dir) ?: 0) >= $cutoff) {
+				continue;
+			}
+
+			foreach (glob($dir . '/*') ?: [] as $f) {
+				@unlink($f);
+			}
+
+			@rmdir($dir);
+		}
+	}
+
+	/**
 	 * Parse the uploaded dump, split it into per-table chunks on disk and return
 	 * a manifest with the record count for every JoomLeague table.
 	 *
@@ -47,6 +81,14 @@ final class SqlimportModel extends BaseDatabaseModel
 	 */
 	public function analyze(string $tmpFile): object
 	{
+		$this->pruneStaleJobs();
+
+		$size = @filesize($tmpFile);
+
+		if ($size !== false && $size > self::MAX_UPLOAD_BYTES) {
+			throw new \RuntimeException('COM_JOOMLEAGUE_SQLIMPORT_ERROR_TOOLARGE');
+		}
+
 		$sql = file_get_contents($tmpFile);
 
 		if ($sql === false || $sql === '') {

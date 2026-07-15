@@ -18,6 +18,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomleague\Component\Joomleague\Site\Service\IcalFeedHelper;
+use Joomleague\Component\Joomleague\Site\Service\PlayerStatsHelper;
 
 class SiteHtmlView extends BaseHtmlView
 {
@@ -44,6 +45,9 @@ class SiteHtmlView extends BaseHtmlView
 	public array $matchSummary = [];
 	public array $headToHeadMatches = [];
 	public array $matchReferees = [];
+	public array $matchRoster = [];
+	public array $matchStaffList = [];
+	public array $matchPlayerStatistics = [];
 	public array $matchTeamComparison = [];
 	public array $homeForm = [];
 	public array $awayForm = [];
@@ -52,6 +56,12 @@ class SiteHtmlView extends BaseHtmlView
 	public array $predictionRanking = [];
 	public array $templateParams = [];
 	public string $rankingScope = 'total';
+	public int $rankingDivisionId = 0;
+	public int $rankingRoundId = 0;
+	public array $standingsRounds = [];
+	public array $matchesReferees = [];
+	public array $matchesEvents = [];
+	public int $resultsRoundId = 0;
 	public object|null $item = null;
 	public object|null $tree = null;
 	public object|null $predictionGame = null;
@@ -73,57 +83,98 @@ class SiteHtmlView extends BaseHtmlView
 		$input = Factory::getApplication()->getInput();
 		$classParts = explode('\\', static::class);
 		$view = strtolower($classParts[count($classParts) - 2] ?? 'projects');
-		$projectId = (int) (($input->getInt('project_id') ?: $input->getInt('pid')) ?? 0);
-		$id = $input->getInt('id');
+		$projectId = (int) (($input->getInt('project_id', 0) ?: $input->getInt('pid', 0)) ?? 0);
+		$id = $input->getInt('id', 0);
 
 		$this->project = $projectId > 0 && method_exists($model, 'getProject') ? $model->getProject($projectId) : null;
 		$projectId = $this->project ? (int) $this->project->id : $projectId;
-		$this->templateParams = $projectId > 0 && method_exists($model, 'getTemplateParameters')
+		// I bez project_id (views bez kontextu jednoho projektu, např. 'clubs') se má použít
+		// aspoň centrální (globální) nastavení – getTemplateParameters(0, ...) na to sama
+		// padá zpět, proto se nesmí volání úplně přeskočit jen kvůli chybějícímu project_id.
+		$this->templateParams = method_exists($model, 'getTemplateParameters')
 			? $model->getTemplateParameters($projectId, $view)
 			: [];
 
 		if ($view === 'projects') {
 			$this->items = $model->getProjects();
 		} elseif ($view === 'project') {
+			$isRunningRaceProject = $this->project && ($this->project->project_type ?? '') === 'RUNNING_RACE';
 			$this->teams = $projectId > 0 ? $model->getProjectTeams($projectId) : [];
 			$this->rounds = $projectId > 0 ? $model->getRounds($projectId) : [];
 			$this->matches = $projectId > 0 ? $model->getMatches($projectId, 0, 0, 8, true) : [];
-			if ($this->project && ($this->project->project_type ?? '') === 'RUNNING_RACE') {
+			if ($isRunningRaceProject) {
 				$this->raceCategories = $model->getRaceCategories($projectId);
 				$this->raceResults = $model->getRaceResults($projectId);
 			}
+
+			// Záhlaví domovské stránky projektu používá konfiguraci 'projectheading'.
+			$this->templateParams = $projectId > 0 ? $model->getTemplateParameters($projectId, 'projectheading') : [];
 		} elseif ($view === 'ranking') {
 			$scope = (string) $input->getCmd('scope', (string) ($this->templateParams['scope'] ?? 'total'));
 			$this->rankingScope = in_array($scope, ['total', 'home', 'away'], true) ? $scope : 'total';
-			$this->standings = $projectId > 0 ? $model->getStandings($projectId, $this->rankingScope) : [];
+			$rankingOrder = (string) ($this->templateParams['ranking_order'] ?? '');
+			$this->divisions = $projectId > 0 ? $model->getProjectDivisions($projectId) : [];
+
+			if (count($this->divisions) > 1) {
+				$requestedDivisionId = (int) ($input->getInt('division_id', 0) ?: $input->getInt('division', 0));
+				$validDivisionIds = array_map(static fn (object $d): int => (int) $d->id, $this->divisions);
+				$this->rankingDivisionId = in_array($requestedDivisionId, $validDivisionIds, true)
+					? $requestedDivisionId
+					: (int) $this->divisions[0]->id;
+			}
+
+			$this->standingsRounds = $projectId > 0 ? $model->getStandingsRounds($projectId, $this->rankingDivisionId) : [];
+			$requestedRoundId = (int) $input->getInt('round_id', 0);
+			$validRoundIds = array_map(static fn (array $r): int => $r['id'], $this->standingsRounds);
+			$this->rankingRoundId = in_array($requestedRoundId, $validRoundIds, true) ? $requestedRoundId : 0;
+			$this->standings = $projectId > 0 ? $model->getStandings($projectId, $this->rankingScope, $rankingOrder, $this->rankingDivisionId, $this->rankingRoundId) : [];
 		} elseif ($view === 'raceresults') {
 			$this->rounds = $projectId > 0 ? $model->getRounds($projectId) : [];
 			$this->raceCategories = $projectId > 0 ? $model->getRaceCategories($projectId) : [];
 			$this->raceResults = $projectId > 0 ? $model->getRaceResults(
 				$projectId,
-				(int) $input->getInt('round_id'),
-				(int) $input->getInt('category_id'),
+				(int) $input->getInt('round_id', 0),
+				(int) $input->getInt('category_id', 0),
 				(string) $input->getCmd('sex'),
 				(string) $input->getCmd('status')
 			) : [];
 		} elseif ($view === 'results') {
 			$this->rounds = $projectId > 0 ? $model->getRounds($projectId) : [];
-			$this->matches = $projectId > 0 ? $model->getMatches($projectId, (int) ($input->getInt('round_id') ?? 0)) : [];
+			$validRoundIds = array_map(static fn (object $r): int => (int) $r->id, $this->rounds);
+			$requestedRoundId = (int) $input->getInt('round_id', 0);
+			$this->resultsRoundId = in_array($requestedRoundId, $validRoundIds, true) ? $requestedRoundId : 0;
+			$this->matches = $projectId > 0 ? $model->getMatches($projectId, $this->resultsRoundId) : [];
+			$matchIds = array_map(static fn (object $m): int => (int) $m->id, $this->matches);
+
+			if ($matchIds !== [] && (bool) ($this->templateParams['show_referee'] ?? false)) {
+				$this->matchesReferees = $model->getMatchesReferees($matchIds);
+			}
+
+			if ($matchIds !== [] && (bool) ($this->templateParams['show_events'] ?? false)) {
+				$this->matchesEvents = $model->getMatchesEvents($matchIds);
+			}
+
+			if ($this->resultsRoundId > 0 && (bool) ($this->templateParams['show_dnp_teams'] ?? true)) {
+				$this->teams = $projectId > 0 ? $model->getProjectTeams($projectId) : [];
+			}
 		} elseif ($view === 'resultsranking') {
 			$this->rounds = $projectId > 0 ? $model->getRounds($projectId) : [];
-			$this->matches = $projectId > 0 ? $model->getMatches($projectId, (int) ($input->getInt('round_id') ?? 0)) : [];
+			$this->matches = $projectId > 0 ? $model->getMatches($projectId, (int) ($input->getInt('round_id', 0) ?? 0)) : [];
 			$this->standings = $projectId > 0 ? $model->getStandings($projectId) : [];
 		} elseif ($view === 'resultsmatrix') {
 			$this->teams = $projectId > 0 ? $model->getProjectTeams($projectId) : [];
 			$this->matrix = $projectId > 0 ? $model->getResultMatrix($projectId) : [];
 			$this->divisions = $projectId > 0 ? $model->getProjectDivisions($projectId) : [];
+
+			// Křížová tabulka používá konfiguraci 'matrix', ne doslovný název view.
+			$this->templateParams = $projectId > 0 ? $model->getTemplateParameters($projectId, 'matrix') : [];
 		} elseif ($view === 'schedule') {
-			$scheduleTeamId = (int) ($input->getInt('projectteam_id') ?? 0);
-			$scheduleClubId = (int) ($input->getInt('club_id') ?? 0);
+			$scheduleTeamId = (int) ($input->getInt('projectteam_id', 0) ?? 0);
+			$scheduleClubId = (int) ($input->getInt('club_id', 0) ?? 0);
 
 			if ($scheduleClubId > 0) {
 				$this->scheduleClub = $model->getClub($scheduleClubId);
-				$this->matches = $this->scheduleClub ? $model->getClubMatches((int) $this->scheduleClub->id, $input->getInt('project_id')) : [];
+				$this->matches = $this->scheduleClub ? $model->getClubMatches((int) $this->scheduleClub->id, (int) ($input->getInt('project_id', 0) ?? 0)) : [];
 			} elseif ($scheduleTeamId > 0) {
 				$this->scheduleTeam = $model->getTeam($scheduleTeamId);
 				$this->matches = $this->scheduleTeam ? $model->getMatches((int) $this->scheduleTeam->project_id, 0, (int) $this->scheduleTeam->id) : [];
@@ -132,13 +183,21 @@ class SiteHtmlView extends BaseHtmlView
 			}
 
 			$this->matchSummary = $model->summarizeMatches($this->matches, $scheduleTeamId);
+
+			// Rozpis týmu používá konfiguraci 'teamplan', rozpis klubu 'clubplan' —
+			// doslovný klíč view 'schedule' žádnou konfiguraci nemá.
+			if ($this->scheduleTeam) {
+				$this->templateParams = $model->getTemplateParameters((int) $this->scheduleTeam->project_id, 'teamplan');
+			} elseif ($this->scheduleClub) {
+				$this->templateParams = $model->getTemplateParameters(0, 'clubplan');
+			}
 		} elseif ($view === 'ical') {
-			$scheduleTeamId = (int) ($input->getInt('projectteam_id') ?? 0);
-			$scheduleClubId = (int) ($input->getInt('club_id') ?? 0);
+			$scheduleTeamId = (int) ($input->getInt('projectteam_id', 0) ?? 0);
+			$scheduleClubId = (int) ($input->getInt('club_id', 0) ?? 0);
 
 			if ($scheduleClubId > 0) {
 				$this->scheduleClub = $model->getClub($scheduleClubId);
-				$this->matches = $this->scheduleClub ? $model->getClubMatches((int) $this->scheduleClub->id, $input->getInt('project_id')) : [];
+				$this->matches = $this->scheduleClub ? $model->getClubMatches((int) $this->scheduleClub->id, (int) ($input->getInt('project_id', 0) ?? 0)) : [];
 			} elseif ($scheduleTeamId > 0) {
 				$this->scheduleTeam = $model->getTeam($scheduleTeamId);
 				$this->matches = $this->scheduleTeam ? $model->getMatches((int) $this->scheduleTeam->project_id, 0, (int) $this->scheduleTeam->id) : [];
@@ -146,11 +205,18 @@ class SiteHtmlView extends BaseHtmlView
 				$this->matches = $projectId > 0 ? $model->getMatches($projectId) : [];
 			}
 		} elseif ($view === 'prediction') {
-			$gameId = (int) ($input->getInt('game_id') ?: $id);
-			$roundId = (int) $input->getInt('round_id');
+			$gameId = (int) ($input->getInt('game_id', 0) ?: $id);
+			$roundId = (int) $input->getInt('round_id', 0);
 			$userId = (int) Factory::getApplication()->getIdentity()->id;
 			$this->predictionGame = $model->getPredictionGame($projectId, $gameId);
 			$this->project = $this->predictionGame ? $model->getProject((int) $this->predictionGame->project_id) : $this->project;
+
+			// project_id nemusí být v URL (jen game_id) – jakmile známe reálný projekt hry,
+			// templateParams se musí znovu načíst, ať se použije správné projektové nastavení.
+			if ($this->predictionGame) {
+				$this->templateParams = $model->getTemplateParameters((int) $this->predictionGame->project_id, 'prediction');
+			}
+
 			$this->rounds = $this->predictionGame ? $model->getRounds((int) $this->predictionGame->project_id) : [];
 			$this->predictionMatches = $this->predictionGame ? $model->getPredictionMatches((int) $this->predictionGame->id, $roundId) : [];
 			$this->predictionTips = $this->predictionGame && $userId > 0 ? $model->getPredictionTips((int) $this->predictionGame->id, $userId) : [];
@@ -158,71 +224,150 @@ class SiteHtmlView extends BaseHtmlView
 		} elseif ($view === 'teams') {
 			$this->teams = $projectId > 0 ? $model->getProjectTeams($projectId) : [];
 		} elseif ($view === 'team' || $view === 'roster') {
-			$this->item = $model->getTeam($id ?: $input->getInt('projectteam_id'));
+			$this->item = $model->getTeam($id ?: $input->getInt('projectteam_id', 0));
 			$this->items = $this->item ? $model->getRoster((int) $this->item->id) : [];
 			$this->matches = $this->item ? $model->getMatches((int) $this->item->project_id, 0, (int) $this->item->id) : [];
 			$this->teamSeasons = $this->item ? $model->getTeamSeasons((int) $this->item->team_id, (int) $this->item->id) : [];
+
+			// Konfigurace týmové stránky žije pod klíčem 'teaminfo', ne pod doslovným
+			// názvem view 'team' (a project_id se u tohoto view zjistí až podle týmu).
+			if ($view === 'team' && $this->item) {
+				$this->templateParams = $model->getTemplateParameters((int) $this->item->project_id, 'teaminfo');
+			}
+
+			if ($view === 'roster' && $this->item) {
+				$this->rosterStaff = (bool) ($this->templateParams['show_staff'] ?? true)
+					? $model->getRosterStaff((int) $this->item->id)
+					: [];
+
+				if ((bool) ($this->templateParams['show_stats'] ?? true)) {
+					$rosterStatsData = $model->getRosterPlayerStats((int) $this->item->id);
+					$this->rosterPlayerStats = PlayerStatsHelper::aggregate(
+						$rosterStatsData['appearances'],
+						$rosterStatsData['subOut'],
+						$rosterStatsData['events'],
+						static fn (object $row) => (int) $row->teamplayer_id
+					);
+				} else {
+					$this->rosterPlayerStats = [];
+				}
+			} else {
+				$this->rosterStaff = [];
+				$this->rosterPlayerStats = [];
+			}
 		} elseif ($view === 'teamstats') {
-			$this->item = $model->getTeam($id ?: $input->getInt('projectteam_id') ?: $input->getInt('tid'));
+			$this->item = $model->getTeam($id ?: $input->getInt('projectteam_id', 0) ?: $input->getInt('tid', 0));
 			$this->matches = $this->item ? $model->getMatches((int) $this->item->project_id, 0, (int) $this->item->id) : [];
 			$this->teamStats = $this->item ? $model->getTeamStatsSummary((int) $this->item->id) : [];
 			$this->teamPlayerStats = $this->item ? $model->getTeamPlayerStats((int) $this->item->project_id, (int) $this->item->id) : [];
 		} elseif ($view === 'rivals') {
-			$this->item = $model->getTeam($id ?: $input->getInt('projectteam_id') ?: $input->getInt('tid'));
+			$this->item = $model->getTeam($id ?: $input->getInt('projectteam_id', 0) ?: $input->getInt('tid', 0));
 			$this->rivals = $this->item ? $model->getTeamRivals((int) $this->item->project_id, (int) $this->item->id) : [];
 		} elseif ($view === 'treetonode') {
-			$treeId = (int) ($input->getInt('treeto_id') ?: $input->getInt('tnid') ?: $id);
+			$treeId = (int) ($input->getInt('treeto_id', 0) ?: $input->getInt('tnid', 0) ?: $id);
 			$this->tree = $model->getTree($treeId, $projectId);
 			$this->project = $this->tree ? $model->getProject((int) $this->tree->project_id) : $this->project;
 			$this->treeNodes = $this->tree ? $model->getTreeNodes((int) $this->tree->id) : [];
 			$this->treeRounds = $this->tree ? $model->getTreeRounds((int) $this->tree->id) : [];
+
+			// Pavouk používá konfiguraci 'tree', ne doslovný název view 'treetonode'.
+			if ($this->tree) {
+				$this->templateParams = $model->getTemplateParameters((int) $this->tree->project_id, 'tree');
+			}
 		} elseif ($view === 'curve') {
-			$divisionId = (int) ($input->getInt('division_id') ?: $input->getInt('division'));
+			$divisionId = (int) ($input->getInt('division_id', 0) ?: $input->getInt('division', 0));
 			$this->divisions = $projectId > 0 ? $model->getProjectDivisions($projectId) : [];
 			$this->teams = $projectId > 0 ? $model->getProjectTeams($projectId, $divisionId) : [];
 			$this->rounds = $projectId > 0 ? $model->getRounds($projectId) : [];
 			$this->curve = $projectId > 0 ? $model->getRankingCurve(
 				$projectId,
 				$divisionId,
-				(int) ($input->getInt('projectteam1_id') ?: $input->getInt('tid1')),
-				(int) ($input->getInt('projectteam2_id') ?: $input->getInt('tid2'))
+				(int) ($input->getInt('projectteam1_id', 0) ?: $input->getInt('tid1', 0)),
+				(int) ($input->getInt('projectteam2_id', 0) ?: $input->getInt('tid2', 0))
 			) : [];
 		} elseif ($view === 'matchreport') {
-			$this->item = $model->getMatch($id ?: $input->getInt('match_id'));
+			$this->item = $model->getMatch($id ?: $input->getInt('match_id', 0));
 			$this->items = $this->item ? $model->getMatchEvents((int) $this->item->id) : [];
 			$this->headToHeadMatches = $this->item ? $model->getHeadToHeadMatches((int) $this->item->projectteam1_id, (int) $this->item->projectteam2_id, (int) $this->item->id) : [];
 			$this->matchReferees = $this->item ? $model->getMatchReferees((int) $this->item->id) : [];
 			$this->matchTeamComparison = $this->item ? $model->getMatchTeamComparison($this->item) : [];
+
+			if ($this->item && (bool) ($this->templateParams['show_roster'] ?? true)) {
+				$this->matchRoster = $model->getMatchRoster((int) $this->item->id);
+				$this->matchStaffList = $model->getMatchStaffList((int) $this->item->id);
+			}
+
+			if ($this->item && (bool) ($this->templateParams['show_stats'] ?? true)) {
+				$this->matchPlayerStatistics = $model->getMatchPlayerStatistics((int) $this->item->id);
+			}
 		} elseif ($view === 'nextmatch') {
 			$this->item = $model->getNextMatch(
 				$projectId,
-				(int) ($input->getInt('division_id') ?: $input->getInt('division')),
-				(int) ($input->getInt('projectteam_id') ?: $input->getInt('ptid')),
-				(int) ($input->getInt('team_id') ?: $input->getInt('tid')),
-				(int) ($id ?: $input->getInt('match_id') ?: $input->getInt('mid'))
+				(int) ($input->getInt('division_id', 0) ?: $input->getInt('division', 0)),
+				(int) ($input->getInt('projectteam_id', 0) ?: $input->getInt('ptid', 0)),
+				(int) ($input->getInt('team_id', 0) ?: $input->getInt('tid', 0)),
+				(int) ($id ?: $input->getInt('match_id', 0) ?: $input->getInt('mid', 0))
 			);
 			$this->project = $this->item ? $model->getProject((int) $this->item->project_id) : $this->project;
+
+			// Project se u nextmatch často zjistí až podle vyřešeného zápasu (přes tým/divizi,
+			// bez project_id v URL) – templateParams výše proto mohly dopadnout na globální
+			// konfiguraci místo projektové; jakmile známe skutečný projekt, načteme je znovu.
+			if ($this->item) {
+				$this->templateParams = $model->getTemplateParameters((int) $this->item->project_id, $view);
+			}
+
 			$this->items = $this->item ? $model->getMatchEvents((int) $this->item->id) : [];
 			$this->headToHeadMatches = $this->item ? $model->getHeadToHeadMatches((int) $this->item->projectteam1_id, (int) $this->item->projectteam2_id, (int) $this->item->id) : [];
 			$this->matchReferees = $this->item ? $model->getMatchReferees((int) $this->item->id) : [];
 			$this->matchTeamComparison = $this->item ? $model->getMatchTeamComparison($this->item) : [];
-			$this->homeForm = $this->item ? $this->recentForm($model, (int) $this->item->project_id, (int) $this->item->projectteam1_id) : [];
-			$this->awayForm = $this->item ? $this->recentForm($model, (int) $this->item->project_id, (int) $this->item->projectteam2_id) : [];
+			$nbPrevious = max(1, (int) ($this->templateParams['nb_previous'] ?? 5));
+			$this->homeForm = $this->item ? $this->recentForm($model, (int) $this->item->project_id, (int) $this->item->projectteam1_id, $nbPrevious) : [];
+			$this->awayForm = $this->item ? $this->recentForm($model, (int) $this->item->project_id, (int) $this->item->projectteam2_id, $nbPrevious) : [];
 		} elseif ($view === 'person') {
-			$this->item = $model->getPerson($id ?: $input->getInt('person_id'));
+			$this->item = $model->getPerson($id ?: $input->getInt('person_id', 0));
 			$this->playerHistory = $this->item ? $model->getPlayerHistory((int) $this->item->id) : [];
 			$this->staffHistory = $this->item ? $model->getStaffHistory((int) $this->item->id) : [];
 			$this->refereeHistory = $this->item ? $model->getRefereeHistory((int) $this->item->id) : [];
 			$this->personStats = $this->item && method_exists($model, 'getPersonStats') ? $model->getPersonStats((int) $this->item->id) : [];
 			$this->playerMatches = $this->item && method_exists($model, 'getPlayerMatches') ? $model->getPlayerMatches((int) $this->item->id) : [];
+
+			// player.xml/staff.xml/referee.xml – tři samostatné konfigurace, protože sjednocený
+			// pohled 'person' může na jedné stránce zobrazovat hráčskou, realizační i rozhodcovskou historii najednou.
+			$this->playerTemplateParams = $model->getTemplateParameters($projectId, 'player');
+			$this->staffTemplateParams = $model->getTemplateParameters($projectId, 'staff');
+			$this->refereeTemplateParams = $model->getTemplateParameters($projectId, 'referee');
+
+			if ($this->item && method_exists($model, 'getPlayerCareerData')) {
+				$careerData = $model->getPlayerCareerData((int) $this->item->id);
+				$this->playerMatchStats = PlayerStatsHelper::aggregate(
+					$careerData['appearances'],
+					$careerData['subOut'],
+					$careerData['events'],
+					static fn (object $row) => (int) $row->match_id
+				);
+				$this->playerCareerStats = PlayerStatsHelper::aggregate(
+					$careerData['appearances'],
+					$careerData['subOut'],
+					$careerData['events'],
+					static fn (object $row) => (int) $row->projectteam_id
+				);
+			} else {
+				$this->playerMatchStats = [];
+				$this->playerCareerStats = [];
+			}
 		} elseif ($view === 'clubs') {
 			$this->items = $model->getClubs();
 		} elseif ($view === 'club') {
-			$this->item = $model->getClub($id ?: $input->getInt('club_id'));
+			$this->item = $model->getClub($id ?: $input->getInt('club_id', 0));
 			$this->items = $this->item ? $model->getClubTeams((int) $this->item->id) : [];
 			$this->clubPlaygrounds = $this->item ? $model->getClubPlaygrounds((int) $this->item->id) : [];
+
+			// Klub není vázaný na jeden konkrétní projekt (může hrát ve více soutěžích
+			// zároveň) — konfigurace 'clubinfo' proto vždy jen centrální (globální).
+			$this->templateParams = $model->getTemplateParameters(0, 'clubinfo');
 		} elseif ($view === 'playground') {
-			$this->item = $model->getPlayground($id ?: $input->getInt('playground_id'));
+			$this->item = $model->getPlayground($id ?: $input->getInt('playground_id', 0));
 		} elseif ($view === 'referees') {
 			$this->items = $projectId > 0 ? $model->getReferees($projectId) : [];
 		} elseif ($view === 'stats') {
@@ -231,16 +376,16 @@ class SiteHtmlView extends BaseHtmlView
 			$this->statistics = $projectId > 0 ? $model->getProjectStatistics($projectId) : [];
 			$this->items = $projectId > 0 ? $model->getStatsRankings(
 				$projectId,
-				(int) ($input->getInt('statistic_id') ?: $input->getInt('sid')),
-				(int) ($input->getInt('projectteam_id') ?: $input->getInt('tid'))
+				(int) ($input->getInt('statistic_id', 0) ?: $input->getInt('sid', 0)),
+				(int) ($input->getInt('projectteam_id', 0) ?: $input->getInt('tid', 0))
 			) : [];
 		} elseif ($view === 'eventsranking') {
 			$this->eventTypes = $projectId > 0 ? $model->getProjectEventTypes($projectId) : [];
 			$this->items = $projectId > 0 ? $model->getEventRankings(
 				$projectId,
-				(int) ($input->getInt('event_type_id') ?: $input->getInt('evid')),
-				(int) ($input->getInt('projectteam_id') ?: $input->getInt('tid')),
-				(int) ($input->getInt('match_id') ?: $input->getInt('mid'))
+				(int) ($input->getInt('event_type_id', 0) ?: $input->getInt('evid', 0)),
+				(int) ($input->getInt('projectteam_id', 0) ?: $input->getInt('tid', 0)),
+				(int) ($input->getInt('match_id', 0) ?: $input->getInt('mid', 0))
 			) : [];
 		}
 
@@ -319,7 +464,7 @@ class SiteHtmlView extends BaseHtmlView
 
 		$title = $this->pathwayTitle($view);
 		$title = $title !== '' ? Text::_($title) : '';
-		$projectName = $this->project !== null ? trim((string) ($this->project->name ?? '')) : '';
+		$projectName = $this->pageTitleLabel();
 		$teamName = $this->teamPathwayName();
 
 		if ($view === 'project' && $projectName !== '') {
@@ -351,6 +496,33 @@ class SiteHtmlView extends BaseHtmlView
 		if ($title !== '') {
 			$this->getDocument()->setTitle($title);
 		}
+	}
+
+	/**
+	 * Sestaví "název projektu" pro titulek stránky podle šablonového parametru page_title_format
+	 * (COM_JOOMLEAGUE_FES_PARAM_LABEL_PAGE_TITLE_FORMAT): 0=projekt, 1=projekt+liga, 2=projekt+liga+sezóna,
+	 * 3=projekt+sezóna, 4=liga, 5=liga+sezóna, 6=sezóna, 7=žádné. Beze změny (0) odpovídá
+	 * původnímu chování, takže views bez tohoto parametru nejsou ovlivněny.
+	 */
+	private function pageTitleLabel(): string
+	{
+		$format = (string) ($this->templateParams['page_title_format'] ?? '0');
+		$projectName = $this->project !== null ? trim((string) ($this->project->name ?? '')) : '';
+		$leagueName = $this->project !== null ? trim((string) ($this->project->league_name ?? '')) : '';
+		$seasonName = $this->project !== null ? trim((string) ($this->project->season_name ?? '')) : '';
+
+		$parts = match ($format) {
+			'1' => [$projectName, $leagueName],
+			'2' => [$projectName, $leagueName, $seasonName],
+			'3' => [$projectName, $seasonName],
+			'4' => [$leagueName],
+			'5' => [$leagueName, $seasonName],
+			'6' => [$seasonName],
+			'7' => [],
+			default => [$projectName],
+		};
+
+		return implode(' - ', array_filter($parts, static fn (string $p): bool => $p !== ''));
 	}
 
 	private function prepareCanonicalLink(string $view): void
@@ -422,7 +594,7 @@ class SiteHtmlView extends BaseHtmlView
 	{
 		return match ($view) {
 			'project', 'teams', 'referees', 'stats', 'resultsmatrix' => ['project_id'],
-			'ranking' => ['project_id', 'scope'],
+			'ranking' => ['project_id', 'scope', 'division_id', 'round_id'],
 			'results' => ['project_id', 'round_id'],
 			'resultsranking' => ['project_id', 'round_id'],
 			'schedule' => ['project_id', 'club_id', 'projectteam_id', 'ptid', 'plan', 'filter'],

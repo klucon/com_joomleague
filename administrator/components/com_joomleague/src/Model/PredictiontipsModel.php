@@ -29,7 +29,7 @@ final class PredictiontipsModel extends EntityListModel
 	protected function populateState($ordering = 'm.match_date', $direction = 'desc'): void
 	{
 		$app = Factory::getApplication();
-		$gameId = $app->getInput()->getInt('game_id');
+		$gameId = $app->getInput()->getInt('game_id', 0);
 
 		if ($gameId > 0) {
 			$app->setUserState('com_joomleague.predictiontips.game_id', $gameId);

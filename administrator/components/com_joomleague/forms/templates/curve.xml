@@ -7,11 +7,11 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_curve" type="radio" default="1" label="COM_JOOMLEAGUE_FES_CURVE_PARAM_LABEL_SHOW_CURVE" description="COM_JOOMLEAGUE_FES_CURVE_PARAM_DESCR_SHOW_CURVE">
+			<field name="show_curve" type="radio" default="1" label="COM_JOOMLEAGUE_FES_CURVE_PARAM_LABEL_SHOW_CURVE" description="COM_JOOMLEAGUE_FES_CURVE_PARAM_DESCR_SHOW_CURVE" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_colorlegend" type="radio" default="1" label="COM_JOOMLEAGUE_FES_CURVE_PARAM_LABEL_SHOW_COLOR" description="COM_JOOMLEAGUE_FES_CURVE_PARAM_DESCR_SHOW_COLOR">
+			<field name="show_colorlegend" type="radio" default="1" label="COM_JOOMLEAGUE_FES_CURVE_PARAM_LABEL_SHOW_COLOR" description="COM_JOOMLEAGUE_FES_CURVE_PARAM_DESCR_SHOW_COLOR" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>

@@ -32,14 +32,15 @@ final class TemplateTable extends Table
 			return false;
 		}
 
-		$this->project_id = (int) $this->project_id;
+		// project_id = NULL označuje centrální (globální) řádek šablony, sdílený napříč projekty.
+		$this->project_id = $this->project_id === null || $this->project_id === '' ? null : (int) $this->project_id;
 		$this->template = trim((string) $this->template);
 		$this->func = trim((string) $this->func);
 		$this->title = trim((string) $this->title);
 		$this->params = trim((string) $this->params);
 		$this->published = (int) $this->published;
 
-		if ($this->project_id < 1 || $this->template === '' || $this->title === '') {
+		if (($this->project_id !== null && $this->project_id < 1) || $this->template === '' || $this->title === '') {
 			$this->setError(Text::_('COM_JOOMLEAGUE_TEMPLATE_ERROR_REQUIRED'));
 
 			return false;

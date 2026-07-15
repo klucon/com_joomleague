@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+	<fields name="params">
+		<fieldset name="display" label="COM_JOOMLEAGUE_TEMPLATE_FIELDSET_DISPLAY">
+			<field name="show_sectionheader" type="radio" default="1" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_SHOW_SECTIONHEADER" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_SHOW_SECTIONHEADER" class="btn-group btn-group-yesno">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field name="show_results" type="radio" default="1" label="COM_JOOMLEAGUE_FES_RESULTSRANKING_PARAM_LABEL_SHOW_RESULTS" description="COM_JOOMLEAGUE_FES_RESULTSRANKING_PARAM_DESCR_SHOW_RESULTS" class="btn-group btn-group-yesno">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+			<field name="show_ranking" type="radio" default="1" label="COM_JOOMLEAGUE_FES_RESULTSRANKING_PARAM_LABEL_SHOW_RANKING" description="COM_JOOMLEAGUE_FES_RESULTSRANKING_PARAM_DESCR_SHOW_RANKING" class="btn-group btn-group-yesno">
+				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
+				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
+			</field>
+		</fieldset>
+	</fields>
+</form>

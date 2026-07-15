@@ -15,11 +15,13 @@ namespace Joomleague\Component\Joomleague\Administrator\Model;
 use Joomla\CMS\Application\AdministratorApplication;
 use Joomla\Database\ParameterType;
 use Joomla\Database\QueryInterface;
+use Joomleague\Component\Joomleague\Administrator\Service\TemplateConfigBootstrapService;
 
 final class TemplatesModel extends EntityListModel
 {
 	protected array $searchColumns = ['a.template', 'a.func', 'a.title'];
 	private AdministratorApplication $application;
+	private ?TemplateConfigBootstrapService $bootstrapService = null;
 
 	public function __construct($config = [], $factory = null)
 	{
@@ -32,21 +34,64 @@ final class TemplatesModel extends EntityListModel
 		$this->application = $application;
 	}
 
+	public function setBootstrapService(TemplateConfigBootstrapService $bootstrapService): void
+	{
+		$this->bootstrapService = $bootstrapService;
+	}
+
+	/**
+	 * Lazy self-heal: chybějící řádky (centrální i projektové) se založí při prvním otevření obrazovky.
+	 */
+	public function ensureSeeded(): void
+	{
+		if ($this->bootstrapService === null) {
+			return;
+		}
+
+		if ((string) $this->getState('filter.scope', 'project') === 'global') {
+			$this->bootstrapService->seedGlobalDefaults();
+
+			return;
+		}
+
+		$projectId = (int) $this->getState('filter.project_id');
+
+		if ($projectId > 0) {
+			$this->bootstrapService->seedProject($projectId);
+		}
+	}
+
 	protected function populateState($ordering = 'a.template', $direction = 'ASC'): void
 	{
 		$input = $this->application->getInput();
-		$projectId = $input->getInt('project_id');
+		$projectId = $input->getInt('project_id', 0);
+		$globalParam = $input->getCmd('global', '');
+
+		if ($globalParam !== '') {
+			$isGlobal = (bool) $input->getInt('global', 0);
+			$this->application->setUserState('com_joomleague.templates.scope', $isGlobal ? 'global' : 'project');
+		} elseif ($projectId > 0) {
+			$isGlobal = false;
+			$this->application->setUserState('com_joomleague.templates.scope', 'project');
+		} else {
+			$isGlobal = (string) $this->application->getUserState('com_joomleague.templates.scope', 'project') === 'global';
+		}
 
 		if ($projectId > 0) {
 			$this->application->setUserState('com_joomleague.templates.project_id', $projectId);
 		}
 
-		$this->setState('filter.project_id', $projectId ?: (int) $this->application->getUserState('com_joomleague.templates.project_id'));
+		$this->setState('filter.scope', $isGlobal ? 'global' : 'project');
+		$this->setState('filter.project_id', $isGlobal ? 0 : ($projectId ?: (int) $this->application->getUserState('com_joomleague.templates.project_id')));
 		parent::populateState($ordering, $direction);
 	}
 
 	public function getProjectContext(): ?object
 	{
+		if ((string) $this->getState('filter.scope', 'project') === 'global') {
+			return null;
+		}
+
 		$projectId = (int) $this->getState('filter.project_id');
 
 		if ($projectId < 1) {
@@ -78,6 +123,7 @@ final class TemplatesModel extends EntityListModel
 	protected function buildQuery(): QueryInterface
 	{
 		$db = $this->getDatabase();
+		$isGlobal = (string) $this->getState('filter.scope', 'project') === 'global';
 		$projectId = (int) $this->getState('filter.project_id');
 
 		$query = $db->createQuery()
@@ -85,8 +131,12 @@ final class TemplatesModel extends EntityListModel
 			->from('#__joomleague_template_config a')
 			->join('LEFT', '#__users u ON u.id = a.checked_out');
 
-		if ($projectId > 0) {
+		if ($isGlobal) {
+			$query->where('a.project_id IS NULL');
+		} elseif ($projectId > 0) {
 			$query->where('a.project_id = :project_id')->bind(':project_id', $projectId, ParameterType::INTEGER);
+		} else {
+			$query->where('1 = 0');
 		}
 
 		return $query;

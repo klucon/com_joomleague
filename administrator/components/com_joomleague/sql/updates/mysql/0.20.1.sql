@@ -1,1 +1,0 @@
--- Schema guard: column `periods` on `#__joomleague_sports_type` is added by script.php only when missing.

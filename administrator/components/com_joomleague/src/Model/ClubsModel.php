@@ -35,7 +35,7 @@ final class ClubsModel extends ListModel
 		$db = $this->getDatabase();
 		$query = $db->createQuery()->select([
 			$db->quoteName('a.id'), $db->quoteName('a.name'), $db->quoteName('a.location'), $db->quoteName('a.country'),
-			$db->quoteName('a.logo_small'), $db->quoteName('a.ordering'), $db->quoteName('a.checked_out'),
+			$db->quoteName('a.logo_small'), $db->quoteName('a.latitude'), $db->quoteName('a.longitude'), $db->quoteName('a.ordering'), $db->quoteName('a.checked_out'),
 			$db->quoteName('a.checked_out_time'), $db->quoteName('venue.name', 'stadium'), $db->quoteName('uc.name', 'editor'),
 		])->from($db->quoteName('#__joomleague_club', 'a'))
 			->join('LEFT', $db->quoteName('#__joomleague_playground', 'venue'), $db->quoteName('venue.id') . ' = ' . $db->quoteName('a.standard_playground'))

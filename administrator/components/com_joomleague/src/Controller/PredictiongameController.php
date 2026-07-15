@@ -34,7 +34,7 @@ final class PredictiongameController extends EntityFormController
 				throw new RuntimeException(Text::_('JLIB_APPLICATION_ERROR_EDIT_NOT_PERMITTED'), 403);
 			}
 
-			$id = $this->input->getInt('id');
+			$id = $this->input->getInt('id', 0);
 
 			if ($id < 1) {
 				throw new RuntimeException(Text::_('COM_JOOMLEAGUE_PREDICTIONGAME_ERROR_REQUIRED'));

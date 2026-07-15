@@ -16,24 +16,28 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 
 // Pozn.: WebAssetManager (useScript) v tomto view assety neemituje; document API ano.
-$this->getDocument()->addScript(Uri::root(true) . '/media/com_joomleague/js/matchdata.js?v=1.0.1', [], ['defer' => true]);
+$this->getDocument()->addScript(Uri::root(true) . '/media/com_joomleague/js/matchdata.js?v=1.0.2', [], ['defer' => true]);
 
 $rows = $this->rows;
-$minimumRows = match ($this->section) {
-	'players' => max(count($rows) + 10, count($this->players) + 5, 30),
-	'events', 'statistics' => max(count($rows) + 15, 30),
-	default => max(count($rows) + 8, 12),
-};
 
-while (count($rows) < $minimumRows) {
+// Jen tolik řádků, kolik je reálných dat, + jeden prázdný jako výchozí – slouží mj. jako
+// šablona pro klonování v matchdata.js (tlačítko "Přidat řádek" klonuje poslední <tr>,
+// takže tabulka nesmí být úplně prázdná, i když ještě nejsou žádná data).
+if ($rows === []) {
 	$rows[] = (object) [];
 }
 
-$select = static function (string $name, array $options, mixed $selected, string $value = 'id', string $label = 'name'): void {
-	echo '<select class="form-select" name="' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . '"><option value="">-</option>';
+// $teamAttr: název vlastnosti options objektu s ID týmu (projectteam_id) – pokud je zadaný,
+// select dostane třídu pro JS filtrování (matchdata.js) podle sesterského výběru "Tým".
+$select = static function (string $name, array $options, mixed $selected, string $value = 'id', string $label = 'name', string $teamAttr = '', bool $translateLabel = false): void {
+	$class = 'form-select' . ($teamAttr !== '' ? ' jl-matchdata-person-select' : '');
+	echo '<select class="' . $class . '" name="' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . '"><option value="">-</option>';
 	foreach ($options as $option) {
 		$optionValue = (string) $option->{$value};
-		echo '<option value="' . htmlspecialchars($optionValue, ENT_QUOTES, 'UTF-8') . '"' . ((string) $selected === $optionValue ? ' selected' : '') . '>' . htmlspecialchars((string) $option->{$label}, ENT_QUOTES, 'UTF-8') . '</option>';
+		$optionLabel = (string) $option->{$label};
+		$optionLabel = $translateLabel ? Text::_($optionLabel) : $optionLabel;
+		$teamData = $teamAttr !== '' && isset($option->{$teamAttr}) ? ' data-team="' . htmlspecialchars((string) $option->{$teamAttr}, ENT_QUOTES, 'UTF-8') . '"' : '';
+		echo '<option value="' . htmlspecialchars($optionValue, ENT_QUOTES, 'UTF-8') . '"' . $teamData . ((string) $selected === $optionValue ? ' selected' : '') . '>' . htmlspecialchars($optionLabel, ENT_QUOTES, 'UTF-8') . '</option>';
 	}
 	echo '</select>';
 };
@@ -56,9 +60,9 @@ $checked = static fn (mixed $value): string => !empty($value) ? ' checked' : '';
 								<th><?php echo Text::_('COM_JOOMLEAGUE_EVENTTYPE'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_TEAMS'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_PERSON'); ?></th>
-								<th><?php echo Text::_('COM_JOOMLEAGUE_MATCH_SECOND_PERSON'); ?></th>
-								<th><?php echo Text::_('COM_JOOMLEAGUE_MATCH_MINUTE'); ?></th>
-								<th><?php echo Text::_('COM_JOOMLEAGUE_MATCH_VALUE'); ?></th>
+								<th style="width:6rem"><?php echo Text::_('COM_JOOMLEAGUE_MATCH_MINUTE'); ?></th>
+								<th style="width:6rem"><?php echo Text::_('COM_JOOMLEAGUE_MATCH_VALUE'); ?></th>
+								<th><?php echo Text::_('COM_JOOMLEAGUE_MATCH_NOTICE'); ?></th>
 							<?php elseif ($this->section === 'players') : ?>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_PERSON'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_POSITION'); ?></th>
@@ -70,7 +74,10 @@ $checked = static fn (mixed $value): string => !empty($value) ? ' checked' : '';
 								<th><?php echo Text::_('COM_JOOMLEAGUE_STATISTIC'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_TEAMS'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_PERSON'); ?></th>
-								<th><?php echo Text::_('COM_JOOMLEAGUE_MATCH_VALUE'); ?></th>
+								<th style="width:6rem"><?php echo Text::_('COM_JOOMLEAGUE_MATCH_VALUE'); ?></th>
+							<?php elseif ($this->section === 'staff') : ?>
+								<th><?php echo Text::_('COM_JOOMLEAGUE_PERSON'); ?></th>
+								<th><?php echo Text::_('COM_JOOMLEAGUE_POSITION'); ?></th>
 							<?php else : ?>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_REFEREES'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_POSITION'); ?></th>
@@ -84,15 +91,15 @@ $checked = static fn (mixed $value): string => !empty($value) ? ' checked' : '';
 								<?php if ($this->section === 'events') : ?>
 									<td><?php $select("rows[$i][event_type_id]", $this->types, $row->event_type_id ?? ''); ?></td>
 									<td>
-										<select class="form-select" name="rows[<?php echo $i; ?>][projectteam_id]">
+										<select class="form-select jl-matchdata-team-select" name="rows[<?php echo $i; ?>][projectteam_id]">
 											<option value="<?php echo (int) $this->match->projectteam1_id; ?>"><?php echo $this->escape($this->match->home); ?></option>
 											<option value="<?php echo (int) $this->match->projectteam2_id; ?>" <?php echo ($row->projectteam_id ?? 0) == $this->match->projectteam2_id ? 'selected' : ''; ?>><?php echo $this->escape($this->match->away); ?></option>
 										</select>
 									</td>
-									<td><?php $select("rows[$i][teamplayer_id]", $this->players, $row->teamplayer_id ?? ''); ?></td>
-									<td><?php $select("rows[$i][teamplayer_id2]", $this->players, $row->teamplayer_id2 ?? ''); ?></td>
-									<td><input class="form-control" name="rows[<?php echo $i; ?>][event_time]" value="<?php echo $this->escape($row->event_time ?? ''); ?>"></td>
-									<td><input class="form-control" type="number" step="0.01" name="rows[<?php echo $i; ?>][event_sum]" value="<?php echo $this->escape((string) ($row->event_sum ?? 1)); ?>"></td>
+									<td><?php $select("rows[$i][teamplayer_id]", $this->players, $row->teamplayer_id ?? '', 'id', 'name', 'projectteam_id'); ?></td>
+									<td><input class="form-control" style="max-width:6rem" name="rows[<?php echo $i; ?>][event_time]" value="<?php echo $this->escape($row->event_time ?? ''); ?>"></td>
+									<td><input class="form-control" style="max-width:6rem" type="number" step="0.01" name="rows[<?php echo $i; ?>][event_sum]" value="<?php echo $this->escape((string) ($row->event_sum ?? 1)); ?>"></td>
+									<td><input class="form-control" name="rows[<?php echo $i; ?>][notice]" value="<?php echo $this->escape((string) ($row->notice ?? '')); ?>"></td>
 									<td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger jl-matchdata-remove" aria-label="<?php echo Text::_('JACTION_DELETE'); ?>">×</button></td>
 								<?php elseif ($this->section === 'players') : ?>
 									<td><?php $select("rows[$i][teamplayer_id]", $this->players, $row->teamplayer_id ?? ''); ?></td>
@@ -105,13 +112,17 @@ $checked = static fn (mixed $value): string => !empty($value) ? ' checked' : '';
 								<?php elseif ($this->section === 'statistics') : ?>
 									<td><?php $select("rows[$i][statistic_id]", $this->types, $row->statistic_id ?? ''); ?></td>
 									<td>
-										<select class="form-select" name="rows[<?php echo $i; ?>][projectteam_id]">
+										<select class="form-select jl-matchdata-team-select" name="rows[<?php echo $i; ?>][projectteam_id]">
 											<option value="<?php echo (int) $this->match->projectteam1_id; ?>"><?php echo $this->escape($this->match->home); ?></option>
 											<option value="<?php echo (int) $this->match->projectteam2_id; ?>" <?php echo ($row->projectteam_id ?? 0) == $this->match->projectteam2_id ? 'selected' : ''; ?>><?php echo $this->escape($this->match->away); ?></option>
 										</select>
 									</td>
-									<td><?php $select("rows[$i][teamplayer_id]", $this->players, $row->teamplayer_id ?? ''); ?></td>
-									<td><input class="form-control" type="number" step="0.01" name="rows[<?php echo $i; ?>][value]" value="<?php echo $this->escape((string) ($row->value ?? 0)); ?>"></td>
+									<td><?php $select("rows[$i][teamplayer_id]", $this->players, $row->teamplayer_id ?? '', 'id', 'name', 'projectteam_id'); ?></td>
+									<td><input class="form-control" style="max-width:6rem" type="number" step="0.01" name="rows[<?php echo $i; ?>][value]" value="<?php echo $this->escape((string) ($row->value ?? 0)); ?>"></td>
+									<td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger jl-matchdata-remove" aria-label="<?php echo Text::_('JACTION_DELETE'); ?>">×</button></td>
+								<?php elseif ($this->section === 'staff') : ?>
+									<td><?php $select("rows[$i][team_staff_id]", $this->staff, $row->team_staff_id ?? ''); ?></td>
+									<td><?php $select("rows[$i][project_position_id]", $this->staffPositions, $row->project_position_id ?? ''); ?></td>
 									<td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger jl-matchdata-remove" aria-label="<?php echo Text::_('JACTION_DELETE'); ?>">×</button></td>
 								<?php else : ?>
 									<td><?php $select("rows[$i][project_referee_id]", $this->referees, $row->project_referee_id ?? ''); ?></td>

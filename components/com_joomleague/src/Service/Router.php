@@ -121,6 +121,14 @@ final class Router extends RouterBase
 			return $query;
 		}
 
+		$base = $this->findCanonicalMenuItem($query);
+
+		if ($base !== null) {
+			$query['Itemid'] = $base->id;
+
+			return $query;
+		}
+
 		$base = $this->findBaseMenuItem((string) $query['view']);
 
 		if ($base !== null) {
@@ -189,6 +197,7 @@ final class Router extends RouterBase
 					$segments[] = $this->segment('COM_JOOMLEAGUE_ROUTE_' . strtoupper($section), $this->defaultSectionSegment($section));
 				}
 
+				$this->appendProjectSectionFilterSegments($segments, $query, $view, 0);
 				unset($query['view'], $query['project_id'], $query['pid']);
 			}
 
@@ -331,6 +340,12 @@ final class Router extends RouterBase
 		$segments = array_values(array_filter($segments, static fn ($segment): bool => $segment !== ''));
 
 		if ($segments === []) {
+			$activeView = $this->activeMenuView([]);
+
+			if ($activeView !== '') {
+				return ['view' => $activeView];
+			}
+
 			return $vars;
 		}
 
@@ -400,7 +415,7 @@ final class Router extends RouterBase
 			];
 		}
 
-		if ($activeView === 'clubs') {
+		if ($activeView === 'clubs' || $activeView === 'club') {
 			return [
 				'view' => 'club',
 				'id' => $this->getIdByAlias('club', $first),
@@ -492,6 +507,90 @@ final class Router extends RouterBase
 		}
 
 		return null;
+	}
+
+	private function findCanonicalMenuItem(array $query): ?object
+	{
+		$view = (string) ($query['view'] ?? '');
+		$projectId = $this->projectIdForRouteQuery($view, $query);
+
+		if ($projectId > 0) {
+			$item = $this->findMenuItemByViewAndProject('project', $projectId);
+
+			if ($item !== null) {
+				return $item;
+			}
+
+			$item = $this->findMenuItemByView('project');
+
+			if ($item !== null) {
+				return $item;
+			}
+		}
+
+		if ($view === 'club' && (int) ($query['id'] ?? $query['club_id'] ?? 0) > 0) {
+			$item = $this->findBaseMenuItem('clubs');
+
+			if ($item !== null) {
+				return $item;
+			}
+		}
+
+		return null;
+	}
+
+	private function findMenuItemByViewAndProject(string $view, int $projectId): ?object
+	{
+		$items = (array) $this->menu->getItems(['component'], ['com_joomleague']);
+		$currentLanguage = $this->app->getLanguage()->getTag();
+		$fallback = null;
+
+		foreach ($items as $item) {
+			$query = (array) ($item->query ?? []);
+
+			if (($query['view'] ?? '') !== $view || (int) ($query['project_id'] ?? $query['pid'] ?? 0) !== $projectId) {
+				continue;
+			}
+
+			$language = (string) ($item->language ?? '');
+
+			if ($language === $currentLanguage) {
+				return $item;
+			}
+
+			if ($fallback === null && ($language === '*' || $language === '')) {
+				$fallback = $item;
+			}
+		}
+
+		return $fallback;
+	}
+
+	private function findMenuItemByView(string $view): ?object
+	{
+		$items = (array) $this->menu->getItems(['component'], ['com_joomleague']);
+		$currentLanguage = $this->app->getLanguage()->getTag();
+		$fallback = null;
+
+		foreach ($items as $item) {
+			$query = (array) ($item->query ?? []);
+
+			if (($query['view'] ?? '') !== $view) {
+				continue;
+			}
+
+			$language = (string) ($item->language ?? '');
+
+			if ($language === $currentLanguage) {
+				return $item;
+			}
+
+			if ($fallback === null && ($language === '*' || $language === '')) {
+				$fallback = $item;
+			}
+		}
+
+		return $fallback;
 	}
 
 	private function isExactMenuQuery(array $query): bool
@@ -1022,6 +1121,35 @@ final class Router extends RouterBase
 		return 0;
 	}
 
+	private function projectIdForRouteQuery(string $view, array $query): int
+	{
+		$projectId = (int) ($query['project_id'] ?? $query['pid'] ?? 0);
+
+		if ($projectId > 0) {
+			return $projectId;
+		}
+
+		if (in_array($view, ['team', 'roster', 'rivals', 'teamstats'], true)) {
+			$projectTeamId = (int) ($query['id'] ?? $query['projectteam_id'] ?? $query['tid'] ?? 0);
+
+			return $projectTeamId > 0 ? $this->lookupProjectIdByProjectTeam($projectTeamId) : 0;
+		}
+
+		if ($view === 'matchreport') {
+			$matchId = (int) ($query['id'] ?? $query['match_id'] ?? 0);
+
+			return $matchId > 0 ? $this->lookupProjectIdByMatch($matchId) : 0;
+		}
+
+		if ($view === 'person') {
+			$personId = (int) ($query['id'] ?? $query['person_id'] ?? 0);
+
+			return $personId > 0 ? $this->lookupProjectIdByPerson($personId) : 0;
+		}
+
+		return $this->lookupProjectIdFromProjectSectionQuery($view, $query);
+	}
+
 	private function lookupProjectIdByMatch(int $matchId): int
 	{
 		$query = $this->db->getQuery(true)
@@ -1059,6 +1187,29 @@ final class Router extends RouterBase
 
 	private function lookupMatchId(string $alias, int $projectId = 0): int
 	{
+		$query = $this->db->getQuery(true)
+			->select($this->db->quoteName('m.id'))
+			->from($this->db->quoteName('#__joomleague_match', 'm'))
+			->join('INNER', $this->db->quoteName('#__joomleague_round', 'r') . ' ON ' . $this->db->quoteName('r.id') . ' = ' . $this->db->quoteName('m.round_id'))
+			->join('LEFT', $this->db->quoteName('#__joomleague_project_team', 'home') . ' ON ' . $this->db->quoteName('home.id') . ' = ' . $this->db->quoteName('m.projectteam1_id'))
+			->join('LEFT', $this->db->quoteName('#__joomleague_project_team', 'away') . ' ON ' . $this->db->quoteName('away.id') . ' = ' . $this->db->quoteName('m.projectteam2_id'))
+			->join('LEFT', $this->db->quoteName('#__joomleague_team', 'ht') . ' ON ' . $this->db->quoteName('ht.id') . ' = ' . $this->db->quoteName('home.team_id'))
+			->join('LEFT', $this->db->quoteName('#__joomleague_team', 'at') . ' ON ' . $this->db->quoteName('at.id') . ' = ' . $this->db->quoteName('away.team_id'));
+
+		if ($projectId > 0) {
+			$query->where($this->db->quoteName('r.project_id') . ' = ' . (int) $projectId);
+		}
+
+		$query->order($this->db->quoteName('m.id') . ' DESC');
+
+		foreach ($this->db->setQuery($query)->loadObjectList() as $row) {
+			$matchAlias = $this->normaliseSegment(trim((string) $row->home_name . '-' . (string) $row->away_name . '-' . substr((string) $row->match_date, 0, 10), '-'));
+
+			if ($matchAlias === $alias) {
+				return (int) $row->id;
+			}
+		}
+
 		return 0;
 	}
 

@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @package     JoomLeague
+ * @copyright   Copyright (C) 2026 Ondřej Klučka (https://klucon.cz). All rights reserved.
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ *
  * Joomla menu component item override.
  * Re-routes JoomLeague component menu items so project scoped menu links use
  * the component canonical SEF path instead of the stored menu alias path.

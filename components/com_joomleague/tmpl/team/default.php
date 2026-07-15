@@ -7,6 +7,7 @@
 
 declare(strict_types=1);
 \defined('_JEXEC') or die;
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
@@ -23,11 +24,26 @@ $translateLegacyName = static function ($value): string {
 };
 $sportName = $this->project ? $translateLegacyName($this->project->sport_name ?? '') : '';
 
+$params = $this->templateParams;
+$showDescription = (bool) ($params['show_description'] ?? false);
+$showHistory = (bool) ($params['show_history'] ?? true);
+$showClubInfo = (bool) ($params['show_club_info'] ?? true);
+$showRosterLink = (bool) ($params['show_teams_roster_link'] ?? true);
+$showTeamplanLink = (bool) ($params['show_teams_teamplan_link'] ?? true);
+$showTeamstatsLink = (bool) ($params['show_teams_teamstats_link'] ?? true);
+$showRankingLink = (bool) ($params['show_teams_ranking_link'] ?? true);
+$showResultsLink = (bool) ($params['show_teams_results_link'] ?? true);
+
 // URL loga týmu (team_picture je cesta relativní ke kořeni Joomly)
 $teamLogo = null;
-if ($team && trim((string) ($team->team_picture ?? '')) !== '') {
-	$pic = trim((string) $team->team_picture);
-	$teamLogo = preg_match('#^https?://#i', $pic) ? $pic : Uri::root(true) . '/' . ltrim($pic, '/');
+if ($team) {
+	$pic = trim((string) ($team->team_picture ?? ''));
+	if ($pic === '') {
+		$pic = trim((string) ComponentHelper::getParams('com_joomleague')->get('placeholder_team_picture', ''));
+	}
+	if ($pic !== '') {
+		$teamLogo = preg_match('#^https?://#i', $pic) ? $pic : Uri::root(true) . '/' . ltrim($pic, '/');
+	}
 }
 
 if ($team) {
@@ -66,27 +82,29 @@ if ($team) {
 			</div>
 		</div>
 		<nav class="jl-site-nav mt-3">
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=roster&id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_ROSTER'); ?></a>
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=schedule&project_id=' . (int) $team->project_id . '&projectteam_id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE'); ?></a>
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=teamstats&projectteam_id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_STATS'); ?></a>
+			<?php if ($showRosterLink) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=roster&id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_ROSTER'); ?></a><?php endif; ?>
+			<?php if ($showTeamplanLink) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=schedule&project_id=' . (int) $team->project_id . '&projectteam_id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE'); ?></a><?php endif; ?>
+			<?php if ($showTeamstatsLink) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=teamstats&projectteam_id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_STATS'); ?></a><?php endif; ?>
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=rivals&projectteam_id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RIVALS'); ?></a>
-			<?php if ($team->club_id) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=club&id=' . (int) $team->club_id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CLUB'); ?></a><?php endif; ?>
+			<?php if ($showRankingLink && $this->project) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=ranking&project_id=' . (int) $team->project_id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RANKING'); ?></a><?php endif; ?>
+			<?php if ($showResultsLink && $this->project) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=results&project_id=' . (int) $team->project_id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULTS'); ?></a><?php endif; ?>
+			<?php if ($showClubInfo && $team->club_id) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=club&id=' . (int) $team->club_id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CLUB'); ?></a><?php endif; ?>
 			<?php if ($team->playground_id) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=playground&id=' . (int) $team->playground_id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PLAYGROUND'); ?></a><?php endif; ?>
 		</nav>
 	</section>
 	<div class="jl-site-grid mb-4">
 		<div class="jl-site-card"><strong><?php echo $this->escape($this->project->name ?? Text::_('COM_JOOMLEAGUE_SITE_NOT_SET')); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT'); ?></span></div>
-		<div class="jl-site-card"><strong><?php echo $this->escape($team->club_name ?: Text::_('COM_JOOMLEAGUE_SITE_NOT_SET')); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CLUB'); ?></span></div>
+		<?php if ($showClubInfo) : ?><div class="jl-site-card"><strong><?php echo $this->escape($team->club_name ?: Text::_('COM_JOOMLEAGUE_SITE_NOT_SET')); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CLUB'); ?></span></div><?php endif; ?>
 		<div class="jl-site-card"><strong><?php echo $this->escape($team->playground_name ?: Text::_('COM_JOOMLEAGUE_SITE_NOT_SET')); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PLAYGROUND'); ?></span></div>
 		<div class="jl-site-card"><strong><?php echo count($this->items); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PLAYERS'); ?></span></div>
 	</div>
-	<?php if ($teamText !== '') : ?>
+	<?php if ($showDescription && $teamText !== '') : ?>
 		<div class="jl-site-panel mb-4">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_INFO'); ?></h2>
 			<p class="jl-site-muted mb-0"><?php echo nl2br($this->escape($teamText)); ?></p>
 		</div>
 	<?php endif; ?>
-	<?php if ($this->teamSeasons) : ?>
+	<?php if ($showHistory && $this->teamSeasons) : ?>
 		<div class="jl-site-panel table-responsive mb-4">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_SEASONS'); ?></h2>
 			<table class="table jl-site-table align-middle">

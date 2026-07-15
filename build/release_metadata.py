@@ -20,6 +20,9 @@ MAINTAINER = "Ondřej Klučka"
 MAINTAINER_URL = "https://klucon.cz"
 JOOMLA_TARGET = "6.*"
 PHP_MINIMUM = "8.3"
+PUBLIC_ROLLUP_BASE = {
+    "6.1.0-alpha-151": 150,
+}
 
 
 def version() -> str:
@@ -66,6 +69,42 @@ def changelog_sections() -> list[tuple[str, list[str]]]:
     return sections
 
 
+def alpha_number(release_version: str) -> int | None:
+    match = re.search(r"-alpha-(\d+)$", release_version)
+
+    return int(match.group(1)) if match else None
+
+
+def public_rollup_items(release_version: str, sections: list[tuple[str, list[str]]]) -> list[str] | None:
+    base = PUBLIC_ROLLUP_BASE.get(release_version)
+    current = alpha_number(release_version)
+
+    if base is None or current is None:
+        return None
+
+    if base + 1 == current:
+        summary = f"Public {release_version} update summary: this release replaces the previous public alpha-{base} package and includes the listed {release_version} changes."
+    else:
+        summary = f"Public {release_version} update summary: this release replaces the previous public alpha-{base} package and includes all listed alpha changes from 6.1.0-alpha-{base + 1} through {release_version}."
+
+    items = [
+        summary,
+        "Target platform: Joomla 6.1 and PHP 8.3. This is still an alpha release intended for evaluation, migration testing and demo deployments.",
+        "Main focus areas: project-aware SEF routing, administrator form stability, frontend template polish, map support, prediction views, SQL tools and package metadata.",
+    ]
+
+    for section_version, section_items in sections:
+        section_alpha = alpha_number(section_version)
+
+        if section_alpha is None or section_alpha <= base or section_alpha > current:
+            continue
+
+        for item in section_items:
+            items.append(f"{section_version}: {item.replace('`', '')}")
+
+    return items
+
+
 def package_zip(release_version: str) -> Path:
     path = DIST / f"pkg_joomleague-{release_version}.zip"
 
@@ -89,7 +128,7 @@ def write_update_xml(release_version: str, output: Path) -> None:
     tag = f"v{release_version}"
     release_url = f"https://github.com/{REPOSITORY}/releases/tag/{tag}"
     download_url = f"https://github.com/{REPOSITORY}/releases/download/{tag}/pkg_joomleague-{release_version}.zip"
-    changelog_url = f"https://github.com/{REPOSITORY}/releases/download/{tag}/joomleague-changelog.xml"
+    changelog_url = f"https://github.com/{REPOSITORY}/releases/download/{tag}/joomleague-changelog-{release_version}.xml"
     checksum = sha256(package_zip(release_version))
 
     updates = ET.Element("updates")
@@ -121,18 +160,23 @@ def write_update_xml(release_version: str, output: Path) -> None:
 
 def write_changelog_xml(release_version: str, output: Path) -> None:
     changelogs = ET.Element("changelogs")
+    sections = changelog_sections()
+    rollup_items = public_rollup_items(release_version, sections)
 
-    for section_version, items in changelog_sections():
+    for section_version, items in sections:
         changelog = ET.SubElement(changelogs, "changelog")
         ET.SubElement(changelog, "element").text = "pkg_joomleague"
         ET.SubElement(changelog, "type").text = "package"
         ET.SubElement(changelog, "version").text = section_version
         changes = ET.SubElement(changelog, "change")
 
+        if section_version == release_version and rollup_items is not None:
+            items = rollup_items
+
         for item in items:
             ET.SubElement(changes, "item").text = item
 
-    if not any(section_version == release_version for section_version, _ in changelog_sections()):
+    if not any(section_version == release_version for section_version, _ in sections):
         raise RuntimeError(f"Missing CHANGELOG.md section for {release_version}")
 
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -148,8 +192,11 @@ def main() -> int:
 
     write_update_xml(args.version, args.update_output)
     write_changelog_xml(args.version, args.changelog_output)
+    versioned_changelog = args.changelog_output.with_name(f"joomleague-changelog-{args.version}.xml")
+    versioned_changelog.write_text(args.changelog_output.read_text(encoding="utf-8"), encoding="utf-8")
     print(args.update_output)
     print(args.changelog_output)
+    print(versioned_changelog)
     return 0
 
 

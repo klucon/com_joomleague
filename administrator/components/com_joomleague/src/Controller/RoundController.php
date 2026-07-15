@@ -29,7 +29,7 @@ final class RoundController extends EntityFormController
 	{
 		$this->checkToken();
 
-		$id = $this->input->getInt('move_id');
+		$id = $this->input->getInt('move_id', 0);
 		$dates = $this->input->get('move_date', [], 'array');
 		$newDate = isset($dates[$id]) ? trim((string) $dates[$id]) : '';
 

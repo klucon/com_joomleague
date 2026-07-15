@@ -7,10 +7,12 @@
 
 declare(strict_types=1);
 \defined('_JEXEC') or die;
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
+use Joomleague\Component\Joomleague\Site\Service\MapUrlHelper;
 use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $club = $this->item;
@@ -28,11 +30,35 @@ $sportName = $club ? $translateLegacyName($club->sport_name ?? '') : '';
 $clubLogo = '';
 if ($club) {
 	$logo = trim((string) ($club->logo_big ?: $club->logo_middle ?: $club->logo_small ?: ''));
+	if ($logo === '') {
+		$logo = trim((string) ComponentHelper::getParams('com_joomleague')->get('placeholder_club_logo', ''));
+	}
 	if ($logo !== '') {
 		$clubLogo = preg_match('#^https?://#i', $logo) ? $logo : Uri::root(true) . '/' . ltrim($logo, '/');
 	}
 }
-$mapUrl = static fn (string $query): string => 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($query);
+$mapUrl = static fn (string $query, ?float $lat = null, ?float $lng = null): string => MapUrlHelper::build($query, $lat, $lng);
+
+$params = $this->templateParams;
+$showDescription = (bool) ($params['show_description'] ?? true);
+$showMaps = (bool) ($params['show_maps'] ?? true);
+$showMapEmbed = (bool) ($params['show_map_embed'] ?? false);
+$showTeamsOfClub = (bool) ($params['show_teams_of_club'] ?? true);
+$showClubLogo = (bool) ($params['show_club_logo'] ?? true);
+$showPlaygroundsOfClub = (bool) ($params['show_playgrounds_of_club'] ?? true);
+
+if ($showMapEmbed && $club && $club->latitude !== null && $club->longitude !== null) {
+	$document = $this->getDocument();
+	$document->addStyleSheet(Uri::root(true) . '/media/com_joomleague/vendor/leaflet/leaflet.css?v=1.9.4');
+	$document->addScript(Uri::root(true) . '/media/com_joomleague/vendor/leaflet/leaflet.js?v=1.9.4');
+	$document->addScript(Uri::root(true) . '/media/com_joomleague/js/map-embed.js?v=1.0.0', [], ['defer' => true]);
+} else {
+	$showMapEmbed = false;
+}
+
+if (!$showClubLogo) {
+	$clubLogo = '';
+}
 
 if ($club) {
 	StructuredDataHelper::add($this->getDocument(), [
@@ -71,7 +97,7 @@ if ($club) {
 		<nav class="jl-site-nav mt-3">
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=schedule&club_id=' . (int) $club->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE'); ?></a>
 			<?php if ($club->standard_playground) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=playground&id=' . (int) $club->standard_playground); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PLAYGROUND'); ?></a><?php endif; ?>
-			<?php if ($address !== '') : ?><a href="<?php echo $this->escape($mapUrl($club->name . ', ' . $address)); ?>" target="_blank" rel="noopener"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SHOW_ON_MAP'); ?></a><?php endif; ?>
+			<?php if ($showMaps && $address !== '') : ?><a href="<?php echo $this->escape($mapUrl($address, $club->latitude !== null ? (float) $club->latitude : null, $club->longitude !== null ? (float) $club->longitude : null)); ?>" target="_blank" rel="noopener"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SHOW_ON_MAP'); ?></a><?php endif; ?>
 		</nav>
 	</section>
 	<div class="jl-site-grid mb-4">
@@ -84,12 +110,18 @@ if ($club) {
 		<div class="jl-site-card"><strong><?php echo $this->escape($club->manager ?: Text::_('COM_JOOMLEAGUE_SITE_NOT_SET')); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_MANAGER'); ?></span></div>
 		<div class="jl-site-card"><strong><?php echo count($this->items); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CLUB_TEAMS'); ?></span></div>
 	</div>
-	<?php if ($clubText !== '') : ?>
+	<?php if ($showMapEmbed) : ?>
+		<div class="jl-site-panel mb-4">
+			<div class="jl-map-embed" data-lat="<?php echo $this->escape((string) $club->latitude); ?>" data-lng="<?php echo $this->escape((string) $club->longitude); ?>" style="height:320px;"></div>
+		</div>
+	<?php endif; ?>
+	<?php if ($showDescription && $clubText !== '') : ?>
 		<div class="jl-site-panel mb-4">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_SUMMARY'); ?></h2>
 			<p class="jl-site-muted mb-0"><?php echo nl2br($this->escape($clubText)); ?></p>
 		</div>
 	<?php endif; ?>
+	<?php if ($showTeamsOfClub) : ?>
 	<div class="jl-site-panel table-responsive mb-4">
 		<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_CLUB_TEAMS'); ?></h2>
 		<table class="table jl-site-table align-middle">
@@ -116,7 +148,8 @@ if ($club) {
 		</table>
 		<?php if (!$this->items) : ?><div class="alert alert-info"><?php echo Text::_('COM_JOOMLEAGUE_SITE_NO_DATA'); ?></div><?php endif; ?>
 	</div>
-	<?php if ($this->clubPlaygrounds) : ?>
+	<?php endif; ?>
+	<?php if ($showPlaygroundsOfClub && $this->clubPlaygrounds) : ?>
 		<div class="jl-site-panel table-responsive">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_VENUES'); ?></h2>
 			<table class="table jl-site-table align-middle">
@@ -128,7 +161,7 @@ if ($club) {
 							<td><?php echo $this->escape($pgAddress); ?></td>
 							<td><?php echo $this->escape((string) ($playground->max_visitors ?? '')); ?></td>
 							<td class="jl-site-actions">
-								<?php if ($pgAddress !== '') : ?><a class="jl-site-button" href="<?php echo $this->escape($mapUrl($playground->name . ', ' . $pgAddress)); ?>" target="_blank" rel="noopener"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SHOW_ON_MAP'); ?></a><?php endif; ?>
+								<?php if ($showMaps && $pgAddress !== '') : ?><a class="jl-site-button" href="<?php echo $this->escape($mapUrl($pgAddress, $playground->latitude !== null ? (float) $playground->latitude : null, $playground->longitude !== null ? (float) $playground->longitude : null)); ?>" target="_blank" rel="noopener"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SHOW_ON_MAP'); ?></a><?php endif; ?>
 								<a class="jl-site-button" href="<?php echo Route::_('index.php?option=com_joomleague&view=playground&id=' . (int) $playground->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DETAIL'); ?></a>
 							</td>
 						</tr>

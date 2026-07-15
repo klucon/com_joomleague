@@ -16,19 +16,27 @@ use Joomla\CMS\Router\Route;
 $project = $this->project;
 $rowsByStatistic = [];
 
+$params = $this->templateParams;
+$showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
+$maxStats = max(1, (int) ($params['max_stats'] ?? 20));
+$linkToPlayer = (bool) ($params['link_to_player'] ?? true);
+$linkToTeam = (bool) ($params['link_to_team'] ?? true);
+
 foreach ($this->items as $row) {
 	$rowsByStatistic[(int) $row->statistic_id][] = $row;
 }
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$project) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT_NOT_FOUND'); ?></div><?php return; endif; ?>
+	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo $this->escape($project->name); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_STATS_RANKING'); ?></h1>
 	</section>
+	<?php endif; ?>
 
 	<?php foreach ($this->statistics as $statistic) : ?>
-		<?php $statRows = $rowsByStatistic[(int) $statistic->id] ?? []; ?>
+		<?php $statRows = \array_slice($rowsByStatistic[(int) $statistic->id] ?? [], 0, $maxStats); ?>
 		<div class="jl-site-panel table-responsive mb-4">
 			<h2><?php echo $this->escape($statistic->name); ?></h2>
 			<table class="table jl-site-table align-middle">
@@ -44,8 +52,8 @@ foreach ($this->items as $row) {
 					<?php foreach ($statRows as $i => $row) : ?>
 						<tr>
 							<td><?php echo $i + 1; ?></td>
-							<td><?php if ($row->person_id) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=person&id=' . (int) $row->person_id . '&project_id=' . (int) $project->id); ?>"><?php echo $this->escape($row->person_name ?: $row->nickname); ?></a><?php else : ?><?php echo Text::_('COM_JOOMLEAGUE_SITE_NOT_SET'); ?><?php endif; ?></td>
-							<td><?php if ($row->projectteam_id) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $row->projectteam_id); ?>"><?php echo $this->escape($row->team_name ?? ''); ?></a><?php else : ?><?php echo $this->escape($row->team_name ?? ''); ?><?php endif; ?></td>
+							<td><?php if ($linkToPlayer && $row->person_id) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=person&id=' . (int) $row->person_id . '&project_id=' . (int) $project->id); ?>"><?php echo $this->escape($row->person_name ?: $row->nickname); ?></a><?php elseif ($row->person_id) : ?><?php echo $this->escape($row->person_name ?: $row->nickname); ?><?php else : ?><?php echo Text::_('COM_JOOMLEAGUE_SITE_NOT_SET'); ?><?php endif; ?></td>
+							<td><?php if ($linkToTeam && $row->projectteam_id) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $row->projectteam_id); ?>"><?php echo $this->escape($row->team_name ?? ''); ?></a><?php else : ?><?php echo $this->escape($row->team_name ?? ''); ?><?php endif; ?></td>
 							<td><strong><?php echo $this->escape((string) $row->value); ?></strong></td>
 						</tr>
 					<?php endforeach; ?>

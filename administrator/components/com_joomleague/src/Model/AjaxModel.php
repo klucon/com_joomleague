@@ -227,6 +227,39 @@ final class AjaxModel extends BaseDatabaseModel
 		return $db->setQuery($query)->loadAssocList() ?: [];
 	}
 
+	public function getTeamStaffPositions(int $projectTeamId): array
+	{
+		if ($projectTeamId <= 0) {
+			return [];
+		}
+
+		$db = $this->getDatabase();
+		$query = $db->createQuery()
+			->select('pp.id AS value, po.name AS text')
+			->from('#__joomleague_project_position pp')
+			->join('INNER', '#__joomleague_position po ON po.id = pp.position_id')
+			->join('INNER', '#__joomleague_project_team pt ON pt.project_id = pp.project_id')
+			->where('pt.id = :projectteam_id')
+			->where('po.persontype IN (2, 4)')
+			->bind(':projectteam_id', $projectTeamId, ParameterType::INTEGER);
+
+		$rows = $db->setQuery($query)->loadAssocList() ?: [];
+
+		foreach ($rows as &$row) {
+			$row['text'] = Text::_((string) $row['text']);
+		}
+
+		unset($row);
+
+		// Řadit až podle přeloženého textu českou kolací – syrová konstanta ani sloupec
+		// ordering (pořadí vytvoření) neodpovídají abecednímu pořadí, které admin čeká
+		// v rozbalovacím seznamu.
+		$collator = new \Collator('cs_CZ');
+		usort($rows, static fn (array $a, array $b): int => $collator->compare((string) $a['text'], (string) $b['text']));
+
+		return $rows;
+	}
+
 	public function searchPersons(string $search, int $limit = 20): array
 	{
 		$db = $this->getDatabase();

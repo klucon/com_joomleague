@@ -35,7 +35,7 @@ final class StadiumsModel extends ListModel
 		$db = $this->getDatabase();
 		$query = $db->createQuery()->select([
 			$db->quoteName('a.id'), $db->quoteName('a.name'), $db->quoteName('a.short_name'),
-			$db->quoteName('a.city'), $db->quoteName('a.country'), $db->quoteName('a.max_visitors'),
+			$db->quoteName('a.city'), $db->quoteName('a.country'), $db->quoteName('a.latitude'), $db->quoteName('a.longitude'), $db->quoteName('a.max_visitors'),
 			$db->quoteName('a.picture'), $db->quoteName('a.ordering'), $db->quoteName('a.checked_out'),
 			$db->quoteName('a.checked_out_time'), $db->quoteName('club.name', 'club'), $db->quoteName('uc.name', 'editor'),
 		])->from($db->quoteName('#__joomleague_playground', 'a'))

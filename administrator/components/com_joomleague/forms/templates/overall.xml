@@ -7,15 +7,15 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_project_country" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SHOW_PROJECT_COUNTRY" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SHOW_PROJECT_COUNTRY">
+			<field name="show_project_country" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SHOW_PROJECT_COUNTRY" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SHOW_PROJECT_COUNTRY" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_project_picture" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SHOW_PROJECT_PICTURE" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SHOW_PROJECT_PICTURE">
+			<field name="show_project_picture" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SHOW_PROJECT_PICTURE" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SHOW_PROJECT_PICTURE" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_project_text" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SHOW_PROJECT_TEXT" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SHOW_PROJECT_TEXT">
+			<field name="show_project_text" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SHOW_PROJECT_TEXT" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SHOW_PROJECT_TEXT" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -25,7 +25,7 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_division_picture" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SHOW_DIVISION_PICTURE" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SHOW_DIVISION_PICTURE">
+			<field name="show_division_picture" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SHOW_DIVISION_PICTURE" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SHOW_DIVISION_PICTURE" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -35,7 +35,7 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_print_button" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SHOW_PRINT_BUTTON" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SHOW_PRINT_BUTTON">
+			<field name="show_print_button" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SHOW_PRINT_BUTTON" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SHOW_PRINT_BUTTON" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -46,15 +46,15 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="use_jl_substitution" type="radio" default="1" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SUBST_SYSTEM" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SUBST_SYSTEM">
+			<field name="use_jl_substitution" type="radio" default="1" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_SUBST_SYSTEM" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_SUBST_SYSTEM" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="use_jl_events" type="radio" default="1" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_EVENTS_SYSTEM" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_EVENTS_SYSTEM">
+			<field name="use_jl_events" type="radio" default="1" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_EVENTS_SYSTEM" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_EVENTS_SYSTEM" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="use_jl_events_required" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_EVENTS_REQUIRED" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_EVENTS_REQUIRED">
+			<field name="use_jl_events_required" type="radio" default="0" label="COM_JOOMLEAGUE_FES_OVERALL_PARAM_LABEL_EVENTS_REQUIRED" description="COM_JOOMLEAGUE_FES_OVERALL_PARAM_DESCR_EVENTS_REQUIRED" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>

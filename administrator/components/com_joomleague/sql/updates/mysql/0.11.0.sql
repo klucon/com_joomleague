@@ -1,1 +1,0 @@
--- Joomla 6 project administration CRUD release.

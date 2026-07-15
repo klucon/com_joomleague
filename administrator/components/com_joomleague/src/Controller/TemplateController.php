@@ -33,7 +33,7 @@ final class TemplateController extends EntityFormController
 	protected function getRedirectToListAppend()
 	{
 		$append = parent::getRedirectToListAppend();
-		$projectId = $this->input->getInt('project_id');
+		$projectId = $this->input->getInt('project_id', 0);
 
 		if ($projectId < 1) {
 			$form = $this->input->post->get('jform', [], 'array');
@@ -47,7 +47,7 @@ final class TemplateController extends EntityFormController
 	{
 		$append = parent::getRedirectToItemAppend($recordId, $urlVar);
 		$form = $this->input->post->get('jform', [], 'array');
-		$projectId = (int) ($form['project_id'] ?? $this->input->getInt('project_id'));
+		$projectId = (int) ($form['project_id'] ?? $this->input->getInt('project_id', 0));
 
 		return $projectId > 0 ? $append . '&project_id=' . $projectId : $append;
 	}

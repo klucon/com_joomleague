@@ -16,7 +16,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 
 $projectId = (int) $this->project->id;
-$style = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.5';
+$style = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.9';
 $supportedTemplateIds = ['round-robin-first-half-v1', 'round-robin-second-half-v1'];
 
 ?>

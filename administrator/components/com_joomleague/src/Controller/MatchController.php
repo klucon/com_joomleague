@@ -43,7 +43,7 @@ final class MatchController extends EntityFormController
 				throw new RuntimeException(Text::_('JLIB_APPLICATION_ERROR_EDIT_NOT_PERMITTED'), 403);
 			}
 
-			$id = $this->input->getInt('id');
+			$id = $this->input->getInt('id', 0);
 			$value = (string) $this->input->getString('match_date', '');
 
 			$stored = $this->getModel('Match')->saveDate($id, $value);
@@ -52,6 +52,48 @@ final class MatchController extends EntityFormController
 				'success' => true,
 				'value' => $stored,
 				'message' => Text::_('COM_JOOMLEAGUE_MATCH_DATE_SAVED'),
+			];
+		} catch (Throwable $exception) {
+			$message = $exception->getMessage();
+			$result['message'] = str_starts_with($message, 'COM_') || str_starts_with($message, 'JLIB_') || str_starts_with($message, 'JINVALID')
+				? Text::_($message)
+				: $message;
+		}
+
+		$this->app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+		$this->app->sendHeaders();
+		echo json_encode($result, JSON_UNESCAPED_UNICODE);
+		$this->app->close();
+	}
+
+	/**
+	 * Inline AJAX uložení hlavního výsledku zápasu ze seznamu (autosave). Vrací JSON.
+	 */
+	public function saveresult(): void
+	{
+		$result = ['success' => false, 'team1' => '', 'team2' => '', 'result' => '', 'message' => ''];
+
+		try {
+			if (!Session::checkToken()) {
+				throw new RuntimeException(Text::_('JINVALID_TOKEN'));
+			}
+
+			if (!$this->app->getIdentity()->authorise('core.edit', 'com_joomleague')) {
+				throw new RuntimeException(Text::_('JLIB_APPLICATION_ERROR_EDIT_NOT_PERMITTED'), 403);
+			}
+
+			$id = $this->input->getInt('id', 0);
+			$team1Value = (string) $this->input->getString('team1_result', '');
+			$team2Value = (string) $this->input->getString('team2_result', '');
+
+			$saved = $this->getModel('Match')->saveResult($id, $team1Value, $team2Value);
+
+			$result = [
+				'success' => true,
+				'team1' => $saved['team1'],
+				'team2' => $saved['team2'],
+				'result' => $saved['result'],
+				'message' => Text::_('COM_JOOMLEAGUE_MATCH_RESULT_SAVED'),
 			];
 		} catch (Throwable $exception) {
 			$message = $exception->getMessage();
@@ -77,7 +119,7 @@ final class MatchController extends EntityFormController
 				throw new RuntimeException(Text::_('JINVALID_TOKEN'));
 			}
 
-			$id = $this->input->getInt('id');
+			$id = $this->input->getInt('id', 0);
 
 			if ($id < 1) {
 				throw new RuntimeException(Text::_('COM_JOOMLEAGUE_MATCH_ARTICLE_INVALID'));

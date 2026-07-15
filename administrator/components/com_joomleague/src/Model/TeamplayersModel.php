@@ -53,7 +53,7 @@ final class TeamplayersModel extends EntityListModel
 	{
 		parent::populateState($ordering, $direction);
 
-		$projectteamId = $this->application->getInput()->getInt('projectteam_id');
+		$projectteamId = $this->application->getInput()->getInt('projectteam_id', 0);
 
 		if ($projectteamId > 0) {
 			$this->application->setUserState('com_joomleague.teamplayers.projectteam_id', $projectteamId);

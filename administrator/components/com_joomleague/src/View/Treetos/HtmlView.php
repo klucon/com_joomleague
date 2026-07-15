@@ -18,6 +18,8 @@ final class HtmlView extends AdminListView
 {
 	protected function configure(): array
 	{
+		$projectId = (int) $this->getModel()->getState('filter.project_id');
+
 		return [
 			'title' => 'COM_JOOMLEAGUE_TREES_TITLE',
 			'caption' => 'COM_JOOMLEAGUE_TREES_TITLE',
@@ -27,10 +29,11 @@ final class HtmlView extends AdminListView
 			'primary' => 'name',
 			'state' => true,
 			'toolbar_links' => [
-				['url' => 'index.php?option=com_joomleague&view=tools', 'label' => 'COM_JOOMLEAGUE_TOOLS_BACK', 'icon' => 'arrow-left'],
+				['url' => 'index.php?option=com_joomleague&view=projectpanel&project_id=' . $projectId, 'label' => 'COM_JOOMLEAGUE_BACK_TO_PROJECT_PANEL', 'icon' => 'arrow-left'],
 			],
 			'columns' => [
 				['field' => 'name', 'label' => 'COM_JOOMLEAGUE_FIELD_NAME', 'sort' => 'a.name'],
+				['field' => 'trophypic', 'label' => 'COM_JOOMLEAGUE_FIELD_IMAGE', 'type' => 'image', 'image_placeholder' => 'treeto_trophypic'],
 				['field' => 'project_name', 'label' => 'COM_JOOMLEAGUE_MENU_PROJECTS', 'sort' => 'p.name'],
 				['field' => 'division_name', 'label' => 'COM_JOOMLEAGUE_PROJECT_DIVISIONS'],
 				['field' => 'tree_i', 'label' => 'COM_JOOMLEAGUE_TREETO_FIELD_DEPTH', 'sort' => 'a.tree_i'],

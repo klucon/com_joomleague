@@ -34,7 +34,7 @@ final class TreetonodesModel extends EntityListModel
 
 	protected function populateState($ordering = 'a.node', $direction = 'ASC'): void
 	{
-		$treeId = $this->application->getInput()->getInt('treeto_id');
+		$treeId = $this->application->getInput()->getInt('treeto_id', 0);
 
 		if ($treeId > 0) {
 			$this->application->setUserState('com_joomleague.treetonodes.treeto_id', $treeId);

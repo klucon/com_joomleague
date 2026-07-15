@@ -42,7 +42,7 @@ final class DisplayController extends BaseController
 
 	private function getProjectIdFromInput(): int
 	{
-		$projectId = $this->input->getInt('project_id');
+		$projectId = $this->input->getInt('project_id', 0);
 
 		if ($projectId < 1) {
 			$pid = $this->input->get('pid', [], 'array');
@@ -95,7 +95,7 @@ final class DisplayController extends BaseController
 			$model = $view->getModel();
 
 			if ($model !== null && method_exists($model, 'setState')) {
-				$model->setState('match_id', $this->input->getInt('match_id'));
+				$model->setState('match_id', $this->input->getInt('match_id', 0));
 				$model->setState('section', $this->input->getCmd('section', 'events'));
 			}
 

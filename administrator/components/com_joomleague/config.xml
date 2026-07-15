@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<config>
-	<fields name="params" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
+<config addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 		<fieldset name="dashboard" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_DASHBOARD">
 			<field
 				name="dashboard_club_id"
@@ -98,21 +97,6 @@
 			/>
 		</fieldset>
 
-		<fieldset name="templates" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_TEMPLATES">
-			<field
-				name="enable_template_inheritance"
-				type="radio"
-				layout="joomla.form.field.radio.switcher"
-				label="COM_JOOMLEAGUE_CONFIG_TEMPLATE_INHERITANCE_LABEL"
-				description="COM_JOOMLEAGUE_CONFIG_TEMPLATE_INHERITANCE_DESC"
-				default="1"
-				filter="integer"
-			>
-				<option value="0">JNO</option>
-				<option value="1">JYES</option>
-			</field>
-		</fieldset>
-
 		<fieldset name="sports_bootstrap" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_SPORTS_BOOTSTRAP">
 			<field
 				name="sports_bootstrap_profile"
@@ -181,6 +165,153 @@
 				default="images/com_joomleague"
 				filter="path"
 			/>
+			<field
+				name="placeholders_note"
+				type="note"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDERS_NOTE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDERS_NOTE_DESC"
+				hr="true"
+			/>
+			<field
+				name="placeholder_club_logo"
+				type="media"
+				directory="com_joomleague/placeholders"
+				preview="tooltip"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_CLUB_LOGO_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_CLUB_LOGO_DESC"
+				default="images/com_joomleague/database/placeholders/placeholder_club_logo.svg"
+			/>
+			<field
+				name="placeholder_person_picture"
+				type="media"
+				directory="com_joomleague/placeholders"
+				preview="tooltip"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PERSON_PICTURE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PERSON_PICTURE_DESC"
+				default="images/com_joomleague/database/placeholders/placeholder_person.svg"
+			/>
+			<field
+				name="placeholder_playground_picture"
+				type="media"
+				directory="com_joomleague/placeholders"
+				preview="tooltip"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PLAYGROUND_PICTURE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PLAYGROUND_PICTURE_DESC"
+				default="images/com_joomleague/database/placeholders/placeholder_playground.svg"
+			/>
+			<field
+				name="placeholder_team_picture"
+				type="media"
+				directory="com_joomleague/placeholders"
+				preview="tooltip"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PICTURE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PICTURE_DESC"
+				default="images/com_joomleague/database/placeholders/placeholder_team.svg"
+			/>
+			<field
+				name="placeholder_division_picture"
+				type="media"
+				directory="com_joomleague/placeholders"
+				preview="tooltip"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_DIVISION_PICTURE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_DIVISION_PICTURE_DESC"
+				default="images/com_joomleague/database/placeholders/placeholder_division.svg"
+			/>
+			<field
+				name="placeholder_project_picture"
+				type="media"
+				directory="com_joomleague/placeholders"
+				preview="tooltip"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PROJECT_PICTURE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PROJECT_PICTURE_DESC"
+				default="images/com_joomleague/database/placeholders/placeholder_project.svg"
+			/>
+			<field
+				name="placeholder_project_referee_picture"
+				type="media"
+				directory="com_joomleague/placeholders"
+				preview="tooltip"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PROJECT_REFEREE_PICTURE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PROJECT_REFEREE_PICTURE_DESC"
+				default="images/com_joomleague/database/placeholders/placeholder_project_referee.svg"
+			/>
+			<field
+				name="placeholder_project_team_picture"
+				type="media"
+				directory="com_joomleague/placeholders"
+				preview="tooltip"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PROJECT_TEAM_PICTURE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PROJECT_TEAM_PICTURE_DESC"
+				default="images/com_joomleague/database/placeholders/placeholder_project_team.svg"
+			/>
+			<field
+				name="placeholder_team_player_picture"
+				type="media"
+				directory="com_joomleague/placeholders"
+				preview="tooltip"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PLAYER_PICTURE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PLAYER_PICTURE_DESC"
+				default="images/com_joomleague/database/placeholders/placeholder_team_player.svg"
+			/>
+			<field
+				name="placeholder_team_staff_picture"
+				type="media"
+				directory="com_joomleague/placeholders"
+				preview="tooltip"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_STAFF_PICTURE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_STAFF_PICTURE_DESC"
+				default="images/com_joomleague/database/placeholders/placeholder_team_staff.svg"
+			/>
+			<field
+				name="placeholder_treeto_trophypic"
+				type="media"
+				directory="com_joomleague/placeholders"
+				preview="tooltip"
+				label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TREETO_TROPHYPIC_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TREETO_TROPHYPIC_DESC"
+				default="images/com_joomleague/database/placeholders/placeholder_trophy.svg"
+			/>
+		</fieldset>
+		<fieldset name="maps" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_MAPS">
+			<field
+				name="map_provider"
+				type="list"
+				label="COM_JOOMLEAGUE_CONFIG_MAP_PROVIDER_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_MAP_PROVIDER_DESC"
+				default="osm"
+			>
+				<option value="google">COM_JOOMLEAGUE_CONFIG_MAP_PROVIDER_GOOGLE</option>
+				<option value="osm">COM_JOOMLEAGUE_CONFIG_MAP_PROVIDER_OSM</option>
+				<option value="seznam">COM_JOOMLEAGUE_CONFIG_MAP_PROVIDER_SEZNAM</option>
+				<option value="bing">COM_JOOMLEAGUE_CONFIG_MAP_PROVIDER_BING</option>
+				<option value="yandex">COM_JOOMLEAGUE_CONFIG_MAP_PROVIDER_YANDEX</option>
+				<option value="custom">COM_JOOMLEAGUE_CONFIG_MAP_PROVIDER_CUSTOM</option>
+			</field>
+			<field
+				name="map_url_template"
+				type="text"
+				label="COM_JOOMLEAGUE_CONFIG_MAP_URL_TEMPLATE_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_MAP_URL_TEMPLATE_DESC"
+				default=""
+				showon="map_provider:custom"
+			/>
+			<field
+				name="map_zoom"
+				type="list"
+				label="COM_JOOMLEAGUE_CONFIG_MAP_ZOOM_LABEL"
+				description="COM_JOOMLEAGUE_CONFIG_MAP_ZOOM_DESC"
+				default="16"
+				filter="integer"
+			>
+				<option value="12">12</option>
+				<option value="13">13</option>
+				<option value="14">14</option>
+				<option value="15">15</option>
+				<option value="16">16</option>
+				<option value="17">17</option>
+				<option value="18">18</option>
+				<option value="19">19</option>
+			</field>
 		</fieldset>
 		<fieldset name="telemetry" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_TELEMETRY">
 			<field
@@ -202,5 +333,4 @@
 				<option value="never">COM_JOOMLEAGUE_CONFIG_TELEMETRY_NEVER</option>
 			</field>
 		</fieldset>
-	</fields>
 </config>

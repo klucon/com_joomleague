@@ -19,8 +19,11 @@ $user = Factory::getApplication()->getIdentity();
 $game = $this->predictionGame;
 $canTip = (int) $user->id > 0;
 $selectedRoundId = (int) Factory::getApplication()->getInput()->getInt('round_id');
+$params = $this->templateParams;
+$showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
 ?>
 <div class="com-joomleague-site">
+	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo $this->project ? $this->escape($this->project->name) : ''; ?></div>
 		<h1 class="jl-site-title"><?php echo $game ? $this->escape($game->name) : Text::_('COM_JOOMLEAGUE_SITE_PREDICTION'); ?></h1>
@@ -32,6 +35,7 @@ $selectedRoundId = (int) Factory::getApplication()->getInput()->getInt('round_id
 			</nav>
 		<?php endif; ?>
 	</section>
+	<?php endif; ?>
 
 	<?php if (!$game) : ?>
 		<div class="alert alert-info"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PREDICTION_NOT_FOUND'); ?></div>

@@ -14,19 +14,27 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
 $team = $this->item;
+
+$params = $this->templateParams;
+$showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
+$showTeamLink = (bool) ($params['show_team_link'] ?? true);
+$showTeamstatsLink = (bool) ($params['show_teamstats_link'] ?? true);
+$showPlanLink = (bool) ($params['show_plan_link'] ?? true);
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$team) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_NOT_FOUND'); ?></div><?php return; endif; ?>
+	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo $this->escape($team->club_name ?? ''); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RIVALS'); ?></h1>
 		<p class="jl-site-muted mb-3"><?php echo $this->escape($team->team_name); ?></p>
 		<nav class="jl-site-nav">
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM'); ?></a>
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=teamstats&projectteam_id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_STATS'); ?></a>
-			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=schedule&project_id=' . (int) $team->project_id . '&projectteam_id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE'); ?></a>
+			<?php if ($showTeamLink) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM'); ?></a><?php endif; ?>
+			<?php if ($showTeamstatsLink) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=teamstats&projectteam_id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_STATS'); ?></a><?php endif; ?>
+			<?php if ($showPlanLink) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=schedule&project_id=' . (int) $team->project_id . '&projectteam_id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE'); ?></a><?php endif; ?>
 		</nav>
 	</section>
+	<?php endif; ?>
 
 	<div class="jl-site-panel table-responsive">
 		<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_RIVALS'); ?></h2>

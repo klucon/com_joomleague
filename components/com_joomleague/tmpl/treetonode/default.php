@@ -18,6 +18,27 @@ $project = $this->project;
 $nodesByLevel = [];
 $maxLevel = 0;
 
+$params = $this->templateParams;
+$showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
+$teamNameLinkMode = (string) ($params['show_teamname_link'] ?? '1');
+$nameTeamType = (string) ($params['name_team_type'] ?? '2');
+
+$teamLink = static function (int $projectteamId) use ($teamNameLinkMode): string {
+	return match ($teamNameLinkMode) {
+		'0' => Route::_('index.php?option=com_joomleague&view=schedule&projectteam_id=' . $projectteamId),
+		'2' => Route::_('index.php?option=com_joomleague&view=teamstats&projectteam_id=' . $projectteamId),
+		default => Route::_('index.php?option=com_joomleague&view=team&id=' . $projectteamId),
+	};
+};
+
+$teamDisplayName = static function (object $node) use ($nameTeamType): string {
+	return match ($nameTeamType) {
+		'0' => (string) ($node->team_short_name ?: $node->team_name ?: $node->team_middle_name),
+		'1' => (string) ($node->team_middle_name ?: $node->team_name ?: $node->team_short_name),
+		default => (string) ($node->team_name ?: $node->team_short_name ?: $node->team_middle_name),
+	};
+};
+
 foreach ($this->treeNodes as $node) {
 	$level = (int) floor(log(max(1, (int) $node->node), 2)) + 1;
 	$nodesByLevel[$level][] = $node;
@@ -32,6 +53,7 @@ ksort($nodesByLevel);
 		<?php return; ?>
 	<?php endif; ?>
 
+	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo $this->escape($tree->project_name ?? ''); ?></div>
 		<h1 class="jl-site-title"><?php echo $this->escape($tree->name ?: Text::_('COM_JOOMLEAGUE_SITE_TREE')); ?></h1>
@@ -46,6 +68,7 @@ ksort($nodesByLevel);
 			<?php endif; ?>
 		</nav>
 	</section>
+	<?php endif; ?>
 
 	<div class="jl-site-grid mb-4">
 		<div class="jl-site-card"><strong><?php echo (int) $tree->tree_i; ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TREE_DEPTH'); ?></span></div>
@@ -85,7 +108,7 @@ ksort($nodesByLevel);
 
 							<div class="jl-site-bracket-team">
 								<?php if ((int) $node->projectteam_id > 0) : ?>
-									<a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $node->projectteam_id); ?>"><?php echo $this->escape($node->team_name ?: $node->team_short_name ?: $node->team_middle_name); ?></a>
+									<a href="<?php echo $teamLink((int) $node->projectteam_id); ?>"><?php echo $this->escape($teamDisplayName($node)); ?></a>
 								<?php else : ?>
 									<span><?php echo $this->escape($node->content ?: Text::_('COM_JOOMLEAGUE_SITE_NOT_SET')); ?></span>
 								<?php endif; ?>

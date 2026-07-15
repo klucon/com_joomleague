@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
@@ -29,16 +30,19 @@ $user = $this->getCurrentUser(); $listOrder = $this->escape($this->state->get('l
 		<th><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_PLAYGROUND_FIELD_NAME_LABEL', 'a.name', $listDirection, $listOrder); ?></th>
 		<th class="d-none d-md-table-cell"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_PLAYGROUND_FIELD_CITY_LABEL', 'a.city', $listDirection, $listOrder); ?></th>
 		<th class="d-none d-lg-table-cell"><?php echo Text::_('COM_JOOMLEAGUE_PLAYGROUND_FIELD_CLUB_LABEL'); ?></th>
+		<th class="w-5 text-center d-none d-md-table-cell"><?php echo Text::_('COM_JOOMLEAGUE_LIST_COORDINATES_LABEL'); ?></th>
 		<th class="w-10 d-none d-md-table-cell"><?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ORDERING', 'a.ordering', $listDirection, $listOrder); ?></th>
 		<th class="w-5 d-none d-md-table-cell"><?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirection, $listOrder); ?></th></tr></thead><tbody>
 	<?php foreach ($this->items as $i => $item) :
 		$canEdit = $user->authorise('core.edit', 'com_joomleague'); $canCheckin = $user->authorise('core.manage', 'com_checkin') || (int) $item->checked_out === (int) $user->id || empty($item->checked_out);
-		$image = HTMLHelper::cleanImageURL((string) $item->picture); $src = $image->url === '' ? '' : Uri::root(true) . '/' . ltrim($image->url, '/');
+		$playgroundPicture = trim((string) $item->picture) !== '' ? (string) $item->picture : (string) ComponentHelper::getParams('com_joomleague')->get('placeholder_playground_picture', '');
+		$image = HTMLHelper::cleanImageURL($playgroundPicture); $src = $image->url === '' ? '' : Uri::root(true) . '/' . ltrim($image->url, '/');
 	?><tr><td class="text-center"><?php echo HTMLHelper::_('grid.id', $i, $item->id, false, 'cid', 'cb', $item->name); ?></td>
 		<td><?php if ($src !== '') : ?><img src="<?php echo $this->escape($src); ?>" alt="" width="40" height="40" loading="lazy" class="rounded object-fit-cover"><?php else : ?><span class="icon-image text-muted" aria-hidden="true"></span><?php endif; ?></td>
 		<th scope="row"><?php if ($item->checked_out) { echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'stadiums.', $canCheckin); } ?>
 		<?php echo \Joomleague\Component\Joomleague\Administrator\Helper\FlagHelper::render($item->country ?? '', false); ?> <?php if ($canEdit) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&task=playground.edit&id=' . (int) $item->id); ?>"><?php echo $this->escape($item->name); ?></a><?php else : echo $this->escape($item->name); endif; ?></th>
 		<td class="d-none d-md-table-cell"><?php echo $this->escape($item->city); ?></td><td class="d-none d-lg-table-cell"><?php echo $this->escape((string) $item->club); ?></td>
+		<td class="text-center d-none d-md-table-cell"><?php if ($item->latitude !== null && $item->longitude !== null) : ?><span class="icon-location text-success" aria-hidden="true" title="<?php echo Text::_('COM_JOOMLEAGUE_LIST_COORDINATES_SET'); ?>"></span><?php else : ?><span class="icon-warning-circle text-muted" aria-hidden="true" title="<?php echo Text::_('COM_JOOMLEAGUE_LIST_COORDINATES_MISSING'); ?>"></span><?php endif; ?></td>
 		<td class="d-none d-md-table-cell"><?php echo (int) $item->ordering; ?></td><td class="d-none d-md-table-cell"><?php echo (int) $item->id; ?></td></tr><?php endforeach; ?>
 	</tbody></table><?php echo $this->pagination->getListFooter(); ?><?php endif; ?><?php echo $this->filterForm->renderControlFields(); ?>
 </div></form>

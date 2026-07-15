@@ -1,1 +1,0 @@
--- Database schema remains unchanged in version 0.8.0.

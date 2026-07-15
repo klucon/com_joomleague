@@ -8,7 +8,7 @@
 	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-150</version>
+	<version>6.1.0-alpha-151</version>
 	<description>PKG_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<changelogurl>https://github.com/klucon/com_joomleague/releases/latest/download/joomleague-changelog.xml</changelogurl>
 	<scriptfile>pkg_script.php</scriptfile>

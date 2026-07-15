@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+	<title id="title">Team staff photo placeholder</title>
+	<rect x="18" y="18" width="220" height="220" rx="28" fill="currentColor" opacity=".06"/>
+	<circle cx="104" cy="76" r="48" fill="currentColor" opacity=".24"/>
+	<path fill="currentColor" opacity=".26" d="M18 238c9-67 41-107 86-107s77 40 86 107z"/>
+	<path fill="currentColor" opacity=".38" d="m68 145 36 50 36-50h-25l-11 18-11-18z"/>
+	<rect x="158" y="62" width="74" height="46" rx="13" fill="currentColor" opacity=".24" transform="rotate(-45 158 62)"/>
+	<rect x="185" y="68" width="16" height="66" rx="8" fill="currentColor" opacity=".36" transform="rotate(-45 185 68)"/>
+</svg>

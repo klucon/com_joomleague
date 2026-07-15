@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
@@ -27,11 +28,12 @@ $assigned = array_values(array_filter($this->options, static fn ($o): bool => (b
 // Pozn.: WebAssetManager (useScript/registerAndUseScript) v tomto view assety neemituje;
 // document API (addScript/addStyleSheet) ano – zapisuje přímo do <head>.
 $doc = $this->getDocument();
-$doc->addStyleSheet(Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.5');
+$doc->addStyleSheet(Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.9');
 $doc->addScript(Uri::root(true) . '/media/com_joomleague/js/duallist.js?v=1.0.6', [], ['defer' => true]);
 
 $projectId = $this->project ? (int) $this->project->id : 0;
 $sectionTitle = Text::_($labels[$this->section]);
+$optionName = fn (object $option): string => $this->section === 'positions' ? Text::_($option->name) : $option->name;
 
 ?>
 <?php if ($projectId < 1) : ?>
@@ -76,7 +78,7 @@ $sectionTitle = Text::_($labels[$this->section]);
 						</label>
 						<select class="form-select" multiple size="14" data-available>
 							<?php foreach ($available as $option) : ?>
-								<option value="<?php echo (int) $option->id; ?>"><?php echo $this->escape($option->name); ?></option>
+								<option value="<?php echo (int) $option->id; ?>"><?php echo $this->escape($optionName($option)); ?></option>
 							<?php endforeach; ?>
 						</select>
 					</div>
@@ -99,7 +101,7 @@ $sectionTitle = Text::_($labels[$this->section]);
 						</label>
 						<select class="form-select" name="assigned[]" multiple size="14" data-assigned>
 							<?php foreach ($assigned as $option) : ?>
-								<option value="<?php echo (int) $option->id; ?>"><?php echo $this->escape($option->name); ?></option>
+								<option value="<?php echo (int) $option->id; ?>"><?php echo $this->escape($optionName($option)); ?></option>
 							<?php endforeach; ?>
 						</select>
 					</div>
@@ -148,11 +150,14 @@ $sectionTitle = Text::_($labels[$this->section]);
 		</table>
 	<?php endif; ?>
 
-	<?php if ($this->section !== 'positions') : ?>
+	<?php if ($this->section !== 'positions') :
+		$assignmentPlaceholderKey = $this->section === 'teams' ? 'project_team_picture' : 'project_referee_picture';
+	?>
 		<table class="table">
 			<thead>
 				<tr>
 					<th><?php echo Text::_('COM_JOOMLEAGUE_ORDERING'); ?></th>
+					<th class="w-5"><?php echo Text::_('COM_JOOMLEAGUE_FIELD_IMAGE'); ?></th>
 					<th><?php echo Text::_('COM_JOOMLEAGUE_FIELD_NAME'); ?></th>
 					<?php if ($this->section === 'teams') : ?>
 						<th><?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAYERS_TITLE'); ?></th>
@@ -163,7 +168,11 @@ $sectionTitle = Text::_($labels[$this->section]);
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ($assigned as $index => $option) : $task = $this->section === 'teams' ? 'projectteam.edit' : 'projectreferee.edit'; ?>
+				<?php foreach ($assigned as $index => $option) : $task = $this->section === 'teams' ? 'projectteam.edit' : 'projectreferee.edit';
+					$assignmentPicture = trim((string) ($option->picture ?? '')) !== '' ? (string) $option->picture : (string) ComponentHelper::getParams('com_joomleague')->get('placeholder_' . $assignmentPlaceholderKey, '');
+					$assignmentImage = HTMLHelper::cleanImageURL($assignmentPicture);
+					$assignmentImageSrc = $assignmentImage->url === '' ? '' : Uri::root(true) . '/' . ltrim($assignmentImage->url, '/');
+				?>
 					<tr>
 						<td>
 							<?php if ($this->section === 'teams') : ?>
@@ -172,6 +181,7 @@ $sectionTitle = Text::_($labels[$this->section]);
 								<?php echo $index + 1; ?>
 							<?php endif; ?>
 						</td>
+						<td><?php if ($assignmentImageSrc !== '') : ?><img src="<?php echo $this->escape($assignmentImageSrc); ?>" alt="" width="32" height="32" loading="lazy" class="rounded object-fit-contain"><?php else : ?><span class="icon-image text-muted" aria-hidden="true"></span><?php endif; ?></td>
 						<td><a href="<?php echo Route::_('index.php?option=com_joomleague&task=' . $task . '&id=' . (int) $option->assignment_id); ?>"><?php echo $this->escape($option->name); ?></a></td>
 						<?php if ($this->section === 'teams') : ?>
 							<td>

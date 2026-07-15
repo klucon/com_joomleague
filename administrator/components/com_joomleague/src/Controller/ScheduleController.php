@@ -33,7 +33,7 @@ final class ScheduleController extends BaseController
 	{
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
-		$projectId = $this->input->getInt('project_id');
+		$projectId = $this->input->getInt('project_id', 0);
 
 		try {
 			if (!$this->app->getIdentity()->authorise('core.edit', 'com_joomleague.project.' . $projectId)) {
@@ -47,7 +47,7 @@ final class ScheduleController extends BaseController
 			if ($this->input->getCmd('mode') === 'empty') {
 				$result = $this->service->createEmptyRounds(
 					$projectId,
-					$this->input->getString('start_date'),
+					$this->input->getString('start_date', ''),
 					$interval,
 					max(1, $this->input->getInt('round_count', 1)),
 					$pattern
@@ -55,11 +55,11 @@ final class ScheduleController extends BaseController
 			} else {
 				$result = $this->service->generateRoundRobin(
 					$projectId,
-					$this->input->getString('start_date'),
-					$this->input->getString('start_time'),
+					$this->input->getString('start_date', ''),
+					$this->input->getString('start_time', ''),
 					$interval,
 					$includeReturnLegs,
-					$this->input->getInt('match_number'),
+					$this->input->getInt('match_number', 0),
 					$pattern,
 					$this->input->getCmd('template_id', ScheduleGeneratorService::ROUND_ROBIN_FIRST_HALF)
 				);

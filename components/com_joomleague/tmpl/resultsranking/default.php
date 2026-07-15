@@ -14,17 +14,27 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
 $project = $this->project;
+
+$params = $this->templateParams;
+$showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
+$showResults = (bool) ($params['show_results'] ?? true);
+$showRanking = (bool) ($params['show_ranking'] ?? true);
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$project) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT_NOT_FOUND'); ?></div><?php return; endif; ?>
+	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo $this->escape($project->name); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULTS_RANKING'); ?></h1>
 	</section>
+	<?php endif; ?>
 
+	<?php if ($showResults) : ?>
 	<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULTS'); ?></h2>
 	<?php require JPATH_COMPONENT . '/tmpl/results/matches_grouped.php'; ?>
+	<?php endif; ?>
 
+	<?php if ($showRanking) : ?>
 	<div class="jl-site-panel table-responsive">
 		<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_RANKING'); ?></h2>
 		<table class="table jl-site-table align-middle">
@@ -59,4 +69,5 @@ $project = $this->project;
 		</table>
 		<?php if (!$this->standings) : ?><div class="alert alert-info"><?php echo Text::_('COM_JOOMLEAGUE_SITE_NO_DATA'); ?></div><?php endif; ?>
 	</div>
+	<?php endif; ?>
 </div>

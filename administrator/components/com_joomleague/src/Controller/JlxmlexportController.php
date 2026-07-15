@@ -27,7 +27,7 @@ final class JlxmlexportController extends BaseController
 			throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
 		}
 
-		$projectId = $this->input->getInt('project_id');
+		$projectId = $this->input->getInt('project_id', 0);
 
 		if ($projectId < 1) {
 			$this->setRedirect(Route::_('index.php?option=com_joomleague&view=jlxmlexports', false), Text::_('COM_JOOMLEAGUE_EXPORT_ERROR_PROJECT'), 'error');

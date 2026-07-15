@@ -29,7 +29,7 @@ final class DivisionModel extends EntityAdminModel
 		$item = $this->getItem();
 
 		if (!$item->project_id) {
-			$item->project_id = $this->application->getInput()->getInt('project_id') ?: $this->application->getUserState('com_joomleague.project_context.project_id');
+			$item->project_id = $this->application->getInput()->getInt('project_id', 0) ?: $this->application->getUserState('com_joomleague.project_context.project_id');
 		}
 
 		return $item;

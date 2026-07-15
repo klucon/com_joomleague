@@ -12,7 +12,7 @@ final class RoundModel extends EntityAdminModel
 {
  protected string $entityName='round';private AdministratorApplication $application;public function setApplication(AdministratorApplication $a):void{$this->application=$a;}
  public function delete(&$pks):bool{$ids=array_map('intval',(array)$pks);$assets=[];if($ids){$db=$this->getDatabase();$assets=$db->setQuery('SELECT asset_id FROM #__joomleague_match WHERE round_id IN ('.implode(',',$ids).') AND asset_id IS NOT NULL')->loadColumn();}if(!parent::delete($pks))return false;if($assets)$this->getDatabase()->setQuery('DELETE FROM #__assets WHERE id IN ('.implode(',',array_map('intval',$assets)).')')->execute();return true;}
- protected function loadFormData():object{$item=$this->getItem();if(!$item->project_id){$input=$this->application->getInput();$projectId=$input->getInt('project_id');if(!$projectId){$pid=$input->get('pid',[],'array');$projectId=(int)($pid[0]??0);}$item->project_id=$projectId?:$this->application->getUserState('com_joomleague.rounds.project_id');}return $item;}
+ protected function loadFormData():object{$item=$this->getItem();if(!$item->project_id){$input=$this->application->getInput();$projectId=$input->getInt('project_id', 0);if(!$projectId){$pid=$input->get('pid',[],'array');$projectId=(int)($pid[0]??0);}$item->project_id=$projectId?:$this->application->getUserState('com_joomleague.rounds.project_id');}return $item;}
  protected function prepareTable($t):void{$t->project_id=(int)$t->project_id;$t->roundcode=(int)$t->roundcode;$t->published=(int)$t->published;$t->name=trim((string)$t->name);$t->round_date_first=trim((string)$t->round_date_first)?:null;$t->round_date_last=trim((string)$t->round_date_last)?:null;parent::prepareTable($t);}
 
 	/**

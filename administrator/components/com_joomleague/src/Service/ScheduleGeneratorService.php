@@ -43,16 +43,22 @@ final class ScheduleGeneratorService
 		string $templateId = self::ROUND_ROBIN_FIRST_HALF
 	): array {
 		$project = $this->getProject($projectId);
-		$this->ensureProjectHasNoRounds($projectId);
+
+		if (!in_array($templateId, [self::ROUND_ROBIN_FIRST_HALF, self::ROUND_ROBIN_SECOND_HALF], true)) {
+			throw new RuntimeException('COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_UNSUPPORTED');
+		}
+
+		// První polovina (a tím i kombinace s odvetami v jednom kroku) předpokládá čistý projekt,
+		// aby nevznikl duplicitní rozpis. Druhou polovinu je naopak potřeba umět dogenerovat
+		// k už existujícím podzimním kolům – proto se pro ni tahle pojistka neuplatní.
+		if ($templateId === self::ROUND_ROBIN_FIRST_HALF) {
+			$this->ensureProjectHasNoRounds($projectId);
+		}
 
 		$teams = $this->getProjectTeamIds($projectId);
 
 		if (count($teams) < 2) {
 			throw new RuntimeException('COM_JOOMLEAGUE_SCHEDULE_NEEDS_TEAMS');
-		}
-
-		if (!in_array($templateId, [self::ROUND_ROBIN_FIRST_HALF, self::ROUND_ROBIN_SECOND_HALF], true)) {
-			throw new RuntimeException('COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_UNSUPPORTED');
 		}
 
 		$templateSchedules = [
@@ -66,7 +72,11 @@ final class ScheduleGeneratorService
 		$timezone = new DateTimeZone($project->timezone ?: 'UTC');
 		$start = new DateTimeImmutable(trim($startDate) . ' ' . trim($startTime), $timezone);
 		$nextMatchNumber = $firstMatchNumber;
-		$roundNumber = 0;
+		// Číslo kola (roundcode/název) navazuje na už existující kola v projektu (stejně jako
+		// createEmptyRounds()), ale datum se počítá od zadaného start_date této dávky – to je
+		// datum startu JARNÍ části, ne datum startu celé sezóny.
+		$roundCodeBase = $this->getMaxRoundCode($projectId);
+		$roundIndex = 0;
 		$matchCount = 0;
 
 		$this->database->transactionStart();
@@ -74,8 +84,9 @@ final class ScheduleGeneratorService
 		try {
 			foreach ($templateSchedules as $templateSchedule) {
 				foreach ($templateSchedule as $templateRound) {
-					$roundNumber++;
-					$roundDate = $start->add(new DateInterval('P' . (($roundNumber - 1) * max(1, $intervalDays)) . 'D'));
+					$roundIndex++;
+					$roundNumber = $roundCodeBase + $roundIndex;
+					$roundDate = $start->add(new DateInterval('P' . (($roundIndex - 1) * max(1, $intervalDays)) . 'D'));
 					$roundId = $this->createRound($projectId, $roundNumber, $roundDate, $roundNamePattern);
 
 					foreach ($templateRound->matches ?? [] as $templateMatch) {
@@ -94,7 +105,7 @@ final class ScheduleGeneratorService
 
 			$this->database->transactionCommit();
 
-			return ['rounds' => $roundNumber, 'matches' => $matchCount];
+			return ['rounds' => $roundIndex, 'matches' => $matchCount];
 		} catch (Throwable $exception) {
 			$this->database->transactionRollback();
 			throw $exception;

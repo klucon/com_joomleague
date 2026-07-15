@@ -9,13 +9,18 @@ declare(strict_types=1);
 \defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+
+$params = $this->templateParams;
+$showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
 ?>
 <div class="com-joomleague-site">
+	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo Text::_('COM_JOOMLEAGUE_SITE_COMPETITIONS'); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECTS_TITLE'); ?></h1>
 		<p class="jl-site-muted mb-0"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECTS_DESC'); ?></p>
 	</section>
+	<?php endif; ?>
 	<div class="jl-site-grid">
 		<?php foreach ($this->items as $item) : ?>
 			<a class="jl-site-card" href="<?php echo Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $item->id); ?>">

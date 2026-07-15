@@ -44,7 +44,7 @@ The package has been **rebuilt from the ground up for Joomla 6**, using a modern
 
 The current public alpha line focuses on production-ready Joomla 6 packaging, multilingual frontend routing and menu-driven publishing.
 
-- Current package version: **6.1.0-alpha-150**
+- Current package version: **6.1.0-alpha-151**
 - Release assets: package ZIP, Joomla update XML and changelog XML
 - Public update channel: GitHub Releases and the registered Joomla update server
 - Supported frontend URL languages: Czech, English and German route segments

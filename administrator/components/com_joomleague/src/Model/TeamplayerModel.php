@@ -30,7 +30,7 @@ final class TeamplayerModel extends EntityAdminModel
 		$item = $this->getItem();
 
 		if ((int) $item->projectteam_id < 1) {
-			$projectteamId = $this->application->getInput()->getInt('projectteam_id');
+			$projectteamId = $this->application->getInput()->getInt('projectteam_id', 0);
 
 			if ($projectteamId > 0) {
 				$this->application->setUserState('com_joomleague.teamplayers.projectteam_id', $projectteamId);

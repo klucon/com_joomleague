@@ -18,6 +18,7 @@ use Joomla\CMS\Extension\ComponentInterface;
 use Joomla\CMS\Extension\Service\Provider\ComponentDispatcherFactory;
 use Joomla\CMS\Extension\Service\Provider\RouterFactory;
 use Joomla\CMS\Form\FormFactoryInterface;
+use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\MVC\Factory\MVCFactory;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
@@ -37,6 +38,11 @@ use Joomleague\Component\Joomleague\Administrator\Service\TemplateConfigBootstra
 
 \JLoader::registerNamespace('Joomleague\\Component\\Joomleague\\Administrator', JPATH_ADMINISTRATOR . '/components/com_joomleague/src');
 \JLoader::registerNamespace('Joomleague\\Component\\Joomleague\\Site', JPATH_SITE . '/components/com_joomleague/src');
+
+// Vlastní form field typy (např. modal_person, modal_match) žijí pod tímto namespace –
+// bez registrace prefixu je FormHelper::loadClass() nikdy nenajde a formulář potichu
+// spadne na obyčejné textové pole (žádná chyba, jen nefunkční výběr).
+FormHelper::addFieldPrefix('Joomleague\\Component\\Joomleague\\Administrator\\Field');
 
 if (!class_exists(JoomleagueComponent::class)) {
 	require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Extension/JoomleagueComponent.php';
@@ -105,7 +111,8 @@ return new class () implements ServiceProviderInterface {
 					$application,
 					$container->get(ScheduleGeneratorService::class),
 					$container->get(ScheduleTemplateService::class),
-					$container->get(SportsBootstrapService::class)
+					$container->get(SportsBootstrapService::class),
+					$container->get(TemplateConfigBootstrapService::class)
 				);
 				$factory->setFormFactory($container->get(FormFactoryInterface::class));
 				$factory->setDispatcher($container->get(DispatcherInterface::class));

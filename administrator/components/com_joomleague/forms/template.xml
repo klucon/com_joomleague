@@ -2,7 +2,7 @@
 <form>
 	<fieldset name="details">
 		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
-		<field name="project_id" type="hidden" required="true" />
+		<field name="project_id" type="hidden" />
 		<field name="template" type="text" label="COM_JOOMLEAGUE_TEMPLATE_FIELD_TEMPLATE" readonly="true" />
 		<field name="func" type="hidden" />
 		<field name="title" type="text" label="COM_JOOMLEAGUE_TEMPLATE_FIELD_TITLE" required="true" maxlength="255" description="COM_JOOMLEAGUE_TEMPLATE_FIELD_TITLE_DESC" />

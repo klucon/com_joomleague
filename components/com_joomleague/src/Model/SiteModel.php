@@ -12,6 +12,7 @@ namespace Joomleague\Component\Joomleague\Site\Model;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
@@ -21,30 +22,51 @@ class SiteModel extends BaseDatabaseModel
 {
 	public function getTemplateParameters(int $projectId, string $template): array
 	{
-		if ($projectId < 1 || !preg_match('/^[a-z0-9_]+$/', $template)) {
+		if (!preg_match('/^[a-z0-9_]+$/', $template)) {
 			return [];
 		}
 
+		if ($projectId > 0) {
+			$projectParams = $this->loadTemplateParams($projectId, $template);
+
+			if ($projectParams !== null) {
+				return $projectParams;
+			}
+		}
+
+		// Bez per-projektového přepsání se použije centrální (globální) nastavení šablony.
+		return $this->loadTemplateParams(null, $template) ?? [];
+	}
+
+	/**
+	 * @return  array<string, mixed>|null
+	 */
+	private function loadTemplateParams(?int $projectId, string $template): ?array
+	{
 		$db = $this->getDatabase();
 		$query = $db->getQuery(true)
 			->select($db->quoteName('params'))
 			->from($db->quoteName('#__joomleague_template_config'))
-			->where($db->quoteName('project_id') . ' = :project_id')
 			->where($db->quoteName('template') . ' = :template')
 			->where($db->quoteName('published') . ' = 1')
 			->order($db->quoteName('id') . ' DESC')
-			->bind(':project_id', $projectId, ParameterType::INTEGER)
 			->bind(':template', $template);
+
+		if ($projectId === null) {
+			$query->where($db->quoteName('project_id') . ' IS NULL');
+		} else {
+			$query->where($db->quoteName('project_id') . ' = :project_id')->bind(':project_id', $projectId, ParameterType::INTEGER);
+		}
 
 		$params = (string) $db->setQuery($query, 0, 1)->loadResult();
 
 		if ($params === '' || !json_validate($params)) {
-			return [];
+			return null;
 		}
 
 		$decoded = json_decode($params, true);
 
-		return is_array($decoded) ? $decoded : [];
+		return is_array($decoded) ? $decoded : null;
 	}
 
 	public function getProject(int $projectId = 0): ?object
@@ -111,8 +133,14 @@ class SiteModel extends BaseDatabaseModel
 				'pt.*',
 				$db->quoteName('t.name', 'team_name'),
 				$db->quoteName('t.short_name', 'team_short_name'),
+				$db->quoteName('t.middle_name', 'team_middle_name'),
 				$db->quoteName('t.picture', 'team_picture'),
+				$db->quoteName('c.id', 'club_id'),
 				$db->quoteName('c.name', 'club_name'),
+				$db->quoteName('c.country', 'club_country'),
+				$db->quoteName('c.logo_small', 'club_logo_small'),
+				$db->quoteName('c.logo_middle', 'club_logo_middle'),
+				$db->quoteName('c.logo_big', 'club_logo_big'),
 				$db->quoteName('d.name', 'division_name'),
 			])
 			->from($db->quoteName('#__joomleague_project_team', 'pt'))
@@ -170,6 +198,9 @@ class SiteModel extends BaseDatabaseModel
 				$db->quoteName('c.id', 'club_id'),
 				$db->quoteName('c.name', 'club_name'),
 				$db->quoteName('c.country', 'club_country'),
+				$db->quoteName('c.logo_small', 'club_logo_small'),
+				$db->quoteName('c.logo_middle', 'club_logo_middle'),
+				$db->quoteName('c.logo_big', 'club_logo_big'),
 				$db->quoteName('pg.id', 'playground_id'),
 				$db->quoteName('pg.name', 'playground_name'),
 			])
@@ -194,8 +225,11 @@ class SiteModel extends BaseDatabaseModel
 				'CONCAT_WS(' . $db->quote(', ') . ', ' . $db->quoteName('p.lastname') . ', ' . $db->quoteName('p.firstname') . ') AS person_name',
 				$db->quoteName('p.firstname'),
 				$db->quoteName('p.lastname'),
+				$db->quoteName('p.nickname'),
+				$db->quoteName('p.birthday'),
+				$db->quoteName('p.deathday'),
 				$db->quoteName('p.country', 'person_country'),
-				$db->quoteName('p.picture', 'person_picture'),
+				'COALESCE(NULLIF(' . $db->quoteName('tp.picture') . ", ''), " . $db->quoteName('p.picture') . ') AS person_picture',
 				$db->quoteName('pos.name', 'position_name'),
 			])
 			->from($db->quoteName('#__joomleague_team_player', 'tp'))
@@ -208,6 +242,112 @@ class SiteModel extends BaseDatabaseModel
 			->order($db->quoteName('tp.jerseynumber') . ' IS NULL ASC, ' . $db->quoteName('tp.jerseynumber') . ' ASC, ' . $db->quoteName('p.lastname') . ' ASC');
 
 		return $db->setQuery($query)->loadObjectList();
+	}
+
+	public function getRosterStaff(int $projectTeamId): array
+	{
+		$db = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select([
+				'ts.*',
+				'CONCAT_WS(' . $db->quote(', ') . ', ' . $db->quoteName('p.lastname') . ', ' . $db->quoteName('p.firstname') . ') AS person_name',
+				$db->quoteName('p.firstname'),
+				$db->quoteName('p.lastname'),
+				$db->quoteName('p.nickname'),
+				$db->quoteName('p.birthday'),
+				$db->quoteName('p.deathday'),
+				$db->quoteName('p.country', 'person_country'),
+				'COALESCE(NULLIF(' . $db->quoteName('ts.picture') . ", ''), " . $db->quoteName('p.picture') . ') AS person_picture',
+				$db->quoteName('pos.name', 'position_name'),
+			])
+			->from($db->quoteName('#__joomleague_team_staff', 'ts'))
+			->join('INNER', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('ts.person_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_project_position', 'pp') . ' ON ' . $db->quoteName('pp.id') . ' = ' . $db->quoteName('ts.project_position_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_position', 'pos') . ' ON ' . $db->quoteName('pos.id') . ' = ' . $db->quoteName('pp.position_id'))
+			->where($db->quoteName('ts.projectteam_id') . ' = :projectteam_id')
+			->where($db->quoteName('ts.published') . ' = 1')
+			->bind(':projectteam_id', $projectTeamId, ParameterType::INTEGER)
+			->order($db->quoteName('ts.ordering') . ' ASC, ' . $db->quoteName('p.lastname') . ' ASC');
+
+		return $db->setQuery($query)->loadObjectList();
+	}
+
+	/**
+	 * Syrová data pro PlayerStatsHelper::aggregate() (klíčováno podle teamplayer_id) – odehrané
+	 * starty/střídání/minuty a statistiky událostí pro CELOU sestavu týmu najednou, ne pro
+	 * jednu osobu. Stejné tři dotazy jako PersonModel::getPlayerCareerData(), jen podle
+	 * projectteam_id místo person_id.
+	 *
+	 * @return array{appearances: object[], subOut: object[], events: object[]}
+	 */
+	public function getRosterPlayerStats(int $projectTeamId): array
+	{
+		if ($projectTeamId < 1) {
+			return ['appearances' => [], 'subOut' => [], 'events' => []];
+		}
+
+		$db = $this->getDatabase();
+
+		$query = $db->getQuery(true)
+			->select([
+				$db->quoteName('mp.match_id'),
+				$db->quoteName('mp.teamplayer_id'),
+				$db->quoteName('mp.came_in'),
+				$db->quoteName('mp.in_out_time'),
+				$db->quoteName('p.game_regular_time'),
+			])
+			->from($db->quoteName('#__joomleague_match_player', 'mp'))
+			->join('INNER', $db->quoteName('#__joomleague_team_player', 'tp') . ' ON ' . $db->quoteName('tp.id') . ' = ' . $db->quoteName('mp.teamplayer_id'))
+			->join('INNER', $db->quoteName('#__joomleague_match', 'm') . ' ON ' . $db->quoteName('m.id') . ' = ' . $db->quoteName('mp.match_id'))
+			->join('INNER', $db->quoteName('#__joomleague_round', 'r') . ' ON ' . $db->quoteName('r.id') . ' = ' . $db->quoteName('m.round_id'))
+			->join('INNER', $db->quoteName('#__joomleague_project', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('r.project_id'))
+			->where($db->quoteName('tp.projectteam_id') . ' = :projectteam_id')
+			->where($db->quoteName('m.published') . ' = 1')
+			->bind(':projectteam_id', $projectTeamId, ParameterType::INTEGER);
+
+		$appearances = $db->setQuery($query)->loadObjectList();
+
+		if ($appearances === []) {
+			return ['appearances' => [], 'subOut' => [], 'events' => []];
+		}
+
+		$query = $db->getQuery(true)
+			->select([
+				$db->quoteName('mp2.match_id'),
+				$db->quoteName('mp2.in_for', 'teamplayer_id'),
+				$db->quoteName('mp2.in_out_time'),
+			])
+			->from($db->quoteName('#__joomleague_match_player', 'mp2'))
+			->where($db->quoteName('mp2.came_in') . ' = 1')
+			->where(
+				$db->quoteName('mp2.in_for') . ' IN (SELECT ' . $db->quoteName('id')
+				. ' FROM ' . $db->quoteName('#__joomleague_team_player')
+				. ' WHERE ' . $db->quoteName('projectteam_id') . ' = :projectteam_id2)'
+			)
+			->bind(':projectteam_id2', $projectTeamId, ParameterType::INTEGER);
+
+		$subOut = $db->setQuery($query)->loadObjectList();
+
+		$query = $db->getQuery(true)
+			->select([
+				$db->quoteName('me.match_id'),
+				$db->quoteName('me.teamplayer_id'),
+				$db->quoteName('me.event_type_id'),
+				$db->quoteName('me.event_time'),
+				$db->quoteName('me.event_sum'),
+				$db->quoteName('et.name', 'event_name'),
+				$db->quoteName('et.icon', 'event_icon'),
+				$db->quoteName('et.suspension'),
+			])
+			->from($db->quoteName('#__joomleague_match_event', 'me'))
+			->join('INNER', $db->quoteName('#__joomleague_team_player', 'tp3') . ' ON ' . $db->quoteName('tp3.id') . ' = ' . $db->quoteName('me.teamplayer_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_eventtype', 'et') . ' ON ' . $db->quoteName('et.id') . ' = ' . $db->quoteName('me.event_type_id'))
+			->where($db->quoteName('tp3.projectteam_id') . ' = :projectteam_id3')
+			->bind(':projectteam_id3', $projectTeamId, ParameterType::INTEGER);
+
+		$events = $db->setQuery($query)->loadObjectList();
+
+		return ['appearances' => $appearances, 'subOut' => $subOut, 'events' => $events];
 	}
 
 	public function getTeamSeasons(int $teamId, int $currentProjectTeamId = 0): array
@@ -642,6 +782,8 @@ class SiteModel extends BaseDatabaseModel
 				'm.*',
 				$db->quoteName('r.name', 'round_name'),
 				$db->quoteName('r.roundcode'),
+				$db->quoteName('r.round_date_first'),
+				$db->quoteName('r.round_date_last'),
 				$db->quoteName('p.name', 'project_name'),
 				$db->quoteName('l.name', 'league_name'),
 				$db->quoteName('s.name', 'season_name'),
@@ -649,7 +791,26 @@ class SiteModel extends BaseDatabaseModel
 				$db->quoteName('away.id', 'away_projectteam_id'),
 				$db->quoteName('ht.name', 'home_name'),
 				$db->quoteName('at.name', 'away_name'),
+				$db->quoteName('ht.short_name', 'home_team_short_name'),
+				$db->quoteName('at.short_name', 'away_team_short_name'),
+				$db->quoteName('ht.middle_name', 'home_team_middle_name'),
+				$db->quoteName('at.middle_name', 'away_team_middle_name'),
 				$db->quoteName('hp.name', 'playground_name'),
+				$db->quoteName('home.division_id'),
+				$db->quoteName('hd.name', 'division_name'),
+				$db->quoteName('hd.shortname', 'division_short_name'),
+				$db->quoteName('home.standard_playground', 'home_standard_playground'),
+				$db->quoteName('hc.standard_playground', 'home_club_standard_playground'),
+				$db->quoteName('hc.id', 'home_club_id'),
+				$db->quoteName('hc.country', 'home_club_country'),
+				$db->quoteName('hc.logo_small', 'home_club_logo_small'),
+				$db->quoteName('hc.logo_middle', 'home_club_logo_middle'),
+				$db->quoteName('hc.logo_big', 'home_club_logo_big'),
+				$db->quoteName('ac.id', 'away_club_id'),
+				$db->quoteName('ac.country', 'away_club_country'),
+				$db->quoteName('ac.logo_small', 'away_club_logo_small'),
+				$db->quoteName('ac.logo_middle', 'away_club_logo_middle'),
+				$db->quoteName('ac.logo_big', 'away_club_logo_big'),
 			])
 			->from($db->quoteName('#__joomleague_match', 'm'))
 			->join('INNER', $db->quoteName('#__joomleague_round', 'r') . ' ON ' . $db->quoteName('r.id') . ' = ' . $db->quoteName('m.round_id'))
@@ -661,6 +822,9 @@ class SiteModel extends BaseDatabaseModel
 			->join('LEFT', $db->quoteName('#__joomleague_team', 'ht') . ' ON ' . $db->quoteName('ht.id') . ' = ' . $db->quoteName('home.team_id'))
 			->join('LEFT', $db->quoteName('#__joomleague_team', 'at') . ' ON ' . $db->quoteName('at.id') . ' = ' . $db->quoteName('away.team_id'))
 			->join('LEFT', $db->quoteName('#__joomleague_playground', 'hp') . ' ON ' . $db->quoteName('hp.id') . ' = ' . $db->quoteName('m.playground_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_division', 'hd') . ' ON ' . $db->quoteName('hd.id') . ' = ' . $db->quoteName('home.division_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_club', 'hc') . ' ON ' . $db->quoteName('hc.id') . ' = ' . $db->quoteName('ht.club_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_club', 'ac') . ' ON ' . $db->quoteName('ac.id') . ' = ' . $db->quoteName('at.club_id'))
 			->where($db->quoteName('r.project_id') . ' = :project_id')
 			->where($db->quoteName('m.published') . ' = 1')
 			->bind(':project_id', $projectId, ParameterType::INTEGER);
@@ -682,6 +846,187 @@ class SiteModel extends BaseDatabaseModel
 		$query->order($db->quoteName('m.match_date') . ' ASC, ' . $db->quoteName('m.id') . ' ASC');
 
 		return $db->setQuery($query, 0, $limit > 0 ? $limit : 0)->loadObjectList();
+	}
+
+	/**
+	 * @return  array<int, array<int, object>> rozhodčí seskupení podle match_id
+	 */
+	public function getMatchesReferees(array $matchIds): array
+	{
+		$matchIds = array_values(array_unique(array_map('intval', $matchIds)));
+
+		if ($matchIds === []) {
+			return [];
+		}
+
+		$db = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select([
+				$db->quoteName('mr.match_id'),
+				$db->quoteName('pos.name', 'position_name'),
+				'CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . ') AS person_name',
+			])
+			->from($db->quoteName('#__joomleague_match_referee', 'mr'))
+			->join('INNER', $db->quoteName('#__joomleague_project_referee', 'pr') . ' ON ' . $db->quoteName('pr.id') . ' = ' . $db->quoteName('mr.project_referee_id'))
+			->join('INNER', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('pr.person_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_project_position', 'pp') . ' ON ' . $db->quoteName('pp.id') . ' = ' . $db->quoteName('mr.project_position_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_position', 'pos') . ' ON ' . $db->quoteName('pos.id') . ' = ' . $db->quoteName('pp.position_id'))
+			->whereIn($db->quoteName('mr.match_id'), $matchIds)
+			->where($db->quoteName('p.published') . ' = 1')
+			->order($db->quoteName('mr.match_id') . ' ASC, ' . $db->quoteName('mr.ordering') . ' ASC, ' . $db->quoteName('mr.id') . ' ASC');
+
+		$byMatch = [];
+
+		foreach ($db->setQuery($query)->loadObjectList() as $referee) {
+			$byMatch[(int) $referee->match_id][] = $referee;
+		}
+
+		return $byMatch;
+	}
+
+	/**
+	 * @return  array<int, array<int, object>> události seskupené podle match_id
+	 */
+	public function getMatchesEvents(array $matchIds): array
+	{
+		$matchIds = array_values(array_unique(array_map('intval', $matchIds)));
+
+		if ($matchIds === []) {
+			return [];
+		}
+
+		$db = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select([
+				'e.*',
+				$db->quoteName('et.name', 'event_name'),
+				$db->quoteName('et.icon', 'event_icon'),
+				$db->quoteName('t.name', 'team_name'),
+				$db->quoteName('p.id', 'person_id'),
+				'CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . ') AS person_name',
+			])
+			->from($db->quoteName('#__joomleague_match_event', 'e'))
+			->join('LEFT', $db->quoteName('#__joomleague_eventtype', 'et') . ' ON ' . $db->quoteName('et.id') . ' = ' . $db->quoteName('e.event_type_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_project_team', 'pt') . ' ON ' . $db->quoteName('pt.id') . ' = ' . $db->quoteName('e.projectteam_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_team', 't') . ' ON ' . $db->quoteName('t.id') . ' = ' . $db->quoteName('pt.team_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_team_player', 'tp') . ' ON ' . $db->quoteName('tp.id') . ' = ' . $db->quoteName('e.teamplayer_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('tp.person_id'))
+			->whereIn($db->quoteName('e.match_id'), $matchIds)
+			->order($db->quoteName('e.event_time') . ' ASC, ' . $db->quoteName('e.id') . ' ASC');
+
+		$byMatch = [];
+
+		foreach ($db->setQuery($query)->loadObjectList() as $event) {
+			$byMatch[(int) $event->match_id][] = $event;
+		}
+
+		return $byMatch;
+	}
+
+	/**
+	 * @return  array<int, object> nominace hráčů k danému zápasu (sestava + střídání)
+	 */
+	public function getMatchRoster(int $matchId): array
+	{
+		if ($matchId <= 0) {
+			return [];
+		}
+
+		$db = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select([
+				'mp.*',
+				$db->quoteName('tp.projectteam_id'),
+				$db->quoteName('tp.jerseynumber'),
+				$db->quoteName('tp.person_id'),
+				$db->quoteName('tp.picture', 'person_teampicture'),
+				$db->quoteName('p.firstname'),
+				$db->quoteName('p.lastname'),
+				$db->quoteName('p.nickname'),
+				$db->quoteName('p.country', 'person_country'),
+				$db->quoteName('p.picture', 'person_picture'),
+				'CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . ') AS person_name',
+				$db->quoteName('pos.name', 'position_name'),
+			])
+			->from($db->quoteName('#__joomleague_match_player', 'mp'))
+			->join('INNER', $db->quoteName('#__joomleague_team_player', 'tp') . ' ON ' . $db->quoteName('tp.id') . ' = ' . $db->quoteName('mp.teamplayer_id'))
+			->join('INNER', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('tp.person_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_project_position', 'pp') . ' ON ' . $db->quoteName('pp.id') . ' = ' . $db->quoteName('mp.project_position_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_position', 'pos') . ' ON ' . $db->quoteName('pos.id') . ' = ' . $db->quoteName('pp.position_id'))
+			->where($db->quoteName('mp.match_id') . ' = :match_id')
+			->bind(':match_id', $matchId, ParameterType::INTEGER)
+			->order($db->quoteName('mp.came_in') . ' ASC, ' . $db->quoteName('mp.ordering') . ' ASC, ' . $db->quoteName('mp.id') . ' ASC');
+
+		return $db->setQuery($query)->loadObjectList();
+	}
+
+	/**
+	 * @return  array<int, object> realizační tým nominovaný k danému zápasu
+	 */
+	public function getMatchStaffList(int $matchId): array
+	{
+		if ($matchId <= 0) {
+			return [];
+		}
+
+		$db = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select([
+				'ms.*',
+				$db->quoteName('ts.projectteam_id'),
+				$db->quoteName('ts.person_id'),
+				$db->quoteName('ts.picture', 'person_teampicture'),
+				$db->quoteName('p.firstname'),
+				$db->quoteName('p.lastname'),
+				$db->quoteName('p.nickname'),
+				$db->quoteName('p.country', 'person_country'),
+				$db->quoteName('p.picture', 'person_picture'),
+				'CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . ') AS person_name',
+				$db->quoteName('pos.name', 'position_name'),
+			])
+			->from($db->quoteName('#__joomleague_match_staff', 'ms'))
+			->join('INNER', $db->quoteName('#__joomleague_team_staff', 'ts') . ' ON ' . $db->quoteName('ts.id') . ' = ' . $db->quoteName('ms.team_staff_id'))
+			->join('INNER', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('ts.person_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_project_position', 'pp') . ' ON ' . $db->quoteName('pp.id') . ' = ' . $db->quoteName('ms.project_position_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_position', 'pos') . ' ON ' . $db->quoteName('pos.id') . ' = ' . $db->quoteName('pp.position_id'))
+			->where($db->quoteName('ms.match_id') . ' = :match_id')
+			->bind(':match_id', $matchId, ParameterType::INTEGER)
+			->order($db->quoteName('ms.ordering') . ' ASC, ' . $db->quoteName('ms.id') . ' ASC');
+
+		return $db->setQuery($query)->loadObjectList();
+	}
+
+	/**
+	 * @return  array<int, object> statistiky hráčů k danému zápasu
+	 */
+	public function getMatchPlayerStatistics(int $matchId): array
+	{
+		if ($matchId <= 0) {
+			return [];
+		}
+
+		$db = $this->getDatabase();
+		$query = $db->getQuery(true)
+			->select([
+				'mst.*',
+				$db->quoteName('st.name', 'statistic_name'),
+				$db->quoteName('st.short', 'statistic_short'),
+				$db->quoteName('st.icon', 'statistic_icon'),
+				$db->quoteName('tp.jerseynumber'),
+				$db->quoteName('p.firstname'),
+				$db->quoteName('p.lastname'),
+				'CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . ') AS person_name',
+			])
+			->from($db->quoteName('#__joomleague_match_statistic', 'mst'))
+			->join('LEFT', $db->quoteName('#__joomleague_statistic', 'st') . ' ON ' . $db->quoteName('st.id') . ' = ' . $db->quoteName('mst.statistic_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_team_player', 'tp') . ' ON ' . $db->quoteName('tp.id') . ' = ' . $db->quoteName('mst.teamplayer_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('tp.person_id'))
+			->where($db->quoteName('mst.match_id') . ' = :match_id')
+			->where($db->quoteName('mst.value') . ' != 0')
+			->bind(':match_id', $matchId, ParameterType::INTEGER)
+			->order($db->quoteName('mst.projectteam_id') . ' ASC, ' . $db->quoteName('tp.jerseynumber') . ' ASC, ' . $db->quoteName('st.ordering') . ' ASC');
+
+		return $db->setQuery($query)->loadObjectList();
 	}
 
 	public function getClubMatches(int $clubId, int $projectId = 0, int $limit = 0, bool $upcomingOnly = false): array
@@ -845,7 +1190,25 @@ class SiteModel extends BaseDatabaseModel
 				$db->quoteName('away.id', 'away_projectteam_id'),
 				$db->quoteName('ht.name', 'home_name'),
 				$db->quoteName('at.name', 'away_name'),
+				$db->quoteName('ht.short_name', 'home_team_short_name'),
+				$db->quoteName('at.short_name', 'away_team_short_name'),
+				$db->quoteName('ht.middle_name', 'home_team_middle_name'),
+				$db->quoteName('at.middle_name', 'away_team_middle_name'),
+				$db->quoteName('ht.picture', 'home_team_picture'),
+				$db->quoteName('at.picture', 'away_team_picture'),
+				$db->quoteName('home.picture', 'home_projectteam_picture'),
+				$db->quoteName('away.picture', 'away_projectteam_picture'),
 				$db->quoteName('hp.name', 'playground_name'),
+				$db->quoteName('hc.id', 'home_club_id'),
+				$db->quoteName('hc.country', 'home_club_country'),
+				$db->quoteName('hc.logo_small', 'home_club_logo_small'),
+				$db->quoteName('hc.logo_middle', 'home_club_logo_middle'),
+				$db->quoteName('hc.logo_big', 'home_club_logo_big'),
+				$db->quoteName('ac.id', 'away_club_id'),
+				$db->quoteName('ac.country', 'away_club_country'),
+				$db->quoteName('ac.logo_small', 'away_club_logo_small'),
+				$db->quoteName('ac.logo_middle', 'away_club_logo_middle'),
+				$db->quoteName('ac.logo_big', 'away_club_logo_big'),
 			])
 			->from($db->quoteName('#__joomleague_match', 'm'))
 			->join('INNER', $db->quoteName('#__joomleague_round', 'r') . ' ON ' . $db->quoteName('r.id') . ' = ' . $db->quoteName('m.round_id'))
@@ -858,6 +1221,8 @@ class SiteModel extends BaseDatabaseModel
 			->join('LEFT', $db->quoteName('#__joomleague_team', 'ht') . ' ON ' . $db->quoteName('ht.id') . ' = ' . $db->quoteName('home.team_id'))
 			->join('LEFT', $db->quoteName('#__joomleague_team', 'at') . ' ON ' . $db->quoteName('at.id') . ' = ' . $db->quoteName('away.team_id'))
 			->join('LEFT', $db->quoteName('#__joomleague_playground', 'hp') . ' ON ' . $db->quoteName('hp.id') . ' = ' . $db->quoteName('m.playground_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_club', 'hc') . ' ON ' . $db->quoteName('hc.id') . ' = ' . $db->quoteName('ht.club_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_club', 'ac') . ' ON ' . $db->quoteName('ac.id') . ' = ' . $db->quoteName('at.club_id'))
 			->whereIn($db->quoteName('m.id'), $ids);
 
 		return $db->setQuery($query)->loadObjectList();
@@ -955,21 +1320,136 @@ class SiteModel extends BaseDatabaseModel
 			return [];
 		}
 
-		$ranks = [];
+		$totals = [];
 
 		foreach ($this->getStandings($projectId) as $index => $team) {
-			$ranks[(int) $team->projectteam_id] = $index + 1;
+			$totals[(int) $team->projectteam_id] = ['rank' => $index + 1, 'row' => $team];
 		}
 
+		$homeSplit = [];
+
+		foreach ($this->getStandings($projectId, 'home') as $team) {
+			$homeSplit[(int) $team->projectteam_id] = $team;
+		}
+
+		$awaySplit = [];
+
+		foreach ($this->getStandings($projectId, 'away') as $team) {
+			$awaySplit[(int) $team->projectteam_id] = $team;
+		}
+
+		$buildSide = function (int $projectTeamId) use ($projectId, $totals, $homeSplit, $awaySplit): array {
+			$total = $totals[$projectTeamId]['row'] ?? null;
+			$home = $homeSplit[$projectTeamId] ?? null;
+			$away = $awaySplit[$projectTeamId] ?? null;
+			$stats = $this->getTeamStatsSummary($projectTeamId);
+
+			return [
+				'rank' => $totals[$projectTeamId]['rank'] ?? null,
+				'stats' => $stats,
+				'points' => $total !== null ? (int) $total->points : null,
+				'home_split' => $home !== null ? ['won' => (int) $home->won, 'drawn' => (int) $home->drawn, 'lost' => (int) $home->lost] : null,
+				'away_split' => $away !== null ? ['won' => (int) $away->won, 'drawn' => (int) $away->drawn, 'lost' => (int) $away->lost] : null,
+				'records' => $this->getTeamMatchRecords($projectId, $projectTeamId),
+			];
+		};
+
+		$home = $buildSide($homeId);
+		$away = $buildSide($awayId);
+
+		$chances = $this->getMatchChances($home['stats'], $away['stats']);
+
 		return [
-			'home' => [
-				'rank' => $ranks[$homeId] ?? null,
-				'stats' => $this->getTeamStatsSummary($homeId),
-			],
-			'away' => [
-				'rank' => $ranks[$awayId] ?? null,
-				'stats' => $this->getTeamStatsSummary($awayId),
-			],
+			'home' => $home + ['chance' => $chances[0] ?? null],
+			'away' => $away + ['chance' => $chances[1] ?? null],
+		];
+	}
+
+	/**
+	 * Nejvyšší domácí/venkovní výhra a prohra tohoto týmu v rámci daného projektu (soutěže) –
+	 * ne napříč celou historií klubu. Ověřeno 1:1 podle JoomLeague 3
+	 * (models/nextmatch.php::_getHighestHomeWin()/_getHighestHomeDef()/_getHighestAwayWin()/_getHighestAwayDef()),
+	 * jen počítáno v PHP nad už načtenými zápasy místo 4 samostatných SQL dotazů.
+	 *
+	 * @return array{highest_home_win: object|null, highest_home_loss: object|null, highest_away_win: object|null, highest_away_loss: object|null}
+	 */
+	public function getTeamMatchRecords(int $projectId, int $projectTeamId): array
+	{
+		$records = [
+			'highest_home_win' => null,
+			'highest_home_loss' => null,
+			'highest_away_win' => null,
+			'highest_away_loss' => null,
+		];
+
+		if ($projectId < 1 || $projectTeamId < 1) {
+			return $records;
+		}
+
+		$bestMagnitude = ['highest_home_win' => 0.0, 'highest_home_loss' => 0.0, 'highest_away_win' => 0.0, 'highest_away_loss' => 0.0];
+
+		foreach ($this->getMatches($projectId, 0, $projectTeamId) as $candidate) {
+			if ($candidate->team1_result === null || $candidate->team2_result === null || (int) ($candidate->count_result ?? 1) !== 1) {
+				continue;
+			}
+
+			$isHome = (int) $candidate->projectteam1_id === $projectTeamId;
+			$goalsFor = (float) ($isHome ? $candidate->team1_result : $candidate->team2_result);
+			$goalsAgainst = (float) ($isHome ? $candidate->team2_result : $candidate->team1_result);
+			$diff = $goalsFor - $goalsAgainst;
+
+			if ($diff === 0.0) {
+				continue;
+			}
+
+			$key = $isHome
+				? ($diff > 0 ? 'highest_home_win' : 'highest_home_loss')
+				: ($diff > 0 ? 'highest_away_win' : 'highest_away_loss');
+
+			if (abs($diff) > $bestMagnitude[$key]) {
+				$bestMagnitude[$key] = abs($diff);
+				$records[$key] = $candidate;
+			}
+		}
+
+		return $records;
+	}
+
+	/**
+	 * Procentuální "šance na výhru" obou týmů z celkových statistik v tomto projektu (ne home/away
+	 * specifických) – ověřeno 1:1 podle JoomLeague 3 (models/nextmatch.php::getChances()): kombinace
+	 * podílu výher/proher a podílu vstřelených/obdržených branek na zápas, zprůměrováno.
+	 *
+	 * @return array{0: string, 1: string}|array{}
+	 */
+	private function getMatchChances(array $homeStats, array $awayStats): array
+	{
+		$homePlayed = (int) ($homeStats['played'] ?? 0);
+		$awayPlayed = (int) ($awayStats['played'] ?? 0);
+
+		if ($homePlayed < 1 || $awayPlayed < 1) {
+			return [];
+		}
+
+		$ax = (100 * $homeStats['wins'] / $homePlayed) + (100 * $awayStats['losses'] / $awayPlayed);
+		$bx = (100 * $awayStats['wins'] / $awayPlayed) + (100 * $homeStats['losses'] / $homePlayed);
+		$cx = ($homeStats['goals_for'] / $homePlayed) + ($awayStats['goals_against'] / $awayPlayed);
+		$dx = ($awayStats['goals_for'] / $awayPlayed) + ($homeStats['goals_against'] / $homePlayed);
+		$ex = $ax + $bx;
+		$fx = $cx + $dx;
+
+		if ($ex <= 0 || $fx <= 0) {
+			return [];
+		}
+
+		$ax = round(10000 * $ax / $ex);
+		$bx = round(10000 * $bx / $ex);
+		$cx = round(10000 * $cx / $fx);
+		$dx = round(10000 * $dx / $fx);
+
+		return [
+			number_format(($ax + $cx) / 200, 2),
+			number_format(($bx + $dx) / 200, 2),
 		];
 	}
 
@@ -1186,6 +1666,7 @@ class SiteModel extends BaseDatabaseModel
 				$db->quoteName('et.name', 'event_name'),
 				$db->quoteName('et.icon', 'event_icon'),
 				$db->quoteName('t.name', 'team_name'),
+				$db->quoteName('p.id', 'person_id'),
 				'CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . ') AS person_name',
 			])
 			->from($db->quoteName('#__joomleague_match_event', 'e'))
@@ -1525,25 +2006,122 @@ class SiteModel extends BaseDatabaseModel
 		return $db->setQuery($query)->loadObjectList();
 	}
 
-	public function getStandings(int $projectId, string $scope = 'total'): array
+	public function getStandings(int $projectId, string $scope = 'total', ?string $rankingOrder = null, int $divisionId = 0, int $asOfRoundId = 0): array
 	{
 		$scope = in_array($scope, ['total', 'home', 'away'], true) ? $scope : 'total';
+		$cacheKey = implode('_', ['standings', $projectId, $scope, $divisionId, $asOfRoundId, md5((string) $rankingOrder)]);
+
+		try {
+			$cache = Factory::getContainer()->get(CacheControllerFactoryInterface::class)
+				->createCacheController('callback', ['defaultgroup' => 'com_joomleague', 'caching' => true, 'lifetime' => 5]);
+
+			return $cache->get(
+				fn (): array => $this->computeStandings($projectId, $scope, $rankingOrder, $divisionId, $asOfRoundId),
+				[],
+				$cacheKey,
+				false
+			);
+		} catch (\Exception) {
+			// Cache je jen optimalizace – při jakémkoliv problému s cache vrstvou počítáme normálně.
+			return $this->computeStandings($projectId, $scope, $rankingOrder, $divisionId, $asOfRoundId);
+		}
+	}
+
+	/**
+	 * Chronologicky seřazený seznam kol, ve kterých padl alespoň jeden výsledek (jen zápasy
+	 * týmů z dané divize, pokud je zadaná) – podklad pro historickou navigaci "tabulka po kole X".
+	 *
+	 * @return  array<int, array{id: int, name: string, date: string}>
+	 */
+	public function getStandingsRounds(int $projectId, int $divisionId = 0): array
+	{
+		$teamIds = [];
+
+		foreach ($this->getProjectTeams($projectId, $divisionId) as $team) {
+			$teamIds[(int) $team->id] = true;
+		}
+
+		$rounds = [];
+
+		foreach ($this->getMatches($projectId) as $match) {
+			if ($match->team1_result === null || $match->team2_result === null || (int) $match->count_result !== 1) {
+				continue;
+			}
+
+			$homeId = (int) $match->projectteam1_id;
+			$awayId = (int) $match->projectteam2_id;
+
+			if (!isset($teamIds[$homeId], $teamIds[$awayId])) {
+				continue;
+			}
+
+			$roundId = (int) ($match->round_id ?? 0);
+			$date = (string) ($match->match_date ?? '');
+
+			if ($roundId < 1 || $date === '') {
+				continue;
+			}
+
+			if (!isset($rounds[$roundId]) || $date > $rounds[$roundId]['date']) {
+				$rounds[$roundId] = [
+					'id' => $roundId,
+					'name' => (string) ($match->round_name ?? ''),
+					'date' => $date,
+					'roundcode' => (int) ($match->roundcode ?? 0),
+				];
+			}
+		}
+
+		$list = array_values($rounds);
+
+		// round.ordering je v reálných datech vždy 0 a číslo v názvu kola ("1. kolo")
+		// neodpovídá skutečnému pořadí sezóny (kolo pojmenované "1. kolo" může být
+		// odehráno jako poslední, viz odložené zápasy). round.roundcode je pole, které
+		// admin sám vyplňuje jako pořadové číslo kola v sezóně (ověřeno na reálných
+		// datech - odpovídá 1:1 chronologickému pořadí i adminem zobrazenému "Číslo
+		// kola"), takže je jediným spolehlivým klíčem pro řazení. Pokud by admin
+		// roundcode nevyplnil (všechny 0), spadneme zpět na datum odehrání.
+		$allZero = true;
+
+		foreach ($list as $round) {
+			if ($round['roundcode'] !== 0) {
+				$allZero = false;
+
+				break;
+			}
+		}
+
+		if ($allZero) {
+			usort($list, static fn (array $a, array $b): int => $a['date'] <=> $b['date']);
+		} else {
+			usort($list, static fn (array $a, array $b): int => $a['roundcode'] <=> $b['roundcode']);
+		}
+
+		return $list;
+	}
+
+	/**
+	 * @return  array<int, object>
+	 */
+	private function computeStandings(int $projectId, string $scope, ?string $rankingOrder, int $divisionId, int $asOfRoundId = 0): array
+	{
+		$project = $this->getProject($projectId);
+
+		$pointsRegular = $this->parsePointsTriple((string) ($project->points_after_regular_time ?? ''), [3, 1, 0]);
+		$allowAddTime = (int) ($project->allow_add_time ?? 0) === 1;
+		$pointsAddTime = $allowAddTime ? $this->parsePointsTriple((string) ($project->points_after_add_time ?? ''), $pointsRegular) : $pointsRegular;
+		$pointsPenalty = $allowAddTime ? $this->parsePointsTriple((string) ($project->points_after_penalty ?? ''), $pointsRegular) : $pointsRegular;
+
 		$teams = [];
 
-		foreach ($this->getProjectTeams($projectId) as $team) {
-			$teams[(int) $team->id] = (object) [
-				'projectteam_id' => (int) $team->id,
-				'team_name' => $team->team_name,
-				'played' => 0,
-				'won' => 0,
-				'drawn' => 0,
-				'lost' => 0,
-				'goals_for' => 0.0,
-				'goals_against' => 0.0,
-				'goal_diff' => 0.0,
-				'points' => (int) ($team->start_points ?? 0),
-			];
+		foreach ($this->getProjectTeams($projectId, $divisionId) as $team) {
+			$teams[(int) $team->id] = $this->newStandingsRow($team);
 		}
+
+		$playedMatches = [];
+		// "Poslední kolo" se určuje podle data zápasu, ne podle round.ordering – to pole
+		// v reálných datech často zůstává 0 u všech kol a jako klíč k řazení je nespolehlivé.
+		$roundLatestDate = [];
 
 		foreach ($this->getMatches($projectId) as $match) {
 			if ($match->team1_result === null || $match->team2_result === null || (int) $match->count_result !== 1) {
@@ -1557,53 +2135,357 @@ class SiteModel extends BaseDatabaseModel
 				continue;
 			}
 
-			$homeGoals = (float) $match->team1_result;
-			$awayGoals = (float) $match->team2_result;
+			$playedMatches[] = $match;
+			$roundId = (int) ($match->round_id ?? 0);
+			$matchDate = (string) ($match->match_date ?? '');
+
+			if ($matchDate !== '' && (!isset($roundLatestDate[$roundId]) || $matchDate > $roundLatestDate[$roundId])) {
+				$roundLatestDate[$roundId] = $matchDate;
+			}
+		}
+
+		// Historická tabulka "k danému kolu" – ponechá jen zápasy z kol odehraných nejpozději
+		// do data vybraného kola (včetně), zbytek logiky (aktuální/předchozí kolo) na to navazuje
+		// beze změny, jen počítá s tímto (případně užším) výběrem zápasů.
+		if ($asOfRoundId > 0 && isset($roundLatestDate[$asOfRoundId])) {
+			$cutoffDate = $roundLatestDate[$asOfRoundId];
+			$playedMatches = array_values(array_filter(
+				$playedMatches,
+				static fn (object $m): bool => ($roundLatestDate[(int) ($m->round_id ?? 0)] ?? '') <= $cutoffDate
+			));
+			$roundLatestDate = array_filter($roundLatestDate, static fn (string $date): bool => $date <= $cutoffDate);
+		}
+
+		$currentRoundId = null;
+		$currentRoundDate = null;
+
+		foreach ($roundLatestDate as $roundId => $date) {
+			if ($currentRoundDate === null || $date > $currentRoundDate) {
+				$currentRoundDate = $date;
+				$currentRoundId = $roundId;
+			}
+		}
+
+		foreach ($playedMatches as $match) {
+			$homeId = (int) $match->projectteam1_id;
+			$awayId = (int) $match->projectteam2_id;
+			$isPrevious = $currentRoundId !== null && (int) ($match->round_id ?? 0) !== $currentRoundId;
 
 			if ($scope !== 'away') {
-				$this->applyStandingResult($teams[$homeId], $homeGoals, $awayGoals);
+				$this->applyMatchResult($teams[$homeId], $match, true, $pointsRegular, $pointsAddTime, $pointsPenalty, false);
+
+				if ($isPrevious) {
+					$this->applyMatchResult($teams[$homeId], $match, true, $pointsRegular, $pointsAddTime, $pointsPenalty, true);
+				}
 			}
 
 			if ($scope !== 'home') {
-				$this->applyStandingResult($teams[$awayId], $awayGoals, $homeGoals);
+				$this->applyMatchResult($teams[$awayId], $match, false, $pointsRegular, $pointsAddTime, $pointsPenalty, false);
+
+				if ($isPrevious) {
+					$this->applyMatchResult($teams[$awayId], $match, false, $pointsRegular, $pointsAddTime, $pointsPenalty, true);
+				}
 			}
 		}
 
 		foreach ($teams as $team) {
 			$team->goal_diff = $team->goals_for - $team->goals_against;
+			$team->previous_goal_diff = $team->previous_goals_for - $team->previous_goals_against;
+			$team->legs_diff = $team->legs_for - $team->legs_against;
 		}
 
-		$list = array_values($teams);
+		$criteria = $this->parseRankingOrder($rankingOrder);
+		$matchesByTeamPair = $this->groupMatchesByTeamPair($playedMatches);
 
-		usort(
-			$list,
-			static fn (object $a, object $b): int => [$b->points, $b->goal_diff, $b->goals_for, $a->team_name] <=> [$a->points, $a->goal_diff, $a->goals_for, $b->team_name]
-		);
+		$list = array_values($teams);
+		usort($list, fn (object $a, object $b): int => $this->compareStandings($a, $b, $criteria, $matchesByTeamPair));
+
+		foreach ($list as $index => $team) {
+			$team->rank = $index + 1;
+		}
+
+		$previousList = $list;
+		usort($previousList, fn (object $a, object $b): int => $this->comparePreviousStandings($a, $b));
+
+		foreach ($previousList as $index => $team) {
+			$team->previous_rank = $team->previous_played > 0 ? $index + 1 : null;
+		}
 
 		return $list;
 	}
 
-	private function applyStandingResult(object $team, float $goalsFor, float $goalsAgainst): void
+	private function newStandingsRow(object $team): object
 	{
-		$team->played++;
-		$team->goals_for += $goalsFor;
-		$team->goals_against += $goalsAgainst;
+		$startPoints = (int) ($team->start_points ?? 0);
 
-		if ($goalsFor > $goalsAgainst) {
-			$team->won++;
-			$team->points += 3;
+		return (object) [
+			'projectteam_id' => (int) $team->id,
+			'team_name' => $team->team_name,
+			'team_short_name' => $team->team_short_name ?? '',
+			'team_middle_name' => $team->team_middle_name ?? '',
+			'team_picture' => $team->team_picture ?? '',
+			'projectteam_picture' => $team->picture ?? '',
+			'club_id' => (int) ($team->club_id ?? 0),
+			'club_name' => $team->club_name ?? '',
+			'club_country' => $team->club_country ?? '',
+			'club_logo_small' => $team->club_logo_small ?? '',
+			'club_logo_middle' => $team->club_logo_middle ?? '',
+			'club_logo_big' => $team->club_logo_big ?? '',
+			'played' => 0,
+			'won' => 0,
+			'drawn' => 0,
+			'lost' => 0,
+			'goals_for' => 0.0,
+			'goals_against' => 0.0,
+			'goal_diff' => 0.0,
+			'points' => $startPoints,
+			'previous_played' => 0,
+			'previous_won' => 0,
+			'previous_drawn' => 0,
+			'previous_lost' => 0,
+			'previous_goals_for' => 0.0,
+			'previous_goals_against' => 0.0,
+			'previous_goal_diff' => 0.0,
+			'previous_points' => $startPoints,
+			'cnt_wot' => 0,
+			'cnt_wso' => 0,
+			'cnt_lot' => 0,
+			'cnt_lso' => 0,
+			'sum_bonus' => 0.0,
+			'legs_for' => 0.0,
+			'legs_against' => 0.0,
+			'legs_diff' => 0.0,
+			'start_points' => $startPoints,
+			'neg_points' => (int) ($team->neg_points_finally ?? 0),
+			'rank' => 0,
+			'previous_rank' => null,
+		];
+	}
 
-			return;
+	/**
+	 * Zapíše výsledek jednoho zápasu do akumulátoru daného týmu. Rozhoduje typ výsledku
+	 * (řádná hrací doba / prodloužení / nájezdy), podle kterého se použije odpovídající
+	 * bodová tabulka projektu a — u prodloužení/nájezdů — se navýší cnt_wot/wso/lot/lso.
+	 */
+	private function applyMatchResult(object $team, object $match, bool $isHome, array $pointsRegular, array $pointsAddTime, array $pointsPenalty, bool $previous): void
+	{
+		$prefix = $previous ? 'previous_' : '';
+		$ownFinal = (float) ($isHome ? $match->team1_result : $match->team2_result);
+		$oppFinal = (float) ($isHome ? $match->team2_result : $match->team1_result);
+
+		$team->{$prefix . 'played'}++;
+		$team->{$prefix . 'goals_for'} += $ownFinal;
+		$team->{$prefix . 'goals_against'} += $oppFinal;
+
+		$resultType = (int) ($match->match_result_type ?? 0);
+		$ownSo = $isHome ? $match->team1_result_so : $match->team2_result_so;
+		$oppSo = $isHome ? $match->team2_result_so : $match->team1_result_so;
+		$ownOt = $isHome ? $match->team1_result_ot : $match->team2_result_ot;
+		$oppOt = $isHome ? $match->team2_result_ot : $match->team1_result_ot;
+
+		$bucket = null;
+		// Řádná hrací doba vždy rozhoduje jako první; prodloužení/nájezdy nastupují
+		// jen při remíze v řádné hrací době (stejné pořadí jako v originálu).
+		$decided = $ownFinal <=> $oppFinal;
+
+		if ($decided === 0) {
+			if ($resultType === 2 && $ownSo !== null && $oppSo !== null) {
+				$decided = (float) $ownSo <=> (float) $oppSo;
+				$bucket = 'so';
+			} elseif ($resultType === 1 && $ownOt !== null && $oppOt !== null) {
+				$decided = (float) $ownOt <=> (float) $oppOt;
+				$bucket = 'ot';
+			}
 		}
 
-		if ($goalsFor < $goalsAgainst) {
-			$team->lost++;
+		$points = match ($resultType) {
+			1 => $pointsAddTime,
+			2 => $pointsPenalty,
+			default => $pointsRegular,
+		};
 
-			return;
+		if ($decided > 0) {
+			$team->{$prefix . 'won'}++;
+			$team->{$prefix . 'points'} += $points[0];
+
+			if (!$previous) {
+				if ($bucket === 'ot') {
+					$team->cnt_wot++;
+				} elseif ($bucket === 'so') {
+					$team->cnt_wso++;
+				}
+			}
+		} elseif ($decided < 0) {
+			$team->{$prefix . 'lost'}++;
+			$team->{$prefix . 'points'} += $points[2];
+
+			if (!$previous) {
+				if ($bucket === 'ot') {
+					$team->cnt_lot++;
+				} elseif ($bucket === 'so') {
+					$team->cnt_lso++;
+				}
+			}
+		} else {
+			$team->{$prefix . 'drawn'}++;
+			$team->{$prefix . 'points'} += $points[1];
 		}
 
-		$team->drawn++;
-		$team->points++;
+		if (!$previous) {
+			$team->sum_bonus += (float) ($isHome ? ($match->team1_bonus ?? 0) : ($match->team2_bonus ?? 0));
+			$team->legs_for += (float) ($isHome ? ($match->team1_legs ?? 0) : ($match->team2_legs ?? 0));
+			$team->legs_against += (float) ($isHome ? ($match->team2_legs ?? 0) : ($match->team1_legs ?? 0));
+		}
+	}
+
+	/**
+	 * @return  array{0: int, 1: int, 2: int}
+	 */
+	private function parsePointsTriple(string $raw, array $default): array
+	{
+		$parts = array_map('trim', explode(',', $raw));
+
+		if (count($parts) !== 3 || !is_numeric($parts[0]) || !is_numeric($parts[1]) || !is_numeric($parts[2])) {
+			return $default;
+		}
+
+		return [(int) $parts[0], (int) $parts[1], (int) $parts[2]];
+	}
+
+	/**
+	 * @return  array<int, string>
+	 */
+	private function parseRankingOrder(?string $raw): array
+	{
+		$default = ['POINTS', 'DIFF', 'FOR'];
+
+		if ($raw === null || trim($raw) === '') {
+			return $default;
+		}
+
+		$criteria = array_values(array_filter(array_map('trim', explode(',', strtoupper($raw)))));
+
+		return $criteria !== [] ? $criteria : $default;
+	}
+
+	/**
+	 * @return  array<string, array<int, object>>
+	 */
+	private function groupMatchesByTeamPair(array $matches): array
+	{
+		$grouped = [];
+
+		foreach ($matches as $match) {
+			$t1 = (int) $match->projectteam1_id;
+			$t2 = (int) $match->projectteam2_id;
+			$key = min($t1, $t2) . ':' . max($t1, $t2);
+			$grouped[$key][] = $match;
+		}
+
+		return $grouped;
+	}
+
+	/**
+	 * Vrátí [hodnota, směr] pro dané kritérium řazení (směr: 1 = vyšší je lepší, -1 = nižší je lepší),
+	 * nebo null pro kritéria, která nelze v aktuálním datovém modelu vyhodnotit (např. GB je samo
+	 * odvozené od výsledného pořadí, takže jako řadicí kritérium nedává smysl).
+	 *
+	 * @return  array{0: float, 1: int}|null
+	 */
+	private function criterionValue(object $team, string $criterion): ?array
+	{
+		return match ($criterion) {
+			'POINTS' => [(float) $team->points, 1],
+			'DIFF' => [$team->goal_diff, 1],
+			'FOR' => [$team->goals_for, 1],
+			'AGAINST' => [$team->goals_against, -1],
+			'SCOREPCT' => [$team->goals_against > 0 ? $team->goals_for / $team->goals_against * 100 : $team->goals_for * 100, 1],
+			'PLAYED' => [(float) $team->played, 1],
+			'PLAYEDASC' => [(float) $team->played, -1],
+			'WINS' => [(float) $team->won, 1],
+			'BONUS' => [$team->sum_bonus, 1],
+			'SCOREAVG' => [$team->played > 0 ? $team->goals_for / $team->played : 0.0, 1],
+			'WINPCT' => [$team->played > 0 ? $team->won / $team->played * 100 : 0.0, 1],
+			'LEGS_DIFF' => [$team->legs_diff, 1],
+			'LEGS_WIN' => [$team->legs_for, 1],
+			'LEGS_RATIO' => [$team->legs_against > 0 ? $team->legs_for / $team->legs_against : $team->legs_for, 1],
+			default => null,
+		};
+	}
+
+	private function compareStandings(object $a, object $b, array $criteria, array $matchesByTeamPair): int
+	{
+		foreach ($criteria as $criterion) {
+			if (in_array($criterion, ['H2H', 'H2H_DIFF'], true)) {
+				$result = $this->compareHeadToHead($a, $b, $criterion, $matchesByTeamPair);
+
+				if ($result !== 0) {
+					return $result;
+				}
+
+				continue;
+			}
+
+			$valueA = $this->criterionValue($a, $criterion);
+			$valueB = $this->criterionValue($b, $criterion);
+
+			if ($valueA === null || $valueB === null || $valueA[0] == $valueB[0]) {
+				continue;
+			}
+
+			return $valueA[1] > 0 ? ($valueB[0] <=> $valueA[0]) : ($valueA[0] <=> $valueB[0]);
+		}
+
+		return $a->team_name <=> $b->team_name;
+	}
+
+	/**
+	 * Vzájemné zápasy mezi právě těmito dvěma týmy (párové porovnání, ne mini-tabulka pro 3+ týmů
+	 * se stejným počtem bodů — u vícenásobných remíz proto nemusí přesně odpovídat oficiálním
+	 * pravidlům soutěže).
+	 */
+	private function compareHeadToHead(object $a, object $b, string $criterion, array $matchesByTeamPair): int
+	{
+		$key = min($a->projectteam_id, $b->projectteam_id) . ':' . max($a->projectteam_id, $b->projectteam_id);
+		$matches = $matchesByTeamPair[$key] ?? [];
+
+		if ($matches === []) {
+			return 0;
+		}
+
+		$pointsA = 0;
+		$pointsB = 0;
+		$forA = 0.0;
+		$againstA = 0.0;
+
+		foreach ($matches as $match) {
+			$aIsHome = (int) $match->projectteam1_id === $a->projectteam_id;
+			$scoreA = (float) ($aIsHome ? $match->team1_result : $match->team2_result);
+			$scoreB = (float) ($aIsHome ? $match->team2_result : $match->team1_result);
+			$forA += $scoreA;
+			$againstA += $scoreB;
+
+			if ($scoreA > $scoreB) {
+				$pointsA += 3;
+			} elseif ($scoreA < $scoreB) {
+				$pointsB += 3;
+			} else {
+				$pointsA++;
+				$pointsB++;
+			}
+		}
+
+		if ($criterion === 'H2H') {
+			return -($pointsA <=> $pointsB);
+		}
+
+		return -(($forA - $againstA) <=> 0.0);
+	}
+
+	private function comparePreviousStandings(object $a, object $b): int
+	{
+		return [$b->previous_points, $b->previous_goal_diff, $b->previous_goals_for, $a->team_name]
+			<=> [$a->previous_points, $a->previous_goal_diff, $a->previous_goals_for, $b->team_name];
 	}
 
 	public function getPredictionGame(int $projectId = 0, int $gameId = 0): ?object

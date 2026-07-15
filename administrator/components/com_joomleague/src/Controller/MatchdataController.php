@@ -20,13 +20,13 @@ use Throwable;
 
 final class MatchdataController extends BaseController
 {
-	private const ALLOWED_SECTIONS = ['events', 'players', 'statistics', 'referees'];
+	private const ALLOWED_SECTIONS = ['events', 'players', 'statistics', 'referees', 'staff'];
 
 	public function save(): void
 	{
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
-		$matchId = $this->input->getInt('match_id');
+		$matchId = $this->input->getInt('match_id', 0);
 		$section = $this->input->getCmd('section', 'events');
 
 		if (!in_array($section, self::ALLOWED_SECTIONS, true)) {

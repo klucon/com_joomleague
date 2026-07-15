@@ -28,8 +28,9 @@ final class HtmlView extends AdminListView
 			'state' => true,
 			'columns' => [
 				['field' => 'player_name', 'label' => 'COM_JOOMLEAGUE_PERSON', 'sort' => 'pe.lastname'],
+				['field' => 'picture', 'label' => 'COM_JOOMLEAGUE_FIELD_IMAGE', 'type' => 'image', 'image_placeholder' => 'team_player_picture'],
 				['field' => 'jerseynumber', 'label' => 'COM_JOOMLEAGUE_TEAMPLAYER_FIELD_JERSEY', 'class' => 'text-center'],
-				['field' => 'position_name', 'label' => 'COM_JOOMLEAGUE_POSITION'],
+				['field' => 'position_name', 'label' => 'COM_JOOMLEAGUE_POSITION', 'type' => 'lang'],
 				['field' => 'team_name', 'label' => 'COM_JOOMLEAGUE_TEAM'],
 				['field' => 'active', 'label' => 'COM_JOOMLEAGUE_TEAMPLAYER_FIELD_ACTIVE', 'class' => 'text-center'],
 				['field' => 'id', 'label' => 'JGRID_HEADING_ID', 'class' => 'text-center'],

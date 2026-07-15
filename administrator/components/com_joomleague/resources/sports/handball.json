@@ -1,1 +1,143 @@
-{"profile":"handball","sport":{"name":"Házená","icon":""},"positions":[{"name":"Brankář","personType":1},{"name":"Levé křídlo","personType":1},{"name":"Levá spojka","personType":1},{"name":"Střední spojka","personType":1},{"name":"Pravá spojka","personType":1},{"name":"Pravé křídlo","personType":1},{"name":"Pivot","personType":1},{"name":"Hlavní trenér","personType":2},{"name":"Asistent trenéra","personType":2},{"name":"Vedoucí družstva","personType":2},{"name":"Hlavní rozhodčí","personType":3},{"name":"Rozhodčí","personType":3},{"name":"Časoměřič","personType":4},{"name":"Zapisovatel","personType":4}],"events":[{"name":"Gól","icon":""},{"name":"Gól ze sedmičky","icon":""},{"name":"Neproměněná sedmička","icon":""},{"name":"Žlutá karta","icon":""},{"name":"Vyloučení 2 minuty","icon":"","suspension":1},{"name":"Červená karta","icon":"","suspension":1},{"name":"Střídání","icon":""},{"name":"Oddechový čas","icon":""}],"statistics":[{"name":"Góly","short":"G"},{"name":"Střely","short":"STR"},{"name":"Úspěšnost střelby","short":"STR%"},{"name":"Asistence","short":"A"},{"name":"Technické chyby","short":"TC"},{"name":"Zisky","short":"ZIS"},{"name":"Bloky","short":"BLK"},{"name":"Zákroky brankáře","short":"GK-Z"},{"name":"Inkasované góly","short":"GK-IG"},{"name":"Odehrané minuty","short":"MIN"}]}
+{
+  "profile": "handball",
+  "sport": {
+    "name": "COM_JOOMLEAGUE_ST_HANDBALL",
+    "icon": ""
+  },
+  "positions": [
+    {
+      "name": "COM_JOOMLEAGUE_P_HANDBALL_GOALKEEPER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_HANDBALL_LEFT_WING",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_HANDBALL_LEFT_BACK",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_HANDBALL_CENTRE_BACK",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_HANDBALL_RIGHT_BACK",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_HANDBALL_RIGHT_WING",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_HANDBALL_PIVOT",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_HEAD_COACH",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_ASSISTANT_COACH",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_TEAM_MANAGER",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_HEAD_REFEREE",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_REFEREE",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_TIMEKEEPER",
+      "personType": 4
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_SCOREKEEPER",
+      "personType": 4
+    }
+  ],
+  "events": [
+    {
+      "name": "COM_JOOMLEAGUE_E_GOAL",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_HANDBALL_SEVEN_METER_GOAL",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_HANDBALL_SEVEN_METER_MISS",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_YELLOW_CARD",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_HANDBALL_TWO_MINUTE_SUSPENSION",
+      "icon": "",
+      "suspension": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_RED_CARD",
+      "icon": "",
+      "suspension": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_SUBSTITUTION",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_TIMEOUT",
+      "icon": ""
+    }
+  ],
+  "statistics": [
+    {
+      "name": "COM_JOOMLEAGUE_S_HANDBALL_GOALS",
+      "short": "G"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_HANDBALL_SHOTS",
+      "short": "STR"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_HANDBALL_SHOOTING_PERCENTAGE",
+      "short": "STR%"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ASSISTS",
+      "short": "A"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_HANDBALL_TECHNICAL_ERRORS",
+      "short": "TC"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_STEALS",
+      "short": "ZIS"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_BLOCKS",
+      "short": "BLK"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_HANDBALL_GOALKEEPER_SAVES",
+      "short": "GK-Z"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_HANDBALL_GOALS_CONCEDED",
+      "short": "GK-IG"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_MINUTES_PLAYED",
+      "short": "MIN"
+    }
+  ]
+}

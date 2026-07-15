@@ -29,7 +29,7 @@ final class PredictionscoresModel extends EntityListModel
 	protected function populateState($ordering = 'a.points', $direction = 'desc'): void
 	{
 		$app = Factory::getApplication();
-		$gameId = $app->getInput()->getInt('game_id');
+		$gameId = $app->getInput()->getInt('game_id', 0);
 
 		if ($gameId > 0) {
 			$app->setUserState('com_joomleague.predictionscores.game_id', $gameId);

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+	<title id="title">Club logo placeholder</title>
+	<path fill="currentColor" opacity=".08" d="M128 10 232 49v80c0 62-39 102-104 126C63 231 24 191 24 129V49z"/>
+	<path fill="currentColor" opacity=".22" d="M128 40 198 66v61c0 43-23 73-70 94-47-21-70-51-70-94V66z"/>
+	<path fill="currentColor" opacity=".42" d="M128 75 167 90v36c0 25-12 43-39 59-27-16-39-34-39-59V90z"/>
+	<path fill="currentColor" opacity=".2" d="M103 202h50v18h-50z"/>
+</svg>

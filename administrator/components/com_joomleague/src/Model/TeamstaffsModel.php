@@ -51,15 +51,23 @@ final class TeamstaffsModel extends EntityListModel
 	{
 		parent::populateState($ordering, $direction);
 
-		$projectteamId = $this->application->getInput()->getInt('projectteam_id');
+		$input = $this->application->getInput();
+		$projectteamId = $input->getInt('projectteam_id', 0);
+		$projectId = $input->getInt('project_id', 0);
 
 		if ($projectteamId > 0) {
 			$this->application->setUserState('com_joomleague.teamstaffs.projectteam_id', $projectteamId);
-		 } else {
+			$this->application->setUserState('com_joomleague.teamstaffs.project_id', 0);
+		} elseif ($projectId > 0) {
+			$this->application->setUserState('com_joomleague.teamstaffs.project_id', $projectId);
+			$this->application->setUserState('com_joomleague.teamstaffs.projectteam_id', 0);
+		} else {
 			$projectteamId = (int) $this->application->getUserState('com_joomleague.teamstaffs.projectteam_id');
+			$projectId = (int) $this->application->getUserState('com_joomleague.teamstaffs.project_id');
 		}
 
 		$this->setState('filter.projectteam_id', $projectteamId);
+		$this->setState('filter.project_id', $projectId);
 	}
 
 	protected function buildQuery(): QueryInterface
@@ -87,6 +95,13 @@ final class TeamstaffsModel extends EntityListModel
 		if ($projectteamId > 0) {
 			$query->where($db->quoteName('a.projectteam_id') . ' = :projectteam_id')
 				->bind(':projectteam_id', $projectteamId, ParameterType::INTEGER);
+		} else {
+			$projectId = (int) $this->getState('filter.project_id');
+
+			if ($projectId > 0) {
+				$query->where($db->quoteName('pt.project_id') . ' = :project_id')
+					->bind(':project_id', $projectId, ParameterType::INTEGER);
+			}
 		}
 
 		return $query;

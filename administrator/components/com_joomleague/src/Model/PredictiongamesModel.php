@@ -29,7 +29,7 @@ final class PredictiongamesModel extends EntityListModel
 	protected function populateState($ordering = 'a.id', $direction = 'desc'): void
 	{
 		$app = Factory::getApplication();
-		$projectId = $app->getInput()->getInt('project_id');
+		$projectId = $app->getInput()->getInt('project_id', 0);
 
 		if ($projectId > 0) {
 			$app->setUserState('com_joomleague.predictiongames.project_id', $projectId);
@@ -43,16 +43,11 @@ final class PredictiongamesModel extends EntityListModel
 	{
 		$db = $this->getDatabase();
 		$projectId = (int) $this->getState('filter.project_id');
-		$query = $db->createQuery()
+		return $db->createQuery()
 			->select('a.*, p.name AS project_name, u.name AS editor, (SELECT COUNT(*) FROM #__joomleague_prediction_tip t WHERE t.game_id = a.id) AS tip_count')
 			->from('#__joomleague_prediction_game a')
 			->join('LEFT', '#__joomleague_project p ON p.id = a.project_id')
-			->join('LEFT', '#__users u ON u.id = a.checked_out');
-
-		if ($projectId > 0) {
-			$query->where('a.project_id = :project_id')->bind(':project_id', $projectId, ParameterType::INTEGER);
-		}
-
-		return $query;
+			->join('LEFT', '#__users u ON u.id = a.checked_out')
+			->where('a.project_id = :project_id')->bind(':project_id', $projectId, ParameterType::INTEGER);
 	}
 }

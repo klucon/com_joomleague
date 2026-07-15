@@ -16,7 +16,7 @@ use Joomla\CMS\Uri\Uri;
 
 /** @var Joomleague\Component\Joomleague\Administrator\View\Updates\HtmlView $this */
 
-$style = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.6';
+$style = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.9';
 ?>
 <link rel="stylesheet" href="<?php echo htmlspecialchars($style, ENT_QUOTES, 'UTF-8'); ?>">
 <div class="com-joomleague-dashboard com-joomleague-workflow">

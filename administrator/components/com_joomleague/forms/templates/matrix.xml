@@ -7,7 +7,7 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_matrix" type="radio" default="1" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_SHOW_MATRIX" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_SHOW_MATRIX">
+			<field name="show_matrix" type="radio" default="1" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_SHOW_MATRIX" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_SHOW_MATRIX" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -35,11 +35,11 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="crosstable_icons_vertical" type="radio" default="0" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_SHOW_VERT_ICONS" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_SHOW_VERT_ICONS">
+			<field name="crosstable_icons_vertical" type="radio" default="0" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_SHOW_VERT_ICONS" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_SHOW_VERT_ICONS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="link_teams" type="radio" default="1" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_LINK_TEAMNAMES" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_LINK_TEAMNAMES">
+			<field name="link_teams" type="radio" default="1" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_LINK_TEAMNAMES" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_LINK_TEAMNAMES" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -53,7 +53,7 @@
 				<option value="1">COM_JOOMLEAGUE_FES_MATRIX_PARAM_OPTION1_HIGHLIGHT_FAVTEAM</option>
 				<option value="2">COM_JOOMLEAGUE_FES_MATRIX_PARAM_OPTION2_HIGHLIGHT_FAVTEAM</option>
 			</field>
-			<field name="show_help" type="radio" default="0" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_SHOW_HELP" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_SHOW_HELP">
+			<field name="show_help" type="radio" default="0" label="COM_JOOMLEAGUE_FES_MATRIX_PARAM_LABEL_SHOW_HELP" description="COM_JOOMLEAGUE_FES_MATRIX_PARAM_DESCR_SHOW_HELP" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>

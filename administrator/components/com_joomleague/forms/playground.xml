@@ -9,6 +9,9 @@
 		<field name="zipcode" type="text" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_ZIPCODE_LABEL" maxlength="10" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_ZIPCODE_LABEL_DESCRIPTION" />
 		<field name="city" type="text" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_CITY_LABEL" maxlength="64" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_CITY_LABEL_DESCRIPTION" />
 		<field name="country" type="country" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_COUNTRY_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_COUNTRY_DESCRIPTION" />
+		<field name="geocode" type="geocode" label="COM_JOOMLEAGUE_FIELD_GEOCODE_LABEL" source_fields="address,zipcode,city" lat_field="latitude" lng_field="longitude" />
+		<field name="latitude" type="text" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_LATITUDE_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_LATITUDE_DESCRIPTION" filter="float" />
+		<field name="longitude" type="text" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_LONGITUDE_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_LONGITUDE_DESCRIPTION" filter="float" />
 		<field name="max_visitors" type="number" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_CAPACITY_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_CAPACITY_DESCRIPTION" min="0" />
 		<field name="website" type="url" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_WEBSITE_LABEL" relative="true" maxlength="250" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_WEBSITE_LABEL_DESCRIPTION" />
 		<field name="club_id" type="sql" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_CLUB_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_CLUB_DESCRIPTION" query="SELECT id, name FROM #__joomleague_club ORDER BY name" key_field="id" value_field="name">

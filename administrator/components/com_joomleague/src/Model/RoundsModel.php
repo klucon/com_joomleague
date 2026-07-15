@@ -35,7 +35,7 @@ final class RoundsModel extends EntityListModel
 	protected function populateState($o = 'a.round_date_first', $d = 'asc'): void
 	{
 		$input = $this->application->getInput();
-		$id = $input->getInt('project_id');
+		$id = $input->getInt('project_id', 0);
 
 		if (!$id) {
 			$pid = $input->get('pid', [], 'array');

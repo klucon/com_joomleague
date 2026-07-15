@@ -23,7 +23,7 @@ final class PredictionController extends BaseController
 {
 	public function save(): void
 	{
-		$gameId = $this->input->getInt('game_id');
+		$gameId = $this->input->getInt('game_id', 0);
 		$return = Route::_('index.php?option=com_joomleague&view=prediction&game_id=' . $gameId, false);
 
 		try {

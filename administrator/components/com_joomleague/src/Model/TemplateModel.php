@@ -54,9 +54,12 @@ final class TemplateModel extends EntityAdminModel
 	protected function loadFormData(): object
 	{
 		$item = $this->getItem();
+		$isGlobal = (bool) $this->application->getInput()->getInt('global', 0);
 
-		if (empty($item->project_id)) {
-			$projectId = $this->application->getInput()->getInt('project_id');
+		// project_id = NULL u existujícího řádku znamená centrální (globální) šablonu a nesmí
+		// se přepsat – doplnění z requestu/session platí jen pro nově zakládanou položku.
+		if ((int) ($item->id ?? 0) < 1 && empty($item->project_id) && !$isGlobal) {
+			$projectId = $this->application->getInput()->getInt('project_id', 0);
 			$item->project_id = $projectId ?: (int) $this->application->getUserState('com_joomleague.templates.project_id');
 		}
 
@@ -72,7 +75,9 @@ final class TemplateModel extends EntityAdminModel
 
 	protected function prepareTable($table): void
 	{
-		$table->project_id = (int) $table->project_id;
+		// project_id = NULL/'' znamená centrální (globální) šablonu – nesmí se přetypovat na 0.
+		$rawProjectId = $table->project_id;
+		$table->project_id = ($rawProjectId === null || $rawProjectId === '') ? null : (int) $rawProjectId;
 		$table->template = trim((string) $table->template);
 		$table->func = trim((string) $table->func);
 		$table->title = trim((string) $table->title);

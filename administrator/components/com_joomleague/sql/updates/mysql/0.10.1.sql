@@ -1,1 +1,0 @@
--- Fix release: writable image directories and statistic JSON form normalization.

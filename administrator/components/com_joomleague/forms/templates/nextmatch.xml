@@ -7,27 +7,27 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_nextmatch" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_NEXTMATCH" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_NEXTMATCH">
+			<field name="show_nextmatch" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_NEXTMATCH" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_NEXTMATCH" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_details" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_DETAILS" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_DETAILS">
+			<field name="show_details" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_DETAILS" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_DETAILS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_preview" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_PREVIEW" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_PREVIEW">
+			<field name="show_preview" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_PREVIEW" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_PREVIEW" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_STATS" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_STATS">
+			<field name="show_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_STATS" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_STATS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_history" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_HISTORY" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_HISTORY">
+			<field name="show_history" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_HISTORY" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_HISTORY" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_previousx" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_PREVIOUSX" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_PREVIOUSX">
+			<field name="show_previousx" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_PREVIOUSX" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_PREVIOUSX" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -68,87 +68,87 @@
 				<option value="17">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_LAST_FIRST_NICK</option>
 				<option value="18">COM_JOOMLEAGUE_GLOBAL_NAME_FORMAT_LAST_FIRSTNAME_FIRST_CHAR_DOT</option>
 			</field>
-			<field name="show_match_number" type="radio" default="0" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCH_NUMBER" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCH_NUMBER">
+			<field name="show_match_number" type="radio" default="0" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCH_NUMBER" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCH_NUMBER" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_date" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCH_DATE" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCH_DATE">
+			<field name="show_match_date" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCH_DATE" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCH_DATE" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_time" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCH_TIME" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCH_TIME">
+			<field name="show_match_time" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCH_TIME" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCH_TIME" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_time_present" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_TIME_PRESENT" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_TIME_PRESENT">
+			<field name="show_time_present" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_TIME_PRESENT" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_TIME_PRESENT" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_playground" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCH_PLAYGROUND" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCH_PLAYGROUND">
+			<field name="show_match_playground" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCH_PLAYGROUND" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCH_PLAYGROUND" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_referees" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCH_REFEREES" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCH_REFEREES">
+			<field name="show_match_referees" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCH_REFEREES" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCH_REFEREES" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_chances" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_CHANCES" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_CHANCES">
+			<field name="show_chances" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_CHANCES" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_CHANCES" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_current_rank" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_CURRENTRANK" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_CURRENTRANK">
+			<field name="show_current_rank" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_CURRENTRANK" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_CURRENTRANK" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_count" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHCOUNT" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHCOUNT">
+			<field name="show_match_count" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHCOUNT" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHCOUNT" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_total" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHTOTAL" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHTOTAL">
+			<field name="show_match_total" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHTOTAL" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHTOTAL" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_total_home" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHTOTAL_HOME" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHTOTAL_HOME">
+			<field name="show_match_total_home" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHTOTAL_HOME" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHTOTAL_HOME" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_total_away" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHTOTAL_AWAY" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHTOTAL_AWAY">
+			<field name="show_match_total_away" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHTOTAL_AWAY" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHTOTAL_AWAY" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_points" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHPOINTS" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHPOINTS">
+			<field name="show_match_points" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHPOINTS" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHPOINTS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_goals" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHGOALS" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHGOALS">
+			<field name="show_match_goals" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_MATCHGOALS" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_MATCHGOALS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_diff" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_DIFFERENCE" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_DIFFERENCE">
+			<field name="show_match_diff" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_DIFFERENCE" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_DIFFERENCE" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_highest_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_RECORDS" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_RECORDS">
+			<field name="show_match_highest_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_RECORDS" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_RECORDS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_highest_won" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_HIGH_WIN_HOME" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_HIGH_WIN_HOME">
+			<field name="show_match_highest_won" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_HIGH_WIN_HOME" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_HIGH_WIN_HOME" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_highest_loss" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_HIGH_LOSS_HOME" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_HIGH_LOSS_HOME">
+			<field name="show_match_highest_loss" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_HIGH_LOSS_HOME" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_HIGH_LOSS_HOME" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_highest_won_away" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_HIGH_WIN_AWAY" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_HIGH_WIN_AWAY">
+			<field name="show_match_highest_won_away" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_HIGH_WIN_AWAY" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_HIGH_WIN_AWAY" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_match_highest_loss_away" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_HIGH_LOSS_AWAY" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_HIGH_LOSS_AWAY">
+			<field name="show_match_highest_loss_away" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_HIGH_LOSS_AWAY" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_HIGH_LOSS_AWAY" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_time_suffix" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_TIME_SUFFIX" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_TIME_SUFFIX">
+			<field name="show_time_suffix" type="radio" default="1" label="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_LABEL_SHOW_TIME_SUFFIX" description="COM_JOOMLEAGUE_FES_NEXTMATCH_PARAM_DESCR_SHOW_TIME_SUFFIX" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>

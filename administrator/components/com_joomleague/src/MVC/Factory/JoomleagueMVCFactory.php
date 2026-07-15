@@ -32,8 +32,10 @@ use Joomleague\Component\Joomleague\Administrator\Model\TeamstaffModel;
 use Joomleague\Component\Joomleague\Administrator\Model\TeamstaffsModel;
 use Joomleague\Component\Joomleague\Administrator\Model\TemplateModel;
 use Joomleague\Component\Joomleague\Administrator\Model\TemplatesModel;
+use Joomleague\Component\Joomleague\Administrator\Service\TemplateConfigBootstrapService;
 use Joomleague\Component\Joomleague\Administrator\Model\TreetonodeModel;
 use Joomleague\Component\Joomleague\Administrator\Model\TreetonodesModel;
+use Joomleague\Component\Joomleague\Administrator\Model\TreetosModel;
 use Joomleague\Component\Joomleague\Administrator\Controller\ScheduleController;
 use Joomleague\Component\Joomleague\Administrator\Controller\SportsbootstrapController;
 use Joomleague\Component\Joomleague\Administrator\Service\ScheduleGeneratorService;
@@ -48,7 +50,8 @@ final class JoomleagueMVCFactory extends MVCFactory
 		private readonly CMSApplicationInterface $application,
 		private readonly ScheduleGeneratorService $scheduleGeneratorService,
 		private readonly ScheduleTemplateService $scheduleTemplateService,
-		private readonly SportsBootstrapService $sportsBootstrapService
+		private readonly SportsBootstrapService $sportsBootstrapService,
+		private readonly TemplateConfigBootstrapService $templateConfigBootstrapService
 	) {
 		parent::__construct($namespace);
 	}
@@ -72,7 +75,11 @@ final class JoomleagueMVCFactory extends MVCFactory
 			$model->setScheduleTemplateService($this->scheduleTemplateService);
 		}
 
-		if ($this->application instanceof AdministratorApplication && ($model instanceof ProjectpanelModel || $model instanceof DivisionModel || $model instanceof DivisionsModel || $model instanceof RoundModel || $model instanceof RoundsModel || $model instanceof MatchModel || $model instanceof MatchesModel || $model instanceof TeamplayerModel || $model instanceof TeamplayersModel || $model instanceof TeamstaffModel || $model instanceof TeamstaffsModel || $model instanceof TemplateModel || $model instanceof TemplatesModel || $model instanceof TreetonodeModel || $model instanceof TreetonodesModel)) {
+		if ($model instanceof TemplatesModel) {
+			$model->setBootstrapService($this->templateConfigBootstrapService);
+		}
+
+		if ($this->application instanceof AdministratorApplication && ($model instanceof ProjectpanelModel || $model instanceof DivisionModel || $model instanceof DivisionsModel || $model instanceof RoundModel || $model instanceof RoundsModel || $model instanceof MatchModel || $model instanceof MatchesModel || $model instanceof TeamplayerModel || $model instanceof TeamplayersModel || $model instanceof TeamstaffModel || $model instanceof TeamstaffsModel || $model instanceof TemplateModel || $model instanceof TemplatesModel || $model instanceof TreetonodeModel || $model instanceof TreetonodesModel || $model instanceof TreetosModel)) {
 			$model->setApplication($this->application);
 		}
 

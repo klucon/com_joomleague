@@ -17,7 +17,8 @@ use Joomla\CMS\Uri\Uri;
 /** @var Joomleague\Component\Joomleague\Administrator\View\Projectpanel\HtmlView $this */
 
 $id = (int) $this->project->id;
-$style = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.4';
+$isTournament = ($this->project->project_type ?? '') === 'TOURNAMENT_MODE';
+$style = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.9';
 
 $cards = [
 	[
@@ -66,6 +67,15 @@ $cards = [
 		'future' => false,
 	],
 	[
+		'url' => Route::_('index.php?option=com_joomleague&view=teamstaffs&project_id=' . $id),
+		'title' => 'COM_JOOMLEAGUE_TEAMSTAFFS_TITLE',
+		'description' => 'COM_JOOMLEAGUE_PROJECT_STAFF_DESC',
+		'count' => (int) $this->project->staff_count,
+		'icon' => 'icon-user',
+		'tone' => 'cyan',
+		'future' => false,
+	],
+	[
 		'url' => Route::_('index.php?option=com_joomleague&view=divisions&project_id=' . $id),
 		'title' => 'COM_JOOMLEAGUE_PROJECT_DIVISIONS',
 		'description' => 'COM_JOOMLEAGUE_PROJECT_DIVISIONS_DESC',
@@ -91,6 +101,16 @@ $cards = [
 		'icon' => 'icon-star',
 		'tone' => 'rose',
 		'future' => false,
+	],
+	[
+		'url' => Route::_('index.php?option=com_joomleague&view=treetos&project_id=' . $id),
+		'title' => 'COM_JOOMLEAGUE_PROJECT_TREES',
+		'description' => 'COM_JOOMLEAGUE_PROJECT_TREES_DESC',
+		'count' => null,
+		'icon' => 'icon-tree-2',
+		'tone' => 'teal',
+		'future' => false,
+		'disabled_reason' => $isTournament ? null : 'COM_JOOMLEAGUE_PROJECT_TREES_WRONG_TYPE',
 	],
 	[
 		'url' => '',
@@ -130,16 +150,22 @@ $cards = [
 
 	<div class="jl-dashboard-grid jl-projectpanel-grid" role="list">
 		<?php foreach ($cards as $card) : ?>
-			<?php $tag = $card['future'] ? 'span' : 'a'; ?>
+			<?php
+			$disabledReason = $card['disabled_reason'] ?? null;
+			$isDisabled = $card['future'] || $disabledReason !== null;
+			$tag = $isDisabled ? 'span' : 'a';
+			?>
 			<<?php echo $tag; ?>
-				class="jl-dashboard-card jl-projectpanel-card jl-dashboard-card--<?php echo htmlspecialchars($card['tone'], ENT_QUOTES, 'UTF-8'); ?><?php echo $card['future'] ? ' jl-projectpanel-card--future' : ''; ?>"
-				<?php echo $card['future'] ? '' : 'href="' . $card['url'] . '"'; ?>
+				class="jl-dashboard-card jl-projectpanel-card jl-dashboard-card--<?php echo htmlspecialchars($card['tone'], ENT_QUOTES, 'UTF-8'); ?><?php echo $isDisabled ? ' jl-projectpanel-card--future' : ''; ?>"
+				<?php echo $isDisabled ? '' : 'href="' . $card['url'] . '"'; ?>
 				role="listitem"
 			>
 				<span class="jl-dashboard-card__heading">
 					<span class="jl-dashboard-card__icon <?php echo htmlspecialchars($card['icon'], ENT_QUOTES, 'UTF-8'); ?>" aria-hidden="true"></span>
 					<span class="jl-dashboard-card__title"><?php echo Text::_($card['title']); ?></span>
-					<?php if ($card['future']) : ?>
+					<?php if ($disabledReason !== null) : ?>
+						<span class="jl-projectpanel-card__badge"><?php echo Text::_($disabledReason); ?></span>
+					<?php elseif ($card['future']) : ?>
 						<span class="jl-projectpanel-card__badge"><?php echo Text::_('COM_JOOMLEAGUE_FUTURE_FUNCTION'); ?></span>
 					<?php else : ?>
 						<span class="jl-dashboard-card__arrow icon-arrow-right" aria-hidden="true"></span>

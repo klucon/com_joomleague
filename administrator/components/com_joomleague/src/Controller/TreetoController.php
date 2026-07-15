@@ -29,7 +29,7 @@ final class TreetoController extends EntityFormController
 			throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
 		}
 
-		$id = $this->input->getInt('id');
+		$id = $this->input->getInt('id', 0);
 		$count = (int) $this->getModel('Treeto')->generateNodes($id);
 		$type = $count > 0 ? 'message' : 'warning';
 		$message = $count > 0 ? Text::sprintf('COM_JOOMLEAGUE_TREETO_GENERATED', $count) : Text::_('COM_JOOMLEAGUE_TREETO_GENERATE_FAILED');

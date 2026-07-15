@@ -32,8 +32,8 @@ final class RaceresultsController extends AdminController
 
 		$model = $this->getModel('Raceresults', 'Administrator', ['ignore_request' => false]);
 		$count = $model->recalculateRankings(
-			$this->input->getInt('project_id'),
-			$this->input->getInt('round_id')
+			$this->input->getInt('project_id', 0),
+			$this->input->getInt('round_id', 0)
 		);
 
 		$this->setMessage(Text::sprintf('COM_JOOMLEAGUE_RACERESULTS_RECALCULATED', $count));

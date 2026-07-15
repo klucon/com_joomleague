@@ -27,6 +27,9 @@ $translateLegacyName = static function ($value): string {
 };
 $sportName = $project ? $translateLegacyName($project->sport_name ?? '') : '';
 
+$params = $this->templateParams;
+$showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
+
 if ($project) {
 	StructuredDataHelper::add($this->getDocument(), [
 		'@context' => 'https://schema.org',
@@ -50,11 +53,13 @@ if ($project) {
 		<?php return; ?>
 	<?php endif; ?>
 
+	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo $this->escape(trim(($project->league_name ?? '') . ' · ' . ($project->season_name ?? ''), ' ·')); ?></div>
 		<h1 class="jl-site-title"><?php echo $this->escape($project->name); ?></h1>
 		<p class="jl-site-muted mb-3"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RACE_RESULTS'); ?></p>
 	</section>
+	<?php endif; ?>
 
 	<form action="<?php echo Route::_('index.php'); ?>" method="get" class="jl-site-panel mb-4">
 		<input type="hidden" name="option" value="com_joomleague">

@@ -23,15 +23,15 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_sectionheader" type="radio" default="1" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_SHOW_SECTIONHEADER" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_SHOW_SECTIONHEADER">
+			<field name="show_sectionheader" type="radio" default="1" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_SHOW_SECTIONHEADER" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_SHOW_SECTIONHEADER" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_description" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_DESCRIPTION" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_DESCRIPTION">
+			<field name="show_description" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_DESCRIPTION" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_DESCRIPTION" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_players" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_PLAYERS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_PLAYERS">
+			<field name="show_players" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_PLAYERS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_PLAYERS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -39,7 +39,7 @@
 				<option value="player_standard">COM_JOOMLEAGUE_FES_ROSTER_PARAM_OPTION1_PLAYER_STANDARD</option>
 				<option value="player_card">COM_JOOMLEAGUE_FES_ROSTER_PARAM_OPTION2_PLAYER_CARD</option>
 			</field>
-			<field name="show_staff" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_STAFF" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_STAFF">
+			<field name="show_staff" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_STAFF" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_STAFF" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -47,19 +47,19 @@
 				<option value="staff_standard">COM_JOOMLEAGUE_FES_ROSTER_PARAM_OPTION1_STAFF_STANDARD</option>
 				<option value="staff_card">COM_JOOMLEAGUE_FES_ROSTER_PARAM_OPTION2_STAFF_CARD</option>
 			</field>
-			<field name="show_team_shortform" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_TEAM_SHORTFORM" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_TEAM_SHORTFORM">
+			<field name="show_team_shortform" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_TEAM_SHORTFORM" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_TEAM_SHORTFORM" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_events_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_EVENTS_STATS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_EVENTS_STATS">
+			<field name="show_events_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_EVENTS_STATS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_EVENTS_STATS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_STATS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_STATS">
+			<field name="show_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_STATS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_STATS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_totals" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_TOTALS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_TOTALS">
+			<field name="show_totals" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_TOTALS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_TOTALS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -103,7 +103,7 @@
 				<option value="3">COM_JOOMLEAGUE_FES_ROSTER_PARAM_OPTION3_SHOW_BIRTHDAY</option>
 				<option value="4">COM_JOOMLEAGUE_FES_ROSTER_PARAM_OPTION4_SHOW_BIRTHDAY</option>
 			</field>
-			<field name="show_player_icon" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_PLAYER_ICON" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_PLAYER_ICON">
+			<field name="show_player_icon" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_PLAYER_ICON" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_PLAYER_ICON" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -113,11 +113,11 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_player_numbers" type="radio" default="0" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_PLAYER_NUMBERS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_PLAYER_NUMBERS">
+			<field name="show_player_numbers" type="radio" default="0" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_PLAYER_NUMBERS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_PLAYER_NUMBERS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="player_numbers_pictures" type="radio" default="0" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_PLAYER_NUMBERS_PICTURES" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_PLAYER_NUMBERS_PICTURES">
+			<field name="player_numbers_pictures" type="radio" default="0" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_PLAYER_NUMBERS_PICTURES" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_PLAYER_NUMBERS_PICTURES" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -126,7 +126,7 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_substitution_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_SUBS_STATS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_SUBS_STATS">
+			<field name="show_substitution_stats" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_SUBS_STATS" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_SUBS_STATS" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -159,7 +159,7 @@
 				<option value="3">COM_JOOMLEAGUE_FES_ROSTER_PARAM_OPTION3_SHOW_BIRTHDAY</option>
 				<option value="4">COM_JOOMLEAGUE_FES_ROSTER_PARAM_OPTION4_SHOW_BIRTHDAY</option>
 			</field>
-			<field name="show_staff_icon" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_STAFF_ICON" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_STAFF_ICON">
+			<field name="show_staff_icon" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_STAFF_ICON" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_STAFF_ICON" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -169,7 +169,7 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_country_flag_staff" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_COUNTRY_FLAG" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_COUNTRY_FLAG">
+			<field name="show_country_flag_staff" type="radio" default="1" label="COM_JOOMLEAGUE_FES_ROSTER_PARAM_LABEL_SHOW_COUNTRY_FLAG" description="COM_JOOMLEAGUE_FES_ROSTER_PARAM_DESCR_SHOW_COUNTRY_FLAG" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>

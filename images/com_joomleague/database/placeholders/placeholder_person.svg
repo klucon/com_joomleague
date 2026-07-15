@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+	<title id="title">Person photo placeholder</title>
+	<rect x="18" y="18" width="220" height="220" rx="28" fill="currentColor" opacity=".06"/>
+	<circle cx="128" cy="88" r="53" fill="currentColor" opacity=".24"/>
+	<path fill="currentColor" opacity=".22" d="M37 238c10-63 45-101 91-101s81 38 91 101z"/>
+	<path fill="currentColor" opacity=".36" d="M82 238c8-34 24-53 46-53s38 19 46 53z"/>
+</svg>

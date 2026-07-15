@@ -37,7 +37,7 @@ final class ImportController extends BaseController
 		}
 
 		$result = $this->getModel('Import')->importCsv(
-			$this->input->post->getCmd('target'),
+			$this->input->post->getCmd('target', ''),
 			$tmp,
 			$this->input->post->getString('delimiter', ';'),
 			(bool) $this->input->post->getInt('replace', 0)

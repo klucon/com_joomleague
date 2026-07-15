@@ -7,8 +7,10 @@
 
 declare(strict_types=1);
 \defined('_JEXEC') or die;
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Uri\Uri;
 use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $project = $this->project;
@@ -19,6 +21,22 @@ $translateLegacyName = static function ($value): string {
 	return preg_match('/^(COM|JLM)_[A-Z0-9_-]+$/', $value) ? Text::_($value) : $value;
 };
 $sportName = $project ? $translateLegacyName($project->sport_name ?? '') : '';
+
+// 'projectheading' – konfigurace záhlaví projektové domovské stránky.
+$headingParams = $this->templateParams;
+$showTitle = (bool) ($headingParams['show_title'] ?? true);
+$showProjectLogo = (bool) ($headingParams['show_project_logo'] ?? true);
+
+$projectLogo = '';
+if ($project && $showProjectLogo) {
+	$pic = trim((string) ($project->picture ?? ''));
+	if ($pic === '') {
+		$pic = trim((string) ComponentHelper::getParams('com_joomleague')->get('placeholder_project_picture', ''));
+	}
+	if ($pic !== '') {
+		$projectLogo = preg_match('#^https?://#i', $pic) ? $pic : Uri::root(true) . '/' . ltrim($pic, '/');
+	}
+}
 
 if ($project) {
 	StructuredDataHelper::add($this->getDocument(), [
@@ -45,9 +63,14 @@ if ($project) {
 <div class="com-joomleague-site">
 	<?php if (!$project) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT_NOT_FOUND'); ?></div><?php return; endif; ?>
 	<section class="jl-site-hero mb-4">
+		<div class="d-flex align-items-center gap-3">
+		<?php if ($projectLogo !== '') : ?><img class="jl-team-logo" src="<?php echo $this->escape($projectLogo); ?>" alt="<?php echo $this->escape($project->name); ?>" loading="lazy" style="max-height:90px;width:auto;flex-shrink:0;"><?php endif; ?>
+		<div style="min-width:0;">
 		<div class="jl-site-eyebrow"><?php echo $this->escape(trim(($project->league_name ?? '') . ' · ' . ($project->season_name ?? ''), ' ·')); ?></div>
-		<h1 class="jl-site-title"><?php echo $this->escape($project->name); ?></h1>
-		<p class="jl-site-muted mb-3"><?php echo $this->escape($sportName); ?></p>
+			<?php if ($showTitle) : ?><h1 class="jl-site-title mb-1"><?php echo $this->escape($project->name); ?></h1><?php endif; ?>
+			<p class="jl-site-muted mb-0"><?php echo $this->escape($sportName); ?></p>
+			</div>
+		</div>
 		<nav class="jl-site-nav">
 			<?php if ($isRunningRace) : ?>
 				<a href="<?php echo Route::_('index.php?option=com_joomleague&view=raceresults&project_id=' . (int) $project->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RACE_RESULTS'); ?></a>

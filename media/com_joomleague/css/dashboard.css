@@ -211,7 +211,7 @@ html[data-bs-theme="dark"] .com-joomleague-section {
 
 .jl-projectpanel-card__badge {
 	margin-inline-start: auto;
-	padding: .2rem .48rem;
+	padding: .2rem .48rem .2rem 1rem;
 	color: var(--jl-card-accent);
 	font-size: .68rem;
 	font-weight: 750;
@@ -232,6 +232,7 @@ html[data-bs-theme="dark"] .com-joomleague-section {
 .jl-dashboard-card--teal { --jl-card-accent: #147d79; --jl-card-soft: #e6f7f5; }
 .jl-dashboard-card--lime { --jl-card-accent: #66851a; --jl-card-soft: #f2f8df; }
 .jl-dashboard-card--slate { --jl-card-accent: #596579; --jl-card-soft: #eef1f5; }
+.jl-dashboard-card--danger { --jl-card-accent: #c62828; --jl-card-soft: #fdecea; }
 
 html[data-bs-theme="dark"] .jl-dashboard-header {
 	background:
@@ -262,6 +263,27 @@ html[data-bs-theme="dark"] .jl-section-panel__stats span {
 
 html[data-bs-theme="dark"] .jl-section-panel__stats strong {
 	color: #8fb7ff;
+}
+
+/*
+ * Joomla's Atum admin template only redefines --primary-text-emphasis /
+ * --primary-bg-subtle / --primary-border-subtle for dark mode, not the base
+ * --primary the outline button variant text/border color comes from. That
+ * leaves .btn-outline-primary rendering with the light-mode dark-navy text
+ * on the dark panel background here -- effectively invisible. Patched
+ * locally for the buttons this component renders (Joomla core is otherwise
+ * untouched).
+ */
+html[data-bs-theme="dark"] .com-joomleague-dashboard .btn-outline-primary {
+	color: #8fb7ff;
+	border-color: #8fb7ff;
+}
+
+html[data-bs-theme="dark"] .com-joomleague-dashboard .btn-outline-primary:hover,
+html[data-bs-theme="dark"] .com-joomleague-dashboard .btn-outline-primary:focus {
+	color: #0f1720;
+	background-color: #8fb7ff;
+	border-color: #8fb7ff;
 }
 
 .jl-section-back {

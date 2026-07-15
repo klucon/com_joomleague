@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file.
 
+## 6.1.0-alpha-151 - 2026-07-15
+
+### Added
+
+- Added project-aware canonical menu item selection for generated SEF URLs.
+- Added project detection for routes that start from a project team, match or person instead of an explicit project parameter.
+- Added match alias lookup based on home team, away team and match date for readable match report routes.
+- Added administrator filter forms for prediction scores, prediction tips and tournament tree nodes.
+- Added frontend template configuration forms for prediction, project heading, projects, race results and results-and-standings pages.
+- Added the SQL truncate administrator tool with controller, model, view and template support.
+- Added geocoding support for administrator forms, including a geocode field, helper and JavaScript button.
+- Added map URL and map embed helpers for frontend and administrator views.
+- Added bundled Leaflet assets for map rendering.
+- Added shared frontend helpers for person names, player statistics and ranking columns.
+- Added a shared ranking form layout for frontend ranking-related pages.
+- Added SVG placeholder assets for clubs, teams, projects, persons, stadiums, divisions, trophies, referees, players and team staff.
+
+### Changed
+
+- Updated package, component, module and plugin manifests to `6.1.0-alpha-151`.
+- Reworked project navigation module links to use `project_id` consistently.
+- Improved SEF route generation for project, team, roster, rivals, team statistics, match report and person pages.
+- Improved club detail routing so club pages can reuse the clubs menu item as their route base.
+- Improved active menu parsing for empty route segments.
+- Reworked several administrator list, form and template screens for Joomla 6.1 compatibility and more consistent filtering.
+- Extended project-scoped dynamic menu item selectors so dependent values are loaded from the selected project.
+- Updated administrator forms for clubs, matches, persons, positions, projects, rounds, statistics, templates, teams, team players, team staff, tournament trees and running-race records.
+- Updated frontend templates for clubs, club detail, projects, project detail, results, results and standings, result matrix, schedule, standings, teams, team detail, roster, rivals, statistics, statistics ranking, events ranking, ranking curve, referees, match reports, next match, persons, playgrounds, predictions, tournament trees and race results.
+- Updated module templates for the JoomLeague logo, navigation menu and random player modules.
+- Updated the Cassiopeia menu override used by JoomLeague pages.
+- Updated dashboard and frontend CSS for the revised administrator and frontend layouts.
+- Updated sport bootstrap JSON resources for football, basketball, handball, ice hockey and volleyball.
+- Consolidated historical SQL update files into the current alpha baseline marker.
+- Updated release metadata generation so the Joomla update changelog rolls up the public alpha changes through `6.1.0-alpha-151`.
+
+### Fixed
+
+- Fixed generated project URLs that could use the wrong menu item when multiple project pages were available.
+- Fixed project-scoped URLs that lost their project context when only a team, match or person identifier was present.
+- Fixed match report route parsing for readable match aliases.
+- Fixed project navigation links that still used the older `id` parameter.
+- Fixed administrator dependent selectors that could show global teams, clubs, matches or statistics instead of project-scoped values.
+- Fixed missing administrator filter forms on prediction and tournament tree related list views.
+- Fixed missing template option forms for several frontend pages.
+- Fixed map and stadium related rendering paths that previously lacked shared helper support.
+- Fixed ranking-related frontend rendering by moving repeated column and form logic into shared helpers.
+- Fixed several untranslated or reused language constants in administrator and frontend language files.
+- Fixed package consistency so generated child extension archives use the same release version as the parent package.
+
+### Notes
+
+- This is an alpha release for Joomla 6.1 and PHP 8.3.
+- The release keeps compatibility for existing route parameters where practical while moving generated links toward cleaner project-aware SEF URLs.
+- Sites upgrading from earlier alpha builds should test menu items, project pages, SQL tools, maps and prediction-related views on a staging copy before updating a live site.
+
 ## 6.1.0-alpha-150 - 2026-07-12
 
 ### Fixed

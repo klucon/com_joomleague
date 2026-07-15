@@ -15,6 +15,12 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
 $project = $this->project;
+
+$params = $this->templateParams;
+$showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
+$showCurve = (bool) ($params['show_curve'] ?? true);
+$showColorlegend = (bool) ($params['show_colorlegend'] ?? true);
+
 $input = Factory::getApplication()->getInput();
 $divisionId = (int) ($input->getInt('division_id') ?: $input->getInt('division'));
 $team1Id = (int) ($input->getInt('projectteam1_id') ?: $input->getInt('tid1'));
@@ -50,10 +56,12 @@ $palette = [
 <div class="com-joomleague-site">
 	<?php if (!$project) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT_NOT_FOUND'); ?></div><?php return; endif; ?>
 
+	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo $this->escape($project->name); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CURVE'); ?></h1>
 	</section>
+	<?php endif; ?>
 
 	<form class="jl-site-panel jl-site-filter mb-4" method="get" action="<?php echo Route::_('index.php'); ?>">
 		<input type="hidden" name="option" value="com_joomleague">
@@ -94,6 +102,7 @@ $palette = [
 		<?php return; ?>
 	<?php endif; ?>
 
+	<?php if ($showCurve) : ?>
 	<div class="jl-site-panel mb-4">
 		<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_CURVE'); ?></h2>
 		<div class="jl-site-curve" style="--jl-curve-rounds: <?php echo $roundCount; ?>; --jl-curve-ranks: <?php echo $maxRank; ?>;">
@@ -127,12 +136,15 @@ $palette = [
 				<?php endforeach; ?>
 			</div>
 		</div>
+		<?php if ($showColorlegend) : ?>
 		<div class="jl-site-curve-legend">
 			<?php foreach ($curveTeams as $teamIndex => $team) : ?>
 				<span style="--jl-curve-color: <?php echo $this->escape($palette[$teamIndex % count($palette)]); ?>;"><?php echo $this->escape($team->team_name); ?></span>
 			<?php endforeach; ?>
 		</div>
+		<?php endif; ?>
 	</div>
+	<?php endif; ?>
 
 	<div class="jl-site-panel">
 		<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_CURVE_TABLE'); ?></h2>

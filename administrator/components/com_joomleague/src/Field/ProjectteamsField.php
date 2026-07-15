@@ -71,7 +71,7 @@ class ProjectteamsField extends FormField
 			return $value;
 		}
 
-		$menuItemId = Factory::getApplication()->getInput()->getInt('id');
+		$menuItemId = Factory::getApplication()->getInput()->getInt('id', 0);
 
 		if ($menuItemId <= 0) {
 			return 0;

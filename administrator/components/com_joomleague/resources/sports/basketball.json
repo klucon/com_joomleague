@@ -1,1 +1,150 @@
-{"profile":"basketball","sport":{"name":"Basketbal","icon":""},"positions":[{"name":"Rozehrávač","personType":1},{"name":"Střelec","personType":1},{"name":"Křídlo","personType":1},{"name":"Silové křídlo","personType":1},{"name":"Pivot","personType":1},{"name":"Hlavní trenér","personType":2},{"name":"Asistent trenéra","personType":2},{"name":"Vedoucí družstva","personType":2},{"name":"Hlavní rozhodčí","personType":3},{"name":"Rozhodčí","personType":3},{"name":"Komisař","personType":4},{"name":"Zapisovatel","personType":4},{"name":"Časoměřič","personType":4}],"events":[{"name":"Koš za 1 bod","icon":""},{"name":"Koš za 2 body","icon":""},{"name":"Koš za 3 body","icon":""},{"name":"Faul","icon":"","suspension":0},{"name":"Technická chyba","icon":""},{"name":"Střídání","icon":""},{"name":"Oddechový čas","icon":""}],"statistics":[{"name":"Body","short":"PTS"},{"name":"Doskoky","short":"REB"},{"name":"Asistence","short":"AST"},{"name":"Zisky","short":"STL"},{"name":"Bloky","short":"BLK"},{"name":"Ztráty","short":"TO"},{"name":"Fauly","short":"PF"},{"name":"Trestné hody úspěšné","short":"FTM"},{"name":"Trestné hody pokusy","short":"FTA"},{"name":"Dvoubodové koše úspěšné","short":"2PM"},{"name":"Dvoubodové koše pokusy","short":"2PA"},{"name":"Trojkové koše úspěšné","short":"3PM"},{"name":"Trojkové koše pokusy","short":"3PA"},{"name":"Odehrané minuty","short":"MIN"}]}
+{
+  "profile": "basketball",
+  "sport": {
+    "name": "COM_JOOMLEAGUE_ST_BASKETBALL",
+    "icon": ""
+  },
+  "positions": [
+    {
+      "name": "COM_JOOMLEAGUE_P_BASKETBALL_POINT_GUARD",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_BASKETBALL_SHOOTING_GUARD",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_BASKETBALL_SMALL_FORWARD",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_BASKETBALL_POWER_FORWARD",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_BASKETBALL_CENTER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_HEAD_COACH",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_ASSISTANT_COACH",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_TEAM_MANAGER",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_HEAD_REFEREE",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_REFEREE",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_COMMISSIONER",
+      "personType": 4
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_SCOREKEEPER",
+      "personType": 4
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_TIMEKEEPER",
+      "personType": 4
+    }
+  ],
+  "events": [
+    {
+      "name": "COM_JOOMLEAGUE_E_BASKETBALL_FREE_THROW",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_BASKETBALL_TWO_POINTER",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_BASKETBALL_THREE_POINTER",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_BASKETBALL_FOUL",
+      "icon": "",
+      "suspension": 0
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_BASKETBALL_TECHNICAL_FOUL",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_SUBSTITUTION",
+      "icon": ""
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_TIMEOUT",
+      "icon": ""
+    }
+  ],
+  "statistics": [
+    {
+      "name": "COM_JOOMLEAGUE_S_POINTS",
+      "short": "PTS"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_BASKETBALL_REBOUNDS",
+      "short": "REB"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ASSISTS",
+      "short": "AST"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_STEALS",
+      "short": "STL"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_BLOCKS",
+      "short": "BLK"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_BASKETBALL_TURNOVERS",
+      "short": "TO"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOULS",
+      "short": "PF"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_BASKETBALL_FREE_THROWS_MADE",
+      "short": "FTM"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_BASKETBALL_FREE_THROWS_ATTEMPTED",
+      "short": "FTA"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_BASKETBALL_TWO_POINTERS_MADE",
+      "short": "2PM"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_BASKETBALL_TWO_POINTERS_ATTEMPTED",
+      "short": "2PA"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_BASKETBALL_THREE_POINTERS_MADE",
+      "short": "3PM"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_BASKETBALL_THREE_POINTERS_ATTEMPTED",
+      "short": "3PA"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_MINUTES_PLAYED",
+      "short": "MIN"
+    }
+  ]
+}

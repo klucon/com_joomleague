@@ -29,7 +29,7 @@ if (empty($data['projects'])) {
 		<ul class="list-unstyled mb-2">
 			<?php foreach ($data['projects'] as $project) : ?>
 				<li<?php echo (int) $project->id === (int) $data['active'] ? ' class="fw-bold"' : ''; ?>>
-					<a href="<?php echo Route::_('index.php?option=com_joomleague&view=project&id=' . (int) $project->id); ?>">
+					<a href="<?php echo Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $project->id); ?>">
 						<?php echo htmlspecialchars($project->name, ENT_QUOTES, 'UTF-8'); ?>
 					</a>
 				</li>

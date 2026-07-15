@@ -34,7 +34,7 @@ final class DivisionsModel extends EntityListModel
 
 	protected function populateState($ordering = 'a.ordering', $direction = 'asc'): void
 	{
-		$projectId = $this->application->getInput()->getInt('project_id');
+		$projectId = $this->application->getInput()->getInt('project_id', 0);
 
 		if ($projectId > 0) {
 			$this->application->setUserState('com_joomleague.project_context.project_id', $projectId);

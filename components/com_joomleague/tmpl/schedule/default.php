@@ -20,6 +20,11 @@ use Joomla\CMS\Uri\Uri;
 
 /** @var \Joomleague\Component\Joomleague\Site\View\Schedule\HtmlView $this */
 
+$params = $this->templateParams;
+$showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
+$showPlayground = (bool) ($params['show_playground'] ?? true);
+$showIcalLink = (bool) ($params['show_ical_link'] ?? true);
+
 $title   = Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE');
 $eyebrow = $this->project ? $this->project->name : '';
 
@@ -78,7 +83,7 @@ $modeUrl = static fn (string $mode, string $flt): string =>
 	Route::_($baseQuery . '&plan=' . $mode . ($flt !== 'all' ? '&filter=' . $flt : ''));
 
 // řádek jednoho zápasu
-$matchRow = static function ($m): void {
+$matchRow = static function ($m) use ($showPlayground): void {
 	$score = $m->team1_result === null || $m->team2_result === null
 		? '<span class="jl-site-muted">' . Text::_('COM_JOOMLEAGUE_SITE_NOT_PLAYED') . '</span>'
 		: '<span class="jl-site-score">' . htmlspecialchars((string) $m->team1_result . ' : ' . (string) $m->team2_result, ENT_QUOTES, 'UTF-8') . '</span>';
@@ -88,7 +93,7 @@ $matchRow = static function ($m): void {
 		<td><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $m->home_projectteam_id); ?>"><?php echo htmlspecialchars((string) ($m->home_name ?? ''), ENT_QUOTES, 'UTF-8'); ?></a></td>
 		<td class="text-center"><?php echo $score; ?></td>
 		<td><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $m->away_projectteam_id); ?>"><?php echo htmlspecialchars((string) ($m->away_name ?? ''), ENT_QUOTES, 'UTF-8'); ?></a></td>
-		<td><?php echo htmlspecialchars((string) ($m->playground_name ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
+		<?php if ($showPlayground) : ?><td><?php echo htmlspecialchars((string) ($m->playground_name ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><?php endif; ?>
 		<td class="text-end"><a class="jl-site-button" href="<?php echo Route::_('index.php?option=com_joomleague&view=matchreport&id=' . (int) $m->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DETAIL'); ?></a></td>
 	</tr>
 	<?php
@@ -109,23 +114,25 @@ $tableHead = '<thead><tr>'
 	. '<th>' . Text::_('COM_JOOMLEAGUE_SITE_HOME') . '</th>'
 	. '<th class="text-center">' . Text::_('COM_JOOMLEAGUE_SITE_SCORE') . '</th>'
 	. '<th>' . Text::_('COM_JOOMLEAGUE_SITE_AWAY') . '</th>'
-	. '<th>' . Text::_('COM_JOOMLEAGUE_SITE_PLAYGROUND') . '</th><th></th></tr></thead>';
+	. ($showPlayground ? '<th>' . Text::_('COM_JOOMLEAGUE_SITE_PLAYGROUND') . '</th>' : '') . '<th></th></tr></thead>';
 
-// pevné šířky sloupců (aby se kola zarovnala) — datum, domácí, výsledek, hosté, stadion, detail
+// pevné šířky sloupců (aby se kola zarovnala) — datum, domácí, výsledek, hosté, [stadion], detail
 $colgroup = '<colgroup>'
 	. '<col style="width:15%">'
 	. '<col style="width:22%">'
 	. '<col style="width:8%">'
 	. '<col style="width:22%">'
-	. '<col style="width:23%">'
-	. '<col style="width:10%">'
+	. ($showPlayground ? '<col style="width:23%">' : '')
+	. '<col style="width:' . ($showPlayground ? '10' : '33') . '%">'
 	. '</colgroup>';
 ?>
 <div class="com-joomleague-site">
+	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo $this->escape($eyebrow); ?></div>
 		<h1 class="jl-site-title"><?php echo $this->escape($title); ?></h1>
 	</section>
+	<?php endif; ?>
 
 	<div class="jl-site-grid mb-4">
 		<div class="jl-site-card"><strong><?php echo (int) ($this->matchSummary['total'] ?? 0); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_MATCHES'); ?></span></div>
@@ -136,6 +143,7 @@ $colgroup = '<colgroup>'
 		<?php endif; ?>
 	</div>
 
+	<?php if ($showIcalLink) : ?>
 	<div class="jl-site-panel mb-4">
 		<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_ADD_TO_CALENDAR'); ?></h2>
 		<p class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CALENDAR_SUBSCRIBE_HELP'); ?></p>
@@ -147,6 +155,7 @@ $colgroup = '<colgroup>'
 			<a href="https://outlook.office.com/calendar/0/addfromweb?url=<?php echo rawurlencode($icalUrl); ?>&amp;name=<?php echo rawurlencode($calendarName); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_JOOMLEAGUE_SITE_OFFICE_365'); ?></a>
 		</nav>
 	</div>
+	<?php endif; ?>
 
 	<div class="jl-site-panel">
 		<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">

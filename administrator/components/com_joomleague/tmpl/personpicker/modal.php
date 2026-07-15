@@ -101,7 +101,7 @@ $actionUri->setQuery([
 									data-title="<?php echo $this->escape($name); ?>"><?php echo $this->escape($name); ?></a>
 							</td>
 							<td><?php echo $this->escape((string) ($item->nickname ?? '')); ?></td>
-							<td><?php echo $this->escape((string) ($item->position ?? '')); ?></td>
+							<td><?php echo $this->escape(Text::_((string) ($item->position ?? ''))); ?></td>
 							<td class="text-center"><?php echo (int) $item->id; ?></td>
 						</tr>
 					<?php endforeach; ?>

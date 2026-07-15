@@ -17,12 +17,20 @@ $team = $this->item;
 $stats = $this->teamStats;
 $rowsByStatistic = [];
 
+$params = $this->templateParams;
+$showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
+$showGeneralStats = (bool) ($params['show_general_stats'] ?? true);
+$showGoalsStats = (bool) ($params['show_goals_stats'] ?? true);
+$showHomeAwayStats = (bool) ($params['home_away_stats'] ?? true);
+$showAttendanceStats = (bool) ($params['show_attendance_stats'] ?? false);
+
 foreach ($this->teamPlayerStats as $row) {
 	$rowsByStatistic[(int) $row->statistic_id][] = $row;
 }
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$team) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_NOT_FOUND'); ?></div><?php return; endif; ?>
+	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
 		<div class="jl-site-eyebrow"><?php echo $this->escape($team->club_name ?? ''); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_STATS'); ?></h1>
@@ -33,6 +41,7 @@ foreach ($this->teamPlayerStats as $row) {
 			<a href="<?php echo Route::_('index.php?option=com_joomleague&view=schedule&project_id=' . (int) $team->project_id . '&projectteam_id=' . (int) $team->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE'); ?></a>
 		</nav>
 	</section>
+	<?php endif; ?>
 
 	<div class="jl-site-grid mb-4">
 		<div class="jl-site-card"><strong><?php echo (int) ($stats['played'] ?? 0); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PLAYED_MATCHES'); ?></span></div>
@@ -54,7 +63,7 @@ foreach ($this->teamPlayerStats as $row) {
 	];
 	$goalMax = max(1, ...array_map(static fn ($bar) => (int) $bar[1], $goalBars));
 	?>
-	<?php if ($played > 0) : ?>
+	<?php if ($played > 0 && $showGeneralStats) : ?>
 		<div class="jl-site-panel mb-4">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_WIN_DRAW_LOSS'); ?></h2>
 			<div class="jl-ts-wdl" role="img" aria-label="<?php echo $wins . ' / ' . $draws . ' / ' . $losses; ?>">
@@ -68,7 +77,9 @@ foreach ($this->teamPlayerStats as $row) {
 				<span class="jl-ts-key jl-ts-l"><?php echo Text::_('COM_JOOMLEAGUE_SITE_LOSSES'); ?></span>
 			</div>
 		</div>
+	<?php endif; ?>
 
+	<?php if ($played > 0 && $showGoalsStats) : ?>
 		<div class="jl-site-panel mb-4">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_GOALS'); ?></h2>
 			<div class="jl-ts-bars">
@@ -83,6 +94,7 @@ foreach ($this->teamPlayerStats as $row) {
 		</div>
 	<?php endif; ?>
 
+	<?php if ($showHomeAwayStats) : ?>
 	<div class="jl-site-panel table-responsive mb-4">
 		<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_HOME_AWAY'); ?></h2>
 		<table class="table jl-site-table align-middle">
@@ -113,13 +125,16 @@ foreach ($this->teamPlayerStats as $row) {
 			</tbody>
 		</table>
 	</div>
+	<?php endif; ?>
 
+	<?php if ($showAttendanceStats) : ?>
 	<div class="jl-site-grid mb-4">
 		<div class="jl-site-card"><strong><?php echo (int) ($stats['attendance_total'] ?? 0); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_ATTENDANCE_TOTAL'); ?></span></div>
 		<div class="jl-site-card"><strong><?php echo (int) ($stats['attendance_average'] ?? 0); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_ATTENDANCE_AVERAGE'); ?></span></div>
 		<div class="jl-site-card"><strong><?php echo (int) ($stats['attendance_best'] ?? 0); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_ATTENDANCE_BEST'); ?></span></div>
 		<div class="jl-site-card"><strong><?php echo (int) ($stats['attendance_worst'] ?? 0); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_ATTENDANCE_WORST'); ?></span></div>
 	</div>
+	<?php endif; ?>
 
 	<?php foreach ($rowsByStatistic as $statRows) : ?>
 		<?php $first = $statRows[0]; ?>

@@ -1,1 +1,0 @@
--- Schema guard: asset columns are added by script.php only when missing.

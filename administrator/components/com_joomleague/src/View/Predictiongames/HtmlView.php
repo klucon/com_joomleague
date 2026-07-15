@@ -18,6 +18,8 @@ final class HtmlView extends AdminListView
 {
 	protected function configure(): array
 	{
+		$projectId = (int) $this->getModel()->getState('filter.project_id');
+
 		return [
 			'title' => 'COM_JOOMLEAGUE_PREDICTIONGAMES_TITLE',
 			'caption' => 'COM_JOOMLEAGUE_PREDICTIONGAMES_TITLE',
@@ -27,7 +29,7 @@ final class HtmlView extends AdminListView
 			'primary' => 'name',
 			'state' => true,
 			'toolbar_links' => [
-				['url' => 'index.php?option=com_joomleague&view=tools', 'label' => 'COM_JOOMLEAGUE_TOOLS_BACK', 'icon' => 'arrow-left'],
+				['url' => 'index.php?option=com_joomleague&view=projectpanel&project_id=' . $projectId, 'label' => 'COM_JOOMLEAGUE_BACK_TO_PROJECT_PANEL', 'icon' => 'arrow-left'],
 				['url' => 'index.php?option=com_joomleague&view=predictiontips', 'label' => 'COM_JOOMLEAGUE_PREDICTIONTIPS_TITLE', 'icon' => 'list'],
 				['url' => 'index.php?option=com_joomleague&view=predictionscores', 'label' => 'COM_JOOMLEAGUE_PREDICTIONSCORES_TITLE', 'icon' => 'chart'],
 			],

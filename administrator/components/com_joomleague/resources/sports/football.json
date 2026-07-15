@@ -1,16 +1,328 @@
 {
   "profile": "football",
-  "sport": {"name": "Fotbal", "icon": "images/com_joomleague/database/sport_types/soccer.png"},
+  "sport": {
+    "name": "COM_JOOMLEAGUE_ST_SOCCER",
+    "icon": "images/com_joomleague/database/sport_types/soccer.png"
+  },
   "positions": [
-    {"name":"Brankář","personType":1},{"name":"Pravý obránce","personType":1},{"name":"Střední obránce","personType":1},{"name":"Levý obránce","personType":1},{"name":"Pravý krajní obránce","personType":1},{"name":"Levý krajní obránce","personType":1},{"name":"Defenzivní záložník","personType":1},{"name":"Střední záložník","personType":1},{"name":"Ofenzivní záložník","personType":1},{"name":"Pravý záložník","personType":1},{"name":"Levý záložník","personType":1},{"name":"Pravé křídlo","personType":1},{"name":"Levé křídlo","personType":1},{"name":"Podhrotový útočník","personType":1},{"name":"Střední útočník","personType":1},
-    {"name":"Hlavní trenér","personType":2},{"name":"Asistent trenéra","personType":2},{"name":"Trenér brankářů","personType":2},{"name":"Kondiční trenér","personType":2},{"name":"Týmový lékař","personType":2},{"name":"Fyzioterapeut","personType":2},{"name":"Masér","personType":2},{"name":"Videoanalytik","personType":2},{"name":"Vedoucí mužstva","personType":2},
-    {"name":"Hlavní rozhodčí","personType":3},{"name":"První asistent rozhodčího","personType":3},{"name":"Druhý asistent rozhodčího","personType":3},{"name":"Čtvrtý rozhodčí","personType":3},{"name":"VAR rozhodčí","personType":3},{"name":"AVAR rozhodčí","personType":3},
-    {"name":"Delegát utkání","personType":4},{"name":"Pozorovatel rozhodčích","personType":4},{"name":"Hlavní pořadatel","personType":4},{"name":"Týmový kustod","personType":4},{"name":"Tiskový mluvčí","personType":4},{"name":"Fotograf","personType":4},{"name":"Hlasatel","personType":4}
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_GOALKEEPER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_RIGHT_BACK",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_CENTRE_BACK",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_LEFT_BACK",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_RIGHT_WING_BACK",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_LEFT_WING_BACK",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_DEFENSIVE_MIDFIELDER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_CENTRE_MIDFIELDER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_ATTACKING_MIDFIELDER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_RIGHT_MIDFIELDER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_LEFT_MIDFIELDER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_RIGHT_WINGER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_LEFT_WINGER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_SECOND_STRIKER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_P_FOOTBALL_STRIKER",
+      "personType": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_HEAD_COACH",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_ASSISTANT_COACH",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_GOALKEEPER_COACH",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_FITNESS_COACH",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_TEAM_DOCTOR",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_PHYSIO",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_MASSEUR",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_VIDEO_ANALYST",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_TEAM_MANAGER",
+      "personType": 2
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_HEAD_REFEREE",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_FIRST_ASSISTANT_REFEREE",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_SECOND_ASSISTANT_REFEREE",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_FOURTH_OFFICIAL",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_VAR_REFEREE",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_AVAR_REFEREE",
+      "personType": 3
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_MATCH_DELEGATE",
+      "personType": 4
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_REFEREE_OBSERVER",
+      "personType": 4
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_HEAD_STEWARD",
+      "personType": 4
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_KIT_MANAGER",
+      "personType": 4
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_PRESS_OFFICER",
+      "personType": 4
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_PHOTOGRAPHER",
+      "personType": 4
+    },
+    {
+      "name": "COM_JOOMLEAGUE_F_ANNOUNCER",
+      "personType": 4
+    }
   ],
   "events": [
-    {"name":"Branka","icon":"images/com_joomleague/event_icons/goal.png"},{"name":"Asistence","icon":"images/com_joomleague/event_icons/assist2.png"},{"name":"Vlastní branka","icon":"images/com_joomleague/event_icons/own_goal.png"},{"name":"Branka z penalty","icon":"images/com_joomleague/event_icons/penalty_goal.png"},{"name":"Neproměněná penalta","icon":"images/com_joomleague/event_icons/penmiss.png"},{"name":"Žlutá karta","icon":"images/com_joomleague/event_icons/yellow_card.gif","suspension":1},{"name":"Druhá žlutá karta","icon":"images/com_joomleague/event_icons/yellow_red_card.gif","suspension":1},{"name":"Červená karta","icon":"images/com_joomleague/event_icons/red_card.gif","suspension":1},{"name":"Střídání","icon":"images/com_joomleague/event_icons/subst.png"},{"name":"Zranění","icon":"images/com_joomleague/event_icons/injured.gif"},{"name":"Proměněná penalta v rozstřelu","icon":"images/com_joomleague/event_icons/penalty_goal.png"},{"name":"Neproměněná penalta v rozstřelu","icon":"images/com_joomleague/event_icons/penmiss.png"}
+    {
+      "name": "COM_JOOMLEAGUE_E_GOAL",
+      "icon": "images/com_joomleague/event_icons/goal.png"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_ASSISTS",
+      "icon": "images/com_joomleague/event_icons/assist2.png"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_OWN_GOAL",
+      "icon": "images/com_joomleague/event_icons/own_goal.png"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_PENALTY_GOAL",
+      "icon": "images/com_joomleague/event_icons/penalty_goal.png"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_FOOTBALL_PENALTY_MISS",
+      "icon": "images/com_joomleague/event_icons/penmiss.png"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_YELLOW_CARD",
+      "icon": "images/com_joomleague/event_icons/yellow_card.gif",
+      "suspension": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_YELLOW-RED_CARD",
+      "icon": "images/com_joomleague/event_icons/yellow_red_card.gif",
+      "suspension": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_RED_CARD",
+      "icon": "images/com_joomleague/event_icons/red_card.gif",
+      "suspension": 1
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_SUBSTITUTION",
+      "icon": "images/com_joomleague/event_icons/subst.png"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_INJURY",
+      "icon": "images/com_joomleague/event_icons/injured.gif"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_FOOTBALL_SHOOTOUT_PENALTY_SCORED",
+      "icon": "images/com_joomleague/event_icons/penalty_goal.png"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_E_FOOTBALL_SHOOTOUT_PENALTY_MISSED",
+      "icon": "images/com_joomleague/event_icons/penmiss.png"
+    }
   ],
   "statistics": [
-    {"name":"Odehrané minuty","short":"MIN"},{"name":"Asistence","short":"A"},{"name":"Střely celkem","short":"STR"},{"name":"Střely na branku","short":"STR-B"},{"name":"Zblokované střely","short":"STR-Z"},{"name":"Přihrávky celkem","short":"PRI"},{"name":"Úspěšné přihrávky","short":"PRI-U"},{"name":"Klíčové přihrávky","short":"KLI-PRI"},{"name":"Centery celkem","short":"CEN"},{"name":"Úspěšné centery","short":"CEN-U"},{"name":"Driblinky celkem","short":"DRI"},{"name":"Úspěšné driblinky","short":"DRI-U"},{"name":"Doteky s míčem","short":"DOT"},{"name":"Obranné zákroky","short":"OBR"},{"name":"Úspěšné obranné zákroky","short":"OBR-U"},{"name":"Zachycené přihrávky","short":"INT"},{"name":"Odvrácené míče","short":"ODV"},{"name":"Zblokované pokusy soupeře","short":"BLOK"},{"name":"Souboje celkem","short":"SOU"},{"name":"Vyhrané souboje","short":"SOU-V"},{"name":"Vzdušné souboje celkem","short":"VZD"},{"name":"Vyhrané vzdušné souboje","short":"VZD-V"},{"name":"Spáchané fauly","short":"FAUL"},{"name":"Získané fauly","short":"FAUL-Z"},{"name":"Ofsajdy","short":"OFS"},{"name":"Brankářské zákroky","short":"GK-Z"},{"name":"Inkasované branky","short":"GK-IB"},{"name":"Čisté konto","short":"GK-CK"},{"name":"Chycené penalty","short":"GK-P"}
+    {
+      "name": "COM_JOOMLEAGUE_S_MINUTES_PLAYED",
+      "short": "MIN"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_ASSISTS",
+      "short": "A"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_SHOTS_TOTAL",
+      "short": "STR"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_SHOTS_ON_TARGET",
+      "short": "STR-B"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_SHOTS_BLOCKED",
+      "short": "STR-Z"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_PASSES_TOTAL",
+      "short": "PRI"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_PASSES_COMPLETED",
+      "short": "PRI-U"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_KEY_PASSES",
+      "short": "KLI-PRI"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_CROSSES_TOTAL",
+      "short": "CEN"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_CROSSES_COMPLETED",
+      "short": "CEN-U"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_DRIBBLES_TOTAL",
+      "short": "DRI"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_DRIBBLES_COMPLETED",
+      "short": "DRI-U"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_TOUCHES",
+      "short": "DOT"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_TACKLES_TOTAL",
+      "short": "OBR"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_TACKLES_WON",
+      "short": "OBR-U"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_INTERCEPTIONS",
+      "short": "INT"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_CLEARANCES",
+      "short": "ODV"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_OPPONENT_SHOTS_BLOCKED",
+      "short": "BLOK"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_DUELS_TOTAL",
+      "short": "SOU"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_DUELS_WON",
+      "short": "SOU-V"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_AERIAL_DUELS_TOTAL",
+      "short": "VZD"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_AERIAL_DUELS_WON",
+      "short": "VZD-V"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_FOULS_COMMITTED",
+      "short": "FAUL"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_FOULS_SUFFERED",
+      "short": "FAUL-Z"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_OFFSIDES",
+      "short": "OFS"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_SAVES",
+      "short": "GK-Z"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_GOALS_CONCEDED",
+      "short": "GK-IB"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_CLEAN_SHEETS",
+      "short": "GK-CK"
+    },
+    {
+      "name": "COM_JOOMLEAGUE_S_FOOTBALL_PENALTIES_SAVED",
+      "short": "GK-P"
+    }
   ]
 }

@@ -23,7 +23,7 @@ final class ProjectsetupController extends BaseController
 	{
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
-		$projectId = $this->input->getInt('project_id');
+		$projectId = $this->input->getInt('project_id', 0);
 		$section = $this->input->getCmd('section');
 		$assignedIds = $this->input->get('assigned', [], 'array');
 		$ordering = $this->input->get('ordering', [], 'array');

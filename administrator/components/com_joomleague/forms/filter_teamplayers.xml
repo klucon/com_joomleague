@@ -11,6 +11,6 @@
 			<option value="pe.lastname ASC">COM_JOOMLEAGUE_PERSON_ASC</option>
 			<option value="pe.lastname DESC">COM_JOOMLEAGUE_PERSON_DESC</option>
 		</field>
-		<field name="limit" type="limitbox" label="JGLOBAL_LIST_LIMIT" />
+		<field name="limit" type="limitbox" label="JGLOBAL_LIST_LIMIT" class="js-select-submit-on-change"/>
 	</fields>
 </form>
