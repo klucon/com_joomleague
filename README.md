@@ -19,13 +19,24 @@ JoomLeague helps clubs, leagues and tournament organizers manage seasons, compet
 
 **Public ecosystem**
 
-[![Website](https://img.shields.io/badge/website-klucon.cz-111827?style=flat-square)](https://klucon.cz)
-[![Downloads](https://img.shields.io/badge/downloads-package-2ea44f?style=flat-square)](https://klucon.cz/downloads)
-[![Documentation](https://img.shields.io/badge/docs-docs.klucon.cz-0969da?style=flat-square)](https://docs.klucon.cz)
-[![Demo](https://img.shields.io/badge/demo-joomleague.klucon.cz-0f766e?style=flat-square)](https://joomleague.klucon.cz)
-[![Statistics](https://img.shields.io/badge/stats-stats.klucon.cz-7c3aed?style=flat-square)](https://stats.klucon.cz)
-[![Migration](https://img.shields.io/badge/migration-migrate.klucon.cz-d97706?style=flat-square)](https://migrate.klucon.cz)
-[![Forum](https://img.shields.io/badge/forum-forum.klucon.cz-475569?style=flat-square)](https://forum.klucon.cz)
+<table>
+  <tr>
+    <td align="left" width="50%">
+      <strong>Project</strong><br>
+      <a href="https://klucon.cz">Website</a><br>
+      <a href="https://klucon.cz/downloads">Downloads</a><br>
+      <a href="https://docs.klucon.cz">Documentation</a><br>
+      <a href="https://joomleague.klucon.cz">Live demo</a>
+    </td>
+    <td align="left" width="50%">
+      <strong>Services</strong><br>
+      <a href="https://stats.klucon.cz">Public statistics</a><br>
+      <a href="https://migrate.klucon.cz">Migration tool</a><br>
+      <a href="https://forum.klucon.cz">Community forum</a><br>
+      <a href="https://github.com/klucon/com_joomleague/releases/latest">Latest release</a>
+    </td>
+  </tr>
+</table>
 
 </div>
 
