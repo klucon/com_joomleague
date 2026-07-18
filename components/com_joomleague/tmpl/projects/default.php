@@ -9,9 +9,34 @@ declare(strict_types=1);
 \defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $params = $this->templateParams;
 $showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
+
+StructuredDataHelper::add($this->getDocument(), [
+	'@context' => 'https://schema.org',
+] + StructuredDataHelper::collectionPage(
+	Text::_('COM_JOOMLEAGUE_SITE_PROJECTS_TITLE'),
+	array_map(
+		static fn (object $item): array => [
+			'@type' => 'SportsOrganization',
+			'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $item->id, false)) . '#competition',
+			'name' => (string) $item->name,
+			'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $item->id, false)),
+			'parentOrganization' => !empty($item->league_name) ? [
+				'@type' => 'SportsOrganization',
+				'name' => (string) $item->league_name,
+			] : null,
+			'event' => [
+				'@type' => 'SportsEvent',
+				'name' => (string) $item->name,
+			],
+		],
+		$this->items
+	),
+	Text::_('COM_JOOMLEAGUE_SITE_PROJECTS_DESC')
+));
 ?>
 <div class="com-joomleague-site">
 	<?php if ($showSectionheader) : ?>

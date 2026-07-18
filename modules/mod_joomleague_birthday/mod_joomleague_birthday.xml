@@ -7,7 +7,7 @@
 	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-151</version>
+	<version>6.1.0-alpha-153</version>
 	<description>MOD_JOOMLEAGUE_BIRTHDAY_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Birthday</namespace>
 	<files>
@@ -17,11 +17,7 @@
 	</files>
 	<languages>
 		<language tag="en-GB">language/en-GB/mod_joomleague_birthday.ini</language>
-		<language tag="de-DE">language/de-DE/mod_joomleague_birthday.ini</language>
 		<language tag="en-GB">language/en-GB/mod_joomleague_birthday.sys.ini</language>
-		<language tag="de-DE">language/de-DE/mod_joomleague_birthday.sys.ini</language>
-		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_birthday.ini</language>
-		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_birthday.sys.ini</language>
 	</languages>
 	<config>
 		<fields name="params">

@@ -7,17 +7,15 @@
 		<field name="nickname" type="text" label="COM_JOOMLEAGUE_PERSON_FIELD_NICKNAME" description="COM_JOOMLEAGUE_PERSON_FIELD_NICKNAME_DESCRIPTION" />
 		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" />
 		<field name="contact_id" type="sql" label="COM_JOOMLEAGUE_PERSON_FIELD_CONTACT" query="SELECT id,name FROM #__contact_details ORDER BY name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_PERSON_FIELD_CONTACT_DESCRIPTION">
-			<option value="">JOPTION_SELECT_CONTACT</option>
+			<option value="">COM_JOOMLEAGUE_SELECT_CONTACT</option>
 		</field>
-		<field name="position_id" type="sql" label="COM_JOOMLEAGUE_PERSON_FIELD_POSITION" query="SELECT id,name FROM #__joomleague_position ORDER BY name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_PERSON_FIELD_POSITION_DESCRIPTION">
-			<option value="">COM_JOOMLEAGUE_SELECT_POSITION</option>
-		</field>
+		<field name="position_id" type="positions" label="COM_JOOMLEAGUE_PERSON_FIELD_POSITION" description="COM_JOOMLEAGUE_PERSON_FIELD_POSITION_DESCRIPTION" />
 		<field name="birthday" type="calendar" label="COM_JOOMLEAGUE_PERSON_FIELD_BIRTHDAY" format="%Y-%m-%d" showtime="false" description="COM_JOOMLEAGUE_PERSON_FIELD_BIRTHDAY_DESCRIPTION" />
 		<field name="deathday" type="calendar" label="COM_JOOMLEAGUE_PERSON_FIELD_DEATHDAY" format="%Y-%m-%d" showtime="false" description="COM_JOOMLEAGUE_PERSON_FIELD_DEATHDAY_DESCRIPTION" />
 		<field name="height" type="number" label="COM_JOOMLEAGUE_PERSON_FIELD_HEIGHT" min="0" description="COM_JOOMLEAGUE_PERSON_FIELD_HEIGHT_DESCRIPTION" />
 		<field name="weight" type="number" label="COM_JOOMLEAGUE_PERSON_FIELD_WEIGHT" min="0" description="COM_JOOMLEAGUE_PERSON_FIELD_WEIGHT_DESCRIPTION" />
 		<field name="knvbnr" type="text" label="COM_JOOMLEAGUE_PERSON_FIELD_REGISTRATION" description="COM_JOOMLEAGUE_PERSON_FIELD_REGISTRATION_DESCRIPTION" />
-		<field name="country" type="country" label="COM_JOOMLEAGUE_FIELD_COUNTRY" description="COM_JOOMLEAGUE_FIELD_COUNTRY_DESCRIPTION" />
+		<field name="country" type="country" label="COM_JOOMLEAGUE_PERSON_FIELD_NATIONALITY_COUNTRY" description="COM_JOOMLEAGUE_PERSON_FIELD_NATIONALITY_COUNTRY_DESCRIPTION" />
 		<field name="info" type="textarea" rows="8" label="COM_JOOMLEAGUE_FIELD_INFO" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_INFO_DESCRIPTION" />
 		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
 	</fieldset>
@@ -26,7 +24,7 @@
 		<field name="zipcode" type="text" label="COM_JOOMLEAGUE_FIELD_ZIPCODE" description="COM_JOOMLEAGUE_FIELD_ZIPCODE_DESCRIPTION" />
 		<field name="location" type="text" label="COM_JOOMLEAGUE_FIELD_LOCATION" description="COM_JOOMLEAGUE_FIELD_LOCATION_DESCRIPTION" />
 		<field name="state" type="text" label="COM_JOOMLEAGUE_FIELD_STATE" description="COM_JOOMLEAGUE_FIELD_STATE_DESCRIPTION" />
-		<field name="address_country" type="country" label="COM_JOOMLEAGUE_FIELD_COUNTRY" description="COM_JOOMLEAGUE_FIELD_COUNTRY_DESCRIPTION" />
+		<field name="address_country" type="country" label="COM_JOOMLEAGUE_PERSON_FIELD_ADDRESS_COUNTRY" description="COM_JOOMLEAGUE_PERSON_FIELD_ADDRESS_COUNTRY_DESCRIPTION" />
 		<field name="phone" type="tel" label="COM_JOOMLEAGUE_FIELD_PHONE" description="COM_JOOMLEAGUE_FIELD_PHONE_DESCRIPTION" />
 		<field name="mobile" type="tel" label="COM_JOOMLEAGUE_FIELD_MOBILE" description="COM_JOOMLEAGUE_FIELD_MOBILE_DESCRIPTION" />
 		<field name="email" type="email" label="JGLOBAL_EMAIL" />

@@ -7,7 +7,7 @@
 	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-151</version>
+	<version>6.1.0-alpha-153</version>
 	<description>PLG_EXTENSION_JOOMLEAGUEESPORT_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Plugin\Extension\Joomleagueesport</namespace>
 	<files>
@@ -16,10 +16,6 @@
 	</files>
 	<languages>
 		<language tag="en-GB">language/en-GB/plg_extension_joomleagueesport.ini</language>
-		<language tag="de-DE">language/de-DE/plg_extension_joomleagueesport.ini</language>
 		<language tag="en-GB">language/en-GB/plg_extension_joomleagueesport.sys.ini</language>
-		<language tag="de-DE">language/de-DE/plg_extension_joomleagueesport.sys.ini</language>
-		<language tag="cs-CZ">language/cs-CZ/plg_extension_joomleagueesport.ini</language>
-		<language tag="cs-CZ">language/cs-CZ/plg_extension_joomleagueesport.sys.ini</language>
 	</languages>
 </extension>

@@ -13,6 +13,7 @@ declare(strict_types=1);
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $project = $this->project;
 
@@ -52,13 +53,49 @@ $palette = [
 	'#0369a1',
 	'#4d7c0f',
 ];
+
+if ($project) {
+	StructuredDataHelper::add($this->getDocument(), [
+		'@context' => 'https://schema.org',
+		'@type' => 'Dataset',
+		'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=curve&project_id=' . (int) $project->id, false)) . '#dataset',
+		'name' => Text::_('COM_JOOMLEAGUE_SITE_CURVE') . ' - ' . (string) $project->name,
+		'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=curve&project_id=' . (int) $project->id, false)),
+		'isPartOf' => [
+			'@type' => 'SportsOrganization',
+			'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $project->id, false)) . '#competition',
+			'name' => (string) $project->name,
+		],
+		'about' => array_map(
+			static fn (object $team): array => [
+				'@type' => 'SportsTeam',
+				'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->projectteam_id, false)) . '#sportsteam',
+				'name' => (string) $team->team_name,
+				'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->projectteam_id, false)),
+			],
+			$curveTeams
+		),
+		'variableMeasured' => Text::_('COM_JOOMLEAGUE_SITE_RANKING'),
+		'mainEntityOfPage' => StructuredDataHelper::collectionPage(
+			Text::_('COM_JOOMLEAGUE_SITE_CURVE'),
+			array_map(
+				static fn (object $team): array => [
+					'@type' => 'SportsTeam',
+					'name' => (string) $team->team_name,
+				],
+				$curveTeams
+			),
+			$this->projectLabel($project)
+		),
+	]);
+}
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$project) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PROJECT_NOT_FOUND'); ?></div><?php return; endif; ?>
 
 	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo $this->escape($project->name); ?></div>
+		<div class="jl-site-eyebrow"><?php echo $this->escape($this->projectLabel($project)); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CURVE'); ?></h1>
 	</section>
 	<?php endif; ?>
@@ -184,6 +221,21 @@ $palette = [
 					</tbody>
 				</table>
 			</div>
+		</div>
+		<div class="jl-curve-mobile-list">
+			<?php foreach ($curveTeams as $teamIndex => $team) : ?>
+				<article class="jl-curve-mobile-card" style="--jl-curve-color: <?php echo $this->escape($palette[$teamIndex % count($palette)]); ?>;">
+					<h3><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->projectteam_id); ?>"><?php echo $this->escape($team->team_name); ?></a></h3>
+					<dl>
+						<?php foreach ($rounds as $round) : ?>
+							<div>
+								<dt><?php echo $this->escape($round->name); ?></dt>
+								<dd><?php echo isset($team->positions[(int) $round->id]) ? (int) $team->positions[(int) $round->id] : Text::_('COM_JOOMLEAGUE_SITE_NOT_PLAYED'); ?></dd>
+							</div>
+						<?php endforeach; ?>
+					</dl>
+				</article>
+			<?php endforeach; ?>
 		</div>
 	</div>
 </div>

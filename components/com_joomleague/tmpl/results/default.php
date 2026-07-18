@@ -12,6 +12,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 /** @var Joomleague\Component\Joomleague\Site\View\Results\HtmlView $this */
 
@@ -142,6 +143,43 @@ $isLive = static function (object $match) use ($now): bool {
 
 	return $start !== false && $start <= $now && $now - $start < 3 * 3600;
 };
+
+$schemaMatch = static function (object $match) use ($projectId): array {
+	$matchUrl = StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=matchreport&project_id=' . $projectId . '&id=' . (int) $match->id, false));
+
+	return [
+		'@type' => 'SportsEvent',
+		'@id' => $matchUrl ? $matchUrl . '#sportsevent' : null,
+		'name' => trim((string) ($match->home_name ?? '') . ' - ' . (string) ($match->away_name ?? '')),
+		'url' => $matchUrl,
+		'startDate' => !empty($match->match_date) ? date('c', strtotime((string) $match->match_date)) : null,
+		'eventStatus' => !empty($match->cancel)
+			? 'https://schema.org/EventCancelled'
+			: 'https://schema.org/EventScheduled',
+		'homeTeam' => !empty($match->home_name) ? [
+			'@type' => 'SportsTeam',
+			'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) ($match->home_projectteam_id ?? 0), false)) . '#sportsteam',
+			'name' => (string) $match->home_name,
+		] : null,
+		'awayTeam' => !empty($match->away_name) ? [
+			'@type' => 'SportsTeam',
+			'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) ($match->away_projectteam_id ?? 0), false)) . '#sportsteam',
+			'name' => (string) $match->away_name,
+		] : null,
+		'location' => !empty($match->playground_name) ? [
+			'@type' => 'SportsActivityLocation',
+			'name' => (string) $match->playground_name,
+		] : null,
+	];
+};
+
+StructuredDataHelper::add($this->getDocument(), [
+	'@context' => 'https://schema.org',
+] + StructuredDataHelper::collectionPage(
+	Text::_('COM_JOOMLEAGUE_SITE_RESULTS'),
+	array_map($schemaMatch, $this->matches),
+	$this->projectLabel()
+));
 $liveTitle = static function (object $match) use ($markNowPlayingAltText, $markNowPlayingAltActualTime, $now): string {
 	$start = strtotime((string) $match->match_date);
 	$minutes = $start !== false ? max(0, (int) floor(($now - $start) / 60)) : 0;
@@ -213,6 +251,8 @@ $roundHeading = static function (?string $name, int $roundcode) use ($typeSectio
 
 $showRoundsDates = $show('show_rounds_dates');
 $showMatchdayDateheader = $show('show_matchday_dateheader');
+$showRoundColumn = false;
+$showDetailColumn = false;
 
 // Seskupení zápasů podle kola (i při zobrazení jednoho kola vznikne jedna skupina).
 $byRound = [];
@@ -232,14 +272,27 @@ foreach ($this->matches as $match) {
 			'roundcode' => (int) ($match->roundcode ?? 0),
 			'date_first' => $dateFirst,
 			'date_last' => $dateLast !== '' && $dateLast !== $dateFirst ? $dateLast : '',
+			'sort_date' => (string) ($match->match_date ?? ''),
 			'matches' => [],
 		];
 	}
 
 	$byRound[$roundId]['matches'][] = $match;
+
+	$matchDate = (string) ($match->match_date ?? '');
+
+	if ($matchDate !== '' && (strpos($matchDate, '0000-00-00') !== 0) && ($byRound[$roundId]['sort_date'] === '' || strcmp($matchDate, $byRound[$roundId]['sort_date']) < 0)) {
+		$byRound[$roundId]['sort_date'] = $matchDate;
+	}
 }
 
-uasort($byRound, static fn (array $a, array $b): int => $a['roundcode'] <=> $b['roundcode']);
+uasort($byRound, static function (array $a, array $b): int {
+	$dateA = $a['sort_date'] !== '' && strpos($a['sort_date'], '0000-00-00') !== 0 ? $a['sort_date'] : '9999-12-31 23:59:59';
+	$dateB = $b['sort_date'] !== '' && strpos($b['sort_date'], '0000-00-00') !== 0 ? $b['sort_date'] : '9999-12-31 23:59:59';
+	$dateCompare = strcmp($dateA, $dateB);
+
+	return $dateCompare !== 0 ? $dateCompare : ((int) $a['id'] <=> (int) $b['id']);
+});
 
 // Volné týmy (nehrají v aktuálně zobrazeném kole) – dává smysl jen při filtru na 1 kolo.
 $dnpTeams = [];
@@ -288,7 +341,7 @@ $bottomPagenav = in_array($pagenavMode, ['1', '3'], true) ? $renderPagenav() : '
 ?>
 <div class="com-joomleague-site">
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo $this->project ? $this->escape($this->project->name) : ''; ?></div>
+		<div class="jl-site-eyebrow"><?php echo $this->escape($this->projectLabel()); ?></div>
 		<?php if ($show('show_sectionheader')) : ?><h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULTS'); ?></h1><?php endif; ?>
 		<?php if ($show('show_matchday_dropdown') && count($this->rounds) > 1) : ?>
 			<?php
@@ -335,12 +388,12 @@ $bottomPagenav = in_array($pagenavMode, ['1', '3'], true) ? $renderPagenav() : '
 					<?php endif; ?>
 				</div>
 			<?php endif; ?>
-			<div class="jl-site-panel table-responsive">
-				<table class="table jl-site-table align-middle">
+				<div class="jl-site-panel table-responsive jl-match-table-wrap">
+					<table class="table jl-site-table jl-matches-table align-middle">
 					<thead>
 						<tr>
 							<?php if ($show('show_date')) : ?><th><?php echo Text::_('COM_JOOMLEAGUE_SITE_DATE'); ?></th><?php endif; ?>
-							<?php if ($show('show_round')) : ?><th><?php echo Text::_('COM_JOOMLEAGUE_SITE_ROUND'); ?></th><?php endif; ?>
+							<?php if ($showRoundColumn) : ?><th><?php echo Text::_('COM_JOOMLEAGUE_SITE_ROUND'); ?></th><?php endif; ?>
 							<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_HOME'); ?></th>
 							<?php if ($show('show_score')) : ?><th class="text-center"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCORE'); ?></th><?php endif; ?>
 							<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_AWAY'); ?></th>
@@ -349,7 +402,7 @@ $bottomPagenav = in_array($pagenavMode, ['1', '3'], true) ? $renderPagenav() : '
 							<?php if ($show('show_match_number', false)) : ?><th>#</th><?php endif; ?>
 							<?php if ($show('show_attendance_column', false)) : ?><th><?php echo Text::_('COM_JOOMLEAGUE_SITE_ATTENDANCE'); ?></th><?php endif; ?>
 							<?php if ($show('show_division', false)) : ?><th><?php echo Text::_('COM_JOOMLEAGUE_SITE_DIVISION'); ?></th><?php endif; ?>
-							<?php if ($show('show_detail_link')) : ?><th></th><?php endif; ?>
+							<?php if ($showDetailColumn) : ?><th></th><?php endif; ?>
 						</tr>
 					</thead>
 					<tbody>
@@ -485,7 +538,7 @@ $bottomPagenav = in_array($pagenavMode, ['1', '3'], true) ? $renderPagenav() : '
 										?>
 									</td>
 								<?php endif; ?>
-								<?php if ($show('show_round')) : ?><td><?php echo $this->escape((string) $match->round_name); ?></td><?php endif; ?>
+								<?php if ($showRoundColumn) : ?><td><?php echo $this->escape((string) $match->round_name); ?></td><?php endif; ?>
 								<td><?php echo $homeTeamHtml; ?></td>
 								<?php if ($show('show_score')) : ?>
 									<td class="text-center">
@@ -534,8 +587,8 @@ $bottomPagenav = in_array($pagenavMode, ['1', '3'], true) ? $renderPagenav() : '
 										<?php endif; ?>
 									</td>
 								<?php endif; ?>
-								<?php if ($show('show_detail_link')) : ?>
-									<td class="text-end"><a class="jl-site-button" href="<?php echo Route::_('index.php?option=com_joomleague&view=matchreport&id=' . (int) $match->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DETAIL'); ?></a></td>
+								<?php if ($showDetailColumn) : ?>
+									<td class="jl-match-action-cell text-end"><a class="jl-site-button" href="<?php echo Route::_('index.php?option=com_joomleague&view=matchreport&id=' . (int) $match->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DETAIL'); ?></a></td>
 								<?php endif; ?>
 							</tr>
 							<?php if ($showEvents && !empty($this->matchesEvents[(int) $match->id])) : ?>
@@ -563,7 +616,7 @@ $bottomPagenav = in_array($pagenavMode, ['1', '3'], true) ? $renderPagenav() : '
 					</tbody>
 				</table>
 			</div>
-			<?php if ($dnpTeams && $round['id'] === $this->resultsRoundId) : ?>
+				<?php if ($dnpTeams && $round['id'] === $this->resultsRoundId) : ?>
 				<p class="jl-site-muted mt-2">
 					<?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAMS_NOT_PLAYING'); ?>:
 					<?php foreach ($dnpTeams as $team) : ?>

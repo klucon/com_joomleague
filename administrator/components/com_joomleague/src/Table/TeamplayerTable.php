@@ -48,7 +48,7 @@ final class TeamplayerTable extends Table
 		$this->injury_detail = trim((string) $this->injury_detail);
 		$this->suspension_detail = trim((string) $this->suspension_detail);
 		$this->away_detail = trim((string) $this->away_detail);
-		$this->alias = OutputFilter::stringURLSafe(trim((string) $this->alias) ?: 'team-player-' . (int) $this->person_id);
+		$this->alias = OutputFilter::stringURLSafe(trim((string) $this->alias) ?: 'person-' . (int) $this->person_id);
 
 		foreach (['injury', 'suspension', 'away', 'active', 'published'] as $field) {
 			$this->{$field} = (int) $this->{$field};

@@ -2,60 +2,74 @@
 
 All notable changes to this project will be documented in this file.
 
-## 6.1.0-alpha-151 - 2026-07-15
-
-### Added
-
-- Added project-aware canonical menu item selection for generated SEF URLs.
-- Added project detection for routes that start from a project team, match or person instead of an explicit project parameter.
-- Added match alias lookup based on home team, away team and match date for readable match report routes.
-- Added administrator filter forms for prediction scores, prediction tips and tournament tree nodes.
-- Added frontend template configuration forms for prediction, project heading, projects, race results and results-and-standings pages.
-- Added the SQL truncate administrator tool with controller, model, view and template support.
-- Added geocoding support for administrator forms, including a geocode field, helper and JavaScript button.
-- Added map URL and map embed helpers for frontend and administrator views.
-- Added bundled Leaflet assets for map rendering.
-- Added shared frontend helpers for person names, player statistics and ranking columns.
-- Added a shared ranking form layout for frontend ranking-related pages.
-- Added SVG placeholder assets for clubs, teams, projects, persons, stadiums, divisions, trophies, referees, players and team staff.
-
-### Changed
-
-- Updated package, component, module and plugin manifests to `6.1.0-alpha-151`.
-- Reworked project navigation module links to use `project_id` consistently.
-- Improved SEF route generation for project, team, roster, rivals, team statistics, match report and person pages.
-- Improved club detail routing so club pages can reuse the clubs menu item as their route base.
-- Improved active menu parsing for empty route segments.
-- Reworked several administrator list, form and template screens for Joomla 6.1 compatibility and more consistent filtering.
-- Extended project-scoped dynamic menu item selectors so dependent values are loaded from the selected project.
-- Updated administrator forms for clubs, matches, persons, positions, projects, rounds, statistics, templates, teams, team players, team staff, tournament trees and running-race records.
-- Updated frontend templates for clubs, club detail, projects, project detail, results, results and standings, result matrix, schedule, standings, teams, team detail, roster, rivals, statistics, statistics ranking, events ranking, ranking curve, referees, match reports, next match, persons, playgrounds, predictions, tournament trees and race results.
-- Updated module templates for the JoomLeague logo, navigation menu and random player modules.
-- Updated the Cassiopeia menu override used by JoomLeague pages.
-- Updated dashboard and frontend CSS for the revised administrator and frontend layouts.
-- Updated sport bootstrap JSON resources for football, basketball, handball, ice hockey and volleyball.
-- Consolidated historical SQL update files into the current alpha baseline marker.
-- Updated release metadata generation so the Joomla update changelog rolls up the public alpha changes through `6.1.0-alpha-151`.
+## 6.1.0-alpha-153 - 2026-07-18
 
 ### Fixed
 
-- Fixed generated project URLs that could use the wrong menu item when multiple project pages were available.
-- Fixed project-scoped URLs that lost their project context when only a team, match or person identifier was present.
-- Fixed match report route parsing for readable match aliases.
-- Fixed project navigation links that still used the older `id` parameter.
-- Fixed administrator dependent selectors that could show global teams, clubs, matches or statistics instead of project-scoped values.
-- Fixed missing administrator filter forms on prediction and tournament tree related list views.
-- Fixed missing template option forms for several frontend pages.
-- Fixed map and stadium related rendering paths that previously lacked shared helper support.
-- Fixed ranking-related frontend rendering by moving repeated column and form logic into shared helpers.
-- Fixed several untranslated or reused language constants in administrator and frontend language files.
-- Fixed package consistency so generated child extension archives use the same release version as the parent package.
+- Added a public release rollup for installations upgrading from the previous public `6.1.0-alpha-151` package.
+- Added administrator language package management with translation status, download, update and remove actions.
+- Added generated language ZIP packages for Joomla language tags supported by the translation workflow.
+- Kept the main package English-only while publishing optional language packages separately.
+- Added release download pages, release JSON, checksums and language package manifests for the KLUCON download/update endpoints.
+- Improved administrator dashboard language status reporting and linked it to the language package management screen.
+- Added AJAX project-team assignment for project setup so teams can be added one by one in scheduling order.
+- Added AJAX person assignment workflows for team players and team staff.
+- Added project-team player and staff counts to project team management actions.
+- Improved administrator back-navigation and toolbar handling for match data sections.
+- Renamed compact administrator match action columns to reduce horizontal overflow.
+- Reworked round list result status display to use Joomla state-style icons instead of a duplicate results link.
+- Fixed saving the same staff person in multiple roles for the same project team.
+- Generated team-player aliases from the assigned person's name instead of generic sequential aliases.
+- Improved person, team-player and team-staff administrator ordering, labels and translated position selectors.
+- Added support for text-only external match event persons so opponent scorers and carded players can be recorded without creating global person records.
+- Added support for text-only match referees and displayed referee roles consistently in match reports.
+- Sorted match event rows by minute after saving and in frontend match reports.
+- Added running score display for goal events in match reports.
+- Reworked frontend match report layout with compact lineups, referees, match events and linked staff/person output.
+- Improved match report editor layout so pre-match and match report editors can use the full available width.
+- Added match-report structured data for SportsEvent, teams, players, coaches, referees, venue, address, geo data, event series and match events.
+- Fixed structured data event status values for Schema.org validators and Google rich-result parsing.
+- Removed duplicate `competitor` team expansion from match-report structured data.
+- Avoided placeholder logo output in structured data when a real club/team logo is not available.
+- Added consistent absolute URLs and `Itemid` handling in structured data links where Joomla routing context is available.
+- Added frontend structured data coverage to project, projects, club, clubs, team, person, roster, ranking, schedule, results matrix, statistics, event rankings, result rankings, rivals, race results and other public views.
+- Improved frontend table responsiveness while keeping data as real scrollable tables on mobile.
+- Kept frontend match listings as responsive tables on mobile instead of rendering separate match cards.
+- Removed the redundant mobile match-card output from results, grouped results and schedule views.
+- Added a stable minimum width for match tables so the Detail action remains fully visible inside horizontal scrolling tables.
+- Improved ranking table favourite-team full-row highlighting.
+- Improved ranking curve display colours, point rendering and the ranking-by-round table scroll behaviour.
+- Added match table date-based round ordering where imported round numbers do not match chronological order.
+- Fixed grouped results and results-and-standings output to use round-separated match tables consistently.
+- Added standings score display as goals-for:goals-against with a separate signed goal-difference column.
 
-### Notes
+## 6.1.0-alpha-152 - 2026-07-15
 
-- This is an alpha release for Joomla 6.1 and PHP 8.3.
-- The release keeps compatibility for existing route parameters where practical while moving generated links toward cleaner project-aware SEF URLs.
-- Sites upgrading from earlier alpha builds should test menu items, project pages, SQL tools, maps and prediction-related views on a staging copy before updating a live site.
+### Fixed
+
+- Fixed the default administrator season list ordering so newest season records are shown first.
+- Fixed the default administrator club list ordering so clubs are shown alphabetically by name.
+- Fixed the default administrator team list ordering so teams are shown alphabetically by name.
+- Fixed empty club and playground latitude/longitude form values being saved as empty strings instead of `NULL`.
+- Fixed sport type constants in administrator form selectors by translating sports type SQL field values.
+- Added the team info value to the administrator teams list.
+- Replaced the favourite project team ID text field with a project-team selector in the project appearance settings.
+- Fixed untranslated sport type constants in administrator project panel and project-context headers.
+- Displayed team info in project team assignment labels, using the format `Team (info) - Club`.
+- Replaced the project team duallist workflow with an AJAX autocomplete that assigns teams one by one and preserves ordering for scheduling.
+- Fixed untranslated contact placeholder and position names in the administrator person form.
+- Clarified person form country labels by separating nationality/person country from contact address country.
+- Replaced the team-player position selector with project-scoped translated positions sorted alphabetically by translated label.
+- Fixed saving persons with empty height or weight fields by storing them as `NULL`.
+- Replaced the person position selector with translated positions sorted alphabetically by translated label.
+- Updated the administrator persons list to display last name before first name, use registration number instead of nickname, and default to last-name ascending ordering.
+- Split administrator person names into separate last-name and first-name columns and applied Czech collation for person name ordering.
+
+## 6.1.0-alpha-151 - 2026-07-15
+
+### Fixed
+
+- Public alpha package baseline after `6.1.0-alpha-150`.
 
 ## 6.1.0-alpha-150 - 2026-07-12
 

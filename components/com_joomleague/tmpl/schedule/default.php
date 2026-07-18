@@ -17,6 +17,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 /** @var \Joomleague\Component\Joomleague\Site\View\Schedule\HtmlView $this */
 
@@ -26,14 +27,14 @@ $showPlayground = (bool) ($params['show_playground'] ?? true);
 $showIcalLink = (bool) ($params['show_ical_link'] ?? true);
 
 $title   = Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE');
-$eyebrow = $this->project ? $this->project->name : '';
+$eyebrow = $this->projectLabel();
 
 if ($this->scheduleTeam) {
 	$title   = $this->scheduleTeam->team_name;
-	$eyebrow = Text::_('COM_JOOMLEAGUE_SITE_TEAM') . ' · ' . Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE');
+	$eyebrow = trim($this->projectLabel() . ' · ' . Text::_('COM_JOOMLEAGUE_SITE_TEAM'), ' ·');
 } elseif ($this->scheduleClub) {
 	$title   = $this->scheduleClub->name;
-	$eyebrow = Text::_('COM_JOOMLEAGUE_SITE_CLUB') . ' · ' . Text::_('COM_JOOMLEAGUE_SITE_SCHEDULE');
+	$eyebrow = trim($this->projectLabel() . ' · ' . Text::_('COM_JOOMLEAGUE_SITE_CLUB'), ' ·');
 }
 
 // export do kalendáře
@@ -68,6 +69,43 @@ if ($teamPtId && $filter !== 'all') {
 	}));
 }
 
+$schemaProjectId = $this->project ? (int) $this->project->id : 0;
+StructuredDataHelper::add($this->getDocument(), [
+	'@context' => 'https://schema.org',
+] + StructuredDataHelper::collectionPage(
+	$title,
+	array_map(
+		static function (object $match) use ($schemaProjectId): array {
+			$matchUrl = StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=matchreport&project_id=' . $schemaProjectId . '&id=' . (int) $match->id, false));
+
+			return [
+				'@type' => 'SportsEvent',
+				'@id' => $matchUrl ? $matchUrl . '#sportsevent' : null,
+				'name' => trim((string) ($match->home_name ?? '') . ' - ' . (string) ($match->away_name ?? '')),
+				'url' => $matchUrl,
+				'startDate' => !empty($match->match_date) ? date('c', strtotime((string) $match->match_date)) : null,
+				'eventStatus' => 'https://schema.org/EventScheduled',
+				'homeTeam' => !empty($match->home_name) ? [
+					'@type' => 'SportsTeam',
+					'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) ($match->home_projectteam_id ?? 0), false)) . '#sportsteam',
+					'name' => (string) $match->home_name,
+				] : null,
+				'awayTeam' => !empty($match->away_name) ? [
+					'@type' => 'SportsTeam',
+					'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) ($match->away_projectteam_id ?? 0), false)) . '#sportsteam',
+					'name' => (string) $match->away_name,
+				] : null,
+				'location' => !empty($match->playground_name) ? [
+					'@type' => 'SportsActivityLocation',
+					'name' => (string) $match->playground_name,
+				] : null,
+			];
+		},
+		$scheduleMatches
+	),
+	$eyebrow
+));
+
 // URL pro přepínače (zachová kontext projektu/týmu/klubu)
 $baseQuery = 'index.php?option=com_joomleague&view=schedule';
 if ($this->project) {
@@ -94,7 +132,7 @@ $matchRow = static function ($m) use ($showPlayground): void {
 		<td class="text-center"><?php echo $score; ?></td>
 		<td><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $m->away_projectteam_id); ?>"><?php echo htmlspecialchars((string) ($m->away_name ?? ''), ENT_QUOTES, 'UTF-8'); ?></a></td>
 		<?php if ($showPlayground) : ?><td><?php echo htmlspecialchars((string) ($m->playground_name ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><?php endif; ?>
-		<td class="text-end"><a class="jl-site-button" href="<?php echo Route::_('index.php?option=com_joomleague&view=matchreport&id=' . (int) $m->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DETAIL'); ?></a></td>
+		<td class="jl-match-action-cell text-end"><a class="jl-site-button" href="<?php echo Route::_('index.php?option=com_joomleague&view=matchreport&id=' . (int) $m->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DETAIL'); ?></a></td>
 	</tr>
 	<?php
 };
@@ -176,29 +214,29 @@ $colgroup = '<colgroup>'
 
 		<?php if (!$scheduleMatches) : ?>
 			<div class="alert alert-info"><?php echo Text::_('COM_JOOMLEAGUE_SITE_NO_MATCHES'); ?></div>
-		<?php elseif ($planMode === 'date') : ?>
-			<div class="table-responsive">
-				<table class="table jl-site-table jl-matches-table align-middle">
-					<?php echo $colgroup; ?>
-					<?php echo $tableHead; ?>
-					<tbody><?php foreach ($byDate as $m) { $matchRow($m); } ?></tbody>
-				</table>
-			</div>
-		<?php else : ?>
+			<?php elseif ($planMode === 'date') : ?>
+				<div class="table-responsive jl-match-table-wrap">
+					<table class="table jl-site-table jl-matches-table align-middle">
+						<?php echo $colgroup; ?>
+						<?php echo $tableHead; ?>
+						<tbody><?php foreach ($byDate as $m) { $matchRow($m); } ?></tbody>
+					</table>
+				</div>
+			<?php else : ?>
 			<?php foreach ($byRound as $roundName => $roundMatches) : ?>
 				<div class="jl-schedule-round">
 					<?php if ($roundName !== '') : ?>
 						<div class="jl-schedule-round__head"><?php echo $this->escape($roundName); ?></div>
 					<?php endif; ?>
-					<div class="table-responsive">
+					<div class="table-responsive jl-match-table-wrap">
 						<table class="table jl-site-table jl-matches-table align-middle mb-0">
 							<?php echo $colgroup; ?>
 							<?php echo $tableHead; ?>
 							<tbody><?php foreach ($roundMatches as $m) { $matchRow($m); } ?></tbody>
 						</table>
 					</div>
-				</div>
-			<?php endforeach; ?>
-		<?php endif; ?>
+					</div>
+				<?php endforeach; ?>
+			<?php endif; ?>
 	</div>
 </div>

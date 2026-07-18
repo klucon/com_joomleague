@@ -14,6 +14,7 @@ use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Joomleague\Component\Joomleague\Site\Service\PersonNameHelper;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $team = $this->item;
 $jlFlagPath = JPATH_SITE . '/components/com_joomleague/layouts';
@@ -69,6 +70,15 @@ $pictureUrl = static function (?string $picture): ?string {
 
 	return preg_match('#^https?://#i', $picture) ? $picture : Uri::root(true) . '/' . ltrim($picture, '/');
 };
+$schemaPictureUrl = static function (?string $picture): ?string {
+	$picture = trim((string) $picture);
+
+	if ($picture === '') {
+		return null;
+	}
+
+	return preg_match('#^https?://#i', $picture) ? $picture : Uri::root(true) . '/' . ltrim($picture, '/');
+};
 
 // 0=skryto, 1=datum+věk, 2=jen datum, 3=jen věk, 4=jen rok narození (stejné jako u osoby).
 $birthdayLabel = static function (object $person, int $mode): ?string {
@@ -115,6 +125,62 @@ $translateValue = static function (?string $value): string {
 
 	return $value === '' ? '' : Text::_($value);
 };
+
+if ($team) {
+	$teamUrl = StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->id, false));
+	$personSchema = static function (object $person, string $format, ?string $position = null) use ($team, $schemaPictureUrl): ?array {
+		$name = PersonNameHelper::format((string) $person->firstname, (string) $person->lastname, (string) ($person->nickname ?? ''), $format);
+
+		if ($name === '') {
+			return null;
+		}
+
+		$personUrl = !empty($person->person_id)
+			? StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=person&id=' . (int) $person->person_id . '&project_id=' . (int) $team->project_id, false))
+			: null;
+
+		return [
+			'@type' => 'Person',
+			'@id' => $personUrl ? $personUrl . '#person' : null,
+			'name' => $name,
+			'url' => $personUrl,
+			'image' => $schemaPictureUrl($person->person_picture ?? null),
+			'nationality' => $person->person_country ?? null,
+			'jobTitle' => $position,
+		];
+	};
+	$schemaTeamLogo = isset($teamLogoPath) && trim((string) $teamLogoPath) !== '' ? $schemaPictureUrl($teamLogoPath) : null;
+
+	StructuredDataHelper::add($this->getDocument(), [
+		'@context' => 'https://schema.org',
+		'@type' => 'SportsTeam',
+		'@id' => $teamUrl ? $teamUrl . '#sportsteam' : null,
+		'name' => (string) $team->team_name,
+		'url' => $teamUrl,
+		'logo' => $schemaTeamLogo,
+		'memberOf' => [
+			'@type' => 'SportsOrganization',
+			'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $team->project_id, false)) . '#competition',
+			'name' => (string) ($this->project->name ?? ''),
+		],
+		'athlete' => array_values(array_filter(array_map(
+			static fn (object $player): ?array => $personSchema($player, $nameFormatPlayers, $translateValue($player->position_name ?? '')),
+			$this->items
+		))),
+		'coach' => array_values(array_filter(array_map(
+			static fn (object $staffMember): ?array => $personSchema($staffMember, $nameFormatStaff, $translateValue($staffMember->position_name ?? '')),
+			$this->rosterStaff
+		))),
+		'mainEntityOfPage' => StructuredDataHelper::collectionPage(
+			Text::_('COM_JOOMLEAGUE_SITE_ROSTER'),
+			array_values(array_filter(array_map(
+				static fn (object $player): ?array => $personSchema($player, $nameFormatPlayers, $translateValue($player->position_name ?? '')),
+				$this->items
+			))),
+			$this->projectLabel()
+		),
+	]);
+}
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$team) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_NOT_FOUND'); ?></div><?php return; endif; ?>
@@ -125,7 +191,7 @@ $translateValue = static function (?string $value): string {
 				<img class="rounded" src="<?php echo $this->escape($logoUrl); ?>" alt="" loading="lazy" style="<?php echo $teamPicHeight > 0 ? 'max-height:' . $teamPicHeight . 'px;' : ''; ?><?php echo $teamPicWidth > 0 ? 'max-width:' . $teamPicWidth . 'px;' : 'width:auto;'; ?>">
 			<?php endif; ?>
 			<div>
-				<div class="jl-site-eyebrow"><?php echo $this->escape((string) ($showTeamShortform && !empty($team->team_short_name) ? $team->team_short_name : $team->team_name)); ?></div>
+				<div class="jl-site-eyebrow"><?php echo $this->escape(trim($this->projectLabel() . ' · ' . (string) ($showTeamShortform && !empty($team->team_short_name) ? $team->team_short_name : $team->team_name), ' ·')); ?></div>
 				<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_ROSTER'); ?></h1>
 			</div>
 		</div>

@@ -5,5 +5,51 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-declare(strict_types=1); namespace Joomleague\Component\Joomleague\Administrator\Model; \defined('_JEXEC') or die; use Joomla\Database\QueryInterface;
-final class TeamsModel extends EntityListModel { protected array $searchColumns=['a.name','a.short_name','c.name']; protected function buildQuery():QueryInterface{$d=$this->getDatabase();return $d->createQuery()->select('a.*,'.$d->quoteName('c.name','club').','.$d->quoteName('u.name','editor'))->from($d->quoteName('#__joomleague_team','a'))->join('LEFT',$d->quoteName('#__joomleague_club','c'),$d->quoteName('c.id').'='.$d->quoteName('a.club_id'))->join('LEFT',$d->quoteName('#__users','u'),$d->quoteName('u.id').'='.$d->quoteName('a.checked_out'));}}
+declare(strict_types=1);
+
+namespace Joomleague\Component\Joomleague\Administrator\Model;
+
+\defined('_JEXEC') or die;
+
+use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
+use Joomla\Database\QueryInterface;
+
+final class TeamsModel extends EntityListModel
+{
+	protected array $searchColumns = ['a.name', 'a.short_name', 'a.middle_name', 'a.info', 'c.name'];
+	protected string $defaultOrdering = 'a.name';
+	protected string $defaultDirection = 'ASC';
+
+	public function __construct($config = [], ?MVCFactoryInterface $factory = null)
+	{
+		$config['filter_fields'] ??= [
+			'id',
+			'a.id',
+			'name',
+			'a.name',
+			'club',
+			'c.name',
+			'short_name',
+			'a.short_name',
+			'middle_name',
+			'a.middle_name',
+			'info',
+			'a.info',
+			'ordering',
+			'a.ordering',
+		];
+
+		parent::__construct($config, $factory);
+	}
+
+	protected function buildQuery(): QueryInterface
+	{
+		$db = $this->getDatabase();
+
+		return $db->createQuery()
+			->select('a.*, ' . $db->quoteName('c.name', 'club') . ', ' . $db->quoteName('u.name', 'editor'))
+			->from($db->quoteName('#__joomleague_team', 'a'))
+			->join('LEFT', $db->quoteName('#__joomleague_club', 'c'), $db->quoteName('c.id') . ' = ' . $db->quoteName('a.club_id'))
+			->join('LEFT', $db->quoteName('#__users', 'u'), $db->quoteName('u.id') . ' = ' . $db->quoteName('a.checked_out'));
+	}
+}

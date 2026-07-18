@@ -13,6 +13,7 @@ namespace Joomleague\Component\Joomleague\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Application\AdministratorApplication;
+use Joomla\CMS\Filter\OutputFilter;
 use Joomla\CMS\Form\Form;
 
 final class TeamstaffModel extends EntityAdminModel
@@ -117,10 +118,27 @@ final class TeamstaffModel extends EntityAdminModel
 
 		$table->project_position_id = $table->project_position_id ?: null;
 
+		if ($table->alias === '') {
+			$table->alias = $this->buildPersonAlias((int) $table->person_id);
+		}
+
 		foreach (['injury_date_start', 'injury_date_end', 'susp_date_start', 'susp_date_end', 'away_date_start', 'away_date_end', 'checked_out_time', 'modified'] as $field) {
 			$table->{$field} = trim((string) ($table->{$field} ?? '')) ?: null;
 		}
 
 		parent::prepareTable($table);
+	}
+
+	private function buildPersonAlias(int $personId): string
+	{
+		$db = $this->getDatabase();
+		$query = $db->createQuery()
+			->select('TRIM(CONCAT_WS(" ", ' . $db->quoteName('firstname') . ', ' . $db->quoteName('lastname') . '))')
+			->from($db->quoteName('#__joomleague_person'))
+			->where($db->quoteName('id') . ' = ' . $personId);
+
+		$alias = OutputFilter::stringURLSafe((string) $db->setQuery($query)->loadResult());
+
+		return $alias !== '' ? $alias : 'person-' . $personId;
 	}
 }

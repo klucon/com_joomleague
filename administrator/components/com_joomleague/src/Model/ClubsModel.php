@@ -25,7 +25,7 @@ final class ClubsModel extends ListModel
 		parent::__construct($config, $factory);
 	}
 
-	protected function populateState($ordering = 'a.ordering', $direction = 'asc'): void
+	protected function populateState($ordering = 'a.name', $direction = 'asc'): void
 	{
 		parent::populateState($ordering, $direction);
 	}
@@ -51,7 +51,7 @@ final class ClubsModel extends ListModel
 			}
 		}
 
-		$order = $db->escape((string) $this->getState('list.ordering', 'a.ordering'));
+		$order = $db->escape((string) $this->getState('list.ordering', 'a.name'));
 		$direction = $db->escape((string) $this->getState('list.direction', 'ASC'));
 		$query->order($db->quoteName($order) . ' ' . $direction);
 

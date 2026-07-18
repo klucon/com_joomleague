@@ -14,6 +14,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $match = $this->item;
 $comparison = $this->matchTeamComparison;
@@ -23,6 +24,14 @@ $show = static fn (string $name, bool $default = true): bool => array_key_exists
 $param = static fn (string $name, $default = null) => array_key_exists($name, $params) && $params[$name] !== '' ? $params[$name] : $default;
 
 $nameFormat = (string) $param('name_format', '0');
+
+StructuredDataHelper::add($this->getDocument(), [
+	'@context' => 'https://schema.org',
+] + StructuredDataHelper::webPage(
+	Text::_('COM_JOOMLEAGUE_SITE_NEXT_MATCH'),
+	$match ? trim((string) ($match->home_name ?? '') . ' - ' . (string) ($match->away_name ?? '')) : null,
+	null
+));
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$match) : ?>

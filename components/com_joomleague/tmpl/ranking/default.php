@@ -14,6 +14,7 @@ use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Joomleague\Component\Joomleague\Site\Service\RankingColumnsHelper;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 /** @var Joomleague\Component\Joomleague\Site\View\Ranking\HtmlView $this */
 
@@ -74,7 +75,9 @@ $favTeamIds = array_map(
 		static fn (string $v): bool => $v !== '' && ctype_digit($v)
 	)
 );
-$favHighlightWholeRow = (string) ($params['fav_highlight_type'] ?? '1') !== '0';
+$projectFavHighlightType = trim((string) ($this->project->fav_team_highlight_type ?? ''));
+$favHighlightEnabled = $projectFavHighlightType !== '';
+$favHighlightWholeRow = $projectFavHighlightType === '0';
 $favBackgroundColor = trim((string) ($this->project->fav_team_color ?? '')) ?: null;
 $favTextColor = trim((string) ($this->project->fav_team_text_color ?? '')) ?: null;
 $favTextBold = (string) ($this->project->fav_team_text_bold ?? '0') === '1';
@@ -259,10 +262,41 @@ $showPreviousRank = $show('last_ranking');
 $showSectionHeader = $show('show_sectionheader');
 $showHelp = $show('show_help', false);
 $showExplanation = $show('show_explanation');
+
+StructuredDataHelper::add($this->getDocument(), [
+	'@context' => 'https://schema.org',
+] + StructuredDataHelper::collectionPage(
+	Text::_('COM_JOOMLEAGUE_SITE_RANKING'),
+	array_map(
+		static fn (object $row, int $index): array => [
+			'@type' => 'SportsTeam',
+			'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $row->projectteam_id, false)) . '#sportsteam',
+			'name' => (string) ($row->team_name ?? ''),
+			'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $row->projectteam_id, false)),
+			'memberOf' => [
+				'@type' => 'SportsOrganization',
+				'name' => (string) ($row->project_name ?? ''),
+			],
+			'additionalProperty' => [
+				['@type' => 'PropertyValue', 'name' => 'rank', 'value' => (string) ($index + 1)],
+				['@type' => 'PropertyValue', 'name' => 'played', 'value' => (string) (int) ($row->played ?? 0)],
+				['@type' => 'PropertyValue', 'name' => 'won', 'value' => (string) (int) ($row->won ?? 0)],
+				['@type' => 'PropertyValue', 'name' => 'drawn', 'value' => (string) (int) ($row->drawn ?? 0)],
+				['@type' => 'PropertyValue', 'name' => 'lost', 'value' => (string) (int) ($row->lost ?? 0)],
+				['@type' => 'PropertyValue', 'name' => 'goalsFor', 'value' => (string) (int) ($row->goals_for ?? 0)],
+				['@type' => 'PropertyValue', 'name' => 'goalsAgainst', 'value' => (string) (int) ($row->goals_against ?? 0)],
+				['@type' => 'PropertyValue', 'name' => 'points', 'value' => (string) (int) ($row->points ?? 0)],
+			],
+		],
+		$this->standings,
+		array_keys($this->standings)
+	),
+	$this->projectLabel()
+));
 ?>
 <div class="com-joomleague-site">
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo $this->project ? $this->escape($this->project->name) : ''; ?></div>
+		<div class="jl-site-eyebrow"><?php echo $this->escape($this->projectLabel()); ?></div>
 		<?php if ($showSectionHeader) : ?><h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RANKING'); ?></h1><?php endif; ?>
 		<?php
 		// Jednotný stavitel odkazů tabulky – zachovává rozsah/divizi/kolo, pokud override neřekne jinak.
@@ -364,36 +398,37 @@ $showExplanation = $show('show_explanation');
 		<?php if ($showHelp) : ?><p class="jl-site-muted mt-2 mb-0"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RANKING_HELP'); ?></p><?php endif; ?>
 	</section>
 	<?php if ($show('show_ranking')) : ?>
-	<div class="jl-site-panel table-responsive">
-		<table class="table jl-site-table align-middle">
-			<thead>
-				<tr>
-					<?php if ($show('show_rank')) : ?><th>#</th><?php endif; ?>
-					<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM'); ?></th>
-					<?php foreach ($columns as $column) : ?>
-						<th><?php echo $sortLink($column['code'], $column['header']); ?></th>
-					<?php endforeach; ?>
-				</tr>
-			</thead>
-			<tbody>
-				<?php foreach ($displayRows as $index => $row) : ?>
+	<div class="jl-site-panel">
+		<div class="table-responsive jl-ranking-table-wrap">
+			<table class="table jl-site-table align-middle">
+				<thead>
+					<tr>
+						<?php if ($show('show_rank')) : ?><th>#</th><?php endif; ?>
+						<th><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM'); ?></th>
+						<?php foreach ($columns as $column) : ?>
+							<th><?php echo $sortLink($column['code'], $column['header']); ?></th>
+						<?php endforeach; ?>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ($displayRows as $index => $row) : ?>
 					<?php
 					$rank = (int) $row->rank;
 					$zoneColor = $zoneColorForRank($rank);
 					$isFav = in_array((int) $row->projectteam_id, $favTeamIds, true);
 					$rowStyle = '';
 
-					if ($isFav && $favHighlightWholeRow && $favBackgroundColor !== null) {
-						$rowStyle = 'background-color: ' . $favBackgroundColor . ';';
+					if ($isFav && $favHighlightEnabled && $favHighlightWholeRow && $favBackgroundColor !== null) {
+						$rowStyle = '--bs-table-bg: ' . $favBackgroundColor . '; --bs-table-striped-bg: ' . $favBackgroundColor . '; --bs-table-hover-bg: ' . $favBackgroundColor . '; background-color: ' . $favBackgroundColor . ';';
 					} elseif ($colorWholeRow && $zoneColor !== null) {
-						$rowStyle = 'background-color: ' . $zoneColor . ';';
+						$rowStyle = '--bs-table-bg: ' . $zoneColor . '; --bs-table-striped-bg: ' . $zoneColor . '; --bs-table-hover-bg: ' . $zoneColor . '; background-color: ' . $zoneColor . ';';
 					}
 
 					// Barevný pruh vlevo – zůstává čitelný i u velmi světlých barev zóny,
 					// kdy samotné podbarvení řádku na bílém pozadí téměř splývá. Nastavuje se
 					// na první buňku řádku, ne na <tr>, protože border-collapse u tabulky
 					// spolehlivě vykresluje jen ohraničení buněk, ne celého řádku.
-					$leftAccentColor = $zoneColor ?? (($isFav && $favBackgroundColor !== null) ? $favBackgroundColor : null);
+					$leftAccentColor = $zoneColor ?? (($isFav && $favHighlightEnabled && $favBackgroundColor !== null) ? $favBackgroundColor : null);
 
 					if ($isZoneBoundary($rank)) {
 						$rowStyle .= 'border-bottom: ' . $separationStyle . ' ' . $separationColor . ';';
@@ -401,11 +436,15 @@ $showExplanation = $show('show_explanation');
 
 					$nameStyle = '';
 
-					if ($isFav && $favTextColor !== null) {
+					if ($isFav && $favHighlightEnabled && !$favHighlightWholeRow && $favBackgroundColor !== null) {
+						$nameStyle .= 'background-color: ' . $favBackgroundColor . '; padding: 0.15rem 0.35rem; border-radius: 0.2rem;';
+					}
+
+					if ($isFav && $favHighlightEnabled && $favTextColor !== null) {
 						$nameStyle .= 'color: ' . $favTextColor . ';';
 					}
 
-					if ($isFav && $favTextBold) {
+					if ($isFav && $favHighlightEnabled && $favTextBold) {
 						$nameStyle .= 'font-weight: 700;';
 					}
 
@@ -414,7 +453,7 @@ $showExplanation = $show('show_explanation');
 
 					$firstCellStyle = $leftAccentColor !== null ? 'border-left: 5px solid ' . $leftAccentColor . ';' : '';
 
-					if ($show('show_rank') && !$colorWholeRow && $zoneColor !== null && !($isFav && $favHighlightWholeRow)) {
+					if ($show('show_rank') && !$colorWholeRow && $zoneColor !== null && !($isFav && $favHighlightEnabled && $favHighlightWholeRow)) {
 						$firstCellStyle .= 'background-color: ' . $zoneColor . ';';
 					}
 					?>
@@ -470,8 +509,36 @@ $showExplanation = $show('show_explanation');
 						<?php endforeach; ?>
 					</tr>
 				<?php endforeach; ?>
-			</tbody>
-		</table>
+				</tbody>
+			</table>
+		</div>
+		<div class="jl-ranking-card-list">
+			<?php foreach ($displayRows as $row) : ?>
+				<?php
+				$rank = (int) $row->rank;
+				$zoneColor = $zoneColorForRank($rank);
+				$cardStyle = $zoneColor !== null ? '--jl-ranking-accent: ' . $zoneColor . ';' : '';
+				?>
+				<article class="jl-ranking-card"<?php echo $cardStyle !== '' ? ' style="' . $this->escape($cardStyle) . '"' : ''; ?>>
+					<div class="jl-ranking-card__head">
+						<?php if ($show('show_rank')) : ?><strong>#<?php echo $rank; ?></strong><?php endif; ?>
+						<?php if ($isTeamNameLinked($row)) : ?>
+							<a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $row->projectteam_id); ?>"><?php echo $this->escape($formatTeamName($row)); ?></a>
+						<?php else : ?>
+							<span><?php echo $this->escape($formatTeamName($row)); ?></span>
+						<?php endif; ?>
+					</div>
+					<dl>
+						<?php foreach ($columns as $column) : ?>
+							<div>
+								<dt><?php echo Text::_($column['header']); ?></dt>
+								<dd><?php echo $this->escape(RankingColumnsHelper::value($row, $column['code'], $columnContext)); ?></dd>
+							</div>
+						<?php endforeach; ?>
+					</dl>
+				</article>
+			<?php endforeach; ?>
+		</div>
 		<?php if (!$this->standings) : ?><div class="alert alert-info"><?php echo Text::_('COM_JOOMLEAGUE_SITE_NO_DATA'); ?></div><?php endif; ?>
 		<?php if ($showLegend) : ?>
 			<ul class="jl-site-legend">

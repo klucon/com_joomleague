@@ -231,6 +231,9 @@ return new class implements InstallerScriptInterface {
 			['#__joomleague_sports_type', 'periods', 'TINYINT NOT NULL DEFAULT 2', 'name'],
 			['#__joomleague_sports_type', 'published', 'TINYINT NOT NULL DEFAULT 1', 'icon'],
 			['#__joomleague_match', 'article_id', 'INT NULL DEFAULT NULL', null],
+			['#__joomleague_match_player', 'is_substitute', 'TINYINT NOT NULL DEFAULT 0', 'project_position_id'],
+			['#__joomleague_match_event', 'external_person_name', 'varchar(100) NOT NULL DEFAULT ' . $db->quote(''), 'teamplayer_id'],
+			['#__joomleague_match_referee', 'external_referee_name', 'varchar(100) NOT NULL DEFAULT ' . $db->quote(''), 'project_referee_id'],
 		] as [$table, $column, $definition, $after]) {
 			$this->addColumnIfMissing($db, $table, $column, $definition, $after);
 		}

@@ -41,7 +41,7 @@ final class TemplateConfigBootstrapService
 		[
 			'template' => 'matchreport',
 			'title' => 'COM_JOOMLEAGUE_TEMPLATE_MATCHREPORT',
-			'params' => ['layout' => 'default', 'show_navigation' => true, 'show_meta' => true, 'show_split_results' => true, 'show_preview' => true, 'show_summary' => true, 'show_referees' => true, 'show_events' => true, 'show_head_to_head' => true],
+			'params' => ['layout' => 'default', 'show_navigation' => true, 'show_meta' => true, 'show_split_results' => true, 'show_preview' => true, 'show_summary' => true, 'show_referees' => true, 'show_match_referees' => true, 'show_referee_position' => true, 'show_events' => true, 'show_head_to_head' => true],
 		],
 		[
 			'template' => 'teaminfo',

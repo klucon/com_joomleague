@@ -46,8 +46,8 @@ final class HtmlView extends AdminListView
 				['field' => 'round_date_first', 'label' => 'COM_JOOMLEAGUE_ROUND_FIELD_FIRST_DATE', 'sort' => 'a.round_date_first'],
 				['field' => 'round_date_last', 'label' => 'COM_JOOMLEAGUE_ROUND_FIELD_LAST_DATE'],
 				['field' => 'round_date_first', 'label' => 'COM_JOOMLEAGUE_ROUND_MOVE_LABEL', 'type' => 'roundmove'],
-				['field' => 'match_count', 'label' => 'COM_JOOMLEAGUE_EDIT_MATCHES', 'type' => 'roundmatches'],
-				['field' => 'result_count', 'label' => 'COM_JOOMLEAGUE_MATCH_RESULTS', 'type' => 'roundmatches'],
+				['field' => 'match_count', 'label' => 'COM_JOOMLEAGUE_MATCH_COUNT', 'type' => 'roundmatches'],
+				['field' => 'result_count', 'label' => 'COM_JOOMLEAGUE_MATCH_RESULTS', 'type' => 'roundresults'],
 				['field' => 'id', 'label' => 'JGRID_HEADING_ID', 'sort' => 'a.id'],
 			],
 		];

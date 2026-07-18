@@ -4,7 +4,7 @@
 		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
 		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME" description="COM_JOOMLEAGUE_PROJECT_FIELD_NAME_DESCRIPTION" required="true" maxlength="100" />
 		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" maxlength="255" />
-		<field name="sports_type_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SPORT" description="COM_JOOMLEAGUE_PROJECT_FIELD_SPORT_DESCRIPTION" query="SELECT id,name FROM #__joomleague_sports_type WHERE published=1 ORDER BY name" key_field="id" value_field="name" required="true" />
+		<field name="sports_type_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SPORT" description="COM_JOOMLEAGUE_PROJECT_FIELD_SPORT_DESCRIPTION" query="SELECT id,name FROM #__joomleague_sports_type WHERE published=1 ORDER BY name" key_field="id" value_field="name" required="true" translate="true" />
 		<field name="league_id" type="sql" label="COM_JOOMLEAGUE_PROJECT_FIELD_LEAGUE" description="COM_JOOMLEAGUE_PROJECT_FIELD_LEAGUE_DESCRIPTION" query="SELECT id,name FROM #__joomleague_league ORDER BY name" key_field="id" value_field="name" required="true" />
 		<field name="season_id" type="sql" label="COM_JOOMLEAGUE_PROJECT_FIELD_SEASON" description="COM_JOOMLEAGUE_PROJECT_FIELD_SEASON_DESCRIPTION" query="SELECT id,name FROM #__joomleague_season WHERE published=1 ORDER BY name" key_field="id" value_field="name" required="true" />
 		<field name="project_type" type="list" label="COM_JOOMLEAGUE_PROJECT_FIELD_TYPE" description="COM_JOOMLEAGUE_PROJECT_FIELD_TYPE_DESCRIPTION" default="SIMPLE_LEAGUE" required="true">
@@ -62,9 +62,9 @@
 		</field>
 	</fieldset>
 
-	<fieldset name="appearance" label="COM_JOOMLEAGUE_PROJECT_FIELDSET_APPEARANCE">
+	<fieldset name="appearance" label="COM_JOOMLEAGUE_PROJECT_FIELDSET_APPEARANCE" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_IMAGE" description="COM_JOOMLEAGUE_PROJECT_FIELD_IMAGE_DESCRIPTION" directory="com_joomleague/database/projects" preview="tooltip" />
-		<field name="fav_team" type="text" label="COM_JOOMLEAGUE_PROJECT_FIELD_FAV_TEAM" description="COM_JOOMLEAGUE_PROJECT_FIELD_FAV_TEAM_DESCRIPTION" maxlength="64" />
+		<field name="fav_team" type="projectfavteams" label="COM_JOOMLEAGUE_PROJECT_FIELD_FAV_TEAM" description="COM_JOOMLEAGUE_PROJECT_FIELD_FAV_TEAM_DESCRIPTION" />
 		<field name="fav_team_highlight_type" type="list" label="COM_JOOMLEAGUE_PROJECT_FIELD_HIGHLIGHT" description="COM_JOOMLEAGUE_PROJECT_FIELD_HIGHLIGHT_DESCRIPTION">
 			<option value="">JNONE</option>
 			<option value="0">COM_JOOMLEAGUE_PROJECT_HIGHLIGHT_ROW</option>

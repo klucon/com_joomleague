@@ -7,7 +7,7 @@
 	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-151</version>
+	<version>6.1.0-alpha-153</version>
 	<description>COM_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Component\Joomleague</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -34,6 +34,7 @@
 		<filename>joomla.asset.json</filename>
 		<folder>css</folder>
 		<folder>js</folder>
+		<folder>vendor</folder>
 	</media>
 
 	<files folder="components/com_joomleague">
@@ -43,9 +44,7 @@
 	</files>
 
 	<languages folder="components/com_joomleague">
-		<language tag="cs-CZ">language/cs-CZ/com_joomleague.ini</language>
 		<language tag="en-GB">language/en-GB/com_joomleague.ini</language>
-		<language tag="de-DE">language/de-DE/com_joomleague.ini</language>
 	</languages>
 
 	<administration>
@@ -66,6 +65,7 @@
 			<menu link="option=com_joomleague&amp;view=racecategories">COM_JOOMLEAGUE_MENU_RACE_CATEGORIES</menu>
 			<menu link="option=com_joomleague&amp;view=raceparticipants">COM_JOOMLEAGUE_MENU_RACE_PARTICIPANTS</menu>
 			<menu link="option=com_joomleague&amp;view=raceresults">COM_JOOMLEAGUE_MENU_RACE_RESULTS</menu>
+			<menu link="option=com_joomleague&amp;view=languages">COM_JOOMLEAGUE_LANGUAGES_TITLE</menu>
 			<menu link="option=com_joomleague&amp;view=tools">COM_JOOMLEAGUE_TOOLS_TITLE</menu>
 		</submenu>
 		<files folder="administrator/components/com_joomleague">
@@ -80,12 +80,8 @@
 			<folder>tmpl</folder>
 		</files>
 		<languages folder="administrator/components/com_joomleague">
-			<language tag="cs-CZ">language/cs-CZ/com_joomleague.ini</language>
-			<language tag="cs-CZ">language/cs-CZ/com_joomleague.sys.ini</language>
 			<language tag="en-GB">language/en-GB/com_joomleague.ini</language>
-			<language tag="de-DE">language/de-DE/com_joomleague.ini</language>
 			<language tag="en-GB">language/en-GB/com_joomleague.sys.ini</language>
-			<language tag="de-DE">language/de-DE/com_joomleague.sys.ini</language>
 		</languages>
 	</administration>
 </extension>

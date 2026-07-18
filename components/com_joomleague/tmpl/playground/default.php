@@ -9,6 +9,7 @@ declare(strict_types=1);
 \defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Joomleague\Component\Joomleague\Site\Service\MapUrlHelper;
 use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
@@ -33,12 +34,19 @@ if ($showMapEmbed && $item && $item->latitude !== null && $item->longitude !== n
 }
 
 if ($item) {
+	$playgroundUrl = StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=playground&id=' . (int) $item->id, false));
+	$picture = StructuredDataHelper::imageUrl($item->picture ?? '');
 	StructuredDataHelper::add($this->getDocument(), [
 		'@context' => 'https://schema.org',
 		'@type' => 'SportsActivityLocation',
-		'@id' => StructuredDataHelper::currentUrl() . '#venue',
+		'@id' => $playgroundUrl ? $playgroundUrl . '#venue' : null,
 		'name' => (string) $item->name,
-		'url' => StructuredDataHelper::absoluteUrl($item->website ?? null),
+		'alternateName' => $item->short_name ?? null,
+		'url' => $playgroundUrl,
+		'sameAs' => StructuredDataHelper::externalUrl($item->website ?? ''),
+		'image' => $picture,
+		'description' => trim((string) ($item->notes ?? '')) !== '' ? trim((string) $item->notes) : null,
+		'mainEntityOfPage' => StructuredDataHelper::webPage((string) $item->name, trim((string) ($item->notes ?? '')) !== '' ? trim((string) $item->notes) : null, $playgroundUrl),
 		'maximumAttendeeCapacity' => !empty($item->max_visitors) ? (int) $item->max_visitors : null,
 		'address' => [
 			'@type' => 'PostalAddress',
@@ -47,6 +55,15 @@ if ($item) {
 			'addressLocality' => $item->city ?? null,
 			'addressCountry' => $item->country ?? null,
 		],
+		'geo' => is_numeric($item->latitude ?? null) && is_numeric($item->longitude ?? null) ? [
+			'@type' => 'GeoCoordinates',
+			'latitude' => (float) $item->latitude,
+			'longitude' => (float) $item->longitude,
+		] : null,
+		'containedInPlace' => !empty($item->club_name) ? [
+			'@type' => 'SportsOrganization',
+			'name' => (string) $item->club_name,
+		] : null,
 	]);
 }
 ?>

@@ -65,11 +65,13 @@ final class ProjectsetupModel extends BaseDatabaseModel
 		$query = $db->createQuery()
 			->select([
 				't.id',
-				'CONCAT(t.name, " — ", COALESCE(c.name, "")) AS name',
+				$this->teamLabelExpression() . ' AS name',
 				'0 AS persontype',
 				'pt.ordering',
 				'pt.id AS assignment_id',
 				'pt.picture',
+				'(SELECT COUNT(*) FROM #__joomleague_team_player tp WHERE tp.projectteam_id = pt.id) AS player_count',
+				'(SELECT COUNT(*) FROM #__joomleague_team_staff ts WHERE ts.projectteam_id = pt.id) AS staff_count',
 				'CASE WHEN pt.id IS NULL THEN 0 ELSE 1 END AS selected',
 			])
 			->from('#__joomleague_team t')
@@ -79,6 +81,147 @@ final class ProjectsetupModel extends BaseDatabaseModel
 			->bind(':project_id', $projectId, ParameterType::INTEGER);
 
 		return $db->setQuery($query)->loadObjectList();
+	}
+
+	public function searchAvailableTeams(int $projectId, string $search, int $limit = 20): array
+	{
+		$search = trim($search);
+
+		if ($projectId < 1 || mb_strlen($search) < 2) {
+			return [];
+		}
+
+		$db = $this->getDatabase();
+		$needle = '%' . str_replace(' ', '%', $search) . '%';
+		$query = $db->createQuery()
+			->select([
+				't.id AS value',
+				$this->teamLabelExpression() . ' AS text',
+			])
+			->from('#__joomleague_team t')
+			->join('LEFT', '#__joomleague_club c ON c.id = t.club_id')
+			->join('LEFT', '#__joomleague_project_team pt ON pt.team_id = t.id AND pt.project_id = :project_id')
+			->where('pt.id IS NULL')
+			->where('(t.name LIKE :search OR t.alias LIKE :search OR t.info LIKE :search OR c.name LIKE :search OR CAST(t.id AS CHAR) = :exact)')
+			->order('t.name ASC, c.name ASC')
+			->setLimit($limit)
+			->bind(':project_id', $projectId, ParameterType::INTEGER)
+			->bind(':search', $needle)
+			->bind(':exact', $search);
+
+		return $db->setQuery($query)->loadAssocList() ?: [];
+	}
+
+	public function addTeam(int $projectId, int $teamId): object
+	{
+		if ($projectId < 1 || $teamId < 1) {
+			throw new \InvalidArgumentException('COM_JOOMLEAGUE_PROJECT_SETUP_INVALID');
+		}
+
+		$db = $this->getDatabase();
+		$assignmentId = 0;
+		$db->transactionStart();
+
+		try {
+			$existingId = (int) $db->setQuery(
+				$db->createQuery()
+					->select('id')
+					->from($db->quoteName('#__joomleague_project_team'))
+					->where($db->quoteName('project_id') . ' = :project_id')
+					->where($db->quoteName('team_id') . ' = :team_id')
+					->bind(':project_id', $projectId, ParameterType::INTEGER)
+					->bind(':team_id', $teamId, ParameterType::INTEGER)
+			)->loadResult();
+
+			if ($existingId > 0) {
+				$assignmentId = $existingId;
+			} else {
+				$teamExists = (int) $db->setQuery(
+					$db->createQuery()
+						->select('COUNT(*)')
+						->from($db->quoteName('#__joomleague_team'))
+						->where($db->quoteName('id') . ' = :team_id')
+						->bind(':team_id', $teamId, ParameterType::INTEGER)
+				)->loadResult();
+
+				if ($teamExists < 1) {
+					throw new \RuntimeException('COM_JOOMLEAGUE_PROJECT_TEAM_NOT_FOUND');
+				}
+
+				$row = (object) [
+					'project_id' => $projectId,
+					'team_id' => $teamId,
+					'ordering' => $this->getNextOrdering('#__joomleague_project_team', $projectId),
+					'notes' => '',
+					'reason' => '',
+					'info' => '',
+					'alias' => '',
+					'is_in_score' => 1,
+					'use_finally' => 0,
+					'start_points' => 0,
+					'modified' => (new Date())->toSql(),
+				];
+
+				$db->insertObject('#__joomleague_project_team', $row, 'id');
+				$assignmentId = (int) $row->id;
+			}
+
+			$db->transactionCommit();
+		} catch (Throwable $exception) {
+			$db->transactionRollback();
+			throw $exception;
+		}
+
+		return $this->getTeamAssignment($projectId, $assignmentId);
+	}
+
+	public function removeTeam(int $projectId, int $assignmentId): void
+	{
+		if ($projectId < 1 || $assignmentId < 1) {
+			throw new \InvalidArgumentException('COM_JOOMLEAGUE_PROJECT_SETUP_INVALID');
+		}
+
+		$db = $this->getDatabase();
+		$query = $db->createQuery()
+			->delete($db->quoteName('#__joomleague_project_team'))
+			->where($db->quoteName('id') . ' = :id')
+			->where($db->quoteName('project_id') . ' = :project_id')
+			->bind(':id', $assignmentId, ParameterType::INTEGER)
+			->bind(':project_id', $projectId, ParameterType::INTEGER);
+
+		$db->setQuery($query)->execute();
+	}
+
+	public function getTeamAssignment(int $projectId, int $assignmentId): object
+	{
+		$db = $this->getDatabase();
+		$query = $db->createQuery()
+			->select([
+				't.id',
+				$this->teamLabelExpression() . ' AS name',
+				'0 AS persontype',
+				'pt.ordering',
+				'pt.id AS assignment_id',
+				'pt.picture',
+				'(SELECT COUNT(*) FROM #__joomleague_team_player tp WHERE tp.projectteam_id = pt.id) AS player_count',
+				'(SELECT COUNT(*) FROM #__joomleague_team_staff ts WHERE ts.projectteam_id = pt.id) AS staff_count',
+				'1 AS selected',
+			])
+			->from('#__joomleague_project_team pt')
+			->join('INNER', '#__joomleague_team t ON t.id = pt.team_id')
+			->join('LEFT', '#__joomleague_club c ON c.id = t.club_id')
+			->where('pt.project_id = :project_id')
+			->where('pt.id = :assignment_id')
+			->bind(':project_id', $projectId, ParameterType::INTEGER)
+			->bind(':assignment_id', $assignmentId, ParameterType::INTEGER);
+
+		$row = $db->setQuery($query)->loadObject();
+
+		if (!$row) {
+			throw new \RuntimeException('COM_JOOMLEAGUE_PROJECT_TEAM_NOT_FOUND');
+		}
+
+		return $row;
 	}
 
 	public function getReferees(int $projectId): array
@@ -234,5 +377,10 @@ final class ProjectsetupModel extends BaseDatabaseModel
 			->bind(':project_id', $projectId, ParameterType::INTEGER);
 
 		return max(1, (int) $db->setQuery($query)->loadResult());
+	}
+
+	private function teamLabelExpression(): string
+	{
+		return 'CONCAT(t.name, CASE WHEN TRIM(COALESCE(t.info, "")) = "" THEN "" ELSE CONCAT(" (", TRIM(t.info), ")") END, " - ", COALESCE(c.name, ""))';
 	}
 }

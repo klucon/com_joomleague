@@ -43,6 +43,8 @@ final class PlaygroundModel extends AdminModel
 		}
 
 		$table->country = trim((string) $table->country) ?: null;
+		$table->latitude = trim((string) $table->latitude) !== '' ? (float) $table->latitude : null;
+		$table->longitude = trim((string) $table->longitude) !== '' ? (float) $table->longitude : null;
 		$table->club_id = (int) $table->club_id ?: null;
 		$table->max_visitors = (int) $table->max_visitors ?: null;
 		$table->notes = trim((string) $table->notes);

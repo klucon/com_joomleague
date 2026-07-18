@@ -28,8 +28,11 @@ $sportName = $club ? $translateLegacyName($club->sport_name ?? '') : '';
 
 // Logo klubu (cesta relativní ke kořeni Joomly, nebo absolutní URL).
 $clubLogo = '';
+$schemaClubLogo = null;
 if ($club) {
 	$logo = trim((string) ($club->logo_big ?: $club->logo_middle ?: $club->logo_small ?: ''));
+	$schemaClubLogo = $logo !== '' ? (preg_match('#^https?://#i', $logo) ? $logo : Uri::root(true) . '/' . ltrim($logo, '/')) : null;
+
 	if ($logo === '') {
 		$logo = trim((string) ComponentHelper::getParams('com_joomleague')->get('placeholder_club_logo', ''));
 	}
@@ -61,14 +64,24 @@ if (!$showClubLogo) {
 }
 
 if ($club) {
+	$clubUrl = StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=club&id=' . (int) $club->id, false));
+	$playgroundUrl = !empty($club->standard_playground) ? StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=playground&id=' . (int) $club->standard_playground, false)) : null;
 	StructuredDataHelper::add($this->getDocument(), [
 		'@context' => 'https://schema.org',
 		'@type' => 'SportsOrganization',
-		'@id' => StructuredDataHelper::currentUrl() . '#club',
+		'@id' => $clubUrl ? $clubUrl . '#club' : null,
 		'name' => (string) $club->name,
-		'url' => StructuredDataHelper::absoluteUrl($club->website ?? null),
+		'url' => $clubUrl,
+		'sameAs' => StructuredDataHelper::externalUrl($club->website ?? ''),
+		'logo' => $schemaClubLogo,
+		'image' => $schemaClubLogo,
+		'description' => $clubText !== '' ? $clubText : null,
 		'email' => $club->email ?: null,
+		'telephone' => $club->phone ?: null,
+		'faxNumber' => $club->fax ?: null,
+		'foundingDate' => !empty($club->founded) ? (string) $club->founded : null,
 		'sport' => $sportName !== '' ? $sportName : null,
+		'mainEntityOfPage' => StructuredDataHelper::webPage((string) $club->name, $clubText !== '' ? $clubText : null, $clubUrl),
 		'address' => [
 			'@type' => 'PostalAddress',
 			'streetAddress' => $club->address ?? null,
@@ -76,10 +89,26 @@ if ($club) {
 			'addressLocality' => $club->location ?? null,
 			'addressCountry' => $club->country ?? null,
 		],
+		'geo' => is_numeric($club->latitude ?? null) && is_numeric($club->longitude ?? null) ? [
+			'@type' => 'GeoCoordinates',
+			'latitude' => (float) $club->latitude,
+			'longitude' => (float) $club->longitude,
+		] : null,
 		'location' => $club->playground_name ? [
 			'@type' => 'SportsActivityLocation',
+			'@id' => $playgroundUrl ? $playgroundUrl . '#venue' : null,
 			'name' => (string) $club->playground_name,
+			'url' => $playgroundUrl,
 		] : null,
+		'member' => array_map(
+			static fn (object $team): array => [
+				'@type' => 'SportsTeam',
+				'@id' => !empty($team->projectteam_id) ? StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->projectteam_id, false)) . '#sportsteam' : null,
+				'name' => (string) $team->name,
+				'url' => !empty($team->projectteam_id) ? StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->projectteam_id, false)) : null,
+			],
+			$this->items
+		),
 	]);
 }
 ?>

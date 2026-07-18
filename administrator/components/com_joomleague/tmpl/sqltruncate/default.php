@@ -118,7 +118,7 @@ $refTotal  = array_sum($this->counts['reference']);
         msg.innerHTML = '<span class="text-success">' + <?php echo json_encode(Text::_('COM_JOOMLEAGUE_SQLTRUNCATE_SUCCESS')); ?> + '</span>';
         window.setTimeout(function(){ window.location.href = TOOLS; }, 1500);
       }).catch(function(){
-        msg.innerHTML = '<span class="text-danger">' + <?php echo json_encode(Text::_('COM_JOOMLEAGUE_SQLTRUNCATE_NETWORK_ERROR')); ?> + '</span>';
+        msg.innerHTML = '<span class="text-danger">Network error</span>';
         submit.disabled = confirmInput.value !== SITENAME;
       });
   });

@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 /** @var \Joomleague\Component\Joomleague\Site\View\Resultsmatrix\HtmlView $this */
 
@@ -118,6 +119,41 @@ if (count($divisions) > 1) {
 } else {
 	$groups[] = (object) ['title' => '', 'teams' => array_values($this->teams)];
 }
+
+if ($project) {
+	StructuredDataHelper::add($this->getDocument(), [
+		'@context' => 'https://schema.org',
+		'@type' => 'Dataset',
+		'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=resultsmatrix&project_id=' . (int) $project->id, false)) . '#dataset',
+		'name' => Text::_('COM_JOOMLEAGUE_SITE_RESULT_MATRIX') . ' - ' . (string) $project->name,
+		'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=resultsmatrix&project_id=' . (int) $project->id, false)),
+		'isPartOf' => [
+			'@type' => 'SportsOrganization',
+			'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $project->id, false)) . '#competition',
+			'name' => (string) $project->name,
+		],
+		'about' => array_map(
+			static fn (object $team): array => [
+				'@type' => 'SportsTeam',
+				'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->id, false)) . '#sportsteam',
+				'name' => (string) $team->team_name,
+				'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->id, false)),
+			],
+			$this->teams
+		),
+		'mainEntityOfPage' => StructuredDataHelper::collectionPage(
+			Text::_('COM_JOOMLEAGUE_SITE_RESULT_MATRIX'),
+			array_map(
+				static fn (object $team): array => [
+					'@type' => 'SportsTeam',
+					'name' => (string) $team->team_name,
+				],
+				$this->teams
+			),
+			$this->projectLabel($project)
+		),
+	]);
+}
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$project) : ?>
@@ -127,7 +163,7 @@ if (count($divisions) > 1) {
 
 	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo $this->escape($project->name); ?></div>
+		<div class="jl-site-eyebrow"><?php echo $this->escape($this->projectLabel($project)); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RESULT_MATRIX'); ?></h1>
 	</section>
 	<?php endif; ?>
@@ -139,7 +175,7 @@ if (count($divisions) > 1) {
 			<?php if ($group->title !== '') : ?>
 				<h2 class="jl-site-subtitle h5 mt-4 mb-2"><?php echo $this->escape($group->title); ?></h2>
 			<?php endif; ?>
-			<div class="jl-site-panel table-responsive mb-3">
+			<div class="jl-site-panel table-responsive jl-matrix-table-wrap mb-3">
 				<table class="table jl-site-table jl-matrix align-middle text-center">
 					<thead>
 						<tr>
@@ -168,6 +204,22 @@ if (count($divisions) > 1) {
 						<?php endforeach; ?>
 					</tbody>
 				</table>
+			</div>
+			<div class="jl-matrix-card-list mb-3">
+				<?php foreach ($group->teams as $row) : ?>
+					<article class="jl-matrix-card">
+						<h3>
+							<?php if ($linkTeams) : ?><a href="<?php echo $teamLink((int) $row->id); ?>"><?php echo $this->escape($row->team_name); ?></a><?php else : ?><?php echo $this->escape($row->team_name); ?><?php endif; ?>
+						</h3>
+						<dl>
+							<?php foreach ($group->teams as $col) : ?>
+								<?php if ((int) $row->id === (int) $col->id) : continue; endif; ?>
+								<dt><?php if ($linkTeams) : ?><a href="<?php echo $teamLink((int) $col->id); ?>"><?php echo $this->escape($col->team_name); ?></a><?php else : ?><?php echo $this->escape($col->team_name); ?><?php endif; ?></dt>
+								<dd><?php echo $renderCell($this->matrix[(int) $row->id][(int) $col->id] ?? []); ?></dd>
+							<?php endforeach; ?>
+						</dl>
+					</article>
+				<?php endforeach; ?>
 			</div>
 		<?php endforeach; ?>
 

@@ -80,6 +80,15 @@ $pictureUrl = static function (?string $picture): ?string {
 	}
 	return Uri::root(true) . '/' . ltrim($picture, '/');
 };
+$schemaPictureUrl = static function (?string $picture): ?string {
+	$picture = trim((string) $picture);
+
+	if ($picture === '') {
+		return null;
+	}
+
+	return preg_match('#^https?://#i', $picture) ? $picture : Uri::root(true) . '/' . ltrim($picture, '/');
+};
 
 $translateValue = static function (?string $value): string {
 	$value = trim((string) $value);
@@ -429,18 +438,50 @@ $renderPlcareerSection = function () use ($show, $playerParams, $renderHistory):
 };
 
 if ($person) {
+	$personUrl = StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=person&id=' . (int) $person->id, false));
+	$personImage = $schemaPictureUrl($person->picture ?? '');
+	$memberOf = [];
+
+	foreach (array_merge($this->playerHistory, $this->staffHistory, $this->refereeHistory) as $historyItem) {
+		if (empty($historyItem->project_name)) {
+			continue;
+		}
+
+		$projectUrl = !empty($historyItem->project_id)
+			? StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $historyItem->project_id, false))
+			: null;
+		$memberOf[] = [
+			'@type' => 'SportsOrganization',
+			'@id' => $projectUrl ? $projectUrl . '#competition' : null,
+			'name' => (string) $historyItem->project_name,
+			'url' => $projectUrl,
+		];
+	}
+
 	StructuredDataHelper::add($this->getDocument(), [
 		'@context' => 'https://schema.org',
 		'@type' => 'Person',
-		'@id' => StructuredDataHelper::currentUrl() . '#person',
+		'@id' => $personUrl ? $personUrl . '#person' : null,
+		'identifier' => [
+			'@type' => 'PropertyValue',
+			'propertyID' => 'JoomLeague person ID',
+			'value' => (string) (int) $person->id,
+		],
 		'name' => $fullName($person),
 		'givenName' => $person->firstname ?? null,
 		'familyName' => $person->lastname ?? null,
-		'url' => StructuredDataHelper::absoluteUrl($person->website ?? null),
+		'alternateName' => $person->nickname ?? null,
+		'url' => $personUrl,
+		'sameAs' => StructuredDataHelper::externalUrl($person->website ?? ''),
+		'image' => $personImage,
+		'mainEntityOfPage' => StructuredDataHelper::webPage($fullName($person), trim((string) ($person->notes ?? '')) ?: null, $personUrl),
 		'birthDate' => $person->birthday ?? null,
+		'deathDate' => $person->deathday ?? null,
+		'nationality' => $person->country ?? null,
 		'height' => !empty($person->height) ? (int) $person->height . ' cm' : null,
 		'weight' => !empty($person->weight) ? (int) $person->weight . ' kg' : null,
 		'jobTitle' => $translateValue($person->default_position_name ?? ''),
+		'memberOf' => $memberOf,
 	]);
 }
 ?>

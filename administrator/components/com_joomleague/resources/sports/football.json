@@ -127,11 +127,11 @@
     },
     {
       "name": "COM_JOOMLEAGUE_F_MATCH_DELEGATE",
-      "personType": 4
+      "personType": 3
     },
     {
       "name": "COM_JOOMLEAGUE_F_REFEREE_OBSERVER",
-      "personType": 4
+      "personType": 3
     },
     {
       "name": "COM_JOOMLEAGUE_F_HEAD_STEWARD",

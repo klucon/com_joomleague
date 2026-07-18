@@ -18,6 +18,7 @@ $style = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.9';
 $cards = [
 	['view' => 'databasetools', 'title' => 'COM_JOOMLEAGUE_DBTOOLS_TITLE', 'desc' => 'COM_JOOMLEAGUE_DBTOOLS_DESC', 'icon' => 'icon-database', 'tone' => 'cyan'],
 	['view' => 'updates', 'title' => 'COM_JOOMLEAGUE_UPDATES_TITLE', 'desc' => 'COM_JOOMLEAGUE_UPDATES_DESC', 'icon' => 'icon-refresh', 'tone' => 'violet'],
+	['view' => 'languages', 'title' => 'COM_JOOMLEAGUE_LANGUAGES_TITLE', 'desc' => 'COM_JOOMLEAGUE_LANGUAGES_CARD_DESC', 'icon' => 'icon-comments', 'tone' => 'indigo'],
 	['view' => 'import', 'title' => 'COM_JOOMLEAGUE_IMPORT_TITLE', 'desc' => 'COM_JOOMLEAGUE_IMPORT_DESC', 'icon' => 'icon-upload', 'tone' => 'emerald'],
 	['view' => 'sqlimport', 'title' => 'COM_JOOMLEAGUE_SQLIMPORT_TITLE', 'desc' => 'COM_JOOMLEAGUE_SQLIMPORT_CARD_DESC', 'icon' => 'icon-database', 'tone' => 'cyan'],
 	['view' => 'jlxmlexports', 'title' => 'COM_JOOMLEAGUE_EXPORT_TITLE', 'desc' => 'COM_JOOMLEAGUE_EXPORT_DESC', 'icon' => 'icon-download', 'tone' => 'orange'],

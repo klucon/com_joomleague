@@ -11,6 +11,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $jlFlagPath = JPATH_SITE . '/components/com_joomleague/layouts';
 
@@ -28,6 +29,27 @@ $clubLogo = static function (object $club) use ($showSmallLogo, $showMediumLogo,
 
 	return $pic !== '' ? (preg_match('#^https?://#i', $pic) ? $pic : Uri::root(true) . '/' . ltrim($pic, '/')) : '';
 };
+
+StructuredDataHelper::add($this->getDocument(), [
+	'@context' => 'https://schema.org',
+] + StructuredDataHelper::collectionPage(
+	Text::_('COM_JOOMLEAGUE_SITE_CLUBS'),
+	array_map(
+		static fn (object $club): array => [
+			'@type' => 'SportsOrganization',
+			'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=club&id=' . (int) $club->id, false)) . '#club',
+			'name' => (string) $club->name,
+			'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=club&id=' . (int) $club->id, false)),
+			'address' => trim((string) (($club->location ?? '') . ($club->zipcode ?? '') . ($club->country ?? ''))) !== '' ? [
+				'@type' => 'PostalAddress',
+				'postalCode' => trim((string) ($club->zipcode ?? '')),
+				'addressLocality' => trim((string) ($club->location ?? '')),
+				'addressCountry' => trim((string) ($club->country ?? '')),
+			] : null,
+		],
+		$this->items
+	)
+));
 ?>
 <div class="com-joomleague-site">
 	<?php if ($showSectionheader) : ?>

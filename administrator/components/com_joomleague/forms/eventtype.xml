@@ -4,7 +4,7 @@
 		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" default="0" />
 		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME" required="true" description="COM_JOOMLEAGUE_FIELD_NAME_DESCRIPTION" />
 		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" />
-		<field name="sports_type_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SPORT" query="SELECT id,name FROM #__joomleague_sports_type WHERE published=1 ORDER BY name" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_FIELD_SPORT_DESCRIPTION" />
+		<field name="sports_type_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SPORT" query="SELECT id,name FROM #__joomleague_sports_type WHERE published=1 ORDER BY name" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_FIELD_SPORT_DESCRIPTION" translate="true" />
 		<field name="parent" type="sql" label="COM_JOOMLEAGUE_FIELD_PARENT" query="SELECT id,name FROM #__joomleague_eventtype ORDER BY name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_FIELD_PARENT_DESCRIPTION">
 			<option value="">JGLOBAL_ROOT</option>
 		</field>

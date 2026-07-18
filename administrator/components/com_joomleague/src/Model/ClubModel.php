@@ -139,6 +139,8 @@ final class ClubModel extends AdminModel
 		$table->country = trim((string) $table->country) ?: null;
 		$table->founded = trim((string) $table->founded) ?: null;
 		$table->dissolved = trim((string) $table->dissolved) ?: null;
+		$table->latitude = trim((string) $table->latitude) !== '' ? (float) $table->latitude : null;
+		$table->longitude = trim((string) $table->longitude) !== '' ? (float) $table->longitude : null;
 		$table->standard_playground = (int) $table->standard_playground ?: null;
 		$table->notes = trim((string) $table->notes);
 		$table->extended = trim((string) $table->extended) ?: null;

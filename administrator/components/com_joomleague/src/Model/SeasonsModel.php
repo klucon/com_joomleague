@@ -25,7 +25,7 @@ final class SeasonsModel extends ListModel
 		parent::__construct($config, $factory);
 	}
 
-	protected function populateState($ordering = 'a.ordering', $direction = 'asc'): void
+	protected function populateState($ordering = 'a.id', $direction = 'desc'): void
 	{
 		parent::populateState($ordering, $direction);
 	}
@@ -58,8 +58,8 @@ final class SeasonsModel extends ListModel
 			}
 		}
 
-		$order = $db->escape((string) $this->getState('list.ordering', 'a.ordering'));
-		$direction = $db->escape((string) $this->getState('list.direction', 'ASC'));
+		$order = $db->escape((string) $this->getState('list.ordering', 'a.id'));
+		$direction = $db->escape((string) $this->getState('list.direction', 'DESC'));
 		$query->order($db->quoteName($order) . ' ' . $direction);
 
 		return $query;

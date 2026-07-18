@@ -24,6 +24,16 @@ final class MatchdataController extends BaseController
 
 	public function save(): void
 	{
+		$this->saveRows(false);
+	}
+
+	public function save2close(): void
+	{
+		$this->saveRows(true);
+	}
+
+	private function saveRows(bool $close): void
+	{
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
 
 		$matchId = $this->input->getInt('match_id', 0);
@@ -58,6 +68,14 @@ final class MatchdataController extends BaseController
 				$section,
 				$this->input->get('rows', [], 'array')
 			);
+
+			if ($close) {
+				$match = $this->getModel('Matchdata')->getContext($matchId);
+				$redirect = Route::_(
+					'index.php?option=com_joomleague&view=matches&round_id=' . (int) $match->round_id,
+					false
+				);
+			}
 
 			$this->setRedirect($redirect, Text::_('COM_JOOMLEAGUE_MATCH_DATA_SAVED'));
 		} catch (Throwable $exception) {

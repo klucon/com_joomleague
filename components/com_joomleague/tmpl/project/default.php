@@ -28,8 +28,11 @@ $showTitle = (bool) ($headingParams['show_title'] ?? true);
 $showProjectLogo = (bool) ($headingParams['show_project_logo'] ?? true);
 
 $projectLogo = '';
+$schemaProjectLogo = null;
 if ($project && $showProjectLogo) {
 	$pic = trim((string) ($project->picture ?? ''));
+	$schemaProjectLogo = $pic !== '' ? (preg_match('#^https?://#i', $pic) ? $pic : Uri::root(true) . '/' . ltrim($pic, '/')) : null;
+
 	if ($pic === '') {
 		$pic = trim((string) ComponentHelper::getParams('com_joomleague')->get('placeholder_project_picture', ''));
 	}
@@ -39,21 +42,40 @@ if ($project && $showProjectLogo) {
 }
 
 if ($project) {
+	$projectUrl = StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $project->id, false));
 	StructuredDataHelper::add($this->getDocument(), [
 		'@context' => 'https://schema.org',
-		'@type' => 'SportsOrganization',
-		'@id' => StructuredDataHelper::currentUrl() . '#competition',
+		'@type' => ['SportsOrganization', 'SportsEvent'],
+		'@id' => $projectUrl ? $projectUrl . '#competition' : null,
 		'name' => (string) $project->name,
+		'alternateName' => trim((string) ($project->league_name ?? '') . ' ' . (string) ($project->season_name ?? '')),
+		'url' => $projectUrl,
+		'image' => $schemaProjectLogo,
+		'mainEntityOfPage' => StructuredDataHelper::webPage((string) $project->name, trim($sportName . ' · ' . (string) ($project->season_name ?? ''), ' ·'), $projectUrl),
 		'sport' => $sportName !== '' ? $sportName : null,
+		'startDate' => !empty($project->start_date) ? (string) $project->start_date : null,
+		'endDate' => !empty($project->end_date) ? (string) $project->end_date : null,
 		'parentOrganization' => $project->league_name ? [
 			'@type' => 'SportsOrganization',
 			'name' => (string) $project->league_name,
 		] : null,
-		'event' => array_map(
+		'member' => array_map(
+			static fn (object $team): array => [
+				'@type' => 'SportsTeam',
+				'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->id, false)) . '#sportsteam',
+				'name' => (string) $team->team_name,
+				'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->id, false)),
+			],
+			$this->teams
+		),
+		'subEvent' => array_map(
 			static fn (object $match): array => [
 				'@type' => 'SportsEvent',
+				'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=matchreport&project_id=' . (int) $match->project_id . '&id=' . (int) $match->id, false)) . '#sportsevent',
 				'name' => trim((string) ($match->home_name ?? '') . ' - ' . (string) ($match->away_name ?? '')),
+				'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=matchreport&project_id=' . (int) $match->project_id . '&id=' . (int) $match->id, false)),
 				'startDate' => !empty($match->match_date) ? date('c', strtotime((string) $match->match_date)) : null,
+				'sport' => $sportName !== '' ? $sportName : null,
 			],
 			$this->matches
 		),
@@ -66,10 +88,9 @@ if ($project) {
 		<div class="d-flex align-items-center gap-3">
 		<?php if ($projectLogo !== '') : ?><img class="jl-team-logo" src="<?php echo $this->escape($projectLogo); ?>" alt="<?php echo $this->escape($project->name); ?>" loading="lazy" style="max-height:90px;width:auto;flex-shrink:0;"><?php endif; ?>
 		<div style="min-width:0;">
-		<div class="jl-site-eyebrow"><?php echo $this->escape(trim(($project->league_name ?? '') . ' · ' . ($project->season_name ?? ''), ' ·')); ?></div>
 			<?php if ($showTitle) : ?><h1 class="jl-site-title mb-1"><?php echo $this->escape($project->name); ?></h1><?php endif; ?>
-			<p class="jl-site-muted mb-0"><?php echo $this->escape($sportName); ?></p>
-			</div>
+			<p class="jl-site-muted mb-0"><?php echo $this->escape(trim($sportName . ' · ' . (string) ($project->season_name ?? ''), ' ·')); ?></p>
+		</div>
 		</div>
 		<nav class="jl-site-nav">
 			<?php if ($isRunningRace) : ?>

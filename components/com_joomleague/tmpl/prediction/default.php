@@ -14,6 +14,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $user = Factory::getApplication()->getIdentity();
 $game = $this->predictionGame;
@@ -21,11 +22,46 @@ $canTip = (int) $user->id > 0;
 $selectedRoundId = (int) Factory::getApplication()->getInput()->getInt('round_id');
 $params = $this->templateParams;
 $showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
+
+if ($game) {
+	StructuredDataHelper::add($this->getDocument(), [
+		'@context' => 'https://schema.org',
+		'@type' => 'Game',
+		'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=prediction&game_id=' . (int) $game->id, false)) . '#game',
+		'name' => (string) $game->name,
+		'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=prediction&game_id=' . (int) $game->id, false)),
+		'isPartOf' => [
+			'@type' => 'SportsOrganization',
+			'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $game->project_id, false)) . '#competition',
+			'name' => (string) ($this->project->name ?? ''),
+		],
+		'about' => array_map(
+			static fn (object $match): array => [
+				'@type' => 'SportsEvent',
+				'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=matchreport&id=' . (int) $match->id, false)) . '#sportsevent',
+				'name' => trim((string) ($match->home_name ?? '') . ' - ' . (string) ($match->away_name ?? '')),
+				'startDate' => !empty($match->match_date) ? date('c', strtotime((string) $match->match_date)) : null,
+			],
+			$this->predictionMatches
+		),
+		'mainEntityOfPage' => StructuredDataHelper::collectionPage(
+			(string) $game->name,
+			array_map(
+				static fn (object $match): array => [
+					'@type' => 'SportsEvent',
+					'name' => trim((string) ($match->home_name ?? '') . ' - ' . (string) ($match->away_name ?? '')),
+				],
+				$this->predictionMatches
+			),
+			$this->projectLabel()
+		),
+	]);
+}
 ?>
 <div class="com-joomleague-site">
 	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo $this->project ? $this->escape($this->project->name) : ''; ?></div>
+		<div class="jl-site-eyebrow"><?php echo $this->escape($this->projectLabel()); ?></div>
 		<h1 class="jl-site-title"><?php echo $game ? $this->escape($game->name) : Text::_('COM_JOOMLEAGUE_SITE_PREDICTION'); ?></h1>
 		<?php if ($game) : ?>
 			<nav class="jl-site-nav mt-3">
@@ -71,7 +107,7 @@ $showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
 			<?php endif; ?>
 			<form action="<?php echo Route::_('index.php?option=com_joomleague&task=prediction.save'); ?>" method="post">
 				<input type="hidden" name="game_id" value="<?php echo (int) $game->id; ?>">
-				<div class="table-responsive">
+				<div class="table-responsive jl-prediction-table-wrap">
 					<table class="table jl-site-table align-middle">
 						<thead>
 							<tr>
@@ -114,6 +150,40 @@ $showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
 							<?php endforeach; ?>
 						</tbody>
 					</table>
+				</div>
+				<div class="jl-prediction-card-list">
+					<?php foreach ($this->predictionMatches as $match) :
+						$tip = $this->predictionTips[(int) $match->id] ?? null;
+						$locked = !$canTip || !empty($match->prediction_locked) || !empty($match->prediction_played);
+					?>
+						<article class="jl-prediction-card">
+							<div class="jl-prediction-card__meta">
+								<span><?php echo $this->escape(substr((string) $match->match_date, 0, 16)); ?></span>
+								<span><?php echo $this->escape((string) $match->round_name); ?></span>
+							</div>
+							<a class="jl-prediction-card__match" href="<?php echo Route::_('index.php?option=com_joomleague&view=matchreport&id=' . (int) $match->id); ?>">
+								<?php echo $this->escape((string) $match->home_name); ?> - <?php echo $this->escape((string) $match->away_name); ?>
+							</a>
+							<?php if (!empty($match->prediction_locked) && empty($match->prediction_played)) : ?>
+								<span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PREDICTION_LOCKED'); ?></span>
+							<?php endif; ?>
+							<div class="jl-prediction-card__tip">
+								<label>
+									<span><?php echo Text::_('COM_JOOMLEAGUE_SITE_HOME'); ?></span>
+									<input class="form-control form-control-sm" type="number" min="0" max="999" name="tips[<?php echo (int) $match->id; ?>][home]" value="<?php echo $tip ? (int) $tip->home_score : ''; ?>" <?php echo $locked ? 'disabled' : ''; ?>>
+								</label>
+								<span class="jl-prediction-card__separator">:</span>
+								<label>
+									<span><?php echo Text::_('COM_JOOMLEAGUE_SITE_AWAY'); ?></span>
+									<input class="form-control form-control-sm" type="number" min="0" max="999" name="tips[<?php echo (int) $match->id; ?>][away]" value="<?php echo $tip ? (int) $tip->away_score : ''; ?>" <?php echo $locked ? 'disabled' : ''; ?>>
+								</label>
+							</div>
+							<div class="jl-prediction-card__result">
+								<span><?php echo Text::_('COM_JOOMLEAGUE_SITE_SCORE'); ?>: <?php echo $match->team1_result !== null && $match->team2_result !== null ? $this->escape((string) (int) $match->team1_result . ':' . (string) (int) $match->team2_result) : Text::_('COM_JOOMLEAGUE_SITE_NOT_PLAYED'); ?></span>
+								<span><?php echo Text::_('COM_JOOMLEAGUE_SITE_POINTS'); ?>: <strong><?php echo $tip ? (int) $tip->points : 0; ?></strong></span>
+							</div>
+						</article>
+					<?php endforeach; ?>
 				</div>
 				<?php if (!$this->predictionMatches) : ?><div class="alert alert-info"><?php echo Text::_('COM_JOOMLEAGUE_SITE_NO_MATCHES'); ?></div><?php endif; ?>
 				<?php if ($canTip) : ?>

@@ -44,14 +44,39 @@ for ($s = 0; $s < $splitN; $s++) {
 	$splitSummary[] = ($homeSplit[$s] ?? '-') . ':' . ($awaySplit[$s] ?? '-');
 }
 
+$renderEditorField = function (string $name): void {
+	$field = $this->form->getField($name);
+
+	if (!$field) {
+		return;
+	}
+
+	$label = (string) $field->getAttribute('label');
+	$description = (string) $field->getAttribute('description');
+	?>
+	<div class="jl-match-editor-field mb-4">
+		<h3><?php echo Text::_($label); ?></h3>
+		<?php if ($description !== '') : ?>
+			<div class="form-text mb-2"><?php echo Text::_($description); ?></div>
+		<?php endif; ?>
+		<?php echo $field->input; ?>
+	</div>
+	<?php
+};
+
 ?>
 <style>
-	#match-form .jl-match { max-width: 920px; margin: 0 auto; }
+	#match-form .jl-match { width: min(100%, 1320px); margin: 0 auto; }
 	#match-form .jl-team-name { font-size: 1.15rem; font-weight: 700; }
 	#match-form .jl-logo { width: 72px; height: 72px; object-fit: contain; margin: 0 auto .5rem; display: block; }
 	#match-form .jl-logo-empty { width: 72px; height: 72px; border-radius: 50%; background: rgba(127, 127, 127, .18); display: flex; align-items: center; justify-content: center; margin: 0 auto .5rem; font-size: 1.6rem; font-weight: 700; opacity: .7; }
 	#match-form .jl-score input { width: 4.2rem; text-align: center; font-size: 2rem; font-weight: 800; padding: .2rem; }
 	#match-form .jl-split-input { max-width: 5.5rem; text-align: center; }
+	#match-form .jl-match-editor-field h3 { margin: 0 0 .4rem; font-size: 1.05rem; font-weight: 700; }
+	#match-form .jl-match-editor-field .editor,
+	#match-form .jl-match-editor-field .js-editor-tinymce,
+	#match-form .jl-match-editor-field .tox-tinymce,
+	#match-form .jl-match-editor-field textarea { width: 100% !important; max-width: none !important; }
 	#match-form details.jl-collapse > summary { cursor: pointer; list-style: none; font-weight: 600; }
 	#match-form details.jl-collapse > summary::-webkit-details-marker { display: none; }
 	#match-form details.jl-collapse > summary::before { content: "\25B8"; display: inline-block; margin-right: .4rem; transition: transform .15s; }
@@ -141,8 +166,8 @@ for ($s = 0; $s < $splitN; $s++) {
 		<div class="card mb-3">
 			<div class="card-header"><span class="icon-pencil-2" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_MATCH_SECTION_REPORT'); ?></div>
 			<div class="card-body">
-				<?php echo $this->form->renderField('preview'); ?>
-				<?php echo $this->form->renderField('summary'); ?>
+				<?php $renderEditorField('preview'); ?>
+				<?php $renderEditorField('summary'); ?>
 			</div>
 		</div>
 

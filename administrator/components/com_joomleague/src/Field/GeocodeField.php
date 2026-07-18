@@ -13,6 +13,8 @@ namespace Joomleague\Component\Joomleague\Administrator\Field;
 
 use Joomla\CMS\Form\FormField;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Uri\Uri;
 
 /**
  * Tlačítko "Najít souřadnice" — otevře modal s interaktivní mapou (Leaflet + OpenStreetMap
@@ -31,8 +33,16 @@ final class GeocodeField extends FormField
 		$sourceFields = (string) $this->element['source_fields'];
 		$latField = (string) $this->element['lat_field'];
 		$lngField = (string) $this->element['lng_field'];
+		$endpoint = (new Uri())->setPath(Uri::base(true) . '/index.php');
+		$endpoint->setQuery([
+			'option'                => 'com_joomleague',
+			'task'                  => 'ajax.geocode',
+			'format'                => 'json',
+			Session::getFormToken() => 1,
+		]);
 
 		$button = '<button type="button" class="btn btn-secondary jl-geocode-btn"'
+			. ' data-endpoint="' . htmlspecialchars((string) $endpoint, ENT_QUOTES, 'UTF-8') . '"'
 			. ' data-source-fields="' . htmlspecialchars($sourceFields, ENT_QUOTES, 'UTF-8') . '"'
 			. ' data-lat-field="' . htmlspecialchars($latField, ENT_QUOTES, 'UTF-8') . '"'
 			. ' data-lng-field="' . htmlspecialchars($lngField, ENT_QUOTES, 'UTF-8') . '">'

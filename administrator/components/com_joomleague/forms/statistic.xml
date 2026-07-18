@@ -5,7 +5,7 @@
 		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME" required="true" description="COM_JOOMLEAGUE_FIELD_NAME_DESCRIPTION" />
 		<field name="short" type="text" label="COM_JOOMLEAGUE_STATISTIC_FIELD_SHORT" required="true" description="COM_JOOMLEAGUE_STATISTIC_FIELD_SHORT_DESCRIPTION" />
 		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" />
-		<field name="sports_type_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SPORT" query="SELECT id,name FROM #__joomleague_sports_type WHERE published=1 ORDER BY name" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_FIELD_SPORT_DESCRIPTION" />
+		<field name="sports_type_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SPORT" query="SELECT id,name FROM #__joomleague_sports_type WHERE published=1 ORDER BY name" key_field="id" value_field="name" required="true" description="COM_JOOMLEAGUE_FIELD_SPORT_DESCRIPTION" translate="true" />
 		<field name="class" type="list" label="COM_JOOMLEAGUE_STATISTIC_FIELD_HANDLER" required="true" description="COM_JOOMLEAGUE_STATISTIC_FIELD_HANDLER_DESCRIPTION">
 			<option value="basic">COM_JOOMLEAGUE_STATISTIC_HANDLER_BASIC</option>
 			<option value="complexsum">COM_JOOMLEAGUE_STATISTIC_HANDLER_COMPLEXSUM</option>

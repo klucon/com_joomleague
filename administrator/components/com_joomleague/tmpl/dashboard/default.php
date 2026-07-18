@@ -27,11 +27,13 @@ $dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0
 			<h1 class="mb-2"><?php echo Text::_('COM_JOOMLEAGUE_DASHBOARD_TITLE'); ?></h1>
 			<p class="mb-0"><?php echo Text::_('COM_JOOMLEAGUE_DASHBOARD_DESCRIPTION'); ?></p>
 		</div>
-		<div class="jl-dashboard-total" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_DASHBOARD_TOTAL_LABEL'); ?>">
-			<span class="icon-database" aria-hidden="true"></span>
-			<strong><?php echo number_format($this->totalItems, 0, ',', ' '); ?></strong>
-			<span><?php echo Text::_('COM_JOOMLEAGUE_DASHBOARD_TOTAL_LABEL'); ?></span>
-		</div>
+		<a class="jl-dashboard-total jl-dashboard-total--translations" href="<?php echo Route::_('index.php?option=com_joomleague&view=languages'); ?>" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_LANGUAGES_TITLE'); ?>">
+			<span class="icon-comments" aria-hidden="true"></span>
+			<strong><?php echo (int) ($this->translationSummary['best_percent'] ?? 0); ?>%</strong>
+			<span><?php echo Text::_('COM_JOOMLEAGUE_DASHBOARD_TRANSLATE_STATUS'); ?></span>
+			<small><?php echo Text::sprintf('COM_JOOMLEAGUE_DASHBOARD_LANGUAGES_INSTALLED', (int) ($this->translationSummary['installed'] ?? 0), (int) ($this->translationSummary['available'] ?? 0)); ?></small>
+			<em><?php echo Text::_('COM_JOOMLEAGUE_DASHBOARD_LANGUAGES_DOWNLOAD'); ?></em>
+		</a>
 	</header>
 
 	<div class="jl-dashboard-grid" role="list">

@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $team = $this->item;
 $stats = $this->teamStats;
@@ -27,12 +28,31 @@ $showAttendanceStats = (bool) ($params['show_attendance_stats'] ?? false);
 foreach ($this->teamPlayerStats as $row) {
 	$rowsByStatistic[(int) $row->statistic_id][] = $row;
 }
+
+if ($team) {
+	$teamUrl = StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $team->id, false));
+	StructuredDataHelper::add($this->getDocument(), [
+		'@context' => 'https://schema.org',
+		'@type' => 'Dataset',
+		'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=teamstats&projectteam_id=' . (int) $team->id, false)) . '#dataset',
+		'name' => Text::_('COM_JOOMLEAGUE_SITE_TEAM_STATS') . ' - ' . (string) $team->team_name,
+		'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=teamstats&projectteam_id=' . (int) $team->id, false)),
+		'about' => [
+			'@type' => 'SportsTeam',
+			'@id' => $teamUrl ? $teamUrl . '#sportsteam' : null,
+			'name' => (string) $team->team_name,
+			'url' => $teamUrl,
+		],
+		'variableMeasured' => array_keys($stats),
+		'mainEntityOfPage' => StructuredDataHelper::webPage(Text::_('COM_JOOMLEAGUE_SITE_TEAM_STATS'), $this->projectLabel(), null),
+	]);
+}
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$team) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_NOT_FOUND'); ?></div><?php return; endif; ?>
 	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo $this->escape($team->club_name ?? ''); ?></div>
+		<div class="jl-site-eyebrow"><?php echo $this->escape(trim($this->projectLabel() . ' · ' . (string) ($team->club_name ?? ''), ' ·')); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_STATS'); ?></h1>
 		<p class="jl-site-muted mb-3"><?php echo $this->escape($team->team_name); ?></p>
 		<nav class="jl-site-nav">

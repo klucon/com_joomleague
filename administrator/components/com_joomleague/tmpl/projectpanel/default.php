@@ -67,15 +67,6 @@ $cards = [
 		'future' => false,
 	],
 	[
-		'url' => Route::_('index.php?option=com_joomleague&view=teamstaffs&project_id=' . $id),
-		'title' => 'COM_JOOMLEAGUE_TEAMSTAFFS_TITLE',
-		'description' => 'COM_JOOMLEAGUE_PROJECT_STAFF_DESC',
-		'count' => (int) $this->project->staff_count,
-		'icon' => 'icon-user',
-		'tone' => 'cyan',
-		'future' => false,
-	],
-	[
 		'url' => Route::_('index.php?option=com_joomleague&view=divisions&project_id=' . $id),
 		'title' => 'COM_JOOMLEAGUE_PROJECT_DIVISIONS',
 		'description' => 'COM_JOOMLEAGUE_PROJECT_DIVISIONS_DESC',
@@ -123,6 +114,12 @@ $cards = [
 	],
 ];
 
+$projectContextParts = array_filter([
+	(string) ($this->project->league ?? ''),
+	(string) ($this->project->season ?? ''),
+	$this->project->sport ?? '' ? Text::_((string) $this->project->sport) : '',
+], static fn ($value) => trim((string) $value) !== '');
+
 ?>
 <link rel="stylesheet" href="<?php echo htmlspecialchars($style, ENT_QUOTES, 'UTF-8'); ?>">
 <div class="com-joomleague-dashboard com-joomleague-projectpanel">
@@ -138,7 +135,7 @@ $cards = [
 			<p class="jl-dashboard-eyebrow mb-2"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_PANEL_EYEBROW'); ?></p>
 			<h1 class="mb-2"><?php echo $this->escape($this->project->name); ?></h1>
 			<p class="mb-0">
-				<?php echo $this->escape(trim(($this->project->league ?? '') . ' · ' . ($this->project->season ?? '') . ' · ' . ($this->project->sport ?? ''), " \t\n\r " . chr(11) . '·')); ?>
+				<?php echo $this->escape(implode(' · ', $projectContextParts)); ?>
 			</p>
 		</div>
 		<div class="jl-dashboard-total" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_PROJECT_PANEL_TOTAL_LABEL'); ?>">

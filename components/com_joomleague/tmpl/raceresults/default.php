@@ -31,12 +31,35 @@ $params = $this->templateParams;
 $showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
 
 if ($project) {
+	$raceUrl = StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=raceresults&project_id=' . (int) $project->id, false));
 	StructuredDataHelper::add($this->getDocument(), [
 		'@context' => 'https://schema.org',
 		'@type' => 'SportsEvent',
-		'@id' => StructuredDataHelper::currentUrl() . '#race-results',
+		'@id' => $raceUrl ? $raceUrl . '#sportsevent' : null,
 		'name' => (string) $project->name,
+		'url' => $raceUrl,
 		'sport' => $sportName !== '' ? $sportName : null,
+		'mainEntityOfPage' => StructuredDataHelper::collectionPage(
+			Text::_('COM_JOOMLEAGUE_SITE_RACE_RESULTS'),
+			array_map(
+				static fn (object $result): array => [
+					'@type' => 'Person',
+					'name' => (string) ($result->runner_name ?: $result->bib_number),
+					'identifier' => !empty($result->bib_number) ? [
+						'@type' => 'PropertyValue',
+						'propertyID' => 'Bib number',
+						'value' => (string) $result->bib_number,
+					] : null,
+					'additionalProperty' => array_values(array_filter([
+						isset($result->rank) ? ['@type' => 'PropertyValue', 'name' => 'rank', 'value' => (string) $result->rank] : null,
+						isset($result->time) ? ['@type' => 'PropertyValue', 'name' => 'time', 'value' => (string) $result->time] : null,
+						isset($result->category_name) ? ['@type' => 'PropertyValue', 'name' => 'category', 'value' => (string) $result->category_name] : null,
+					])),
+				],
+				$this->raceResults
+			),
+			$this->projectLabel($project)
+		),
 		'competitor' => array_map(
 			static fn (object $result): array => [
 				'@type' => 'Person',

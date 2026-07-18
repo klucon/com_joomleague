@@ -18,10 +18,12 @@ CHANGELOG = ROOT / "CHANGELOG.md"
 REPOSITORY = "klucon/com_joomleague"
 MAINTAINER = "Ondřej Klučka"
 MAINTAINER_URL = "https://klucon.cz"
+UPDATE_BASE = "https://update.klucon.cz/joomleague"
 JOOMLA_TARGET = "6.*"
 PHP_MINIMUM = "8.3"
 PUBLIC_ROLLUP_BASE = {
-    "6.1.0-alpha-151": 150,
+    "6.1.0-alpha-150": 61,
+    "6.1.0-alpha-153": 151,
 }
 
 
@@ -82,15 +84,10 @@ def public_rollup_items(release_version: str, sections: list[tuple[str, list[str
     if base is None or current is None:
         return None
 
-    if base + 1 == current:
-        summary = f"Public {release_version} update summary: this release replaces the previous public alpha-{base} package and includes the listed {release_version} changes."
-    else:
-        summary = f"Public {release_version} update summary: this release replaces the previous public alpha-{base} package and includes all listed alpha changes from 6.1.0-alpha-{base + 1} through {release_version}."
-
     items = [
-        summary,
+        f"Public {release_version} update summary: this release replaces the previous public alpha-{base} package and includes all listed alpha changes from 6.1.0-alpha-{base + 1} through {release_version}.",
         "Target platform: Joomla 6.1 and PHP 8.3. This is still an alpha release intended for evaluation, migration testing and demo deployments.",
-        "Main focus areas: project-aware SEF routing, administrator form stability, frontend template polish, map support, prediction views, SQL tools and package metadata.",
+        "Main focus areas: multilingual SEF routing, project-aware URLs, administrator menu item stability, frontend page polish, calendar output, running-race groundwork and package metadata.",
     ]
 
     for section_version, section_items in sections:
@@ -127,8 +124,8 @@ def sha256(path: Path) -> str:
 def write_update_xml(release_version: str, output: Path) -> None:
     tag = f"v{release_version}"
     release_url = f"https://github.com/{REPOSITORY}/releases/tag/{tag}"
-    download_url = f"https://github.com/{REPOSITORY}/releases/download/{tag}/pkg_joomleague-{release_version}.zip"
-    changelog_url = f"https://github.com/{REPOSITORY}/releases/download/{tag}/joomleague-changelog-{release_version}.xml"
+    download_url = f"{UPDATE_BASE}/packages/pkg_joomleague-{release_version}.zip"
+    changelog_url = f"{UPDATE_BASE}/changelog-{release_version}.xml"
     checksum = sha256(package_zip(release_version))
 
     updates = ET.Element("updates")

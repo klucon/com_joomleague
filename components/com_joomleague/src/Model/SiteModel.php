@@ -198,11 +198,19 @@ class SiteModel extends BaseDatabaseModel
 				$db->quoteName('c.id', 'club_id'),
 				$db->quoteName('c.name', 'club_name'),
 				$db->quoteName('c.country', 'club_country'),
+				$db->quoteName('c.website', 'club_website'),
 				$db->quoteName('c.logo_small', 'club_logo_small'),
 				$db->quoteName('c.logo_middle', 'club_logo_middle'),
 				$db->quoteName('c.logo_big', 'club_logo_big'),
 				$db->quoteName('pg.id', 'playground_id'),
 				$db->quoteName('pg.name', 'playground_name'),
+				$db->quoteName('pg.address', 'playground_address'),
+				$db->quoteName('pg.zipcode', 'playground_zipcode'),
+				$db->quoteName('pg.city', 'playground_city'),
+				$db->quoteName('pg.country', 'playground_country'),
+				$db->quoteName('pg.latitude', 'playground_latitude'),
+				$db->quoteName('pg.longitude', 'playground_longitude'),
+				$db->quoteName('pg.website', 'playground_website'),
 			])
 			->from($db->quoteName('#__joomleague_project_team', 'pt'))
 			->join('INNER', $db->quoteName('#__joomleague_team', 't') . ' ON ' . $db->quoteName('t.id') . ' = ' . $db->quoteName('pt.team_id'))
@@ -688,12 +696,17 @@ class SiteModel extends BaseDatabaseModel
 	{
 		$db = $this->getDatabase();
 		$query = $db->getQuery(true)
-			->select('*')
-			->from($db->quoteName('#__joomleague_round'))
-			->where($db->quoteName('project_id') . ' = :project_id')
-			->where($db->quoteName('published') . ' = 1')
+			->select([
+				$db->quoteName('r') . '.*',
+				'MIN(NULLIF(' . $db->quoteName('m.match_date') . ', ' . $db->quote('0000-00-00 00:00:00') . ')) AS round_sort_date',
+			])
+			->from($db->quoteName('#__joomleague_round', 'r'))
+			->join('LEFT', $db->quoteName('#__joomleague_match', 'm') . ' ON ' . $db->quoteName('m.round_id') . ' = ' . $db->quoteName('r.id') . ' AND ' . $db->quoteName('m.published') . ' = 1')
+			->where($db->quoteName('r.project_id') . ' = :project_id')
+			->where($db->quoteName('r.published') . ' = 1')
 			->bind(':project_id', $projectId, ParameterType::INTEGER)
-			->order($db->quoteName('roundcode') . ' ASC, ' . $db->quoteName('id') . ' ASC');
+			->group($db->quoteName('r.id'))
+			->order('COALESCE(MIN(NULLIF(' . $db->quoteName('m.match_date') . ', ' . $db->quote('0000-00-00 00:00:00') . ')), ' . $db->quote('9999-12-31 23:59:59') . ') ASC, ' . $db->quoteName('r.id') . ' ASC');
 
 		return $db->setQuery($query)->loadObjectList();
 	}
@@ -863,16 +876,17 @@ class SiteModel extends BaseDatabaseModel
 		$query = $db->getQuery(true)
 			->select([
 				$db->quoteName('mr.match_id'),
+				$db->quoteName('mr.external_referee_name'),
 				$db->quoteName('pos.name', 'position_name'),
-				'CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . ') AS person_name',
+				'COALESCE(NULLIF(CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . '), ' . $db->quote('') . '), NULLIF(' . $db->quoteName('mr.external_referee_name') . ', ' . $db->quote('') . ')) AS person_name',
 			])
 			->from($db->quoteName('#__joomleague_match_referee', 'mr'))
-			->join('INNER', $db->quoteName('#__joomleague_project_referee', 'pr') . ' ON ' . $db->quoteName('pr.id') . ' = ' . $db->quoteName('mr.project_referee_id'))
-			->join('INNER', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('pr.person_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_project_referee', 'pr') . ' ON ' . $db->quoteName('pr.id') . ' = ' . $db->quoteName('mr.project_referee_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('pr.person_id'))
 			->join('LEFT', $db->quoteName('#__joomleague_project_position', 'pp') . ' ON ' . $db->quoteName('pp.id') . ' = ' . $db->quoteName('mr.project_position_id'))
 			->join('LEFT', $db->quoteName('#__joomleague_position', 'pos') . ' ON ' . $db->quoteName('pos.id') . ' = ' . $db->quoteName('pp.position_id'))
 			->whereIn($db->quoteName('mr.match_id'), $matchIds)
-			->where($db->quoteName('p.published') . ' = 1')
+			->where('((' . $db->quoteName('p.id') . ' IS NOT NULL AND ' . $db->quoteName('p.published') . ' = 1) OR NULLIF(' . $db->quoteName('mr.external_referee_name') . ', ' . $db->quote('') . ') IS NOT NULL)')
 			->order($db->quoteName('mr.match_id') . ' ASC, ' . $db->quoteName('mr.ordering') . ' ASC, ' . $db->quoteName('mr.id') . ' ASC');
 
 		$byMatch = [];
@@ -903,7 +917,7 @@ class SiteModel extends BaseDatabaseModel
 				$db->quoteName('et.icon', 'event_icon'),
 				$db->quoteName('t.name', 'team_name'),
 				$db->quoteName('p.id', 'person_id'),
-				'CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . ') AS person_name',
+				'COALESCE(NULLIF(CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . '), ' . $db->quote('') . '), NULLIF(' . $db->quoteName('e.external_person_name') . ', ' . $db->quote('') . ')) AS person_name',
 			])
 			->from($db->quoteName('#__joomleague_match_event', 'e'))
 			->join('LEFT', $db->quoteName('#__joomleague_eventtype', 'et') . ' ON ' . $db->quoteName('et.id') . ' = ' . $db->quoteName('e.event_type_id'))
@@ -912,7 +926,7 @@ class SiteModel extends BaseDatabaseModel
 			->join('LEFT', $db->quoteName('#__joomleague_team_player', 'tp') . ' ON ' . $db->quoteName('tp.id') . ' = ' . $db->quoteName('e.teamplayer_id'))
 			->join('LEFT', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('tp.person_id'))
 			->whereIn($db->quoteName('e.match_id'), $matchIds)
-			->order($db->quoteName('e.event_time') . ' ASC, ' . $db->quoteName('e.id') . ' ASC');
+			->order('CAST(NULLIF(' . $db->quoteName('e.event_time') . ', ' . $db->quote('') . ') AS UNSIGNED) ASC, ' . $db->quoteName('e.id') . ' ASC');
 
 		$byMatch = [];
 
@@ -1199,13 +1213,23 @@ class SiteModel extends BaseDatabaseModel
 				$db->quoteName('home.picture', 'home_projectteam_picture'),
 				$db->quoteName('away.picture', 'away_projectteam_picture'),
 				$db->quoteName('hp.name', 'playground_name'),
+				$db->quoteName('hp.address', 'playground_address'),
+				$db->quoteName('hp.zipcode', 'playground_zipcode'),
+				$db->quoteName('hp.city', 'playground_city'),
+				$db->quoteName('hp.country', 'playground_country'),
+				$db->quoteName('hp.latitude', 'playground_latitude'),
+				$db->quoteName('hp.longitude', 'playground_longitude'),
+				$db->quoteName('hp.max_visitors', 'playground_max_visitors'),
+				$db->quoteName('hp.website', 'playground_website'),
 				$db->quoteName('hc.id', 'home_club_id'),
 				$db->quoteName('hc.country', 'home_club_country'),
+				$db->quoteName('hc.website', 'home_club_website'),
 				$db->quoteName('hc.logo_small', 'home_club_logo_small'),
 				$db->quoteName('hc.logo_middle', 'home_club_logo_middle'),
 				$db->quoteName('hc.logo_big', 'home_club_logo_big'),
 				$db->quoteName('ac.id', 'away_club_id'),
 				$db->quoteName('ac.country', 'away_club_country'),
+				$db->quoteName('ac.website', 'away_club_website'),
 				$db->quoteName('ac.logo_small', 'away_club_logo_small'),
 				$db->quoteName('ac.logo_middle', 'away_club_logo_middle'),
 				$db->quoteName('ac.logo_big', 'away_club_logo_big'),
@@ -1290,20 +1314,21 @@ class SiteModel extends BaseDatabaseModel
 			->select([
 				'mr.id',
 				$db->quoteName('pr.person_id'),
+				$db->quoteName('mr.external_referee_name'),
 				$db->quoteName('pos.name', 'position_name'),
 				$db->quoteName('p.firstname'),
 				$db->quoteName('p.lastname'),
 				$db->quoteName('p.nickname'),
 				$db->quoteName('p.country'),
-				'CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . ') AS person_name',
+				'COALESCE(NULLIF(CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . '), ' . $db->quote('') . '), NULLIF(' . $db->quoteName('mr.external_referee_name') . ', ' . $db->quote('') . ')) AS person_name',
 			])
 			->from($db->quoteName('#__joomleague_match_referee', 'mr'))
-			->join('INNER', $db->quoteName('#__joomleague_project_referee', 'pr') . ' ON ' . $db->quoteName('pr.id') . ' = ' . $db->quoteName('mr.project_referee_id'))
-			->join('INNER', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('pr.person_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_project_referee', 'pr') . ' ON ' . $db->quoteName('pr.id') . ' = ' . $db->quoteName('mr.project_referee_id'))
+			->join('LEFT', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('pr.person_id'))
 			->join('LEFT', $db->quoteName('#__joomleague_project_position', 'pp') . ' ON ' . $db->quoteName('pp.id') . ' = ' . $db->quoteName('mr.project_position_id'))
 			->join('LEFT', $db->quoteName('#__joomleague_position', 'pos') . ' ON ' . $db->quoteName('pos.id') . ' = ' . $db->quoteName('pp.position_id'))
 			->where($db->quoteName('mr.match_id') . ' = :match_id')
-			->where($db->quoteName('p.published') . ' = 1')
+			->where('((' . $db->quoteName('p.id') . ' IS NOT NULL AND ' . $db->quoteName('p.published') . ' = 1) OR NULLIF(' . $db->quoteName('mr.external_referee_name') . ', ' . $db->quote('') . ') IS NOT NULL)')
 			->bind(':match_id', $matchId, ParameterType::INTEGER)
 			->order($db->quoteName('mr.ordering') . ' ASC, ' . $db->quoteName('mr.id') . ' ASC');
 
@@ -1667,7 +1692,7 @@ class SiteModel extends BaseDatabaseModel
 				$db->quoteName('et.icon', 'event_icon'),
 				$db->quoteName('t.name', 'team_name'),
 				$db->quoteName('p.id', 'person_id'),
-				'CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . ') AS person_name',
+				'COALESCE(NULLIF(CONCAT_WS(' . $db->quote(' ') . ', ' . $db->quoteName('p.firstname') . ', ' . $db->quoteName('p.lastname') . '), ' . $db->quote('') . '), NULLIF(' . $db->quoteName('e.external_person_name') . ', ' . $db->quote('') . ')) AS person_name',
 			])
 			->from($db->quoteName('#__joomleague_match_event', 'e'))
 			->join('LEFT', $db->quoteName('#__joomleague_eventtype', 'et') . ' ON ' . $db->quoteName('et.id') . ' = ' . $db->quoteName('e.event_type_id'))
@@ -1677,7 +1702,7 @@ class SiteModel extends BaseDatabaseModel
 			->join('LEFT', $db->quoteName('#__joomleague_person', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('tp.person_id'))
 			->where($db->quoteName('e.match_id') . ' = :match_id')
 			->bind(':match_id', $matchId, ParameterType::INTEGER)
-			->order($db->quoteName('e.event_time') . ' ASC, ' . $db->quoteName('e.id') . ' ASC');
+			->order('CAST(NULLIF(' . $db->quoteName('e.event_time') . ', ' . $db->quote('') . ') AS UNSIGNED) ASC, ' . $db->quoteName('e.id') . ' ASC');
 
 		return $db->setQuery($query)->loadObjectList();
 	}

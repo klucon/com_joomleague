@@ -28,7 +28,7 @@ final class MatchdataModel extends BaseDatabaseModel
 
 	public function getEvents(int $m): array
 	{
-		return $this->getDatabase()->setQuery('SELECT * FROM #__joomleague_match_event WHERE match_id=' . (int) $m . ' ORDER BY event_time,id')->loadObjectList();
+		return $this->getDatabase()->setQuery('SELECT * FROM #__joomleague_match_event WHERE match_id=' . (int) $m . ' ORDER BY CAST(NULLIF(event_time, "") AS UNSIGNED) ASC,id ASC')->loadObjectList();
 	}
 
 	public function getMatchPlayers(int $m): array
@@ -193,13 +193,25 @@ final class MatchdataModel extends BaseDatabaseModel
 
 				if ($section === 'events' && !empty($r['event_type_id'])) {
 					$eventTypeId = (int) $r['event_type_id'];
+					$projectTeamId = $this->nullableInt($r['projectteam_id'] ?? null);
+					$teamplayerId = $this->nullableInt($r['teamplayer_id'] ?? null);
+					$externalPersonName = mb_substr($this->nullableString($r['external_person_name'] ?? '') ?? '', 0, 100);
+					$secondTeamplayerId = $this->nullableInt($r['teamplayer_id2'] ?? null);
+					$eventTime = $this->nullableString($r['event_time'] ?? '') ?? '';
+					$notice = $this->nullableString($r['notice'] ?? '') ?? '';
+
+					if ($projectTeamId === null || ($teamplayerId === null && $externalPersonName === '')) {
+						continue;
+					}
+
 					$eventKey = implode(':', [
 						$eventTypeId,
-						$this->nullableInt($r['projectteam_id'] ?? null) ?? 0,
-						$this->nullableInt($r['teamplayer_id'] ?? null) ?? 0,
-						$this->nullableInt($r['teamplayer_id2'] ?? null) ?? 0,
-						$this->nullableString($r['event_time'] ?? '') ?? '',
-						$this->nullableString($r['notice'] ?? '') ?? '',
+						$projectTeamId,
+						$teamplayerId ?? 0,
+						$externalPersonName,
+						$secondTeamplayerId ?? 0,
+						$eventTime,
+						$notice,
 					]);
 
 					if (isset($seenEvents[$eventKey])) {
@@ -209,13 +221,14 @@ final class MatchdataModel extends BaseDatabaseModel
 					$seenEvents[$eventKey] = true;
 					$row = (object) [
 						'match_id' => $match,
-						'projectteam_id' => $this->nullableInt($r['projectteam_id'] ?? null),
-						'teamplayer_id' => $this->nullableInt($r['teamplayer_id'] ?? null),
-						'teamplayer_id2' => $this->nullableInt($r['teamplayer_id2'] ?? null),
-						'event_time' => $this->nullableString($r['event_time'] ?? '') ?? '',
+						'projectteam_id' => $projectTeamId,
+						'teamplayer_id' => $teamplayerId,
+						'external_person_name' => $externalPersonName,
+						'teamplayer_id2' => $secondTeamplayerId,
+						'event_time' => $eventTime,
 						'event_type_id' => $eventTypeId,
 						'event_sum' => $this->nullableFloat($r['event_sum'] ?? null) ?? 1.0,
-						'notice' => $this->nullableString($r['notice'] ?? '') ?? '',
+						'notice' => $notice,
 						'notes' => $this->nullableString($r['notes'] ?? null),
 					];
 				}
@@ -232,6 +245,7 @@ final class MatchdataModel extends BaseDatabaseModel
 						'match_id' => $match,
 						'teamplayer_id' => $teamplayerId,
 						'project_position_id' => $this->nullableInt($r['project_position_id'] ?? null),
+						'is_substitute' => !empty($r['is_substitute']) ? 1 : 0,
 						'came_in' => !empty($r['came_in']) ? 1 : 0,
 						'in_for' => $this->nullableInt($r['in_for'] ?? null),
 						'out' => !empty($r['out']) ? 1 : 0,
@@ -265,17 +279,25 @@ final class MatchdataModel extends BaseDatabaseModel
 					];
 				}
 
-				if ($section === 'referees' && !empty($r['project_referee_id'])) {
-					$projectRefereeId = (int) $r['project_referee_id'];
+				if ($section === 'referees') {
+					$projectRefereeId = $this->nullableInt($r['project_referee_id'] ?? null);
+					$externalRefereeName = mb_substr($this->nullableString($r['external_referee_name'] ?? '') ?? '', 0, 100);
 
-					if (isset($seenReferees[$projectRefereeId])) {
+					if ($projectRefereeId === null && $externalRefereeName === '') {
 						continue;
 					}
 
-					$seenReferees[$projectRefereeId] = true;
+					$refereeKey = ($projectRefereeId ?? 0) . ':' . $externalRefereeName;
+
+					if (isset($seenReferees[$refereeKey])) {
+						continue;
+					}
+
+					$seenReferees[$refereeKey] = true;
 					$row = (object) [
 						'match_id' => $match,
 						'project_referee_id' => $projectRefereeId,
+						'external_referee_name' => $externalRefereeName,
 						'project_position_id' => $this->nullableInt($r['project_position_id'] ?? null),
 						'ordering' => ++$order,
 					];
@@ -283,16 +305,18 @@ final class MatchdataModel extends BaseDatabaseModel
 
 				if ($section === 'staff' && !empty($r['team_staff_id'])) {
 					$teamStaffId = (int) $r['team_staff_id'];
+					$projectPositionId = $this->nullableInt($r['project_position_id'] ?? null);
+					$staffKey = $teamStaffId . ':' . ($projectPositionId ?? 0);
 
-					if (isset($seenStaff[$teamStaffId])) {
+					if (isset($seenStaff[$staffKey])) {
 						continue;
 					}
 
-					$seenStaff[$teamStaffId] = true;
+					$seenStaff[$staffKey] = true;
 					$row = (object) [
 						'match_id' => $match,
 						'team_staff_id' => $teamStaffId,
-						'project_position_id' => $this->nullableInt($r['project_position_id'] ?? null),
+						'project_position_id' => $projectPositionId,
 						'ordering' => ++$order,
 					];
 				}

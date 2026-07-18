@@ -25,6 +25,7 @@ DIST = ROOT / "dist"
 PACKAGES = DIST / "packages"
 PACKAGE_MANIFEST = ROOT / "pkg_joomleague.xml"
 COMPONENT_MANIFEST = ROOT / "administrator/components/com_joomleague/joomleague.xml"
+SOURCE_LANGUAGE = "en-GB"
 
 COMPONENT_INCLUDE = (
     "administrator",
@@ -51,14 +52,30 @@ def version() -> str:
 def zip_path(source: Path, target: Path, base: Path) -> None:
     with ZipFile(target, "w", ZIP_DEFLATED) as archive:
         if source.is_file():
-            archive.write(source, source.relative_to(base).as_posix())
+            if should_package_file(source):
+                archive.write(source, source.relative_to(base).as_posix())
             return
 
         for file in sorted(source.rglob("*")):
             if not file.is_file():
                 continue
 
+            if not should_package_file(file):
+                continue
+
             archive.write(file, file.relative_to(base).as_posix())
+
+
+def should_package_file(file: Path) -> bool:
+    parts = file.parts
+
+    for index, part in enumerate(parts):
+        if part != "language" or index + 1 >= len(parts):
+            continue
+
+        return parts[index + 1] == SOURCE_LANGUAGE
+
+    return True
 
 
 def build_component() -> None:
@@ -74,11 +91,12 @@ def build_component() -> None:
                 raise RuntimeError(f"Missing component source: {source}")
 
             if source.is_file():
-                archive.write(source, source.relative_to(ROOT).as_posix())
+                if should_package_file(source):
+                    archive.write(source, source.relative_to(ROOT).as_posix())
                 continue
 
             for file in sorted(source.rglob("*")):
-                if file.is_file():
+                if file.is_file() and should_package_file(file):
                     archive.write(file, file.relative_to(ROOT).as_posix())
 
 
@@ -107,7 +125,7 @@ def build_package() -> Path:
         archive.write(PACKAGE_MANIFEST, "pkg_joomleague.xml")
         archive.write(ROOT / "pkg_script.php", "pkg_script.php")
 
-        for file in sorted((ROOT / "language").rglob("*.ini")):
+        for file in sorted((ROOT / "language" / SOURCE_LANGUAGE).glob("*.ini")):
             archive.write(file, file.relative_to(ROOT).as_posix())
 
         for package in sorted(PACKAGES.glob("*.zip")):
@@ -120,8 +138,20 @@ def main() -> None:
     if not COMPONENT_MANIFEST.exists():
         raise RuntimeError(f"Missing component manifest: {COMPONENT_MANIFEST}")
 
+    languages_backup = DIST.parent / ".joomleague-language-packages-backup"
+
+    if (DIST / "languages").is_dir():
+        if languages_backup.exists():
+            shutil.rmtree(languages_backup, ignore_errors=True)
+
+        shutil.copytree(DIST / "languages", languages_backup)
+
     shutil.rmtree(DIST, ignore_errors=True)
     PACKAGES.mkdir(parents=True, exist_ok=True)
+
+    if languages_backup.is_dir():
+        shutil.copytree(languages_backup, DIST / "languages")
+        shutil.rmtree(languages_backup, ignore_errors=True)
 
     build_component()
     build_modules()

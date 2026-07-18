@@ -121,14 +121,21 @@
 
 		const index = parseInt(table.dataset.nextIndex || '0', 10);
 		const clone = source.cloneNode(true);
+		const section = document.querySelector('input[name="section"]') ? document.querySelector('input[name="section"]').value : '';
 
 		clone.querySelectorAll('input, select, textarea').forEach((field) => {
+			const previousValue = field.value;
+
 			if (field.name) {
 				field.name = field.name.replace(/rows\[[0-9]+\]/, `rows[${index}]`);
 			}
 
 			if (field.tagName === 'SELECT') {
-				field.selectedIndex = 0;
+				if (section === 'events' && (field.name.includes('[event_type_id]') || field.name.includes('[projectteam_id]'))) {
+					field.value = previousValue;
+				} else {
+					field.selectedIndex = 0;
+				}
 			} else if (field.type === 'checkbox' || field.type === 'radio') {
 				field.checked = false;
 			} else if (field.type === 'number') {

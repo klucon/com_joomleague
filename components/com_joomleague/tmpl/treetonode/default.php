@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $tree = $this->tree;
 $project = $this->project;
@@ -46,6 +47,41 @@ foreach ($this->treeNodes as $node) {
 }
 
 ksort($nodesByLevel);
+
+if ($tree) {
+	StructuredDataHelper::add($this->getDocument(), [
+		'@context' => 'https://schema.org',
+		'@type' => 'Dataset',
+		'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=treetonode&project_id=' . (int) ($project->id ?? 0) . '&id=' . (int) $tree->id, false)) . '#dataset',
+		'name' => (string) ($tree->name ?: Text::_('COM_JOOMLEAGUE_SITE_TREE')),
+		'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=treetonode&project_id=' . (int) ($project->id ?? 0) . '&id=' . (int) $tree->id, false)),
+		'isPartOf' => $project ? [
+			'@type' => 'SportsOrganization',
+			'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $project->id, false)) . '#competition',
+			'name' => (string) $project->name,
+		] : null,
+		'about' => array_values(array_filter(array_map(
+			static fn (object $node): ?array => (int) ($node->projectteam_id ?? 0) > 0 ? [
+				'@type' => 'SportsTeam',
+				'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $node->projectteam_id, false)) . '#sportsteam',
+				'name' => (string) ($node->team_name ?? ''),
+			] : null,
+			$this->treeNodes
+		))),
+		'mainEntityOfPage' => StructuredDataHelper::collectionPage(
+			(string) ($tree->name ?: Text::_('COM_JOOMLEAGUE_SITE_TREE')),
+			array_map(
+				static fn (object $node): array => [
+					'@type' => 'Thing',
+					'name' => (string) ($node->title ?: ($node->team_name ?? $node->content ?? '')),
+					'identifier' => (string) ($node->id ?? $node->node ?? ''),
+				],
+				$this->treeNodes
+			),
+			$this->projectLabel($project)
+		),
+	]);
+}
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$tree) : ?>
@@ -55,7 +91,7 @@ ksort($nodesByLevel);
 
 	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo $this->escape($tree->project_name ?? ''); ?></div>
+		<div class="jl-site-eyebrow"><?php echo $this->escape($this->projectLabel($project)); ?></div>
 		<h1 class="jl-site-title"><?php echo $this->escape($tree->name ?: Text::_('COM_JOOMLEAGUE_SITE_TREE')); ?></h1>
 		<p class="jl-site-muted mb-3">
 			<?php echo $this->escape(trim(implode(' · ', array_filter([$tree->league_name ?? '', $tree->season_name ?? '', $tree->division_name ?? ''])))); ?>

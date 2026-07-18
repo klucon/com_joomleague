@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $team = $this->item;
 
@@ -20,12 +21,36 @@ $showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
 $showTeamLink = (bool) ($params['show_team_link'] ?? true);
 $showTeamstatsLink = (bool) ($params['show_teamstats_link'] ?? true);
 $showPlanLink = (bool) ($params['show_plan_link'] ?? true);
+
+if ($team) {
+	StructuredDataHelper::add($this->getDocument(), [
+		'@context' => 'https://schema.org',
+	] + StructuredDataHelper::collectionPage(
+		Text::_('COM_JOOMLEAGUE_SITE_RIVALS'),
+		array_map(
+			static fn (object $rival): array => [
+				'@type' => 'SportsTeam',
+				'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $rival->projectteam_id, false)) . '#sportsteam',
+				'name' => (string) $rival->team_name,
+				'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $rival->projectteam_id, false)),
+				'additionalProperty' => [
+					['@type' => 'PropertyValue', 'name' => 'matches', 'value' => (string) (int) $rival->matches],
+					['@type' => 'PropertyValue', 'name' => 'wins', 'value' => (string) (int) $rival->wins],
+					['@type' => 'PropertyValue', 'name' => 'draws', 'value' => (string) (int) $rival->draws],
+					['@type' => 'PropertyValue', 'name' => 'losses', 'value' => (string) (int) $rival->losses],
+				],
+			],
+			$this->rivals
+		),
+		(string) $team->team_name
+	));
+}
 ?>
 <div class="com-joomleague-site">
 	<?php if (!$team) : ?><div class="alert alert-warning"><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_NOT_FOUND'); ?></div><?php return; endif; ?>
 	<?php if ($showSectionheader) : ?>
 	<section class="jl-site-hero mb-4">
-		<div class="jl-site-eyebrow"><?php echo $this->escape($team->club_name ?? ''); ?></div>
+		<div class="jl-site-eyebrow"><?php echo $this->escape(trim($this->projectLabel() . ' · ' . (string) ($team->club_name ?? ''), ' ·')); ?></div>
 		<h1 class="jl-site-title"><?php echo Text::_('COM_JOOMLEAGUE_SITE_RIVALS'); ?></h1>
 		<p class="jl-site-muted mb-3"><?php echo $this->escape($team->team_name); ?></p>
 		<nav class="jl-site-nav">

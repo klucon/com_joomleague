@@ -67,8 +67,20 @@ html[data-bs-theme="dark"] .com-joomleague-section {
 	box-shadow: 0 .75rem 1.75rem rgb(42 103 188 / 24%);
 }
 
+.jl-dashboard-total:hover,
+.jl-dashboard-total:focus-visible {
+	color: #fff;
+	text-decoration: none;
+}
+
 .jl-dashboard-total > .icon-database {
 	grid-row: 1 / 3;
+	font-size: 1.35rem;
+	opacity: .85;
+}
+
+.jl-dashboard-total > .icon-comments {
+	grid-row: 1 / 4;
 	font-size: 1.35rem;
 	opacity: .85;
 }
@@ -83,6 +95,25 @@ html[data-bs-theme="dark"] .com-joomleague-section {
 	margin-top: .2rem;
 	font-size: .72rem;
 	opacity: .78;
+}
+
+.jl-dashboard-total small,
+.jl-dashboard-total em {
+	grid-column: 2;
+	font-size: .72rem;
+	font-style: normal;
+	line-height: 1.25;
+	opacity: .78;
+}
+
+.jl-dashboard-total em {
+	margin-top: .4rem;
+	font-weight: 750;
+	opacity: .94;
+}
+
+.jl-dashboard-total--translations {
+	background: linear-gradient(145deg, #3850a5, #2679b9);
 }
 
 .jl-dashboard-grid {
@@ -233,6 +264,71 @@ html[data-bs-theme="dark"] .com-joomleague-section {
 .jl-dashboard-card--lime { --jl-card-accent: #66851a; --jl-card-soft: #f2f8df; }
 .jl-dashboard-card--slate { --jl-card-accent: #596579; --jl-card-soft: #eef1f5; }
 .jl-dashboard-card--danger { --jl-card-accent: #c62828; --jl-card-soft: #fdecea; }
+
+.jl-language-hero {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.jl-language-hero__actions {
+	flex: 0 0 auto;
+}
+
+.jl-language-summary {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+	gap: 1rem;
+}
+
+.jl-language-summary__item {
+	padding: 1rem;
+	background: var(--jl-surface);
+	border: 1px solid var(--jl-line);
+	border-radius: .75rem;
+}
+
+.jl-language-summary__item span {
+	display: block;
+	color: var(--jl-muted);
+	font-size: .78rem;
+}
+
+.jl-language-summary__item strong {
+	display: block;
+	margin-top: .35rem;
+	font-size: 1.35rem;
+	line-height: 1;
+}
+
+.jl-language-progress {
+	width: 8rem;
+	max-width: 100%;
+	height: .5rem;
+	overflow: hidden;
+	background: color-mix(in srgb, var(--jl-line) 70%, transparent);
+	border-radius: 999px;
+}
+
+.jl-language-progress span {
+	display: block;
+	height: 100%;
+	background: linear-gradient(90deg, #2679b9, #19875b);
+	border-radius: inherit;
+}
+
+.jl-language-status-text {
+	display: block;
+	margin-top: .25rem;
+	color: var(--jl-muted);
+	font-size: .75rem;
+}
+
+.jl-language-table td,
+.jl-language-table th {
+	white-space: nowrap;
+}
 
 html[data-bs-theme="dark"] .jl-dashboard-header {
 	background:
@@ -389,6 +485,52 @@ html[data-bs-theme="dark"] .com-joomleague-dashboard .btn-outline-primary:focus 
 .jl-assignment-actions {
 	display: grid;
 	gap: .5rem;
+}
+
+.jl-projectteam-search {
+	position: relative;
+	max-width: 44rem;
+}
+
+.jl-projectteam-results {
+	position: absolute;
+	z-index: 1060;
+	top: calc(100% + .25rem);
+	right: 0;
+	left: 0;
+	overflow: auto;
+	max-height: 18rem;
+	border: 1px solid var(--jl-line);
+	border-radius: .5rem;
+	background: var(--jl-surface);
+	box-shadow: 0 .75rem 2rem rgb(0 0 0 / 18%);
+}
+
+.jl-projectteam-result {
+	display: block;
+	width: 100%;
+	padding: .55rem .75rem;
+	border: 0;
+	border-bottom: 1px solid var(--jl-line);
+	background: transparent;
+	color: var(--jl-ink);
+	text-align: left;
+}
+
+.jl-projectteam-result:last-child {
+	border-bottom: 0;
+}
+
+.jl-projectteam-result:hover,
+.jl-projectteam-result:focus {
+	background: color-mix(in srgb, var(--jl-card-accent, #3978d4) 16%, var(--jl-surface));
+	color: var(--jl-ink);
+	outline: 0;
+}
+
+.jl-projectteam-result--empty {
+	color: var(--jl-muted);
+	cursor: default;
 }
 
 .jl-schedule-form {

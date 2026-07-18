@@ -25,22 +25,40 @@ $user = $this->getCurrentUser();
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirection = $this->escape($this->state->get('list.direction'));
 $dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.9';
+$personAssignment = $this->entity['person_assignment'] ?? null;
+$projectteamId = (int) $this->state->get('filter.projectteam_id');
 ?>
-<?php if ((property_exists($this, 'projectContext') && $this->projectContext) || (property_exists($this, 'roundContext') && $this->roundContext)) : ?>
+<?php if ((property_exists($this, 'projectContext') && $this->projectContext) || (property_exists($this, 'roundContext') && $this->roundContext) || $personAssignment) : ?>
 <link rel="stylesheet" href="<?php echo htmlspecialchars($dashboardStyle, ENT_QUOTES, 'UTF-8'); ?>">
 <?php endif; ?>
 <?php if (property_exists($this, 'projectContext') && $this->projectContext) : $project = $this->projectContext; ?>
+<?php
+$projectContextParts = array_filter([
+	(string) ($project->league ?? ''),
+	(string) ($project->season ?? ''),
+	$project->sport ?? '' ? Text::_((string) $project->sport) : '',
+], static fn ($value) => trim((string) $value) !== '');
+?>
 <div class="com-joomleague-dashboard com-joomleague-workflow mb-4">
 	<div class="jl-section-panel">
 		<span class="jl-section-panel__icon icon-calendar" aria-hidden="true"></span>
 		<div class="jl-section-panel__content">
 			<p class="jl-dashboard-eyebrow mb-2"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_CONTEXT'); ?></p>
 			<h2 class="h4 mb-1"><?php echo $this->escape($project->name); ?></h2>
-			<p class="mb-2"><?php echo $this->escape(trim(($project->league ?? '') . ' · ' . ($project->season ?? '') . ' · ' . ($project->sport ?? ''), " \t\n\r " . chr(11) . '·')); ?></p>
+			<p class="mb-2"><?php echo $this->escape(implode(' · ', $projectContextParts)); ?></p>
+			<?php if (!empty($project->team_name)) : ?>
+				<p class="mb-2 fw-semibold"><?php echo $this->escape($project->team_name); ?></p>
+			<?php endif; ?>
 			<a class="jl-section-back" href="<?php echo Route::_('index.php?option=com_joomleague&view=projectpanel&project_id=' . (int) $project->id); ?>">
 				<span class="icon-arrow-left" aria-hidden="true"></span>
 				<?php echo Text::_('COM_JOOMLEAGUE_BACK_TO_PROJECT_PANEL'); ?>
 			</a>
+			<?php if (!empty($project->projectteam_id)) : ?>
+				<a class="jl-section-back ms-3" href="<?php echo Route::_('index.php?option=com_joomleague&view=projectteams&project_id=' . (int) $project->id); ?>">
+					<span class="icon-arrow-left" aria-hidden="true"></span>
+					<?php echo Text::_('COM_JOOMLEAGUE_PROJECT_TEAMS'); ?>
+				</a>
+			<?php endif; ?>
 		</div>
 		<div class="jl-section-panel__stats">
 			<span><strong><?php echo number_format((int) $project->round_count, 0, ',', ' '); ?></strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_ROUNDS'); ?></span>
@@ -74,6 +92,45 @@ $dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0
 	</div>
 </div>
 <?php endif; ?>
+<?php if ($personAssignment && $projectteamId > 0) : ?>
+<?php
+$token = Session::getFormToken();
+$searchUrl = Route::_('index.php?option=com_joomleague&task=' . $personAssignment['search_task'], false);
+$addUrl = Route::_('index.php?option=com_joomleague&task=' . $personAssignment['add_task'], false);
+?>
+<div
+	class="com-joomleague-dashboard com-joomleague-workflow mb-4"
+	data-jl-teamperson-assignment
+	data-projectteam-id="<?php echo $projectteamId; ?>"
+	data-token="<?php echo $this->escape($token); ?>"
+	data-search-url="<?php echo $this->escape($searchUrl); ?>"
+	data-add-url="<?php echo $this->escape($addUrl); ?>"
+	data-empty-text="<?php echo $this->escape(Text::_($personAssignment['empty'])); ?>"
+	data-error-text="<?php echo $this->escape(Text::_($personAssignment['error'])); ?>"
+>
+	<div class="jl-section-panel">
+		<span class="jl-section-panel__icon icon-users" aria-hidden="true"></span>
+		<div class="jl-section-panel__content">
+			<label class="form-label fw-semibold" for="jl-teamperson-search"><?php echo Text::_($personAssignment['label']); ?></label>
+			<div class="jl-projectteam-search jl-teamperson-search">
+				<input
+					type="search"
+					id="jl-teamperson-search"
+					class="form-control"
+					autocomplete="off"
+					spellcheck="false"
+					data-teamperson-search
+					placeholder="<?php echo $this->escape(Text::_($personAssignment['placeholder'])); ?>"
+				>
+				<div class="jl-projectteam-results" data-teamperson-results hidden></div>
+			</div>
+			<p class="form-text mb-0"><?php echo Text::_($personAssignment['help']); ?></p>
+			<div class="alert alert-info mt-3 mb-0" data-teamperson-status hidden></div>
+		</div>
+	</div>
+</div>
+<script src="<?php echo $this->escape(Uri::root(true) . '/media/com_joomleague/js/teamperson-assignment.js?v=0.1.0'); ?>" defer></script>
+<?php endif; ?>
 <form action="<?php echo Route::_('index.php?option=com_joomleague&view=' . $this->entity['plural'] . ($this->entity['list_action_append'] ?? '')); ?>" method="post" name="adminForm" id="adminForm"><div id="j-main-container" class="j-main-container">
 	<?php echo LayoutHelper::render('joomla.searchtools.default', ['view' => $this]); ?>
 	<?php if ($this->items === []) : ?><div class="alert alert-info"><span class="icon-info-circle" aria-hidden="true"></span> <?php echo Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?></div>
@@ -103,6 +160,15 @@ $dashboardStyle = Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0
 				<a href="<?php echo Route::_('index.php?option=com_joomleague&view=matchdata&match_id=' . (int) $item->id . '&section=' . $column['section']); ?>"><?php echo (int) $value; ?> <span class="icon-edit" aria-hidden="true"></span></a>
 			<?php elseif (($column['type'] ?? '') === 'roundmatches') : ?>
 				<a href="<?php echo Route::_('index.php?option=com_joomleague&view=matches&round_id=' . (int) $item->id); ?>"><?php echo (int) $value; ?> <span class="icon-edit" aria-hidden="true"></span></a>
+			<?php elseif (($column['type'] ?? '') === 'roundresults') : ?>
+				<?php
+				$matchCount = (int) ($item->match_count ?? 0);
+				$resultCount = (int) $value;
+				$complete = $matchCount > 0 && $resultCount === $matchCount;
+				?>
+				<span title="<?php echo $this->escape($resultCount . ' / ' . $matchCount); ?>">
+					<?php echo HTMLHelper::_('jgrid.published', $complete ? 1 : 0, $i, '', false); ?>
+				</span>
 			<?php elseif (($column['type'] ?? '') === 'treetonodes') : ?>
 				<a href="<?php echo Route::_('index.php?option=com_joomleague&view=treetonodes&treeto_id=' . (int) $item->id); ?>"><?php echo (int) $value; ?> <span class="icon-tree-2" aria-hidden="true"></span></a>
 			<?php elseif (($column['type'] ?? '') === 'treetogenerate') : ?>

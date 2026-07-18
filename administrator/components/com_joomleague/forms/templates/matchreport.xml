@@ -79,12 +79,7 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="use_tabs_events" type="list" default="2" label="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_LABEL_USE_TABS" description="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_DESCR_USE_TABS">
-				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
-				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
-				<option value="2">COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_OPTION2_EVENT_OPTION</option>
-			</field>
-			<field name="sort_events_desc" type="radio" default="1" label="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_LABEL_SORT_DESC" description="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_DESCR_SORT_DESC" class="btn-group btn-group-yesno">
+			<field name="sort_events_desc" type="radio" default="0" label="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_LABEL_SORT_DESC" description="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_DESCR_SORT_DESC" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -133,7 +128,7 @@
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
-			<field name="show_referee_position" type="radio" default="0" label="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_LABEL_SHOW_REFEREE_POSITION" description="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_DESCR_SHOW_REFEREE_POSITION" class="btn-group btn-group-yesno">
+			<field name="show_referee_position" type="radio" default="1" label="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_LABEL_SHOW_REFEREE_POSITION" description="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_DESCR_SHOW_REFEREE_POSITION" class="btn-group btn-group-yesno">
 				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 			</field>
@@ -170,8 +165,6 @@
 				<option value="logo_small">COM_JOOMLEAGUE_FES_MATCHREPORT_CLUB_LOGO_SMALL</option>
 				<option value="logo_middle">COM_JOOMLEAGUE_FES_MATCHREPORT_CLUB_LOGO_MIDDLE</option>
 				<option value="logo_big">COM_JOOMLEAGUE_FES_MATCHREPORT_CLUB_LOGO_BIG</option>
-				<option value="country_small">COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_COUNTRY_FLAG_SMALL</option>
-				<option value="country_big">COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_COUNTRY_FLAG_BIG</option>
 			</field>
 			<field name="team_picture_width" type="text" default="150" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_TEAM_PICTURE_WIDTH" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_TEAM_PICTURE_WIDTH" />
 			<field name="team_picture_height" type="text" default="0" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_TEAM_PICTURE_HEIGHT" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_TEAM_PICTURE_HEIGHT" />
@@ -202,14 +195,6 @@
 				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
 				<option value="2">COM_JOOMLEAGUE_FES_MATCHREPORT_FAVTEAM_ONLY</option>
 			</field>
-			<field name="show_player_picture" type="radio" default="1" label="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_LABEL_SHOW_PLAYER_PICTURE" description="COM_JOOMLEAGUE_FES_MATCHREPORT_PARAM_DESCR_SHOW_PLAYER_PICTURE" class="btn-group btn-group-yesno">
-				<option value="0">COM_JOOMLEAGUE_GLOBAL_NO</option>
-				<option value="1">COM_JOOMLEAGUE_GLOBAL_YES</option>
-			</field>
-			<field name="player_picture_width" type="text" default="0" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_PLAYER_PICTURE_WIDTH" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_PLAYER_PICTURE_WIDTH" />
-			<field name="player_picture_height" type="text" default="40" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_PLAYER_PICTURE_HEIGHT" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_PLAYER_PICTURE_HEIGHT" />
-			<field name="staff_picture_width" type="text" default="0" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_STAFF_PICTURE_WIDTH" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_STAFF_PICTURE_WIDTH" />
-			<field name="staff_picture_height" type="text" default="40" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_STAFF_PICTURE_HEIGHT" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_STAFF_PICTURE_HEIGHT" />
 			<field type="note" label="COM_JOOMLEAGUE_FES_PARAMS_GROUP_ADVANCED_OPTIONS" description="COM_JOOMLEAGUE_FES_PARAMS_DESCR_ADVANCED_OPTIONS" />
 			<field name="style_class1" type="text" default="sectiontableentry1" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_STYLE_ODD" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_STYLE_ODD" />
 			<field name="style_class2" type="text" default="sectiontableentry2" label="COM_JOOMLEAGUE_FES_PARAM_LABEL_STYLE_EVEN" description="COM_JOOMLEAGUE_FES_PARAM_DESCR_STYLE_EVEN" />

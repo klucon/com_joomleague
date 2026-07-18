@@ -60,12 +60,14 @@ $checked = static fn (mixed $value): string => !empty($value) ? ' checked' : '';
 								<th><?php echo Text::_('COM_JOOMLEAGUE_EVENTTYPE'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_TEAMS'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_PERSON'); ?></th>
+								<th><?php echo Text::_('COM_JOOMLEAGUE_MATCH_EXTERNAL_PERSON'); ?></th>
 								<th style="width:6rem"><?php echo Text::_('COM_JOOMLEAGUE_MATCH_MINUTE'); ?></th>
 								<th style="width:6rem"><?php echo Text::_('COM_JOOMLEAGUE_MATCH_VALUE'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_MATCH_NOTICE'); ?></th>
 							<?php elseif ($this->section === 'players') : ?>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_PERSON'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_POSITION'); ?></th>
+								<th class="text-center"><?php echo Text::_('COM_JOOMLEAGUE_MATCH_SUBSTITUTE'); ?></th>
 								<th class="text-center"><?php echo Text::_('COM_JOOMLEAGUE_MATCH_CAME_IN'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_MATCH_IN_FOR'); ?></th>
 								<th class="text-center"><?php echo Text::_('COM_JOOMLEAGUE_MATCH_WENT_OUT'); ?></th>
@@ -80,6 +82,7 @@ $checked = static fn (mixed $value): string => !empty($value) ? ' checked' : '';
 								<th><?php echo Text::_('COM_JOOMLEAGUE_POSITION'); ?></th>
 							<?php else : ?>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_REFEREES'); ?></th>
+								<th><?php echo Text::_('COM_JOOMLEAGUE_MATCH_EXTERNAL_REFEREE'); ?></th>
 								<th><?php echo Text::_('COM_JOOMLEAGUE_POSITION'); ?></th>
 							<?php endif; ?>
 							<th class="text-center"><?php echo Text::_('JACTION_DELETE'); ?></th>
@@ -97,6 +100,7 @@ $checked = static fn (mixed $value): string => !empty($value) ? ' checked' : '';
 										</select>
 									</td>
 									<td><?php $select("rows[$i][teamplayer_id]", $this->players, $row->teamplayer_id ?? '', 'id', 'name', 'projectteam_id'); ?></td>
+									<td><input class="form-control" name="rows[<?php echo $i; ?>][external_person_name]" value="<?php echo $this->escape((string) ($row->external_person_name ?? '')); ?>" placeholder="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_MATCH_EXTERNAL_PERSON_PLACEHOLDER')); ?>"></td>
 									<td><input class="form-control" style="max-width:6rem" name="rows[<?php echo $i; ?>][event_time]" value="<?php echo $this->escape($row->event_time ?? ''); ?>"></td>
 									<td><input class="form-control" style="max-width:6rem" type="number" step="0.01" name="rows[<?php echo $i; ?>][event_sum]" value="<?php echo $this->escape((string) ($row->event_sum ?? 1)); ?>"></td>
 									<td><input class="form-control" name="rows[<?php echo $i; ?>][notice]" value="<?php echo $this->escape((string) ($row->notice ?? '')); ?>"></td>
@@ -104,6 +108,7 @@ $checked = static fn (mixed $value): string => !empty($value) ? ' checked' : '';
 								<?php elseif ($this->section === 'players') : ?>
 									<td><?php $select("rows[$i][teamplayer_id]", $this->players, $row->teamplayer_id ?? ''); ?></td>
 									<td><?php $select("rows[$i][project_position_id]", $this->positions, $row->project_position_id ?? ''); ?></td>
+									<td class="text-center"><input class="form-check-input" type="checkbox" name="rows[<?php echo $i; ?>][is_substitute]" value="1"<?php echo $checked($row->is_substitute ?? 0); ?>></td>
 									<td class="text-center"><input class="form-check-input" type="checkbox" name="rows[<?php echo $i; ?>][came_in]" value="1"<?php echo $checked($row->came_in ?? 0); ?>></td>
 									<td><?php $select("rows[$i][in_for]", $this->players, $row->in_for ?? ''); ?></td>
 									<td class="text-center"><input class="form-check-input" type="checkbox" name="rows[<?php echo $i; ?>][out]" value="1"<?php echo $checked($row->out ?? 0); ?>></td>
@@ -126,6 +131,7 @@ $checked = static fn (mixed $value): string => !empty($value) ? ' checked' : '';
 									<td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger jl-matchdata-remove" aria-label="<?php echo Text::_('JACTION_DELETE'); ?>">×</button></td>
 								<?php else : ?>
 									<td><?php $select("rows[$i][project_referee_id]", $this->referees, $row->project_referee_id ?? ''); ?></td>
+									<td><input class="form-control" name="rows[<?php echo $i; ?>][external_referee_name]" value="<?php echo $this->escape((string) ($row->external_referee_name ?? '')); ?>" placeholder="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_MATCH_EXTERNAL_REFEREE_PLACEHOLDER')); ?>"></td>
 									<td><?php $select("rows[$i][project_position_id]", $this->positions, $row->project_position_id ?? ''); ?></td>
 									<td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger jl-matchdata-remove" aria-label="<?php echo Text::_('JACTION_DELETE'); ?>">×</button></td>
 								<?php endif; ?>

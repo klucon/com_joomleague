@@ -287,6 +287,12 @@ class SiteHtmlView extends BaseHtmlView
 			) : [];
 		} elseif ($view === 'matchreport') {
 			$this->item = $model->getMatch($id ?: $input->getInt('match_id', 0));
+			$this->project = $this->item ? $model->getProject((int) $this->item->project_id) : $this->project;
+
+			if ($this->item) {
+				$this->templateParams = $model->getTemplateParameters((int) $this->item->project_id, 'matchreport');
+			}
+
 			$this->items = $this->item ? $model->getMatchEvents((int) $this->item->id) : [];
 			$this->headToHeadMatches = $this->item ? $model->getHeadToHeadMatches((int) $this->item->projectteam1_id, (int) $this->item->projectteam2_id, (int) $this->item->id) : [];
 			$this->matchReferees = $this->item ? $model->getMatchReferees((int) $this->item->id) : [];
@@ -525,6 +531,20 @@ class SiteHtmlView extends BaseHtmlView
 		return implode(' - ', array_filter($parts, static fn (string $p): bool => $p !== ''));
 	}
 
+	public function projectLabel(?object $project = null): string
+	{
+		$project ??= $this->project;
+
+		if ($project === null) {
+			return '';
+		}
+
+		$name = trim((string) ($project->name ?? ''));
+		$season = trim((string) ($project->season_name ?? ''));
+
+		return implode(' · ', array_filter([$name, $season], static fn (string $part): bool => $part !== ''));
+	}
+
 	private function prepareCanonicalLink(string $view): void
 	{
 		if ($view === 'ical') {
@@ -542,34 +562,7 @@ class SiteHtmlView extends BaseHtmlView
 
 	private function canonicalRoute(string $view): string
 	{
-		$input = Factory::getApplication()->getInput();
-		$query = [
-			'option' => 'com_joomleague',
-			'view' => $view,
-		];
-
-		foreach ($this->canonicalInputKeys($view) as $key) {
-			$value = (string) $input->get($key, '', 'cmd');
-
-			if ($value === '' || $value === '0') {
-				continue;
-			}
-
-			if ($key === 'scope' && $value === 'total') {
-				continue;
-			}
-
-			$query[$key] = $value;
-		}
-
-		if ($this->project !== null && !isset($query['project_id'])) {
-			$query['project_id'] = (int) $this->project->id;
-		}
-
-		if ($this->item !== null && !isset($query['id'])) {
-			$query['id'] = (int) ($this->item->id ?? 0);
-		}
-
+		$query = $this->canonicalQuery($view);
 		$parts = [];
 
 		foreach ($query as $key => $value) {
@@ -584,34 +577,226 @@ class SiteHtmlView extends BaseHtmlView
 			return '';
 		}
 
-		return Route::_('index.php?' . implode('&', $parts), false, Route::TLS_IGNORE, true);
+		return $this->stripCanonicalItemid(
+			Route::_('index.php?' . implode('&', $parts), false, Route::TLS_IGNORE, true)
+		);
 	}
 
 	/**
-	 * @return  array<int, string>
+	 * @return  array<string, int|string|null>
 	 */
-	private function canonicalInputKeys(string $view): array
+	private function canonicalQuery(string $view): array
 	{
-		return match ($view) {
-			'project', 'teams', 'referees', 'stats', 'resultsmatrix' => ['project_id'],
-			'ranking' => ['project_id', 'scope', 'division_id', 'round_id'],
-			'results' => ['project_id', 'round_id'],
-			'resultsranking' => ['project_id', 'round_id'],
-			'schedule' => ['project_id', 'club_id', 'projectteam_id', 'ptid', 'plan', 'filter'],
-			'statsranking' => ['project_id', 'statistic_id', 'sid', 'projectteam_id', 'tid'],
-			'eventsranking' => ['project_id', 'event_type_id', 'evid', 'projectteam_id', 'tid', 'match_id', 'mid'],
-			'curve' => ['project_id', 'division_id', 'division', 'projectteam1_id', 'tid1', 'projectteam2_id', 'tid2'],
-			'nextmatch' => ['project_id', 'division_id', 'division', 'projectteam_id', 'ptid', 'team_id', 'tid', 'match_id', 'mid'],
-			'prediction' => ['project_id', 'game_id', 'round_id'],
-			'treetonode' => ['project_id', 'treeto_id', 'tnid', 'id'],
-			'raceresults' => ['project_id', 'round_id', 'category_id', 'sex', 'status'],
-			'team', 'roster', 'rivals', 'teamstats' => ['project_id', 'id', 'projectteam_id', 'tid'],
-			'matchreport' => ['project_id', 'id', 'match_id'],
-			'person' => ['project_id', 'id', 'person_id'],
-			'club' => ['id', 'club_id'],
-			'playground' => ['id', 'playground_id'],
-			default => [],
-		};
+		$input = Factory::getApplication()->getInput();
+		$query = [
+			'option' => 'com_joomleague',
+			'view' => $view,
+		];
+
+		$projectId = $this->canonicalProjectId();
+
+		switch ($view) {
+			case 'project':
+			case 'teams':
+			case 'referees':
+			case 'stats':
+			case 'resultsmatrix':
+				$this->addCanonicalValue($query, 'project_id', $projectId);
+				break;
+
+			case 'ranking':
+				$scope = (string) $input->getCmd('scope', $this->rankingScope);
+				$this->addCanonicalValue($query, 'project_id', $projectId);
+				$this->addCanonicalValue($query, 'scope', $scope === 'total' ? null : $scope);
+				$this->addCanonicalValue($query, 'division_id', $this->rankingDivisionId ?: $this->inputInt(['division_id', 'division']));
+				$this->addCanonicalValue($query, 'round_id', $this->rankingRoundId ?: $this->inputInt(['round_id']));
+				break;
+
+			case 'results':
+				$this->addCanonicalValue($query, 'project_id', $projectId);
+				$this->addCanonicalValue($query, 'round_id', $this->resultsRoundId ?: $this->inputInt(['round_id']));
+				break;
+
+			case 'resultsranking':
+				$this->addCanonicalValue($query, 'project_id', $projectId);
+				$this->addCanonicalValue($query, 'round_id', $this->inputInt(['round_id']));
+				break;
+
+			case 'schedule':
+			case 'ical':
+				$this->addCanonicalValue($query, 'project_id', $this->scheduleTeam ? (int) $this->scheduleTeam->project_id : $projectId);
+				$this->addCanonicalValue($query, 'club_id', $this->scheduleClub ? (int) $this->scheduleClub->id : $this->inputInt(['club_id']));
+				$this->addCanonicalValue($query, 'projectteam_id', $this->scheduleTeam ? (int) $this->scheduleTeam->id : $this->inputInt(['projectteam_id', 'ptid']));
+				$plan = (string) $input->getCmd('plan', '');
+				$filter = (string) $input->getCmd('filter', '');
+				$this->addCanonicalValue($query, 'plan', $plan !== '' && $plan !== 'round' ? $plan : null);
+				$this->addCanonicalValue($query, 'filter', $filter !== '' && $filter !== 'all' ? $filter : null);
+				break;
+
+			case 'statsranking':
+				$this->addCanonicalValue($query, 'project_id', $projectId);
+				$this->addCanonicalValue($query, 'statistic_id', $this->inputInt(['statistic_id', 'sid']));
+				$this->addCanonicalValue($query, 'projectteam_id', $this->inputInt(['projectteam_id', 'tid']));
+				break;
+
+			case 'eventsranking':
+				$this->addCanonicalValue($query, 'project_id', $projectId);
+				$this->addCanonicalValue($query, 'event_type_id', $this->inputInt(['event_type_id', 'evid']));
+				$this->addCanonicalValue($query, 'projectteam_id', $this->inputInt(['projectteam_id', 'tid']));
+				$this->addCanonicalValue($query, 'match_id', $this->inputInt(['match_id', 'mid']));
+				break;
+
+			case 'curve':
+				$this->addCanonicalValue($query, 'project_id', $projectId);
+				$this->addCanonicalValue($query, 'division_id', $this->inputInt(['division_id', 'division']));
+				$this->addCanonicalValue($query, 'projectteam1_id', $this->inputInt(['projectteam1_id', 'tid1']));
+				$this->addCanonicalValue($query, 'projectteam2_id', $this->inputInt(['projectteam2_id', 'tid2']));
+				break;
+
+			case 'nextmatch':
+				$this->addCanonicalValue($query, 'project_id', $projectId);
+				$this->addCanonicalValue($query, 'division_id', $this->inputInt(['division_id', 'division']));
+				$this->addCanonicalValue($query, 'projectteam_id', $this->inputInt(['projectteam_id', 'ptid']));
+				$this->addCanonicalValue($query, 'team_id', $this->inputInt(['team_id', 'tid']));
+				$this->addCanonicalValue($query, 'match_id', $this->inputInt(['id', 'match_id', 'mid']));
+				break;
+
+			case 'prediction':
+				$this->addCanonicalValue($query, 'project_id', $this->predictionGame ? (int) $this->predictionGame->project_id : $projectId);
+				$this->addCanonicalValue($query, 'game_id', $this->predictionGame ? (int) $this->predictionGame->id : $this->inputInt(['game_id', 'id']));
+				$this->addCanonicalValue($query, 'round_id', $this->inputInt(['round_id']));
+				break;
+
+			case 'treetonode':
+				$this->addCanonicalValue($query, 'project_id', $this->tree ? (int) $this->tree->project_id : $projectId);
+				$this->addCanonicalValue($query, 'id', $this->tree ? (int) $this->tree->id : $this->inputInt(['id', 'treeto_id', 'tnid']));
+				break;
+
+			case 'raceresults':
+				$this->addCanonicalValue($query, 'project_id', $projectId);
+				$this->addCanonicalValue($query, 'round_id', $this->inputInt(['round_id']));
+				$this->addCanonicalValue($query, 'category_id', $this->inputInt(['category_id']));
+				$this->addCanonicalValue($query, 'sex', (string) $input->getCmd('sex', ''));
+				$this->addCanonicalValue($query, 'status', (string) $input->getCmd('status', ''));
+				break;
+
+			case 'team':
+			case 'roster':
+			case 'rivals':
+			case 'teamstats':
+				$this->addCanonicalValue($query, 'id', $this->item ? (int) ($this->item->id ?? 0) : $this->inputInt(['id', 'projectteam_id', 'tid']));
+				break;
+
+			case 'matchreport':
+				$this->addCanonicalValue($query, 'id', $this->item ? (int) ($this->item->id ?? 0) : $this->inputInt(['id', 'match_id']));
+				break;
+
+			case 'person':
+				$this->addCanonicalValue($query, 'project_id', $projectId);
+				$this->addCanonicalValue($query, 'id', $this->item ? (int) ($this->item->id ?? 0) : $this->inputInt(['id', 'person_id']));
+				break;
+
+			case 'club':
+				$this->addCanonicalValue($query, 'id', $this->item ? (int) ($this->item->id ?? 0) : $this->inputInt(['id', 'club_id']));
+				break;
+
+			case 'playground':
+				$this->addCanonicalValue($query, 'id', $this->item ? (int) ($this->item->id ?? 0) : $this->inputInt(['id', 'playground_id']));
+				break;
+		}
+
+		return $query;
+	}
+
+	private function canonicalProjectId(): int
+	{
+		if ($this->project !== null) {
+			return (int) ($this->project->id ?? 0);
+		}
+
+		return $this->inputInt(['project_id', 'pid']);
+	}
+
+	/**
+	 * @param  array<int, string>  $keys
+	 */
+	private function inputInt(array $keys): int
+	{
+		$input = Factory::getApplication()->getInput();
+
+		foreach ($keys as $key) {
+			$value = $input->getInt($key, 0);
+
+			if ($value > 0) {
+				return $value;
+			}
+		}
+
+		return 0;
+	}
+
+	/**
+	 * @param  array<string, int|string|null>  $query
+	 */
+	private function addCanonicalValue(array &$query, string $key, int|string|null $value): void
+	{
+		if ($value === null || $value === '' || $value === 0 || $value === '0') {
+			return;
+		}
+
+		$query[$key] = $value;
+	}
+
+	private function stripCanonicalItemid(string $url): string
+	{
+		$parts = parse_url($url);
+
+		if (!is_array($parts) || empty($parts['query'])) {
+			return $url;
+		}
+
+		parse_str(html_entity_decode((string) $parts['query']), $query);
+
+		if (!isset($query['Itemid'])) {
+			return $url;
+		}
+
+		unset($query['Itemid']);
+
+		$newQuery = http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+		$result = '';
+
+		if (isset($parts['scheme'])) {
+			$result .= $parts['scheme'] . '://';
+		}
+
+		if (isset($parts['user'])) {
+			$result .= $parts['user'];
+			if (isset($parts['pass'])) {
+				$result .= ':' . $parts['pass'];
+			}
+			$result .= '@';
+		}
+
+		if (isset($parts['host'])) {
+			$result .= $parts['host'];
+		}
+
+		if (isset($parts['port'])) {
+			$result .= ':' . $parts['port'];
+		}
+
+		$result .= $parts['path'] ?? '';
+
+		if ($newQuery !== '') {
+			$result .= '?' . $newQuery;
+		}
+
+		if (isset($parts['fragment'])) {
+			$result .= '#' . $parts['fragment'];
+		}
+
+		return $result;
 	}
 
 	private function preparePathway(string $view): void
@@ -631,7 +816,7 @@ class SiteHtmlView extends BaseHtmlView
 		if ($this->project !== null && !empty($this->project->name)) {
 			$link = $view === 'project'
 				? ''
-				: Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $this->project->id);
+				: $this->absoluteRoute('index.php?option=com_joomleague&view=project&project_id=' . (int) $this->project->id);
 
 			$pathway->addItem((string) $this->project->name, $link);
 		}
@@ -660,14 +845,14 @@ class SiteHtmlView extends BaseHtmlView
 		if ($projectId > 0) {
 			$pathway->addItem(
 				Text::_('COM_JOOMLEAGUE_SITE_TEAMS'),
-				Route::_('index.php?option=com_joomleague&view=teams&project_id=' . $projectId)
+				$this->absoluteRoute('index.php?option=com_joomleague&view=teams&project_id=' . $projectId)
 			);
 		}
 
 		if ($teamName !== '') {
 			$pathway->addItem(
 				$teamName,
-				$view === 'team' || $teamId < 1 ? '' : Route::_('index.php?option=com_joomleague&view=team&id=' . $teamId)
+				$view === 'team' || $teamId < 1 ? '' : $this->absoluteRoute('index.php?option=com_joomleague&view=team&id=' . $teamId)
 			);
 		}
 
@@ -680,6 +865,17 @@ class SiteHtmlView extends BaseHtmlView
 		}
 
 		return true;
+	}
+
+	private function absoluteRoute(string $route): string
+	{
+		$url = Route::_($route, false);
+
+		if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+			return $url;
+		}
+
+		return rtrim(Uri::root(), '/') . '/' . ltrim($url, '/');
 	}
 
 	private function teamPathwayName(): string

@@ -27,7 +27,7 @@ $jlMatchRow = static function ($m): void {
 		<td class="text-center"><?php echo $score; ?></td>
 		<td><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&id=' . (int) $m->away_projectteam_id); ?>"><?php echo htmlspecialchars((string) ($m->away_name ?? ''), ENT_QUOTES, 'UTF-8'); ?></a></td>
 		<td><?php echo htmlspecialchars((string) ($m->playground_name ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
-		<td class="text-end"><a class="jl-site-button" href="<?php echo Route::_('index.php?option=com_joomleague&view=matchreport&id=' . (int) $m->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DETAIL'); ?></a></td>
+		<td class="jl-match-action-cell text-end"><a class="jl-site-button" href="<?php echo Route::_('index.php?option=com_joomleague&view=matchreport&id=' . (int) $m->id); ?>"><?php echo Text::_('COM_JOOMLEAGUE_SITE_DETAIL'); ?></a></td>
 	</tr>
 	<?php
 };
@@ -93,7 +93,7 @@ uasort($jlByRound, static function (array $a, array $b): int {
 			<?php if ($jlRoundName !== '') : ?>
 				<div class="jl-schedule-round__head"><?php echo $this->escape($jlRoundName); ?></div>
 			<?php endif; ?>
-			<div class="table-responsive">
+			<div class="table-responsive jl-match-table-wrap">
 				<table class="table jl-site-table jl-matches-table align-middle mb-0">
 					<?php echo $jlColgroup; ?>
 					<?php echo $jlTableHead; ?>

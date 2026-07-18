@@ -14,6 +14,7 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Session\Session;
 use Joomla\CMS\Uri\Uri;
 
 $labels = [
@@ -29,11 +30,17 @@ $assigned = array_values(array_filter($this->options, static fn ($o): bool => (b
 // document API (addScript/addStyleSheet) ano – zapisuje přímo do <head>.
 $doc = $this->getDocument();
 $doc->addStyleSheet(Uri::root(true) . '/media/com_joomleague/css/dashboard.css?v=0.13.9');
-$doc->addScript(Uri::root(true) . '/media/com_joomleague/js/duallist.js?v=1.0.6', [], ['defer' => true]);
+
+if ($this->section === 'teams') {
+	$doc->addScript(Uri::root(true) . '/media/com_joomleague/js/projectteam-assignment.js?v=1.0.0', [], ['defer' => true]);
+} else {
+	$doc->addScript(Uri::root(true) . '/media/com_joomleague/js/duallist.js?v=1.0.6', [], ['defer' => true]);
+}
 
 $projectId = $this->project ? (int) $this->project->id : 0;
 $sectionTitle = Text::_($labels[$this->section]);
 $optionName = fn (object $option): string => $this->section === 'positions' ? Text::_($option->name) : $option->name;
+$formTask = $this->section === 'teams' ? 'projectsetup.saveordering' : 'projectsetup.save';
 
 ?>
 <?php if ($projectId < 1) : ?>
@@ -49,7 +56,7 @@ $optionName = fn (object $option): string => $this->section === 'positions' ? Te
 	</p>
 	<?php return; ?>
 <?php endif; ?>
-<form action="<?php echo Route::_('index.php?option=com_joomleague&task=projectsetup.save'); ?>" method="post" id="adminForm">
+<form action="<?php echo Route::_('index.php?option=com_joomleague&task=' . $formTask); ?>" method="post" id="adminForm">
 	<div class="com-joomleague-dashboard com-joomleague-workflow">
 		<div class="jl-section-panel mb-4">
 			<span class="jl-section-panel__icon icon-address" aria-hidden="true"></span>
@@ -68,6 +75,30 @@ $optionName = fn (object $option): string => $this->section === 'positions' ? Te
 			</div>
 		</div>
 
+		<?php if ($this->section === 'teams') : ?>
+			<div class="card mb-4" data-jl-projectteam-assignment
+				data-project-id="<?php echo $projectId; ?>"
+				data-token="<?php echo $this->escape(Session::getFormToken()); ?>"
+				data-search-url="<?php echo Route::_('index.php?option=com_joomleague&task=projectsetup.searchteams', false); ?>"
+				data-add-url="<?php echo Route::_('index.php?option=com_joomleague&task=projectsetup.addteam', false); ?>"
+				data-remove-url="<?php echo Route::_('index.php?option=com_joomleague&task=projectsetup.removeteam', false); ?>"
+				data-empty-text="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_PROJECT_TEAM_SEARCH_EMPTY')); ?>"
+				data-error-text="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_PROJECT_TEAM_AJAX_ERROR')); ?>"
+				data-confirm-remove="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_PROJECT_TEAM_REMOVE_CONFIRM')); ?>"
+				data-teamplayers-label="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_TEAMPLAYERS_MANAGE')); ?>"
+				data-teamstaffs-label="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_TEAMSTAFFS_MANAGE')); ?>"
+				data-remove-label="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_ACTION_REMOVE')); ?>">
+				<div class="card-body">
+					<label class="form-label" for="jl-projectteam-search"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_TEAM_SEARCH_LABEL'); ?></label>
+					<div class="jl-projectteam-search">
+						<input type="text" class="form-control" id="jl-projectteam-search" data-projectteam-search autocomplete="off" placeholder="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_PROJECT_TEAM_SEARCH_PLACEHOLDER')); ?>" aria-autocomplete="list" aria-controls="jl-projectteam-results">
+						<div class="jl-projectteam-results" id="jl-projectteam-results" data-projectteam-results role="listbox" hidden></div>
+					</div>
+					<div class="form-text"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_TEAM_SEARCH_HELP'); ?></div>
+					<div class="alert alert-info mt-3 mb-0" data-projectteam-status hidden></div>
+				</div>
+			</div>
+		<?php else : ?>
 		<div class="card mb-4">
 			<div class="card-body">
 				<div class="jl-assignment-layout" data-jl-duallist>
@@ -113,6 +144,7 @@ $optionName = fn (object $option): string => $this->section === 'positions' ? Te
 				</button>
 			</div>
 		</div>
+		<?php endif; ?>
 	</div>
 
 	<?php if ($this->section === 'positions') : ?>
@@ -165,15 +197,18 @@ $optionName = fn (object $option): string => $this->section === 'positions' ? Te
 					<?php endif; ?>
 					<th>PID</th>
 					<th>ID</th>
+					<?php if ($this->section === 'teams') : ?>
+						<th><?php echo Text::_('COM_JOOMLEAGUE_ACTIONS'); ?></th>
+					<?php endif; ?>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody<?php echo $this->section === 'teams' ? ' data-projectteam-assigned-body' : ''; ?>>
 				<?php foreach ($assigned as $index => $option) : $task = $this->section === 'teams' ? 'projectteam.edit' : 'projectreferee.edit';
 					$assignmentPicture = trim((string) ($option->picture ?? '')) !== '' ? (string) $option->picture : (string) ComponentHelper::getParams('com_joomleague')->get('placeholder_' . $assignmentPlaceholderKey, '');
 					$assignmentImage = HTMLHelper::cleanImageURL($assignmentPicture);
 					$assignmentImageSrc = $assignmentImage->url === '' ? '' : Uri::root(true) . '/' . ltrim($assignmentImage->url, '/');
 				?>
-					<tr>
+					<tr<?php echo $this->section === 'teams' ? ' data-projectteam-row data-assignment-id="' . (int) $option->assignment_id . '"' : ''; ?>>
 						<td>
 							<?php if ($this->section === 'teams') : ?>
 								<input class="form-control form-control-sm" type="number" min="1" step="1" name="ordering[<?php echo (int) $option->assignment_id; ?>]" value="<?php echo (int) ($option->ordering ?: ($index + 1)); ?>" style="width: 6rem;">
@@ -185,24 +220,38 @@ $optionName = fn (object $option): string => $this->section === 'positions' ? Te
 						<td><a href="<?php echo Route::_('index.php?option=com_joomleague&task=' . $task . '&id=' . (int) $option->assignment_id); ?>"><?php echo $this->escape($option->name); ?></a></td>
 						<?php if ($this->section === 'teams') : ?>
 							<td>
-								<a class="btn btn-sm btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=teamplayers&projectteam_id=' . (int) $option->assignment_id); ?>">
+								<a class="btn btn-sm btn-success" href="<?php echo Route::_('index.php?option=com_joomleague&view=teamplayers&projectteam_id=' . (int) $option->assignment_id); ?>">
 									<span class="icon-users" aria-hidden="true"></span>
-									<?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAYERS_MANAGE'); ?>
+									<?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAYERS_MANAGE'); ?> (<?php echo (int) ($option->player_count ?? 0); ?>)
 								</a>
 							</td>
 							<td>
 								<a class="btn btn-sm btn-outline-secondary" href="<?php echo Route::_('index.php?option=com_joomleague&view=teamstaffs&projectteam_id=' . (int) $option->assignment_id); ?>">
 									<span class="icon-address" aria-hidden="true"></span>
-									<?php echo Text::_('COM_JOOMLEAGUE_TEAMSTAFFS_MANAGE'); ?>
+									<?php echo Text::_('COM_JOOMLEAGUE_TEAMSTAFFS_MANAGE'); ?> (<?php echo (int) ($option->staff_count ?? 0); ?>)
 								</a>
 							</td>
 						<?php endif; ?>
 						<td><?php echo (int) $option->id; ?></td>
 						<td><?php echo (int) $option->assignment_id; ?></td>
+						<?php if ($this->section === 'teams') : ?>
+							<td>
+								<button class="btn btn-sm btn-outline-danger" type="button" data-projectteam-remove="<?php echo (int) $option->assignment_id; ?>">
+									<span class="icon-trash" aria-hidden="true"></span>
+									<?php echo Text::_('COM_JOOMLEAGUE_ACTION_REMOVE'); ?>
+								</button>
+							</td>
+						<?php endif; ?>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
 		</table>
+		<?php if ($this->section === 'teams') : ?>
+			<button class="btn btn-primary" type="submit">
+				<span class="icon-save" aria-hidden="true"></span>
+				<?php echo Text::_('COM_JOOMLEAGUE_PROJECT_TEAM_ORDERING_SAVE'); ?>
+			</button>
+		<?php endif; ?>
 	<?php endif; ?>
 
 	<input type="hidden" name="project_id" value="<?php echo $projectId; ?>">
