@@ -32,7 +32,9 @@ class DynamicoptionsField extends FormField
 		$task       = (string) ($this->element['task'] ?? '');
 		$parent     = (string) ($this->element['parent'] ?? 'project_id');
 		$parent2    = (string) ($this->element['parent2'] ?? '');
-		$value      = (int) $this->value;
+		$multiple   = ((string) ($this->element['multiple'] ?? '') === 'true') || ((string) ($this->element['multiple'] ?? '') === 'multiple') || ((string) ($this->element['multiple'] ?? '') === '1');
+		$values     = $this->normaliseValues($this->value);
+		$value      = $values[0] ?? 0;
 		$parentValue = $this->getRequestValue($parent);
 		$parent2Value = $parent2 !== '' ? $this->getRequestValue($parent2) : 0;
 		$disabled   = ($this->disabled || $parentValue <= 0 || ($parent2 !== '' && $parent2Value <= 0)) ? ' disabled' : '';
@@ -47,19 +49,22 @@ class DynamicoptionsField extends FormField
 
 		$options = $parentValue > 0 ? $this->getOptionsForTask($task, $parentValue, $parent2Value) : [];
 		$html = [];
+		$name = (string) $this->name;
 
-		$html[] = '<select name="' . htmlspecialchars($this->name, ENT_COMPAT, 'UTF-8') . '" id="' . htmlspecialchars($this->id, ENT_COMPAT, 'UTF-8') . '" class="form-select" data-joomleague-dynamic-options="1" data-endpoint="' . htmlspecialchars((string) $endpoint, ENT_COMPAT, 'UTF-8') . '" data-parent="' . htmlspecialchars($parent, ENT_COMPAT, 'UTF-8') . '" data-parent2="' . htmlspecialchars($parent2, ENT_COMPAT, 'UTF-8') . '" data-selected="' . $value . '"' . $required . $disabled . '>';
+		if ($multiple && !str_ends_with($name, '[]')) {
+			$name .= '[]';
+		}
+
+		$html[] = '<select name="' . htmlspecialchars($name, ENT_COMPAT, 'UTF-8') . '" id="' . htmlspecialchars($this->id, ENT_COMPAT, 'UTF-8') . '" class="form-select" data-joomleague-dynamic-options="1" data-endpoint="' . htmlspecialchars((string) $endpoint, ENT_COMPAT, 'UTF-8') . '" data-parent="' . htmlspecialchars($parent, ENT_COMPAT, 'UTF-8') . '" data-parent2="' . htmlspecialchars($parent2, ENT_COMPAT, 'UTF-8') . '" data-selected="' . htmlspecialchars(json_encode($values), ENT_COMPAT, 'UTF-8') . '"' . ($multiple ? ' multiple' : '') . $required . $disabled . '>';
 		$html[] = '<option value="">' . Text::_('JGLOBAL_SELECT_AN_OPTION') . '</option>';
-		$hasSelected = false;
 
 		foreach ($options as $option) {
 			$optionValue = (int) ($option['value'] ?? 0);
-			$selected = $optionValue === $value ? ' selected' : '';
-			$hasSelected = $hasSelected || $selected !== '';
+			$selected = in_array($optionValue, $values, true) ? ' selected' : '';
 			$html[] = '<option value="' . $optionValue . '"' . $selected . '>' . htmlspecialchars((string) ($option['text'] ?? $optionValue), ENT_COMPAT, 'UTF-8') . '</option>';
 		}
 
-		if ($value > 0 && !$hasSelected) {
+		if ($parentValue <= 0 && $value > 0) {
 			$html[] = '<option value="' . $value . '" selected>' . htmlspecialchars($this->getValueTitle($task, $value), ENT_COMPAT, 'UTF-8') . '</option>';
 		}
 
@@ -75,11 +80,13 @@ class DynamicoptionsField extends FormField
 		$html[] = 'function fieldValue(name){const field=findRequestField(name);return field?parseInt(field.value||"0",10):0;}';
 		$html[] = 'function isParentField(target,name){return !!(target&&name&&(target.name==="jform[request]["+name+"]"||target.name&&target.name.endsWith("["+name+"]")||target.id==="jform_request_"+name||target.id==="jform_"+name));}';
 		$html[] = 'const placeholder=select.options[0]?select.options[0].text:"";';
+		$html[] = 'function selectedValues(){try{const parsed=JSON.parse(select.dataset.selected||"[]");return Array.isArray(parsed)?parsed.map(String):[];}catch(e){return (select.dataset.selected||"").split(",").filter(Boolean);}}';
+		$html[] = 'function currentValues(){return Array.from(select.selectedOptions).map(function(option){return option.value;}).filter(Boolean);}';
 		$html[] = 'let lastKey="";';
 		$html[] = 'function syncFancy(){const wrapper=select.closest("joomla-field-fancy-select");if(!wrapper||!wrapper.choicesInstance){return;}const choices=Array.from(select.options).map(function(option){return {value:option.value,label:option.text,selected:option.selected,disabled:option.disabled};});wrapper.choicesInstance.clearStore();wrapper.choicesInstance.setChoices(choices,"value","label",true);if(select.value){wrapper.choicesInstance.setChoiceByValue(select.value);}}';
 		$html[] = 'function reset(){select.replaceChildren(new Option(placeholder,""));select.disabled=true;syncFancy();}';
-		$html[] = 'function load(force){const p=fieldValue(parentName);const p2=fieldValue(parent2Name);const key=p+":"+p2;if(!force&&key===lastKey){return;}lastKey=key;if(!p||(parent2Name&&!p2)){reset();return;}const selected=select.dataset.selected||select.value||"";select.disabled=true;fetch(select.dataset.endpoint+"&p="+encodeURIComponent(p)+"&pt="+encodeURIComponent(p2),{credentials:"same-origin",headers:{"Accept":"application/json"}}).then(function(response){return response.ok?response.json():{items:[]};}).then(function(data){select.replaceChildren(new Option(placeholder,""));(data.items||[]).forEach(function(item){select.add(new Option(item.text,item.value,false,String(item.value)===String(selected)));});select.disabled=false;if(select.value){select.dataset.selected=select.value;}syncFancy();select.dispatchEvent(new Event("change",{bubbles:true}));}).catch(reset);}';
-		$html[] = 'function parentChanged(event){if(isParentField(event.target,parentName)||isParentField(event.target,parent2Name)){select.dataset.selected="";load(true);}}';
+		$html[] = 'function load(force){const p=fieldValue(parentName);const p2=fieldValue(parent2Name);const key=p+":"+p2;if(!force&&key===lastKey){return;}lastKey=key;if(!p||(parent2Name&&!p2)){reset();return;}const selected=selectedValues();select.disabled=true;fetch(select.dataset.endpoint+"&p="+encodeURIComponent(p)+"&pt="+encodeURIComponent(p2),{credentials:"same-origin",headers:{"Accept":"application/json"}}).then(function(response){return response.ok?response.json():{items:[]};}).then(function(data){select.replaceChildren(new Option(placeholder,""));(data.items||[]).forEach(function(item){const isSelected=selected.includes(String(item.value));select.add(new Option(item.text,item.value,false,isSelected));});select.disabled=false;select.dataset.selected=JSON.stringify(currentValues());syncFancy();select.dispatchEvent(new Event("change",{bubbles:true}));}).catch(reset);}';
+		$html[] = 'function parentChanged(event){if(isParentField(event.target,parentName)||isParentField(event.target,parent2Name)){select.dataset.selected="[]";load(true);}}';
 		$html[] = 'document.addEventListener("change",parentChanged,true);';
 		$html[] = 'document.addEventListener("input",parentChanged,true);';
 		$html[] = 'document.addEventListener("DOMContentLoaded",function(){load(true);});';
@@ -92,6 +99,27 @@ class DynamicoptionsField extends FormField
 		$html[] = '</script>';
 
 		return implode("\n", $html);
+	}
+
+	private function normaliseValues(mixed $value): array
+	{
+		if (is_array($value)) {
+			$values = [];
+
+			foreach ($value as $item) {
+				array_push($values, ...$this->normaliseValues($item));
+			}
+
+			return array_values(array_unique(array_filter($values)));
+		}
+
+		if (is_string($value) && str_contains($value, ',')) {
+			return $this->normaliseValues(explode(',', $value));
+		}
+
+		$number = (int) $value;
+
+		return $number > 0 ? [$number] : [];
 	}
 
 	private function getRequestValue(string $name): int

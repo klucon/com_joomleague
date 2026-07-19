@@ -34,7 +34,8 @@ final class ClubsModel extends ListModel
 	{
 		$db = $this->getDatabase();
 		$query = $db->createQuery()->select([
-			$db->quoteName('a.id'), $db->quoteName('a.name'), $db->quoteName('a.location'), $db->quoteName('a.country'),
+				$db->quoteName('a.id'), $db->quoteName('a.name'), $db->quoteName('a.location'), $db->quoteName('a.country'),
+				$db->quoteName('a.info'),
 			$db->quoteName('a.logo_small'), $db->quoteName('a.latitude'), $db->quoteName('a.longitude'), $db->quoteName('a.ordering'), $db->quoteName('a.checked_out'),
 			$db->quoteName('a.checked_out_time'), $db->quoteName('venue.name', 'stadium'), $db->quoteName('uc.name', 'editor'),
 		])->from($db->quoteName('#__joomleague_club', 'a'))
@@ -47,7 +48,7 @@ final class ClubsModel extends ListModel
 				$id = (int) substr($search, 3); $query->where($db->quoteName('a.id') . ' = :id')->bind(':id', $id, ParameterType::INTEGER);
 			} else {
 				$search = '%' . str_replace(' ', '%', $search) . '%';
-				$query->where('(' . $db->quoteName('a.name') . ' LIKE :search OR ' . $db->quoteName('a.location') . ' LIKE :search)')->bind(':search', $search);
+					$query->where('(' . $db->quoteName('a.name') . ' LIKE :search OR ' . $db->quoteName('a.location') . ' LIKE :search OR ' . $db->quoteName('a.info') . ' LIKE :search)')->bind(':search', $search);
 			}
 		}
 

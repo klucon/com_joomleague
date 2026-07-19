@@ -45,9 +45,27 @@ class CalendarHelper
             ->getMVCFactory()
             ->createModel('Results', 'Site', ['ignore_request' => true]);
 
+        $teamIds = $this->positiveInts($params->get('team_ids') ?: $params->get('teams') ?: $params->get('team'));
+        $matches = $model->getMatches($projectId);
+
+        if ($teamIds !== []) {
+            $availableTeamIds = [];
+
+            foreach ($matches as $match) {
+                $availableTeamIds[] = (int) ($match->home_team_id ?? 0);
+                $availableTeamIds[] = (int) ($match->away_team_id ?? 0);
+            }
+
+            $teamIds = array_values(array_intersect($teamIds, array_unique(array_filter($availableTeamIds))));
+        }
+
         $grouped = [];
 
-        foreach ($model->getMatches($projectId) as $m) {
+        foreach ($matches as $m) {
+            if ($teamIds !== [] && !in_array((int) ($m->home_team_id ?? 0), $teamIds, true) && !in_array((int) ($m->away_team_id ?? 0), $teamIds, true)) {
+                continue;
+            }
+
             $day = substr((string) $m->match_date, 0, 10);
             $grouped[$day][] = $m;
         }
@@ -96,5 +114,29 @@ class CalendarHelper
 
         $number = (int) $value;
         return $number > 0 ? $number : 0;
+    }
+
+    /**
+     * @return  int[]
+     */
+    private function positiveInts(mixed $value): array
+    {
+        if (is_array($value)) {
+            $numbers = [];
+
+            foreach ($value as $item) {
+                array_push($numbers, ...$this->positiveInts($item));
+            }
+
+            return array_values(array_unique($numbers));
+        }
+
+        if (is_string($value) && str_contains($value, ',')) {
+            return $this->positiveInts(explode(',', $value));
+        }
+
+        $number = (int) $value;
+
+        return $number > 0 ? [$number] : [];
     }
 }

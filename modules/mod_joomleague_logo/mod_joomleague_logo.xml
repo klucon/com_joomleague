@@ -7,7 +7,7 @@
 	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-153</version>
+	<version>6.1.0-alpha-154-dev</version>
 	<description>MOD_JOOMLEAGUE_LOGO_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Logo</namespace>
 	<files>
@@ -21,9 +21,10 @@
 	</languages>
 	<config>
 		<fields name="params">
-			<fieldset name="basic">
+			<fieldset name="basic" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 				<field name="p" type="sql" default="" label="MOD_JOOMLEAGUE_LOGO_PROJECT_ID_LABEL" description="MOD_JOOMLEAGUE_LOGO_PROJECT_ID_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id" key_field="value" value_field="text" />
-				<field name="division_id" type="sql" depends="p" task="projectdivisionsoptions" label="MOD_JOOMLEAGUE_LOGO_DIVISION_ID_LABEL" description="MOD_JOOMLEAGUE_LOGO_DIVISION_ID_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_division ORDER BY name, id" key_field="value" value_field="text" />
+				<field name="division_id" type="dynamicoptions" task="projectdivisionsoptions" parent="p" label="MOD_JOOMLEAGUE_LOGO_DIVISION_ID_LABEL" description="MOD_JOOMLEAGUE_LOGO_DIVISION_ID_LABEL_DESC" />
+				<field name="team" type="dynamicoptions" default="" task="projectteamsbaseoptions" parent="p" label="MOD_JOOMLEAGUE_LOGO_TEAM_NAME_LABEL" description="MOD_JOOMLEAGUE_LOGO_TEAM_NAME_DESC" />
 				<field name="limit" type="text" default="10" label="MOD_JOOMLEAGUE_LOGO_ROW_LIMIT_LABEL" description="MOD_JOOMLEAGUE_LOGO_ROW_LIMIT_LABEL_DESC" />
 				<field name="spacer_4" type="spacer" default="" label="" description="" />
 				<field name="show_project_name" type="list" default="0" label="MOD_JOOMLEAGUE_LOGO_SHOW_PROJECT_NAME" description="MOD_JOOMLEAGUE_LOGO_SHOW_PROJECT_NAME_DESC">

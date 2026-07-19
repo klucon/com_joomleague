@@ -25,7 +25,7 @@ final class HtmlView extends AdminFormView
 			'icon' => 'location',
 			'singular' => 'playground',
 			'details' => 'COM_JOOMLEAGUE_PLAYGROUND_DETAILS',
-			'main' => ['name', 'short_name', 'alias', 'address', 'zipcode', 'city', 'country', 'geocode', 'latitude', 'longitude', 'max_visitors', 'website', 'club_id', 'picture', 'notes', 'extended'],
+				'main' => ['name', 'short_name', 'alias', 'address', 'zipcode', 'city', 'country', 'geocode', 'latitude', 'longitude', 'max_visitors', 'website', 'club_id', 'picture', 'info', 'notes', 'extended'],
 			'side' => [],
 			'publishing' => ['ordering', 'id'],
 		];

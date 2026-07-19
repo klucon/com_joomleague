@@ -87,9 +87,7 @@ return new class implements InstallerScriptInterface {
 				throw new RuntimeException(Text::sprintf('COM_JOOMLEAGUE_INSTALL_ERROR_CREATE_DIRECTORY', $uploadDirectory));
 			}
 
-			if (!chmod($uploadDirectory, 02775)) {
-				throw new RuntimeException(Text::sprintf('COM_JOOMLEAGUE_INSTALL_ERROR_SET_PERMISSIONS', $uploadDirectory));
-			}
+			$this->ensureDirectoryPermissions($uploadDirectory);
 		}
 
 		foreach (['playgrounds', 'clubs', 'clubs/small', 'clubs/medium', 'clubs/large', 'database/events', 'database/projects'] as $directory) {
@@ -99,9 +97,7 @@ return new class implements InstallerScriptInterface {
 				throw new RuntimeException(Text::sprintf('COM_JOOMLEAGUE_INSTALL_ERROR_CREATE_DIRECTORY', $writableDirectory));
 			}
 
-			if (!chmod($writableDirectory, 02775)) {
-				throw new RuntimeException(Text::sprintf('COM_JOOMLEAGUE_INSTALL_ERROR_SET_PERMISSIONS', $writableDirectory));
-			}
+			$this->ensureDirectoryPermissions($writableDirectory);
 		}
 
 		return true;
@@ -228,22 +224,56 @@ return new class implements InstallerScriptInterface {
 			['#__joomleague_sports_type', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
 			['#__joomleague_statistic', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
 			['#__joomleague_division', 'asset_id', 'INT UNSIGNED NULL DEFAULT NULL', 'modified_by'],
+			['#__joomleague_club', 'latitude', 'DECIMAL(10,7) NULL DEFAULT NULL', 'country'],
+			['#__joomleague_club', 'longitude', 'DECIMAL(10,7) NULL DEFAULT NULL', 'latitude'],
+			['#__joomleague_playground', 'latitude', 'DECIMAL(10,7) NULL DEFAULT NULL', 'country'],
+			['#__joomleague_playground', 'longitude', 'DECIMAL(10,7) NULL DEFAULT NULL', 'latitude'],
 			['#__joomleague_sports_type', 'periods', 'TINYINT NOT NULL DEFAULT 2', 'name'],
 			['#__joomleague_sports_type', 'published', 'TINYINT NOT NULL DEFAULT 1', 'icon'],
 			['#__joomleague_match', 'article_id', 'INT NULL DEFAULT NULL', null],
 			['#__joomleague_match_player', 'is_substitute', 'TINYINT NOT NULL DEFAULT 0', 'project_position_id'],
 			['#__joomleague_match_event', 'external_person_name', 'varchar(100) NOT NULL DEFAULT ' . $db->quote(''), 'teamplayer_id'],
 			['#__joomleague_match_referee', 'external_referee_name', 'varchar(100) NOT NULL DEFAULT ' . $db->quote(''), 'project_referee_id'],
-		] as [$table, $column, $definition, $after]) {
-			$this->addColumnIfMissing($db, $table, $column, $definition, $after);
+			] as [$table, $column, $definition, $after]) {
+				$this->addColumnIfMissing($db, $table, $column, $definition, $after);
+			}
+
+			$this->normaliseTextColumns($db);
+			$this->normaliseSportsTypeTable($db);
 		}
 
-		$this->normaliseSportsTypeTable($db);
-	}
+		private function normaliseTextColumns(DatabaseInterface $db): void
+		{
+			foreach ([
+				['#__joomleague_club', 'info'],
+				['#__joomleague_playground', 'info'],
+				['#__joomleague_project_team', 'info'],
+				['#__joomleague_team', 'info'],
+			] as [$table, $column]) {
+				try {
+					$columns = $db->getTableColumns($table);
+				} catch (\Throwable $exception) {
+					continue;
+				}
 
-	private function normaliseSportsTypeTable(DatabaseInterface $db): void
-	{
-		foreach ([
+				if (!array_key_exists($column, $columns)) {
+					continue;
+				}
+
+				try {
+					$db->setQuery(
+						'ALTER TABLE ' . $db->quoteName($table)
+						. ' MODIFY ' . $db->quoteName($column) . ' text'
+					)->execute();
+				} catch (\Throwable $exception) {
+					// Best-effort compatibility repair for older alpha/dev schemas.
+				}
+			}
+		}
+
+		private function normaliseSportsTypeTable(DatabaseInterface $db): void
+		{
+			foreach ([
 			'ALTER TABLE ' . $db->quoteName('#__joomleague_sports_type') . ' ENGINE=InnoDB',
 			'ALTER TABLE ' . $db->quoteName('#__joomleague_sports_type') . ' CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci',
 			'ALTER TABLE ' . $db->quoteName('#__joomleague_sports_type') . ' MODIFY ' . $db->quoteName('name') . ' VARCHAR(255) NOT NULL DEFAULT ' . $db->quote(''),
@@ -324,4 +354,13 @@ return new class implements InstallerScriptInterface {
 		}
 	}
 
-};
+	private function ensureDirectoryPermissions(string $directory): void
+	{
+		if (@chmod($directory, 02775) || is_writable($directory)) {
+			return;
+		}
+
+		throw new RuntimeException(Text::sprintf('COM_JOOMLEAGUE_INSTALL_ERROR_SET_PERMISSIONS', $directory));
+	}
+
+	};

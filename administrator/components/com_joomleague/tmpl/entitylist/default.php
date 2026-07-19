@@ -213,6 +213,14 @@ $addUrl = Route::_('index.php?option=com_joomleague&task=' . $personAssignment['
 				?>
 			<?php elseif (($column['type'] ?? '') === 'datetime') : ?>
 				<?php echo $this->escape($value === '' || $value === null ? '' : substr((string) $value, 0, 16)); ?>
+			<?php elseif (($column['type'] ?? '') === 'excerpt') : ?>
+				<?php
+				$excerpt = trim(preg_replace('/\s+/', ' ', html_entity_decode(strip_tags((string) $value), ENT_QUOTES, 'UTF-8')) ?? '');
+				if (mb_strlen($excerpt) > 120) {
+					$excerpt = mb_substr($excerpt, 0, 117) . '...';
+				}
+				?>
+				<?php echo $this->escape($excerpt); ?>
 			<?php elseif (($column['type'] ?? '') === 'country') : ?>
 				<?php echo \Joomleague\Component\Joomleague\Administrator\Helper\FlagHelper::render((string) $value); ?>
 			<?php elseif (($column['type'] ?? '') === 'lang') : ?>

@@ -11,7 +11,7 @@
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>
-		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES" rows="5" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
+		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_INTERNAL_NOTES" rows="5" filter="safehtml" description="COM_JOOMLEAGUE_TEAMSTAFF_FIELD_INTERNAL_NOTES_DESC" />
 		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="JFIELD_ALIAS_DESC" />
 	</fieldset>
 	<fieldset name="status" label="COM_JOOMLEAGUE_TEAMSTAFF_FIELDSET_STATUS">

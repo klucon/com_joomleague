@@ -18,7 +18,8 @@
 			<option value="">COM_JOOMLEAGUE_PLAYGROUND_SELECT_CLUB</option>
 		</field>
 		<field name="picture" type="media" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_PICTURE_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_PICTURE_DESCRIPTION" directory="com_joomleague/playgrounds" preview="tooltip" />
-		<field name="notes" type="textarea" rows="8" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_NOTES_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_NOTES_DESCRIPTION" filter="safehtml" />
+		<field name="info" type="editor" height="320" width="100%" buttons="true" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_INFO_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_INFO_DESCRIPTION" filter="safehtml" />
+		<field name="notes" type="textarea" rows="6" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_INTERNAL_NOTES_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_INTERNAL_NOTES_DESCRIPTION" filter="safehtml" />
 		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_PLAYGROUND_FIELD_EXTENDED_LABEL" description="COM_JOOMLEAGUE_PLAYGROUND_FIELD_EXTENDED_DESCRIPTION" rows="5" filter="safehtml" />
 		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" default="0" min="0" />
 	</fieldset>

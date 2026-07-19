@@ -7,7 +7,7 @@
 	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-153</version>
+	<version>6.1.0-alpha-154-dev</version>
 	<description>MOD_JOOMLEAGUE_EVENTSRANKING_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Eventsranking</namespace>
 	<files>
@@ -21,12 +21,12 @@
 	</languages>
 	<config>
 		<fields name="params">
-			<fieldset name="basic">
+			<fieldset name="basic" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 				<field name="p" type="sql" label="MOD_JOOMLEAGUE_EVENTSRANKING_PROJECT_ID_LABEL" description="MOD_JOOMLEAGUE_EVENTSRANKING_PROJECT_ID_DESCR" required="true" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id" key_field="value" value_field="text" />
-				<field name="division_id" type="sql" depends="p" task="projectdivisionsoptions" label="MOD_JOOMLEAGUE_EVENTSRANKING_DIVISION_ID_LABEL" description="MOD_JOOMLEAGUE_EVENTSRANKING_DIVISION_ID_DESCR" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_division ORDER BY name, id" key_field="value" value_field="text" />
-				<field name="tid" type="sql" depends="p,division_id" task="projectteamsbydivisionoptions" label="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_TEAM_LABEL" description="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_TEAM_DESCR" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_team ORDER BY name, id" key_field="value" value_field="text" />
-				<field name="evid" type="sql" depends="p" task="projecteventsoptions" label="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_EVENT_LABEL" description="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_EVENT_DESCR" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_eventtype ORDER BY ordering, name, id" key_field="value" value_field="text" multiple="true" />
-				<field name="mid" type="sql" depends="p" task="matchesoptions" label="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_MATCH_LABEL" description="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_MATCH_DESCR" query="SELECT id AS value, CONCAT(COALESCE(match_number, id), ' / ID ', id) AS text FROM #__joomleague_match ORDER BY match_date DESC, id DESC" key_field="value" value_field="text" />
+				<field name="division_id" type="dynamicoptions" task="projectdivisionsoptions" parent="p" label="MOD_JOOMLEAGUE_EVENTSRANKING_DIVISION_ID_LABEL" description="MOD_JOOMLEAGUE_EVENTSRANKING_DIVISION_ID_DESCR" />
+				<field name="tid" type="dynamicoptions" task="projectteamsbaseoptions" parent="p" label="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_TEAM_LABEL" description="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_TEAM_DESCR" />
+				<field name="evid" type="dynamicoptions" task="projecteventtypesoptions" parent="p" label="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_EVENT_LABEL" description="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_EVENT_DESCR" multiple="true" />
+				<field name="mid" type="dynamicoptions" task="matchesoptions" parent="p" label="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_MATCH_LABEL" description="MOD_JOOMLEAGUE_EVENTSRANKING_SELECT_MATCH_DESCR" />
 				<field name="ranking_order" type="radio" default="DESC" label="MOD_JOOMLEAGUE_EVENTSRANKING_RANKING_ORDER_LABEL" description="MOD_JOOMLEAGUE_EVENTSRANKING_RANKING_ORDER_DESCR">
 					<option value="ASC">MOD_JOOMLEAGUE_EVENTSRANKING_ASCENDING</option>
 					<option value="DESC">MOD_JOOMLEAGUE_EVENTSRANKING_DESCENDING</option>

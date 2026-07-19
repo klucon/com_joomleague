@@ -8,6 +8,7 @@
 declare(strict_types=1);
 \defined('_JEXEC') or die;
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
@@ -16,7 +17,9 @@ use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $team = $this->item;
 $jlFlagPath = JPATH_SITE . '/components/com_joomleague/layouts';
-$teamText = $team ? trim((string) ($team->team_info ?: $team->team_notes)) : '';
+$projectTeamText = $team ? trim((string) ($team->info ?? '')) : '';
+$teamText = $projectTeamText !== '' ? $projectTeamText : ($team ? trim((string) ($team->team_info ?? '')) : '');
+$teamTextPlain = $teamText !== '' ? trim(strip_tags($teamText)) : '';
 $translateLegacyName = static function ($value): string {
 	$value = trim((string) $value);
 
@@ -64,9 +67,9 @@ if ($team) {
 		'sameAs' => StructuredDataHelper::externalUrl($team->team_website ?? ''),
 		'logo' => $schemaTeamLogo,
 		'image' => $schemaTeamLogo,
-		'description' => $teamText !== '' ? $teamText : null,
+		'description' => $teamTextPlain !== '' ? $teamTextPlain : null,
 		'sport' => $sportName !== '' ? $sportName : null,
-		'mainEntityOfPage' => StructuredDataHelper::webPage((string) $team->team_name, $teamText !== '' ? $teamText : null, $teamUrl),
+		'mainEntityOfPage' => StructuredDataHelper::webPage((string) $team->team_name, $teamTextPlain !== '' ? $teamTextPlain : null, $teamUrl),
 		'parentOrganization' => $team->club_name ? [
 			'@type' => 'SportsOrganization',
 			'@id' => $clubUrl ? $clubUrl . '#club' : null,
@@ -138,7 +141,7 @@ if ($team) {
 	<?php if ($showDescription && $teamText !== '') : ?>
 		<div class="jl-site-panel mb-4">
 			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_TEAM_INFO'); ?></h2>
-			<p class="jl-site-muted mb-0"><?php echo nl2br($this->escape($teamText)); ?></p>
+			<div class="jl-site-muted mb-0"><?php echo HTMLHelper::_('content.prepare', $teamText); ?></div>
 		</div>
 	<?php endif; ?>
 	<?php if ($showHistory && $this->teamSeasons) : ?>

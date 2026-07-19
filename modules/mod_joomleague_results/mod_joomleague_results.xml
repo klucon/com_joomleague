@@ -7,7 +7,7 @@
 	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-153</version>
+	<version>6.1.0-alpha-154-dev</version>
 	<description>MOD_JOOMLEAGUE_RESULTS_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Results</namespace>
 	<files>
@@ -21,11 +21,11 @@
 	</languages>
 	<config>
 		<fields name="params">
-			<fieldset name="basic">
+			<fieldset name="basic" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 				<field name="sportstype" type="sql" required="true" label="MOD_JOOMLEAGUE_RESULTS_SPORTSTYPE_ID_LABEL" description="MOD_JOOMLEAGUE_RESULTS_SPORTSTYPE_ID_DESCR" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_sports_type ORDER BY name, id" key_field="value" value_field="text" />
 				<field name="p" type="sql" required="true" depends="sportstype" task="projectsbysportstypesoptions" label="MOD_JOOMLEAGUE_RESULTS_PROJECT_ID_LABEL" description="MOD_JOOMLEAGUE_RESULTS_PROJECT_ID_DESCR" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id" key_field="value" value_field="text" />
-				<field name="division_id" type="sql" required="false" depends="p" task="projectdivisionsoptions" label="MOD_JOOMLEAGUE_RESULTS_DIVISION_ID_LABEL" description="MOD_JOOMLEAGUE_RESULTS_DIVISION_ID_DESCR" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_division ORDER BY name, id" key_field="value" value_field="text" />
-				<field name="r" type="sql" required="false" depends="p" task="roundsoptions" label="MOD_JOOMLEAGUE_RESULTS_SELECT_ROUND_LABEL" description="MOD_JOOMLEAGUE_RESULTS_SELECT_ROUND_DESCR" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_round ORDER BY project_id, roundcode, id" key_field="value" value_field="text" />
+				<field name="division_id" type="dynamicoptions" required="false" task="projectdivisionsoptions" parent="p" label="MOD_JOOMLEAGUE_RESULTS_DIVISION_ID_LABEL" description="MOD_JOOMLEAGUE_RESULTS_DIVISION_ID_DESCR" />
+				<field name="r" type="dynamicoptions" required="false" task="roundsoptions" parent="p" label="MOD_JOOMLEAGUE_RESULTS_SELECT_ROUND_LABEL" description="MOD_JOOMLEAGUE_RESULTS_SELECT_ROUND_DESCR" />
 				<field name="round_selection" type="list" default="0" required="false" label="MOD_JOOMLEAGUE_RESULTS_ROUND_SELECTION_LABEL" description="MOD_JOOMLEAGUE_RESULTS_ROUND_SELECTION_DESCR">
 					<option value="0">MOD_JOOMLEAGUE_RESULTS_ROUND_SELECTION_LATEST
 					</option>

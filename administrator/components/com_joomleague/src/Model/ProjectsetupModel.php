@@ -381,6 +381,6 @@ final class ProjectsetupModel extends BaseDatabaseModel
 
 	private function teamLabelExpression(): string
 	{
-		return 'CONCAT(t.name, CASE WHEN TRIM(COALESCE(t.info, "")) = "" THEN "" ELSE CONCAT(" (", TRIM(t.info), ")") END, " - ", COALESCE(c.name, ""))';
+		return 'CONCAT(t.name, " - ", COALESCE(c.name, ""))';
 	}
 }

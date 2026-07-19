@@ -13,10 +13,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_MANIFEST = ROOT / "pkg_joomleague.xml"
 PUBLIC_URLS = (
-    "https://downloads.klucon.cz/",
-    "https://downloads.klucon.cz/joomleague/",
-    "https://downloads.klucon.cz/joomleague/releases/",
-    "https://downloads.klucon.cz/joomleague/languages/",
+    "https://download.klucon.cz/",
+    "https://download.klucon.cz/joomleague/",
+    "https://download.klucon.cz/joomleague/releases/",
+    "https://download.klucon.cz/joomleague/languages/",
+    "https://download.klucon.cz/joomleague/dev/",
     "https://update.klucon.cz/joomleague/update.xml",
     "https://update.klucon.cz/joomleague/languages/manifest.json",
 )
@@ -62,7 +63,7 @@ def main() -> int:
     ):
         run_step(script)
 
-    urls = (*PUBLIC_URLS, f"https://downloads.klucon.cz/joomleague/releases/{release_version}/")
+    urls = (*PUBLIC_URLS, f"https://download.klucon.cz/joomleague/releases/{release_version}/")
 
     for url in urls:
         check_url(url)

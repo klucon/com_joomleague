@@ -25,10 +25,10 @@ final class HtmlView extends AdminFormView
 			'singular' => 'raceparticipant',
 			'details' => 'COM_JOOMLEAGUE_FIELDSET_DETAILS',
 			'main' => ['project_id', 'person_id', 'category_id', 'bib_number', 'sex', 'date_of_birth', 'country'],
-			'side' => [
-				'relations' => 'COM_JOOMLEAGUE_FIELDSET_RELATIONS',
-				'notes' => 'COM_JOOMLEAGUE_FIELDSET_NOTES',
-			],
+				'side' => [
+					'relations' => 'COM_JOOMLEAGUE_FIELDSET_RELATIONS',
+					'notes' => 'COM_JOOMLEAGUE_RACEPARTICIPANT_FIELDSET_INTERNAL_NOTES',
+				],
 			'publishing' => ['published', 'ordering'],
 		];
 	}

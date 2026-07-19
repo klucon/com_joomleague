@@ -11,6 +11,7 @@ declare(strict_types=1);
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
@@ -20,6 +21,8 @@ use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $person = $this->item;
 $jlFlagPath = JPATH_SITE . '/components/com_joomleague/layouts';
+$personPublicProfile = $person ? trim((string) ($person->info ?? '')) : '';
+$personPublicProfileText = $personPublicProfile !== '' ? trim(strip_tags($personPublicProfile)) : '';
 
 // player.xml / staff.xml / referee.xml – sjednocený pohled 'person' může na jedné
 // stránce zobrazovat hráčskou, realizační i rozhodcovskou historii najednou, takže
@@ -170,7 +173,7 @@ $renderHistory = function (string $title, array $items, bool $showNumber = false
 $renderInfoSection = function () use (
 	$person, $fullName, $showPhoto, $pictureUrl, $picHeight, $picWidth, $birthdayMode, $age,
 	$showHeight, $showWeight, $showNationality, $jlFlagPath, $showRegnr, $showAddress, $showEmail,
-	$showPhone, $showMobile, $showWebsite, $showGeneralDescription, $translateValue
+	$showPhone, $showMobile, $showWebsite, $showGeneralDescription, $showDescription, $personPublicProfileText, $translateValue
 ): void {
 	?>
 	<section class="jl-site-hero mb-4">
@@ -251,22 +254,22 @@ $renderInfoSection = function () use (
 			<?php if ($showWebsite && !empty($person->website)) : ?>
 				<p class="mb-1"><a href="<?php echo $this->escape((string) $person->website); ?>" rel="noopener noreferrer"><?php echo Text::_('COM_JOOMLEAGUE_SITE_WEBSITE'); ?></a></p>
 			<?php endif; ?>
-			<?php if ($showGeneralDescription && !empty($person->info)) : ?>
-				<p class="jl-site-muted mb-0"><?php echo $this->escape((string) $person->info); ?></p>
+			<?php if ($showGeneralDescription && !$showDescription && $personPublicProfileText !== '') : ?>
+				<p class="jl-site-muted mb-0"><?php echo $this->escape($personPublicProfileText); ?></p>
 			<?php endif; ?>
 		</div>
 	</div>
 	<?php
 };
 
-$renderDescriptionSection = function () use ($person, $showDescription): void {
-	if (!$showDescription || empty($person->notes)) {
+$renderDescriptionSection = function () use ($personPublicProfile, $showDescription): void {
+	if (!$showDescription || $personPublicProfile === '') {
 		return;
 	}
 	?>
 	<div class="jl-site-panel mb-4">
 		<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_DESCRIPTION'); ?></h2>
-		<div><?php echo nl2br($this->escape((string) $person->notes)); ?></div>
+		<div class="jl-site-richtext"><?php echo HTMLHelper::_('content.prepare', $personPublicProfile); ?></div>
 	</div>
 	<?php
 };
@@ -474,7 +477,7 @@ if ($person) {
 		'url' => $personUrl,
 		'sameAs' => StructuredDataHelper::externalUrl($person->website ?? ''),
 		'image' => $personImage,
-		'mainEntityOfPage' => StructuredDataHelper::webPage($fullName($person), trim((string) ($person->notes ?? '')) ?: null, $personUrl),
+			'mainEntityOfPage' => StructuredDataHelper::webPage($fullName($person), $personPublicProfileText !== '' ? $personPublicProfileText : null, $personUrl),
 		'birthDate' => $person->birthday ?? null,
 		'deathDate' => $person->deathday ?? null,
 		'nationality' => $person->country ?? null,

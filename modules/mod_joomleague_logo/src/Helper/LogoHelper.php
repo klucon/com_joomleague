@@ -52,12 +52,16 @@ class LogoHelper implements DatabaseAwareInterface
         $query->select([
                 $db->quoteName('pt.id', 'projectteam_id'),
                 $db->quoteName('t.name', 'team_name'),
+                $db->quoteName('t.short_name', 'team_short_name'),
+                $db->quoteName('t.middle_name', 'team_middle_name'),
                 $db->quoteName('t.picture', 'team_picture'),
+                $db->quoteName('p.name', 'project_name'),
                 $db->quoteName('c.logo_small'),
                 $db->quoteName('c.logo_middle'),
                 $db->quoteName('c.logo_big'),
             ])
             ->from($db->quoteName('#__joomleague_project_team', 'pt'))
+            ->join('INNER', $db->quoteName('#__joomleague_project', 'p') . ' ON ' . $db->quoteName('p.id') . ' = ' . $db->quoteName('pt.project_id'))
             ->join('INNER', $db->quoteName('#__joomleague_team', 't') . ' ON ' . $db->quoteName('t.id') . ' = ' . $db->quoteName('pt.team_id'))
             ->join('LEFT', $db->quoteName('#__joomleague_club', 'c') . ' ON ' . $db->quoteName('c.id') . ' = ' . $db->quoteName('t.club_id'))
             ->where($db->quoteName('pt.id') . ' = :ptid')
@@ -83,7 +87,7 @@ class LogoHelper implements DatabaseAwareInterface
             $teamId = $app->getInput()->getCmd('view') === 'team' ? $app->getInput()->getInt('id', 0) : 0;
         }
 
-        if ($teamId === 0 || $projectId === 0) {
+        if ($projectId === 0) {
             return $app->getInput()->getCmd('view') === 'roster' ? $app->getInput()->getInt('id', 0) : 0;
         }
 
@@ -92,13 +96,28 @@ class LogoHelper implements DatabaseAwareInterface
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__joomleague_project_team'))
             ->where($db->quoteName('project_id') . ' = :project_id')
-            ->where($db->quoteName('team_id') . ' = :team_id')
-            ->bind(':project_id', $projectId, ParameterType::INTEGER)
-            ->bind(':team_id', $teamId, ParameterType::INTEGER);
+            ->order($db->quoteName('ordering') . ' ASC, ' . $db->quoteName('id') . ' ASC')
+            ->bind(':project_id', $projectId, ParameterType::INTEGER);
 
-        $db->setQuery($query);
+        if ($teamId > 0) {
+            $query->where($db->quoteName('team_id') . ' = :team_id')
+                ->bind(':team_id', $teamId, ParameterType::INTEGER);
+        }
 
-        return (int) $db->loadResult();
+        $projectTeamId = (int) $db->setQuery($query, 0, 1)->loadResult();
+
+        if ($projectTeamId > 0 || $teamId === 0) {
+            return $projectTeamId;
+        }
+
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('id'))
+            ->from($db->quoteName('#__joomleague_project_team'))
+            ->where($db->quoteName('project_id') . ' = :project_id')
+            ->order($db->quoteName('ordering') . ' ASC, ' . $db->quoteName('id') . ' ASC')
+            ->bind(':project_id', $projectId, ParameterType::INTEGER);
+
+        return (int) $db->setQuery($query, 0, 1)->loadResult();
     }
 
     private function firstPositiveInt(mixed $value): int

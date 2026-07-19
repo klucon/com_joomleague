@@ -25,8 +25,8 @@
 			<option value="">JNONE</option>
 		</field>
 	</fieldset>
-	<fieldset name="notes" label="COM_JOOMLEAGUE_FIELDSET_NOTES">
-		<field name="note" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES" rows="5" filter="safehtml" />
+	<fieldset name="notes" label="COM_JOOMLEAGUE_RACEPARTICIPANT_FIELDSET_INTERNAL_NOTES">
+		<field name="note" type="textarea" label="COM_JOOMLEAGUE_RACEPARTICIPANT_FIELD_NOTES" rows="5" filter="safehtml" description="COM_JOOMLEAGUE_RACEPARTICIPANT_FIELD_NOTES_DESC" />
 	</fieldset>
 	<fieldset name="publishing">
 		<field name="published" type="list" label="JSTATUS" default="1">

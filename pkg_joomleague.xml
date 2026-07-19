@@ -8,9 +8,9 @@
 	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-153</version>
+	<version>6.1.0-alpha-154-dev</version>
 	<description>PKG_JOOMLEAGUE_XML_DESCRIPTION</description>
-	<changelogurl>https://update.klucon.cz/joomleague/changelog.xml</changelogurl>
+	<changelogurl>https://download.klucon.cz/joomleague/dev/changelog.xml</changelogurl>
 	<scriptfile>pkg_script.php</scriptfile>
 	<languages folder="language">
 		<language tag="en-GB">en-GB/joomleague.ini</language>
@@ -44,6 +44,6 @@
 		<file type="plugin" id="joomleaguesefaliases" group="system">plg_system_joomleaguesefaliases.zip</file>
 	</files>
 	<updateservers>
-		<server type="extension" priority="1" name="JoomLeague">https://update.klucon.cz/joomleague/update.xml</server>
+		<server type="extension" priority="1" name="JoomLeague Development">https://download.klucon.cz/joomleague/dev/update.xml</server>
 	</updateservers>
 </extension>

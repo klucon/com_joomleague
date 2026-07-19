@@ -16,8 +16,8 @@
 		<field name="weight" type="number" label="COM_JOOMLEAGUE_PERSON_FIELD_WEIGHT" min="0" description="COM_JOOMLEAGUE_PERSON_FIELD_WEIGHT_DESCRIPTION" />
 		<field name="knvbnr" type="text" label="COM_JOOMLEAGUE_PERSON_FIELD_REGISTRATION" description="COM_JOOMLEAGUE_PERSON_FIELD_REGISTRATION_DESCRIPTION" />
 		<field name="country" type="country" label="COM_JOOMLEAGUE_PERSON_FIELD_NATIONALITY_COUNTRY" description="COM_JOOMLEAGUE_PERSON_FIELD_NATIONALITY_COUNTRY_DESCRIPTION" />
-		<field name="info" type="textarea" rows="8" label="COM_JOOMLEAGUE_FIELD_INFO" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_INFO_DESCRIPTION" />
-		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
+		<field name="info" type="editor" height="420" width="100%" buttons="true" label="COM_JOOMLEAGUE_PERSON_FIELD_PUBLIC_PROFILE" filter="safehtml" description="COM_JOOMLEAGUE_PERSON_FIELD_PUBLIC_PROFILE_DESCRIPTION" />
+		<field name="notes" type="textarea" rows="6" label="COM_JOOMLEAGUE_PERSON_FIELD_INTERNAL_NOTES" filter="safehtml" description="COM_JOOMLEAGUE_PERSON_FIELD_INTERNAL_NOTES_DESCRIPTION" />
 	</fieldset>
 	<fieldset name="contact" label="COM_JOOMLEAGUE_FIELDSET_CONTACT" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 		<field name="address" type="text" label="COM_JOOMLEAGUE_FIELD_ADDRESS" description="COM_JOOMLEAGUE_FIELD_ADDRESS_DESCRIPTION" />

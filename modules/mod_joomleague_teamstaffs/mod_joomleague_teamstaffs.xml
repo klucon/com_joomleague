@@ -7,7 +7,7 @@
 	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-153</version>
+	<version>6.1.0-alpha-154-dev</version>
 	<description>MOD_JOOMLEAGUE_TEAMSTAFFS_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Teamstaffs</namespace>
 	<files>
@@ -21,9 +21,9 @@
 	</languages>
 	<config>
 		<fields name="params">
-			<fieldset name="basic">
+			<fieldset name="basic" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 				<field type="sql" name="p" label="MOD_JOOMLEAGUE_TEAMSTAFFS_PROJECT_LABEL" description="MOD_JOOMLEAGUE_TEAMSTAFFS_PROJECT_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id" key_field="value" value_field="text" />
-				<field name="team" type="sql" default="0" depends="p" task="projectteamsoptions" label="MOD_JOOMLEAGUE_TEAMSTAFFS_TEAM_ID_LABEL" description="MOD_JOOMLEAGUE_TEAMSTAFFS_TEAM_ID_LABEL_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_team ORDER BY name, id" key_field="value" value_field="text" />
+				<field name="team" type="dynamicoptions" default="0" task="projectteamsbaseoptions" parent="p" label="MOD_JOOMLEAGUE_TEAMSTAFFS_TEAM_ID_LABEL" description="MOD_JOOMLEAGUE_TEAMSTAFFS_TEAM_ID_LABEL_DESC" />
 				<field name="show_project_name" type="radio" default="0" label="MOD_JOOMLEAGUE_TEAMSTAFFS_SHOW_PROJECT_NAME" description="MOD_JOOMLEAGUE_TEAMSTAFFS_SHOW_PROJECT_NAME_DESC">
 					<option value="0">No</option>
 					<option value="1">Yes</option>

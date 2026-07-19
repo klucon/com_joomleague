@@ -33,7 +33,8 @@
 		<field name="manager" type="text" label="COM_JOOMLEAGUE_CLUB_FIELD_MANAGER_LABEL" maxlength="50" description="COM_JOOMLEAGUE_CLUB_FIELD_MANAGER_LABEL_DESCRIPTION" />
 	</fieldset>
 	<fieldset name="description" label="COM_JOOMLEAGUE_CLUB_FIELDSET_DESCRIPTION">
-		<field name="notes" type="textarea" rows="8" label="COM_JOOMLEAGUE_CLUB_FIELD_NOTES_LABEL" description="COM_JOOMLEAGUE_CLUB_FIELD_NOTES_DESCRIPTION" filter="safehtml" />
+		<field name="info" type="editor" height="360" width="100%" buttons="true" label="COM_JOOMLEAGUE_CLUB_FIELD_INFO_LABEL" description="COM_JOOMLEAGUE_CLUB_FIELD_INFO_DESCRIPTION" filter="safehtml" />
+		<field name="notes" type="textarea" rows="6" label="COM_JOOMLEAGUE_CLUB_FIELD_INTERNAL_NOTES_LABEL" description="COM_JOOMLEAGUE_CLUB_FIELD_INTERNAL_NOTES_DESCRIPTION" filter="safehtml" />
 		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_CLUB_FIELD_EXTENDED_LABEL" description="COM_JOOMLEAGUE_CLUB_FIELD_EXTENDED_DESCRIPTION" rows="5" filter="safehtml" />
 	</fieldset>
 	<fieldset name="logos" label="COM_JOOMLEAGUE_CLUB_LOGOS">

@@ -25,7 +25,7 @@ if (empty($list)) {
 <div class="jl-module jl-statranking">
 	<?php foreach ($list as $statName => $rows) : ?>
 		<div class="jl-stat-block mb-2">
-			<div class="jl-stat-name fw-bold border-bottom"><?php echo htmlspecialchars($statName, ENT_QUOTES, 'UTF-8'); ?></div>
+			<div class="jl-stat-name fw-bold border-bottom"><?php echo htmlspecialchars(Text::_($statName), ENT_QUOTES, 'UTF-8'); ?></div>
 			<table class="table table-sm mb-0">
 				<tbody>
 				<?php foreach ($rows as $i => $row) : ?>

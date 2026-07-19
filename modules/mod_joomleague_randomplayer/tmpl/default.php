@@ -13,10 +13,13 @@
  */
 
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
 \defined('_JEXEC') or die;
+
+Factory::getApplication()->getLanguage()->load('com_joomleague', JPATH_SITE);
 
 if (empty($item)) {
     echo '<div class="jl-module jl-randomplayer-empty">' . Text::_('MOD_JOOMLEAGUE_RANDOMPLAYER_NO_DATA') . '</div>';
@@ -39,6 +42,15 @@ if ($personPicture === '') {
 		</a>
 	</div>
 	<?php if (!empty($item->position_name)) : ?>
-		<div class="jl-player-position text-muted small"><?php echo htmlspecialchars($item->position_name, ENT_QUOTES, 'UTF-8'); ?></div>
+		<div class="jl-player-position text-muted small"><?php echo htmlspecialchars(Text::_((string) $item->position_name), ENT_QUOTES, 'UTF-8'); ?></div>
 	<?php endif; ?>
 </div>
+<style>
+	.jl-randomplayer .jl-player-photo {
+		display: inline-block;
+		width: auto;
+		max-width: min(100%, 120px);
+		max-height: 140px;
+		object-fit: contain;
+	}
+</style>

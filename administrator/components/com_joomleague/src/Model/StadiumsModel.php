@@ -35,7 +35,8 @@ final class StadiumsModel extends ListModel
 		$db = $this->getDatabase();
 		$query = $db->createQuery()->select([
 			$db->quoteName('a.id'), $db->quoteName('a.name'), $db->quoteName('a.short_name'),
-			$db->quoteName('a.city'), $db->quoteName('a.country'), $db->quoteName('a.latitude'), $db->quoteName('a.longitude'), $db->quoteName('a.max_visitors'),
+				$db->quoteName('a.city'), $db->quoteName('a.country'), $db->quoteName('a.latitude'), $db->quoteName('a.longitude'), $db->quoteName('a.max_visitors'),
+				$db->quoteName('a.info'),
 			$db->quoteName('a.picture'), $db->quoteName('a.ordering'), $db->quoteName('a.checked_out'),
 			$db->quoteName('a.checked_out_time'), $db->quoteName('club.name', 'club'), $db->quoteName('uc.name', 'editor'),
 		])->from($db->quoteName('#__joomleague_playground', 'a'))
@@ -49,7 +50,7 @@ final class StadiumsModel extends ListModel
 				$query->where($db->quoteName('a.id') . ' = :id')->bind(':id', $id, ParameterType::INTEGER);
 			} else {
 				$search = '%' . str_replace(' ', '%', $search) . '%';
-				$query->where('(' . $db->quoteName('a.name') . ' LIKE :search OR ' . $db->quoteName('a.city') . ' LIKE :search)')->bind(':search', $search);
+					$query->where('(' . $db->quoteName('a.name') . ' LIKE :search OR ' . $db->quoteName('a.city') . ' LIKE :search OR ' . $db->quoteName('a.info') . ' LIKE :search)')->bind(':search', $search);
 			}
 		}
 

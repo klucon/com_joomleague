@@ -9,6 +9,7 @@ declare(strict_types=1);
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
@@ -18,6 +19,8 @@ use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 
 $team = $this->item;
 $jlFlagPath = JPATH_SITE . '/components/com_joomleague/layouts';
+$projectTeamInfo = $team ? trim((string) ($team->info ?? '')) : '';
+$teamInfo = $projectTeamInfo !== '' ? $projectTeamInfo : ($team ? trim((string) ($team->team_info ?? '')) : '');
 $params = $this->templateParams;
 $show = static fn (string $name, bool $default = true): bool => array_key_exists($name, $params) && $params[$name] !== '' ? (bool) $params[$name] : $default;
 $param = static fn (string $name, $default = null) => array_key_exists($name, $params) && $params[$name] !== '' ? $params[$name] : $default;
@@ -197,9 +200,9 @@ if ($team) {
 		</div>
 	</section>
 
-	<?php if ($show('show_description') && !empty($team->team_notes)) : ?>
+	<?php if ($show('show_description') && $teamInfo !== '') : ?>
 		<div class="jl-site-panel mb-4">
-			<div><?php echo nl2br($this->escape((string) $team->team_notes)); ?></div>
+			<div><?php echo HTMLHelper::_('content.prepare', $teamInfo); ?></div>
 		</div>
 	<?php endif; ?>
 

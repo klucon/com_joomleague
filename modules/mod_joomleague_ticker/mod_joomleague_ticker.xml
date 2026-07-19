@@ -7,7 +7,7 @@
 	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-153</version>
+	<version>6.1.0-alpha-154-dev</version>
 	<description>MOD_JOOMLEAGUE_TICKER_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Ticker</namespace>
 	<files>
@@ -21,89 +21,84 @@
 	</languages>
 	<config>
 		<fields name="params">
-			<fieldset name="basic">
+			<fieldset name="basic" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 				<field name="p" type="sql" required="true" label="MOD_JOOMLEAGUE_TICKER_LABEL_PROJECT" description="MOD_JOOMLEAGUE_TICKER_PROJECTID" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id" key_field="value" value_field="text" />
 				<field name="usefavteams" type="radio" default="0" label="MOD_JOOMLEAGUE_TICKER_LABEL_USE_FAV_TEAMS" description="MOD_JOOMLEAGUE_TICKER_DESC_USE_FAV_TEAMS">
-					<option value="0">NO</option>
-					<option value="1">YES</option>
+					<option value="0">MOD_JOOMLEAGUE_TICKER_NO</option>
+					<option value="1">MOD_JOOMLEAGUE_TICKER_YES</option>
 				</field>
-				<field name="teamid" type="sql" label="MOD_JOOMLEAGUE_TICKER_LABEL_TEAM" description="MOD_JOOMLEAGUE_TICKER_TEAMID" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_team ORDER BY name, id" key_field="value" value_field="text" />
-				<field name="round" type="sql" default="0" depends="p" task="roundsoptions" label="MOD_JOOMLEAGUE_TICKER_LABEL_ROUND" description="MOD_JOOMLEAGUE_TICKER_DESC_ROUND" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_round ORDER BY project_id, roundcode, id" key_field="value" value_field="text" />
+				<field name="teamid" type="dynamicoptions" label="MOD_JOOMLEAGUE_TICKER_LABEL_TEAM" description="MOD_JOOMLEAGUE_TICKER_TEAMID" task="projectteamsbaseoptions" parent="p" />
+				<field name="round" type="dynamicoptions" default="0" task="roundsoptions" parent="p" label="MOD_JOOMLEAGUE_TICKER_LABEL_ROUND" description="MOD_JOOMLEAGUE_TICKER_DESC_ROUND" />
 				<field name="daysback" type="text" default="14" label="MOD_JOOMLEAGUE_TICKER_LABEL_DAYS_BACK" description="MOD_JOOMLEAGUE_TICKER_DESC_DAYS_BACK" />
 				<field name="showproject" type="radio" default="1" label="MOD_JOOMLEAGUE_TICKER_LABEL_SHOW_PROJECT" description="MOD_JOOMLEAGUE_TICKER_DESC_SHOW_PROJECT">
-					<option value="0">NO</option>
-					<option value="1">YES</option>
+					<option value="0">MOD_JOOMLEAGUE_TICKER_NO</option>
+					<option value="1">MOD_JOOMLEAGUE_TICKER_YES</option>
 				</field>
 				<field name="refresh" type="radio" default="0" label="MOD_JOOMLEAGUE_TICKER_LABEL_REFRESH" description="MOD_JOOMLEAGUE_TICKER_DESC_REFRESH">
-					<option value="0">NO</option>
-					<option value="1">YES</option>
+					<option value="0">MOD_JOOMLEAGUE_TICKER_NO</option>
+					<option value="1">MOD_JOOMLEAGUE_TICKER_YES</option>
 				</field>
 				<field name="minute" type="text" default="120" label="MOD_JOOMLEAGUE_TICKER_LABEL_MINUT_NUMBER" description="MOD_JOOMLEAGUE_TICKER_DESC_MINUT_NUMBER" />
 				<field name="ordering" type="radio" default="asc" label="MOD_JOOMLEAGUE_TICKER_LABEL_MATCHES_ORDERING" description="MOD_JOOMLEAGUE_TICKER_DESC_MATCHES_ORDERING">
-					<option value="asc">ASC</option>
-					<option value="desc">DESC</option>
+					<option value="asc">MOD_JOOMLEAGUE_TICKER_ASC</option>
+					<option value="desc">MOD_JOOMLEAGUE_TICKER_DESC</option>
 				</field>
 				<field name="showdate" type="radio" default="1" label="MOD_JOOMLEAGUE_TICKER_LABEL_SHOW_DATE" description="MOD_JOOMLEAGUE_TICKER_DESC_SHOW_DATE">
-					<option value="0">NO</option>
-					<option value="1">YES</option>
+					<option value="0">MOD_JOOMLEAGUE_TICKER_NO</option>
+					<option value="1">MOD_JOOMLEAGUE_TICKER_YES</option>
 				</field>
 				<field name="matchstatus" type="list" default="4" label="MOD_JOOMLEAGUE_TICKER_LABEL_MATCH_STATUS" description="MOD_JOOMLEAGUE_TICKER_DESC_MATCH_STATUS">
-					<option value="0">ENDED</option>
-					<option value="1">ENDED OR LIVE</option>
-					<option value="2">LIVE OR UPCOMING</option>
-					<option value="3">UPCOMING</option>
-					<option value="4">ALL MATCHES</option>
+					<option value="0">MOD_JOOMLEAGUE_TICKER_ENDED</option>
+					<option value="1">MOD_JOOMLEAGUE_TICKER_ENDED_OR_LIVE</option>
+					<option value="2">MOD_JOOMLEAGUE_TICKER_LIVE_OR_UPCOMING</option>
+					<option value="3">MOD_JOOMLEAGUE_TICKER_UPCOMING</option>
+					<option value="4">MOD_JOOMLEAGUE_TICKER_ALL_MATCHES</option>
 				</field>
 				<field name="dateformat" type="text" default="D, M Y H:i" label="MOD_JOOMLEAGUE_TICKER_LABEL_DATE_FORMAT" description="MOD_JOOMLEAGUE_TICKER_DESC_DATE_FORMAT" />
-				<field name="timezone" type="timezone" default="UTC" label="MOD_JOOMLEAGUE_TICKER_LABEL_TIMEZONE" description="MOD_JOOMLEAGUE_TICKER_DESC_TIMEZONE" />
 				<field name="results" type="text" default="10" label="MOD_JOOMLEAGUE_TICKER_LABEL_RESULTS_NUMBER" description="MOD_JOOMLEAGUE_TICKER_DESC_RESULTS_NUMBER" />
 				<field name="team_separator" type="text" default="vs" label="MOD_JOOMLEAGUE_TICKER_LABEL_TEAM_SEPARATOR" description="MOD_JOOMLEAGUE_TICKER_DESC_TEAM_SEPARATOR" />
 				<field name="result_separator" type="text" default=":" label="MOD_JOOMLEAGUE_TICKER_LABEL_LABEL_RESULTS_SEPARATOR" description="MOD_JOOMLEAGUE_TICKER_DESC_LABEL_RESULTS_SEPARATOR" />
 				<field name="urlformat" type="list" default="" label="MOD_JOOMLEAGUE_TICKER_LABEL_URL_FORMAT" description="MOD_JOOMLEAGUE_TICKER_DESC_URL_FORMAT">
-					<option value="0">NO URL</option>
-					<option value="1">URL SHOW ROUND</option>
-					<option value="2">URL MATCH REPORT</option>
-					<option value="3">URL TEAM SCHEDULE</option>
+					<option value="0">MOD_JOOMLEAGUE_TICKER_NO_URL</option>
+					<option value="1">MOD_JOOMLEAGUE_TICKER_URL_SHOW_ROUND</option>
+					<option value="2">MOD_JOOMLEAGUE_TICKER_URL_MATCH_REPORT</option>
+					<option value="3">MOD_JOOMLEAGUE_TICKER_URL_TEAM_SCHEDULE</option>
 				</field>
 				<field name="itemid" type="text" default="" label="MOD_JOOMLEAGUE_TICKER_LABEL_ITEMID" description="MOD_JOOMLEAGUE_TICKER_DESC_ITEMID" />
 				<field name="teamformat" type="list" default="" label="MOD_JOOMLEAGUE_TICKER_LABEL_TEAM_FORMAT" description="MOD_JOOMLEAGUE_TICKER_DESC_TEAM_FORMAT">
-					<option value="0">LONG NAME</option>
-					<option value="1">MIDDLE NAME</option>
-					<option value="2">SHORT NAME</option>
-					<option value="3">TEAM ICON</option>
-					<option value="4">ICON LONG NAME</option>
-					<option value="5">ICON MIDDLE NAME</option>
-					<option value="6">ICON SHORT NAME</option>
-					<option value="7">ICON ABOVE LONG NAME</option>
-					<option value="8">ICON ABOVE MIDDLE NAME</option>
-					<option value="9">ICON ABOVE SHORT NAME</option>
+					<option value="0">MOD_JOOMLEAGUE_TICKER_LONG_NAME</option>
+					<option value="1">MOD_JOOMLEAGUE_TICKER_MIDDLE_NAME</option>
+					<option value="2">MOD_JOOMLEAGUE_TICKER_SHORT_NAME</option>
+					<option value="3">MOD_JOOMLEAGUE_TICKER_TEAM_ICON</option>
+					<option value="4">MOD_JOOMLEAGUE_TICKER_ICON_LONG_NAME</option>
+					<option value="5">MOD_JOOMLEAGUE_TICKER_ICON_MIDDLE_NAME</option>
+					<option value="6">MOD_JOOMLEAGUE_TICKER_ICON_SHORT_NAME</option>
+					<option value="7">MOD_JOOMLEAGUE_TICKER_ICON_ABOVE_LONG_NAME</option>
+					<option value="8">MOD_JOOMLEAGUE_TICKER_ICON_ABOVE_MIDDLE_NAME</option>
+					<option value="9">MOD_JOOMLEAGUE_TICKER_ICON_ABOVE_SHORT_NAME</option>
 				</field>
 				<field name="outline" type="list" default="" label="MOD_JOOMLEAGUE_TICKER_LABEL_OUTLINE" description="MOD_JOOMLEAGUE_TICKER_DESC_OUTLINE">
-					<option value="0">DOUBLE LINE</option>
-					<option value="1">MIDDLE</option>
-					<option value="2">RIGHT</option>
+					<option value="0">MOD_JOOMLEAGUE_TICKER_DOUBLE_LINE</option>
+					<option value="1">MOD_JOOMLEAGUE_TICKER_MIDDLE</option>
+					<option value="2">MOD_JOOMLEAGUE_TICKER_RIGHT</option>
 				</field>
 				<field name="mode" type="list" default="" label="MOD_JOOMLEAGUE_TICKER_LABEL_MODE" description="MOD_JOOMLEAGUE_TICKER_DESC_MODE">
-					<option value="T">TICKER</option>
-					<option value="L">LIST</option>
-					<option value="V">VERTICAL SCROLL</option>
-					<option value="H">HORIZONTAL SCROLL</option>
+					<option value="T">MOD_JOOMLEAGUE_TICKER_TICKER</option>
+					<option value="L">MOD_JOOMLEAGUE_TICKER_LIST</option>
+					<option value="V">MOD_JOOMLEAGUE_TICKER_VERTICAL_SCROLL</option>
+					<option value="H">MOD_JOOMLEAGUE_TICKER_HORIZONTAL_SCROLL</option>
 				</field>
 				<field name="spacer_22" type="spacer" default="" label="" description="" />
 				<field name="tickerpause" type="text" default="3" label="MOD_JOOMLEAGUE_TICKER_LABEL_PAUSE_TIME" description="MOD_JOOMLEAGUE_TICKER_DESC_PAUSE_TIME" />
 				<field name="spacer_24" type="spacer" default="" label="" description="" />
 				<field name="scrollspeed" type="text" default="2" label="MOD_JOOMLEAGUE_TICKER_LABEL_SCROLLSPEED" description="MOD_JOOMLEAGUE_TICKER_DESC_SCROLLSPEED" />
 				<field name="scrollpause" type="radio" default="1" label="MOD_JOOMLEAGUE_TICKER_LABEL_SCROLLPAUSE" description="MOD_JOOMLEAGUE_TICKER_DESC_SCROLLPAUSE">
-					<option value="0">NO</option>
-					<option value="1">YES</option>
+					<option value="0">MOD_JOOMLEAGUE_TICKER_NO</option>
+					<option value="1">MOD_JOOMLEAGUE_TICKER_YES</option>
 				</field>
 				<field name="height" type="text" default="50" label="MOD_JOOMLEAGUE_TICKER_LABEL_TICKER_HEIGHT" description="MOD_JOOMLEAGUE_TICKER_DESC_TICKER_HEIGHT">
 				</field>
 				<field name="width" type="text" default="200" label="MOD_JOOMLEAGUE_TICKER_LABEL_TICKER_WIDTH" description="MOD_JOOMLEAGUE_TICKER_DESC_TICKER_WIDTH">
-				</field>
-			</fieldset>
-			<fieldset name="advanced">
-				<field name="moduleclass_sfx" type="text" default="" label="MOD_JOOMLEAGUE_TICKER_MODULE_CLASS_SUFFIX_LABEL" description="MOD_JOOMLEAGUE_TICKER_MODULE_CLASS_SUFFIX_DESCR">
 				</field>
 			</fieldset>
 			<fieldset name="advanced">

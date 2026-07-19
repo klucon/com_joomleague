@@ -12,6 +12,9 @@
 namespace Joomleague\Module\Ticker\Site\Helper;
 
 use Joomla\CMS\Application\SiteApplication;
+use Joomla\Database\DatabaseAwareInterface;
+use Joomla\Database\DatabaseAwareTrait;
+use Joomla\Database\ParameterType;
 use Joomla\Registry\Registry;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -23,8 +26,10 @@ use Joomla\Registry\Registry;
  *
  * @since  1.0.0
  */
-class TickerHelper
+class TickerHelper implements DatabaseAwareInterface
 {
+    use DatabaseAwareTrait;
+
     /**
      * Get a ticker list: most recent results followed by upcoming matches.
      *
@@ -42,34 +47,19 @@ class TickerHelper
         }
 
         $count = $this->firstPositiveInt($params->get('count') ?: $params->get('limit') ?: $params->get('results'));
-        $half  = $count > 0 ? max(1, (int) ceil($count / 2)) : 0;
 
         $model = $app->bootComponent('com_joomleague')
             ->getMVCFactory()
             ->createModel('Results', 'Site', ['ignore_request' => true]);
 
-        $all = $model->getMatches($projectId);
+        $roundId = $this->resolveRoundId($params, $projectId);
+        $teamId  = $this->resolveTeamId($params, $projectId);
 
-        $played   = [];
-        $upcoming = [];
+        $all = $model->getMatches($projectId, $roundId);
+        $all = $this->filterMatches($all, $params, $teamId);
+        $all = $this->sortMatches($all, (string) $params->get('ordering', 'asc'));
 
-        foreach ($all as $m) {
-            if ($m->team1_result !== null && $m->team2_result !== null && (int) $m->count_result === 1) {
-                $played[] = $m;
-            } else {
-                $upcoming[] = $m;
-            }
-        }
-
-        usort($played, static fn ($a, $b): int => strcmp((string) $b->match_date, (string) $a->match_date));
-        usort($upcoming, static fn ($a, $b): int => strcmp((string) $a->match_date, (string) $b->match_date));
-
-        if ($half > 0) {
-            $played   = \array_slice($played, 0, $half);
-            $upcoming = \array_slice($upcoming, 0, $half);
-        }
-
-        return array_merge(array_reverse($played), $upcoming);
+        return $count > 0 ? array_slice($all, 0, $count) : $all;
     }
 
     private function resolveProjectId(Registry $params, SiteApplication $app): int
@@ -109,5 +99,96 @@ class TickerHelper
 
         $number = (int) $value;
         return $number > 0 ? $number : 0;
+    }
+
+    private function resolveTeamId(Registry $params, int $projectId): int
+    {
+        $teamId = $this->firstPositiveInt($params->get('teamid') ?: $params->get('team_id'));
+
+        if ($teamId === 0 || $projectId === 0) {
+            return 0;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->createQuery()
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__joomleague_project_team'))
+            ->where($db->quoteName('project_id') . ' = :project_id')
+            ->where($db->quoteName('team_id') . ' = :team_id')
+            ->bind(':project_id', $projectId, ParameterType::INTEGER)
+            ->bind(':team_id', $teamId, ParameterType::INTEGER);
+
+        return (int) $db->setQuery($query)->loadResult() > 0 ? $teamId : 0;
+    }
+
+    private function resolveRoundId(Registry $params, int $projectId): int
+    {
+        $roundId = $this->firstPositiveInt($params->get('round') ?: $params->get('round_id'));
+
+        if ($roundId === 0 || $projectId === 0) {
+            return 0;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->createQuery()
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__joomleague_round'))
+            ->where($db->quoteName('project_id') . ' = :project_id')
+            ->where($db->quoteName('id') . ' = :round_id')
+            ->bind(':project_id', $projectId, ParameterType::INTEGER)
+            ->bind(':round_id', $roundId, ParameterType::INTEGER);
+
+        return (int) $db->setQuery($query)->loadResult() > 0 ? $roundId : 0;
+    }
+
+    private function filterMatches(array $matches, Registry $params, int $teamId): array
+    {
+        $status = (int) $params->get('matchstatus', 4);
+        $daysBack = max(0, (int) $params->get('daysback', 14));
+        $cutoff = $daysBack > 0 ? strtotime('-' . $daysBack . ' days') : 0;
+
+        return array_values(array_filter($matches, function ($match) use ($cutoff, $status, $teamId): bool {
+            if ($teamId > 0 && (int) ($match->home_team_id ?? 0) !== $teamId && (int) ($match->away_team_id ?? 0) !== $teamId) {
+                return false;
+            }
+
+            $played = $this->isPlayed($match);
+            $matchTime = strtotime((string) ($match->match_date ?? '')) ?: 0;
+
+            if ($played && $cutoff > 0 && $matchTime > 0 && $matchTime < $cutoff) {
+                return false;
+            }
+
+            return match ($status) {
+                0 => $played,
+                1 => $played,
+                2, 3 => !$played,
+                default => true,
+            };
+        }));
+    }
+
+    private function sortMatches(array $matches, string $ordering): array
+    {
+        $direction = strtolower($ordering) === 'desc' ? -1 : 1;
+
+        usort($matches, static function ($a, $b) use ($direction): int {
+            $dateCompare = strcmp((string) ($a->match_date ?? ''), (string) ($b->match_date ?? ''));
+
+            if ($dateCompare !== 0) {
+                return $direction * $dateCompare;
+            }
+
+            return $direction * ((int) ($a->id ?? 0) <=> (int) ($b->id ?? 0));
+        });
+
+        return $matches;
+    }
+
+    private function isPlayed(object $match): bool
+    {
+        return $match->team1_result !== null
+            && $match->team2_result !== null
+            && (int) ($match->count_result ?? 1) === 1;
     }
 }

@@ -18,7 +18,7 @@
 			<option value="sumstats">COM_JOOMLEAGUE_STATISTIC_HANDLER_SUMSTATS</option>
 			<option value="winpergame">COM_JOOMLEAGUE_STATISTIC_HANDLER_WINPERGAME</option>
 		</field>
-		<field name="note" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
+		<field name="note" type="textarea" label="COM_JOOMLEAGUE_STATISTIC_FIELD_NOTES" description="COM_JOOMLEAGUE_STATISTIC_FIELD_NOTES_DESCRIPTION" />
 		<field name="params" type="textarea" label="COM_JOOMLEAGUE_STATISTIC_FIELD_PARAMS" filter="raw" validate="json" rows="6" default="{}" description="COM_JOOMLEAGUE_STATISTIC_FIELD_PARAMS_DESCRIPTION" />
 		<field name="baseparams" type="textarea" label="COM_JOOMLEAGUE_STATISTIC_FIELD_BASEPARAMS" filter="raw" validate="json" rows="6" default="{}" description="COM_JOOMLEAGUE_STATISTIC_FIELD_BASEPARAMS_DESCRIPTION" />
 	</fieldset>

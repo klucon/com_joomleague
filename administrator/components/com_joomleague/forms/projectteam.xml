@@ -22,8 +22,8 @@
 		<field name="points_finally" type="number" label="COM_JOOMLEAGUE_PROJECTTEAM_POINTS_FINAL" description="COM_JOOMLEAGUE_PROJECTTEAM_POINTS_FINAL_DESCRIPTION" />
 		<field name="neg_points_finally" type="number" label="COM_JOOMLEAGUE_PROJECTTEAM_NEG_POINTS" description="COM_JOOMLEAGUE_PROJECTTEAM_NEG_POINTS_DESCRIPTION" />
 		<field name="reason" type="text" label="COM_JOOMLEAGUE_PROJECTTEAM_REASON" description="COM_JOOMLEAGUE_PROJECTTEAM_REASON_DESCRIPTION" />
-		<field name="info" type="textarea" label="COM_JOOMLEAGUE_FIELD_INFO" description="COM_JOOMLEAGUE_FIELD_INFO_DESCRIPTION" />
-		<field name="notes" type="textarea" rows="8" label="COM_JOOMLEAGUE_FIELD_NOTES" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
+		<field name="info" type="editor" height="320" width="100%" buttons="true" label="COM_JOOMLEAGUE_PROJECTTEAM_FIELD_PUBLIC_INFO" filter="safehtml" description="COM_JOOMLEAGUE_PROJECTTEAM_FIELD_PUBLIC_INFO_DESCRIPTION" />
+		<field name="notes" type="textarea" rows="8" label="COM_JOOMLEAGUE_PROJECTTEAM_FIELD_INTERNAL_NOTES" filter="safehtml" description="COM_JOOMLEAGUE_PROJECTTEAM_FIELD_INTERNAL_NOTES_DESCRIPTION" />
 		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_FIELD_EXTENDED" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_EXTENDED_DESCRIPTION" />
 	</fieldset>
 	<fieldset name="media">

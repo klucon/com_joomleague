@@ -82,14 +82,15 @@ class TeamstaffsHelper implements DatabaseAwareInterface
             return $projectTeamId;
         }
 
-        $teamId = $this->firstPositiveInt($params->get('team') ?: $params->get('teams') ?: $params->get('tid'));
+        $teamIds = $this->positiveInts($params->get('team') ?: $params->get('teams') ?: $params->get('tid'));
         $projectId = $this->firstPositiveInt($params->get('project_id') ?: $params->get('p') ?: $params->get('project') ?: $params->get('projects') ?: $params->get('project_ids') ?: $app->getInput()->getInt('project_id', 0) ?: $app->getInput()->getInt('p', 0));
 
-        if ($teamId === 0) {
+        if ($teamIds === []) {
             $teamId = $app->getInput()->getCmd('view') === 'team' ? $app->getInput()->getInt('id', 0) : 0;
+            $teamIds = $teamId > 0 ? [$teamId] : [];
         }
 
-        if ($teamId === 0 || $projectId === 0) {
+        if ($teamIds === [] || $projectId === 0) {
             return $app->getInput()->getCmd('view') === 'roster' ? $app->getInput()->getInt('id', 0) : 0;
         }
 
@@ -98,13 +99,34 @@ class TeamstaffsHelper implements DatabaseAwareInterface
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__joomleague_project_team'))
             ->where($db->quoteName('project_id') . ' = :project_id')
-            ->where($db->quoteName('team_id') . ' = :team_id')
-            ->bind(':project_id', $projectId, ParameterType::INTEGER)
-            ->bind(':team_id', $teamId, ParameterType::INTEGER);
+            ->whereIn($db->quoteName('team_id'), $teamIds)
+            ->order($db->quoteName('ordering') . ' ASC, ' . $db->quoteName('id') . ' ASC')
+            ->bind(':project_id', $projectId, ParameterType::INTEGER);
 
-        $db->setQuery($query);
+        $db->setQuery($query, 0, 1);
 
         return (int) $db->loadResult();
+    }
+
+    private function positiveInts(mixed $value): array
+    {
+        if (is_array($value)) {
+            $numbers = [];
+
+            foreach ($value as $item) {
+                array_push($numbers, ...$this->positiveInts($item));
+            }
+
+            return array_values(array_unique($numbers));
+        }
+
+        if (is_string($value) && str_contains($value, ',')) {
+            return $this->positiveInts(explode(',', $value));
+        }
+
+        $number = (int) $value;
+
+        return $number > 0 ? [$number] : [];
     }
 
     private function firstPositiveInt(mixed $value): int

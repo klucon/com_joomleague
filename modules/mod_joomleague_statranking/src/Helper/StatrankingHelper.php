@@ -45,16 +45,22 @@ class StatrankingHelper
             ->getMVCFactory()
             ->createModel('Stats', 'Site', ['ignore_request' => true]);
 
-        $count    = $this->firstPositiveInt($params->get('count') ?: $params->get('limit'));
-        $statId   = $this->firstPositiveInt($params->get('statistic_id') ?: $params->get('sid'));
-        $grouped  = [];
+        $count   = $this->firstPositiveInt($params->get('count') ?: $params->get('limit'));
+        $statIds = $this->positiveInts($params->get('statistic_id') ?: $params->get('sid'));
+        $grouped = [];
+        $rows    = $model->getStats($projectId);
 
-        foreach ($model->getStats($projectId) as $row) {
+        if ($statIds !== []) {
+            $availableStatIds = array_values(array_unique(array_map(static fn ($row): int => (int) ($row->statistic_id ?? 0), $rows)));
+            $statIds = array_values(array_intersect($statIds, array_filter($availableStatIds)));
+        }
+
+        foreach ($rows as $row) {
             if (empty($row->person_name)) {
                 continue;
             }
 
-            if ($statId > 0 && (int) ($row->statistic_id ?? 0) !== $statId) {
+            if ($statIds !== [] && !in_array((int) ($row->statistic_id ?? 0), $statIds, true)) {
                 continue;
             }
 
@@ -111,5 +117,26 @@ class StatrankingHelper
 
         $number = (int) $value;
         return $number > 0 ? $number : 0;
+    }
+
+    private function positiveInts(mixed $value): array
+    {
+        if (is_array($value)) {
+            $numbers = [];
+
+            foreach ($value as $item) {
+                array_push($numbers, ...$this->positiveInts($item));
+            }
+
+            return array_values(array_unique($numbers));
+        }
+
+        if (is_string($value) && str_contains($value, ',')) {
+            return $this->positiveInts(explode(',', $value));
+        }
+
+        $number = (int) $value;
+
+        return $number > 0 ? [$number] : [];
     }
 }

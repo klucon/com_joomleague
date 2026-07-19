@@ -25,4 +25,4 @@ JoomLeague 6.1.0-alpha-153 is a public alpha update for Joomla 6 focused on admi
 
 - Main package: `pkg_joomleague-6.1.0-alpha-153.zip`
 - Update metadata: `https://update.klucon.cz/joomleague/update.xml`
-- Download page: `https://downloads.klucon.cz/joomleague/releases/6.1.0-alpha-153/`
+- Download page: `https://download.klucon.cz/joomleague/releases/6.1.0-alpha-153/`

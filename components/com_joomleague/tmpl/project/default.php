@@ -43,6 +43,7 @@ if ($project && $showProjectLogo) {
 
 if ($project) {
 	$projectUrl = StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $project->id, false));
+	$projectId = (int) $project->id;
 	StructuredDataHelper::add($this->getDocument(), [
 		'@context' => 'https://schema.org',
 		'@type' => ['SportsOrganization', 'SportsEvent'],
@@ -71,9 +72,9 @@ if ($project) {
 		'subEvent' => array_map(
 			static fn (object $match): array => [
 				'@type' => 'SportsEvent',
-				'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=matchreport&project_id=' . (int) $match->project_id . '&id=' . (int) $match->id, false)) . '#sportsevent',
+				'@id' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=matchreport&project_id=' . $projectId . '&id=' . (int) $match->id, false)) . '#sportsevent',
 				'name' => trim((string) ($match->home_name ?? '') . ' - ' . (string) ($match->away_name ?? '')),
-				'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=matchreport&project_id=' . (int) $match->project_id . '&id=' . (int) $match->id, false)),
+				'url' => StructuredDataHelper::absoluteUrl(Route::_('index.php?option=com_joomleague&view=matchreport&project_id=' . $projectId . '&id=' . (int) $match->id, false)),
 				'startDate' => !empty($match->match_date) ? date('c', strtotime((string) $match->match_date)) : null,
 				'sport' => $sportName !== '' ? $sportName : null,
 			],

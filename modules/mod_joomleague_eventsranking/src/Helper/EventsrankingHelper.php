@@ -52,10 +52,12 @@ class EventsrankingHelper implements DatabaseAwareInterface
             return [];
         }
 
-        $eventType = $this->firstPositiveInt($params->get('event_type_id') ?: $params->get('evid')) ?: 1;
+        $eventIds = $this->resolveEventTypeIds($params, $projectId);
+        $projectTeamId = $this->resolveProjectTeamId($params, $projectId);
+        $matchId = $this->resolveMatchId($params, $projectId);
 
         // Treat regular goals (1) together with penalty goals (4) as "goals".
-        $types = $eventType === 1 ? [1, 4] : [$eventType];
+        $types = $eventIds === [] || in_array(1, $eventIds, true) ? [1, 4] : $eventIds;
 
         $db    = $this->getDatabase();
         $query = $db->createQuery();
@@ -79,9 +81,81 @@ class EventsrankingHelper implements DatabaseAwareInterface
             ->group([$db->quoteName('tp.id'), $db->quoteName('p.id'), $db->quoteName('p.firstname'), $db->quoteName('p.lastname'), $db->quoteName('t.name')])
             ->order('total DESC, person_name ASC');
 
+        if ($projectTeamId > 0) {
+            $query->where($db->quoteName('ev.projectteam_id') . ' = :projectteam_id')
+                ->bind(':projectteam_id', $projectTeamId, ParameterType::INTEGER);
+        }
+
+        if ($matchId > 0) {
+            $query->where($db->quoteName('ev.match_id') . ' = :match_id')
+                ->bind(':match_id', $matchId, ParameterType::INTEGER);
+        }
+
         $count = $this->firstPositiveInt($params->get('count') ?: $params->get('limit'));
 
         return $db->setQuery($query, 0, $count > 0 ? $count : 0)->loadObjectList();
+    }
+
+    private function resolveEventTypeIds(Registry $params, int $projectId): array
+    {
+        $eventIds = $this->positiveInts($params->get('event_type_id') ?: $params->get('evid'));
+
+        if ($eventIds === []) {
+            return [];
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->createQuery()
+            ->select('DISTINCT ' . $db->quoteName('ev.event_type_id'))
+            ->from($db->quoteName('#__joomleague_match_event', 'ev'))
+            ->join('INNER', $db->quoteName('#__joomleague_match', 'm') . ' ON ' . $db->quoteName('m.id') . ' = ' . $db->quoteName('ev.match_id'))
+            ->join('INNER', $db->quoteName('#__joomleague_round', 'r') . ' ON ' . $db->quoteName('r.id') . ' = ' . $db->quoteName('m.round_id'))
+            ->where($db->quoteName('r.project_id') . ' = :project_id')
+            ->whereIn($db->quoteName('ev.event_type_id'), $eventIds)
+            ->bind(':project_id', $projectId, ParameterType::INTEGER);
+
+        return array_values(array_filter(array_map('intval', $db->setQuery($query)->loadColumn())));
+    }
+
+    private function resolveProjectTeamId(Registry $params, int $projectId): int
+    {
+        $teamId = $this->firstPositiveInt($params->get('team_id') ?: $params->get('team') ?: $params->get('teams') ?: $params->get('tid'));
+
+        if ($teamId === 0 || $projectId === 0) {
+            return 0;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->createQuery()
+            ->select($db->quoteName('id'))
+            ->from($db->quoteName('#__joomleague_project_team'))
+            ->where($db->quoteName('project_id') . ' = :project_id')
+            ->where($db->quoteName('team_id') . ' = :team_id')
+            ->bind(':project_id', $projectId, ParameterType::INTEGER)
+            ->bind(':team_id', $teamId, ParameterType::INTEGER);
+
+        return (int) $db->setQuery($query, 0, 1)->loadResult();
+    }
+
+    private function resolveMatchId(Registry $params, int $projectId): int
+    {
+        $matchId = $this->firstPositiveInt($params->get('match_id') ?: $params->get('mid'));
+
+        if ($matchId === 0 || $projectId === 0) {
+            return 0;
+        }
+
+        $db = $this->getDatabase();
+        $query = $db->createQuery()
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__joomleague_match', 'm'))
+            ->join('INNER', $db->quoteName('#__joomleague_round', 'r') . ' ON ' . $db->quoteName('r.id') . ' = ' . $db->quoteName('m.round_id'))
+            ->where($db->quoteName('r.project_id') . ' = :project_id')
+            ->where($db->quoteName('m.id') . ' = :match_id')
+            ->bind(':project_id', $projectId, ParameterType::INTEGER)
+            ->bind(':match_id', $matchId, ParameterType::INTEGER);
+
+        return (int) $db->setQuery($query)->loadResult() > 0 ? $matchId : 0;
     }
 
     private function resolveProjectId(Registry $params, SiteApplication $app): int
@@ -121,5 +195,26 @@ class EventsrankingHelper implements DatabaseAwareInterface
 
         $number = (int) $value;
         return $number > 0 ? $number : 0;
+    }
+
+    private function positiveInts(mixed $value): array
+    {
+        if (is_array($value)) {
+            $numbers = [];
+
+            foreach ($value as $item) {
+                array_push($numbers, ...$this->positiveInts($item));
+            }
+
+            return array_values(array_unique($numbers));
+        }
+
+        if (is_string($value) && str_contains($value, ',')) {
+            return $this->positiveInts(explode(',', $value));
+        }
+
+        $number = (int) $value;
+
+        return $number > 0 ? [$number] : [];
     }
 }

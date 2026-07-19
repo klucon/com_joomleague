@@ -45,9 +45,10 @@ final class PlaygroundModel extends AdminModel
 		$table->country = trim((string) $table->country) ?: null;
 		$table->latitude = trim((string) $table->latitude) !== '' ? (float) $table->latitude : null;
 		$table->longitude = trim((string) $table->longitude) !== '' ? (float) $table->longitude : null;
-		$table->club_id = (int) $table->club_id ?: null;
-		$table->max_visitors = (int) $table->max_visitors ?: null;
-		$table->notes = trim((string) $table->notes);
+			$table->club_id = (int) $table->club_id ?: null;
+			$table->max_visitors = (int) $table->max_visitors ?: null;
+			$table->info = trim((string) $table->info);
+			$table->notes = trim((string) $table->notes);
 		$table->extended = trim((string) $table->extended) ?: null;
 		$table->modified = (new Date())->toSql();
 		$table->modified_by = (int) $this->getCurrentUser()->id ?: null;

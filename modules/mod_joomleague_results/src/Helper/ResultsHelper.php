@@ -45,10 +45,19 @@ class ResultsHelper
             ->getMVCFactory()
             ->createModel('Results', 'Site', ['ignore_request' => true]);
 
+        $roundId = $this->firstPositiveInt($params->get('round_id') ?: $params->get('round') ?: $params->get('r'));
         $matches = array_filter(
             $model->getMatches($projectId),
             static fn ($m): bool => $m->team1_result !== null && $m->team2_result !== null && (int) $m->count_result === 1
         );
+
+        if ($roundId > 0) {
+            $roundIds = array_values(array_unique(array_map(static fn ($match): int => (int) ($match->round_id ?? 0), $matches)));
+
+            if (in_array($roundId, $roundIds, true)) {
+                $matches = array_filter($matches, static fn ($match): bool => (int) ($match->round_id ?? 0) === $roundId);
+            }
+        }
 
         usort($matches, static fn ($a, $b): int => strcmp((string) $b->match_date, (string) $a->match_date));
 

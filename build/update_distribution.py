@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import html
 import json
+import re
 import shutil
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
@@ -18,8 +19,40 @@ DIST = ROOT / "dist"
 PACKAGE_MANIFEST = ROOT / "pkg_joomleague.xml"
 DEFAULT_WEBROOT = Path("/mnt/disk-a/docker/webserver/update.klucon.cz/public")
 BASE_URL = "https://update.klucon.cz/joomleague"
-DOWNLOAD_BASE_URL = "https://downloads.klucon.cz/joomleague"
+DOWNLOAD_BASE_URL = "https://download.klucon.cz/joomleague"
 DISPLAY_TIMEZONE = ZoneInfo("Europe/Prague")
+DEV_CHANGELOGS = {
+    "6.1.0-alpha-154-dev": [
+        "Development build based on 6.1.0-alpha-153.",
+        "Added installer schema compatibility for club and stadium latitude/longitude columns used by administrator club and stadium lists.",
+        "Synced the migration tool target schema with the current component install schema so migrated databases include the same columns as fresh installations.",
+        "Modernized mod_joomleague_birthday output for Joomla 6 and Bootstrap 5.",
+        "Added birthday/death anniversary mode selection to mod_joomleague_birthday.",
+        "Added a separate death anniversary message template to mod_joomleague_birthday.",
+        "Removed the module-level timezone option and now uses the project timezone with Joomla fallback.",
+        "Removed legacy module parameters Itemid, heading style and alternating table row classes from mod_joomleague_birthday.",
+        "Added English, Czech and German language constants for the new birthday module options.",
+        "Modernized mod_joomleague_matches output for Joomla 6 and Bootstrap 5.",
+        "Added compact responsive match cards with stable score layout, optional project, round, venue, spectators, referee and match report information.",
+        "Restored core mod_joomleague_matches filtering for played/upcoming windows, selected teams, date ordering and result-only/upcoming-only modes.",
+        "Removed the module-level timezone option, duplicate advanced fieldset and legacy table CSS class parameters from mod_joomleague_matches.",
+        "Added internal team identifiers to the shared match query so module team filters can match the selected teams correctly.",
+        "Modernized mod_joomleague_ticker output for Joomla 6 and Bootstrap 5.",
+        "Reworked ticker rendering into compact responsive match cards that no longer stretch the demo layout.",
+        "Improved ticker contrast in Joomla template banner and topbar positions.",
+        "Restored ticker filtering for match status, round, selected team, days back, result limit and date ordering.",
+        "Scoped ticker team and round selectors to the selected project in the module configuration.",
+        "Ignored stale ticker team filters when the stored team no longer belongs to the selected project.",
+        "Ignored stale ticker round filters when the stored round no longer belongs to the selected project.",
+        "Removed the module-level timezone option and duplicate advanced fieldset from mod_joomleague_ticker.",
+        "Replaced raw ticker XML option labels with language constants.",
+        "Scoped project-dependent selectors in module administration forms for teams, rounds, divisions, statistics, event types and matches.",
+        "Added stale parameter guards for project-dependent module filters so old stored values no longer hide valid demo data.",
+        "Improved random player and logo module fallbacks when no valid team is selected for the current project.",
+        "Translated statistic and position names rendered from JoomLeague language constants in frontend modules.",
+        "Fixed mod_joomleague_logo to render the selected team name format and optional project name instead of showing only the logo.",
+    ],
+}
 
 
 def version() -> str:
@@ -135,6 +168,7 @@ def render_page(title: str, body: str) -> str:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(title)}</title>
+  <script defer src="https://klucon.cz/media/klucon-globalbar/globalbar.js?v=20260718-2114" data-active="download" data-variant="download"></script>
   <style>
     :root {{
       color-scheme: light dark;
@@ -295,6 +329,94 @@ def release_package_link(release_version: str) -> str:
     return f"releases/{release_version}/pkg_joomleague-{release_version}.zip"
 
 
+def dev_package_version(package: Path) -> str:
+    match = re.fullmatch(r"pkg_joomleague-(?P<version>.+)\.zip", package.name)
+
+    return match.group("version") if match else package.stem
+
+
+def dev_packages(dev_dir: Path) -> list[Path]:
+    package_dir = dev_dir / "packages"
+    package_dir.mkdir(parents=True, exist_ok=True)
+
+    return sorted(package_dir.glob("*.zip"), key=lambda path: path.stat().st_mtime, reverse=True)
+
+
+def dev_changelog_items(version_name: str) -> list[str]:
+    return DEV_CHANGELOGS.get(
+        version_name,
+        [
+            f"Development build {version_name}.",
+            "This build is intended for testing only and is not part of the public update channel.",
+        ],
+    )
+
+
+def dev_changelog_xml(version_name: str) -> str:
+    items = "\n".join(f"      <item>{html.escape(item)}</item>" for item in dev_changelog_items(version_name))
+
+    return f"""<?xml version="1.0" encoding="utf-8"?>
+<changelogs>
+  <changelog>
+    <element>pkg_joomleague</element>
+    <type>package</type>
+    <version>{html.escape(version_name)}</version>
+    <change>
+{items}
+    </change>
+  </changelog>
+</changelogs>
+"""
+
+
+def dev_update_xml(version_name: str, package: Path) -> str:
+    package_url = f"{DOWNLOAD_BASE_URL}/dev/packages/{package.name}"
+    changelog_url = f"{DOWNLOAD_BASE_URL}/dev/changelog-{version_name}.xml"
+
+    return f"""<?xml version="1.0" encoding="utf-8"?>
+<updates>
+  <update>
+    <name>JoomLeague Development Build</name>
+    <description>JoomLeague development package for Joomla 6 testing</description>
+    <element>pkg_joomleague</element>
+    <type>package</type>
+    <client>0</client>
+    <version>{html.escape(version_name)}</version>
+    <infourl title="JoomLeague Development Builds">{DOWNLOAD_BASE_URL}/dev/</infourl>
+    <downloads>
+      <downloadurl type="full" format="zip">{html.escape(package_url)}</downloadurl>
+    </downloads>
+    <tags>
+      <tag>dev</tag>
+    </tags>
+    <maintainer>Ondřej Klučka</maintainer>
+    <maintainerurl>https://klucon.cz</maintainerurl>
+    <targetplatform name="joomla" version="6.*"/>
+    <php_minimum>8.3</php_minimum>
+    <sha256>{sha256(package)}</sha256>
+    <changelogurl>{html.escape(changelog_url)}</changelogurl>
+  </update>
+</updates>
+"""
+
+
+def write_dev_metadata(dev_dir: Path) -> None:
+    packages = dev_packages(dev_dir)
+
+    if not packages:
+        return
+
+    latest = packages[0]
+    latest_version = dev_package_version(latest)
+
+    for package in packages:
+        version_name = dev_package_version(package)
+        (dev_dir / f"changelog-{version_name}.xml").write_text(dev_changelog_xml(version_name), encoding="utf-8")
+
+    (dev_dir / "changelog.xml").write_text(dev_changelog_xml(latest_version), encoding="utf-8")
+    (dev_dir / "update.xml").write_text(dev_update_xml(latest_version, latest), encoding="utf-8")
+
+
 def release_page(release: dict[str, object], changelog_items: list[str], languages: dict[str, dict[str, object]]) -> str:
     release_version = str(release["version"])
     package = release["package"]
@@ -359,6 +481,7 @@ def releases_index(releases: list[dict[str, object]]) -> str:
         f"<td><a href=\"{html.escape(str(release['version']))}/\">{html.escape(str(release['version']))}</a></td>"
         f"<td>{html.escape(display_datetime(release['generated']))}</td>"
         f"<td>{bytes_label(int(release['package']['size']))}</td>"
+        f"<td data-download-version=\"{html.escape(str(release['version']))}\">-</td>"
         f"<td><code>{html.escape(str(release['package']['sha256'])[:16])}</code></td>"
         "</tr>"
         for release in releases
@@ -368,13 +491,61 @@ def releases_index(releases: list[dict[str, object]]) -> str:
       <h2>Release History</h2>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Version</th><th>Generated</th><th>Package size</th><th>SHA-256</th></tr></thead>
+          <thead><tr><th>Version</th><th>Generated</th><th>Package size</th><th>Downloads</th><th>SHA-256</th></tr></thead>
           <tbody>{rows}</tbody>
         </table>
       </div>
     </section>
+    {download_stats_script("../download-stats.json")}
 """
     return render_page("JoomLeague Release History", body)
+
+
+def dev_index(dev_dir: Path) -> str:
+    packages = dev_packages(dev_dir)
+
+    if packages:
+        rows = "\n".join(
+            (lambda version_name: (
+            "<tr>"
+            f"<td><strong>{html.escape(version_name)}</strong></td>"
+            f"<td><a href=\"packages/{html.escape(package.name)}\">{html.escape(package.name)}</a></td>"
+            f"<td>{html.escape(display_datetime(datetime.fromtimestamp(package.stat().st_mtime, timezone.utc).isoformat()))}</td>"
+            f"<td>{bytes_label(package.stat().st_size)}</td>"
+            f"<td data-download-version=\"{html.escape(version_name)}\">-</td>"
+            f"<td><code>{html.escape(sha256(package)[:16])}</code></td>"
+            f"<td><a href=\"changelog-{html.escape(version_name)}.xml\">Changelog</a></td>"
+            "</tr>"
+            ))(dev_package_version(package))
+            for package in packages
+        )
+    else:
+        rows = '<tr><td colspan="7" class="muted">No development builds are currently published.</td></tr>'
+
+    body = f"""
+    <section class="panel">
+      <h2>Development Builds</h2>
+      <p class="muted">Development builds are intended for testing only. They are not connected to the public Joomla update channel.</p>
+      <p>Public releases use the <code>6.1.0-alpha-153</code> format. Development builds use the <code>6.1.0-alpha-154-dev</code> format.</p>
+      <p class="muted">Upload development ZIP files to <code>joomleague/dev/packages/</code> with names such as <code>pkg_joomleague-6.1.0-alpha-154-dev.zip</code>.</p>
+      <div class="actions">
+        <a class="button secondary" href="../">JoomLeague downloads</a>
+        <a class="button secondary" href="../releases/">Public releases</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Available Development Packages</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Version</th><th>File</th><th>Uploaded</th><th>Size</th><th>Downloads</th><th>SHA-256</th><th>Changes</th></tr></thead>
+          <tbody>{rows}</tbody>
+        </table>
+      </div>
+    </section>
+    {download_stats_script("../download-stats.json")}
+"""
+    return render_page("JoomLeague Development Builds", body)
 
 
 def languages_index(manifest: dict[str, object]) -> str:
@@ -427,6 +598,7 @@ def overview_page(current: dict[str, object], releases: list[dict[str, object]],
         f"<td><a href=\"releases/{html.escape(str(release['version']))}/\">{html.escape(str(release['version']))}</a></td>"
         f"<td>{html.escape(display_datetime(release['generated']))}</td>"
         f"<td>{bytes_label(int(release['package']['size']))}</td>"
+        f"<td data-download-version=\"{html.escape(str(release['version']))}\">-</td>"
         "</tr>"
         for release in releases[:8]
     )
@@ -453,13 +625,20 @@ def overview_page(current: dict[str, object], releases: list[dict[str, object]],
           <a class="button secondary" href="languages/">View languages</a>
         </div>
       </div>
+      <div class="panel">
+        <h2>Development Builds</h2>
+        <p class="muted">Testing packages are published separately from the public update channel.</p>
+        <div class="actions">
+          <a class="button secondary" href="dev/">View development builds</a>
+        </div>
+      </div>
     </section>
 
     <section class="panel">
       <h2>Release History</h2>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Version</th><th>Generated</th><th>Package size</th></tr></thead>
+          <thead><tr><th>Version</th><th>Generated</th><th>Package size</th><th>Downloads</th></tr></thead>
           <tbody>{latest_rows}</tbody>
         </table>
       </div>
@@ -467,8 +646,35 @@ def overview_page(current: dict[str, object], releases: list[dict[str, object]],
         <a class="button secondary" href="releases/">View all releases</a>
       </div>
     </section>
+    {download_stats_script("download-stats.json")}
 """
     return render_page("JoomLeague Downloads", body)
+
+
+def download_stats_script(stats_path: str) -> str:
+    return f"""
+    <script>
+      fetch("{html.escape(stats_path)}", {{ cache: "no-store" }})
+        .then((response) => response.ok ? response.json() : null)
+        .then((stats) => {{
+          if (!stats) {{
+            return;
+          }}
+
+          const packages = [
+            ...(Array.isArray(stats.release_packages) ? stats.release_packages : []),
+            ...(Array.isArray(stats.dev_packages) ? stats.dev_packages : []),
+          ];
+          const downloads = new Map(packages.map((item) => [String(item.version), item.downloads]));
+
+          document.querySelectorAll("[data-download-version]").forEach((cell) => {{
+            const value = downloads.get(cell.dataset.downloadVersion);
+            cell.textContent = Number.isFinite(value) ? value.toLocaleString("en-US") : "0";
+          }});
+        }})
+        .catch(() => {{}});
+    </script>
+"""
 
 
 def root_page() -> str:
@@ -596,8 +802,10 @@ def main() -> int:
     (target / "languages" / "index.html").write_text(languages_index(manifest), encoding="utf-8")
     current_release = write_release(target, release_version, package, changelog_versioned, language_dir)
     releases = published_releases(target, current_release)
+    write_dev_metadata(target / "dev")
     (target / "index.html").write_text(overview_page(current_release, releases, len(manifest["languages"])), encoding="utf-8")
     (target / "releases" / "index.html").write_text(releases_index(releases), encoding="utf-8")
+    (target / "dev" / "index.html").write_text(dev_index(target / "dev"), encoding="utf-8")
     (DEFAULT_WEBROOT / "index.html").write_text(root_page(), encoding="utf-8")
 
     print(target)

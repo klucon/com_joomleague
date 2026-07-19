@@ -141,8 +141,9 @@ final class ClubModel extends AdminModel
 		$table->dissolved = trim((string) $table->dissolved) ?: null;
 		$table->latitude = trim((string) $table->latitude) !== '' ? (float) $table->latitude : null;
 		$table->longitude = trim((string) $table->longitude) !== '' ? (float) $table->longitude : null;
-		$table->standard_playground = (int) $table->standard_playground ?: null;
-		$table->notes = trim((string) $table->notes);
+			$table->standard_playground = (int) $table->standard_playground ?: null;
+			$table->info = trim((string) $table->info);
+			$table->notes = trim((string) $table->notes);
 		$table->extended = trim((string) $table->extended) ?: null;
 		$table->modified = (new Date())->toSql();
 		$table->modified_by = (int) $this->getCurrentUser()->id ?: null;

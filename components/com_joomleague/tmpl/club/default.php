@@ -8,6 +8,7 @@
 declare(strict_types=1);
 \defined('_JEXEC') or die;
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
@@ -18,7 +19,7 @@ use Joomleague\Component\Joomleague\Site\Service\StructuredDataHelper;
 $club = $this->item;
 $jlFlagPath = JPATH_SITE . '/components/com_joomleague/layouts';
 $address = $club ? trim(($club->address ?? '') . ', ' . ($club->zipcode ?? '') . ' ' . ($club->location ?? ''), ' ,') : '';
-$clubText = $club ? trim((string) ($club->notes ?? '')) : '';
+$clubText = $club ? trim((string) ($club->info ?? '')) : '';
 $translateLegacyName = static function ($value): string {
 	$value = trim((string) $value);
 
@@ -144,12 +145,12 @@ if ($club) {
 			<div class="jl-map-embed" data-lat="<?php echo $this->escape((string) $club->latitude); ?>" data-lng="<?php echo $this->escape((string) $club->longitude); ?>" style="height:320px;"></div>
 		</div>
 	<?php endif; ?>
-	<?php if ($showDescription && $clubText !== '') : ?>
-		<div class="jl-site-panel mb-4">
-			<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_SUMMARY'); ?></h2>
-			<p class="jl-site-muted mb-0"><?php echo nl2br($this->escape($clubText)); ?></p>
-		</div>
-	<?php endif; ?>
+		<?php if ($showDescription && $clubText !== '') : ?>
+			<div class="jl-site-panel mb-4">
+				<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_SUMMARY'); ?></h2>
+				<div class="jl-site-richtext"><?php echo HTMLHelper::_('content.prepare', $clubText); ?></div>
+			</div>
+		<?php endif; ?>
 	<?php if ($showTeamsOfClub) : ?>
 	<div class="jl-site-panel table-responsive mb-4">
 		<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_CLUB_TEAMS'); ?></h2>

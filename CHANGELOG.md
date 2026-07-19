@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## 6.1.0-alpha-154-dev - 2026-07-19
+
+### Fixed
+
+- Renamed the development package version from `6.1.0-dev-154` to `6.1.0-alpha-154-dev` so Joomla and PHP version comparison treat it as newer than `6.1.0-alpha-153` while still lower than a future public `6.1.0-alpha-154` release.
+- Adjusted the team `info` column update statement so Joomla Database Checker parses the modified column name correctly.
+- Normalized public `info` and internal `notes` text column declarations so Joomla Database Checker compares the same attributes on fresh installs and updates.
+- Added installer schema repair for public `info` text columns so repeated installations of the same development version can still fix older alpha/dev database structures.
+- Added installer schema compatibility for club and stadium latitude/longitude columns used by administrator club and stadium lists.
+- Added public `info` fields for clubs and stadiums and changed team `info` to a long text field suitable for editor content.
+- Changed project team `info` to a long text field so project-specific public editor content is not truncated.
+- Used project-specific team public information on team detail and roster pages, with the global team information as a fallback.
+- Standardized public information versus internal notes handling across person, team, project team, club and stadium forms: `info` is public editor content, `notes` remains an internal textarea.
+- Clarified the remaining administrator-only notes fields for divisions, statistics and race participants so they no longer read as public descriptions.
+- Added administrator list previews for public club and stadium information and kept race participant notes under their own internal fieldset label.
+- Removed frontend fallbacks that displayed internal team notes on team detail and roster pages.
+- Rendered public team, person, club and stadium information through Joomla content preparation and kept structured-data descriptions as plain text.
+- Prevented long editor content from being embedded in project team assignment labels and administrator team list cells.
+- Synced the migration tool target schema with the current component install schema so migrated databases include the same columns as fresh installations.
+- Includes the current development module modernization work for birthday, matches, ticker, logo and related project-scoped module selectors.
+
 ## 6.1.0-alpha-153 - 2026-07-18
 
 ### Fixed

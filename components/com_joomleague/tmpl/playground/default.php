@@ -8,6 +8,7 @@
 declare(strict_types=1);
 \defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
@@ -21,6 +22,8 @@ $params = $this->templateParams;
 $showSectionheader = (bool) ($params['show_sectionheader'] ?? true);
 $showMaps = (bool) ($params['show_maps'] ?? true);
 $showMapEmbed = (bool) ($params['show_map_embed'] ?? false);
+$playgroundInfo = $item ? trim((string) ($item->info ?? '')) : '';
+$playgroundInfoText = $playgroundInfo !== '' ? trim(strip_tags($playgroundInfo)) : '';
 $address = $item ? trim(($item->address ?? '') . ', ' . ($item->zipcode ?? '') . ' ' . ($item->city ?? ''), ' ,') : '';
 $mapUrl = $item ? MapUrlHelper::build($address, $item->latitude !== null ? (float) $item->latitude : null, $item->longitude !== null ? (float) $item->longitude : null) : '';
 
@@ -45,8 +48,8 @@ if ($item) {
 		'url' => $playgroundUrl,
 		'sameAs' => StructuredDataHelper::externalUrl($item->website ?? ''),
 		'image' => $picture,
-		'description' => trim((string) ($item->notes ?? '')) !== '' ? trim((string) $item->notes) : null,
-		'mainEntityOfPage' => StructuredDataHelper::webPage((string) $item->name, trim((string) ($item->notes ?? '')) !== '' ? trim((string) $item->notes) : null, $playgroundUrl),
+			'description' => $playgroundInfoText !== '' ? $playgroundInfoText : null,
+			'mainEntityOfPage' => StructuredDataHelper::webPage((string) $item->name, $playgroundInfoText !== '' ? $playgroundInfoText : null, $playgroundUrl),
 		'maximumAttendeeCapacity' => !empty($item->max_visitors) ? (int) $item->max_visitors : null,
 		'address' => [
 			'@type' => 'PostalAddress',
@@ -73,9 +76,15 @@ if ($item) {
 	<section class="jl-site-hero mb-4"><div class="jl-site-eyebrow"><?php echo Text::_('COM_JOOMLEAGUE_SITE_PLAYGROUND'); ?></div><h1 class="jl-site-title"><?php echo $this->escape($item->name); ?></h1><p class="jl-site-muted mb-0"><?php echo $this->escape($address); ?></p><?php if ($showMaps && $address !== '') : ?><p class="mb-0 mt-2"><a href="<?php echo $this->escape($mapUrl); ?>" target="_blank" rel="noopener"><?php echo Text::_('COM_JOOMLEAGUE_SITE_SHOW_ON_MAP'); ?></a></p><?php endif; ?></section>
 	<?php endif; ?>
 	<div class="jl-site-grid"><div class="jl-site-card"><strong><?php echo $this->escape($item->club_name ?: Text::_('COM_JOOMLEAGUE_SITE_NOT_SET')); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CLUB'); ?></span></div><div class="jl-site-card"><strong><?php echo (int) ($item->max_visitors ?? 0); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_CAPACITY'); ?></span></div><div class="jl-site-card"><strong><?php echo $this->escape($item->website ?: Text::_('COM_JOOMLEAGUE_SITE_NOT_SET')); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_WEBSITE'); ?></span></div><?php if (!empty($item->country)) : ?><div class="jl-site-card"><strong><?php echo LayoutHelper::render('joomleague.flag', ['code' => $item->country], $jlFlagPath); ?></strong><span class="jl-site-muted"><?php echo Text::_('COM_JOOMLEAGUE_SITE_COUNTRY'); ?></span></div><?php endif; ?></div>
-	<?php if ($showMapEmbed) : ?>
-		<div class="jl-site-panel mt-4">
-			<div class="jl-map-embed" data-lat="<?php echo $this->escape((string) $item->latitude); ?>" data-lng="<?php echo $this->escape((string) $item->longitude); ?>" style="height:320px;"></div>
-		</div>
-	<?php endif; ?>
-</div>
+		<?php if ($showMapEmbed) : ?>
+			<div class="jl-site-panel mt-4">
+				<div class="jl-map-embed" data-lat="<?php echo $this->escape((string) $item->latitude); ?>" data-lng="<?php echo $this->escape((string) $item->longitude); ?>" style="height:320px;"></div>
+			</div>
+		<?php endif; ?>
+		<?php if ($playgroundInfo !== '') : ?>
+			<div class="jl-site-panel mt-4">
+				<h2><?php echo Text::_('COM_JOOMLEAGUE_SITE_SUMMARY'); ?></h2>
+				<div class="jl-site-richtext"><?php echo HTMLHelper::_('content.prepare', $playgroundInfo); ?></div>
+			</div>
+		<?php endif; ?>
+	</div>

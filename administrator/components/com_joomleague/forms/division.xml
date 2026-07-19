@@ -9,7 +9,7 @@
 		<field name="parent_id" type="sql" label="COM_JOOMLEAGUE_FIELD_PARENT" description="COM_JOOMLEAGUE_DIVISION_FIELD_PARENT_DESCRIPTION" query="SELECT id,name FROM #__joomleague_division ORDER BY ordering,name" key_field="id" value_field="name">
 			<option value="">JNONE</option>
 		</field>
-		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" rows="5" filter="safehtml" />
+		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_DIVISION_FIELD_NOTES" description="COM_JOOMLEAGUE_DIVISION_FIELD_NOTES_DESCRIPTION" rows="5" filter="safehtml" />
 	</fieldset>
 	<fieldset name="media" label="COM_JOOMLEAGUE_FIELDSET_MEDIA">
 		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_IMAGE" description="COM_JOOMLEAGUE_FIELD_IMAGE_DESCRIPTION" directory="com_joomleague/divisions" preview="tooltip" />

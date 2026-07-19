@@ -59,10 +59,11 @@ The public static download tree is generated under:
 
 Public URLs:
 
-- `https://downloads.klucon.cz/joomleague/`
-- `https://downloads.klucon.cz/joomleague/releases/`
-- `https://downloads.klucon.cz/joomleague/releases/<version>/`
-- `https://downloads.klucon.cz/joomleague/languages/`
+- `https://download.klucon.cz/joomleague/`
+- `https://download.klucon.cz/joomleague/releases/`
+- `https://download.klucon.cz/joomleague/releases/<version>/`
+- `https://download.klucon.cz/joomleague/languages/`
+- `https://download.klucon.cz/joomleague/dev/`
 
 Machine-readable URLs:
 
@@ -98,13 +99,14 @@ HTML pages display the same timestamps in `Europe/Prague`, for example:
 `build/release_distribution.py` performs HTTP checks after publishing and
 expects `200 OK` from:
 
-- `https://downloads.klucon.cz/`
-- `https://downloads.klucon.cz/joomleague/`
-- `https://downloads.klucon.cz/joomleague/releases/`
-- `https://downloads.klucon.cz/joomleague/languages/`
+- `https://download.klucon.cz/`
+- `https://download.klucon.cz/joomleague/`
+- `https://download.klucon.cz/joomleague/releases/`
+- `https://download.klucon.cz/joomleague/languages/`
+- `https://download.klucon.cz/joomleague/dev/`
 - `https://update.klucon.cz/joomleague/update.xml`
 - `https://update.klucon.cz/joomleague/languages/manifest.json`
-- `https://downloads.klucon.cz/joomleague/releases/<version>/`
+- `https://download.klucon.cz/joomleague/releases/<version>/`
 
 ## Joomla Update Check
 
@@ -143,5 +145,5 @@ language.
 ## Phoca Download
 
 JoomLeague release packages and language packages are no longer published
-through Phoca Download. The static download system on `downloads.klucon.cz` and
+through Phoca Download. The static download system on `download.klucon.cz` and
 `update.klucon.cz` is the source of truth.

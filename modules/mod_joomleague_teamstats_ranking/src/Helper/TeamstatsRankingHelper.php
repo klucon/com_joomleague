@@ -45,10 +45,25 @@ class TeamstatsRankingHelper
             ->getMVCFactory()
             ->createModel('Stats', 'Site', ['ignore_request' => true]);
 
+        $statId = $this->firstPositiveInt($params->get('statistic_id') ?: $params->get('sid'));
+        $rows   = $model->getStats($projectId);
+
+        if ($statId > 0) {
+            $availableStatIds = array_values(array_unique(array_map(static fn ($row): int => (int) ($row->statistic_id ?? 0), $rows)));
+
+            if (!in_array($statId, $availableStatIds, true)) {
+                $statId = 0;
+            }
+        }
+
         $agg = [];
 
-        foreach ($model->getStats($projectId) as $row) {
+        foreach ($rows as $row) {
             if (empty($row->team_name)) {
+                continue;
+            }
+
+            if ($statId > 0 && (int) ($row->statistic_id ?? 0) !== $statId) {
                 continue;
             }
 

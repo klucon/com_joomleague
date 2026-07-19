@@ -7,7 +7,7 @@
 		<field name="project_position_id" type="sql" label="COM_JOOMLEAGUE_POSITION" query="SELECT pp.id,p.name FROM #__joomleague_project_position pp JOIN #__joomleague_position p ON p.id=pp.position_id WHERE p.persontype=3 ORDER BY p.name" key_field="id" value_field="name" description="COM_JOOMLEAGUE_POSITION_DESCRIPTION">
 			<option value="">JNONE</option>
 		</field>
-		<field name="notes" type="textarea" rows="8" label="COM_JOOMLEAGUE_FIELD_NOTES" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_NOTES_DESCRIPTION" />
+		<field name="notes" type="textarea" rows="8" label="COM_JOOMLEAGUE_PROJECTREFEREE_FIELD_INTERNAL_NOTES" filter="safehtml" description="COM_JOOMLEAGUE_PROJECTREFEREE_FIELD_INTERNAL_NOTES_DESCRIPTION" />
 		<field name="extended" type="textarea" label="COM_JOOMLEAGUE_FIELD_EXTENDED" filter="safehtml" description="COM_JOOMLEAGUE_FIELD_EXTENDED_DESCRIPTION" />
 	</fieldset>
 	<fieldset name="media">
