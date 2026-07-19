@@ -24,6 +24,7 @@ PHP_MINIMUM = "8.3"
 PUBLIC_ROLLUP_BASE = {
     "6.1.0-alpha-150": 61,
     "6.1.0-alpha-153": 151,
+    "6.1.0-alpha-154": 153,
 }
 
 

@@ -2,14 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## 6.1.0-alpha-154-dev - 2026-07-19
+## 6.1.0-alpha-154 - 2026-07-19
 
 ### Fixed
 
-- Renamed the development package version from `6.1.0-dev-154` to `6.1.0-alpha-154-dev` so Joomla and PHP version comparison treat it as newer than `6.1.0-alpha-153` while still lower than a future public `6.1.0-alpha-154` release.
+- Published the current migration and module maintenance work as the public `6.1.0-alpha-154` release.
 - Adjusted the team `info` column update statement so Joomla Database Checker parses the modified column name correctly.
 - Normalized public `info` and internal `notes` text column declarations so Joomla Database Checker compares the same attributes on fresh installs and updates.
-- Added installer schema repair for public `info` text columns so repeated installations of the same development version can still fix older alpha/dev database structures.
+- Added installer schema repair for public `info` text columns so repeated installations of the same release can still fix older alpha/dev database structures.
 - Added installer schema compatibility for club and stadium latitude/longitude columns used by administrator club and stadium lists.
 - Added public `info` fields for clubs and stadiums and changed team `info` to a long text field suitable for editor content.
 - Changed project team `info` to a long text field so project-specific public editor content is not truncated.

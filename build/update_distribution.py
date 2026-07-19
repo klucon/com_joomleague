@@ -22,8 +22,8 @@ BASE_URL = "https://update.klucon.cz/joomleague"
 DOWNLOAD_BASE_URL = "https://download.klucon.cz/joomleague"
 DISPLAY_TIMEZONE = ZoneInfo("Europe/Prague")
 DEV_CHANGELOGS = {
-    "6.1.0-alpha-154-dev": [
-        "Development build based on 6.1.0-alpha-153.",
+    "6.1.0-alpha-155-dev": [
+        "Development build based on 6.1.0-alpha-154.",
         "Added installer schema compatibility for club and stadium latitude/longitude columns used by administrator club and stadium lists.",
         "Synced the migration tool target schema with the current component install schema so migrated databases include the same columns as fresh installations.",
         "Modernized mod_joomleague_birthday output for Joomla 6 and Bootstrap 5.",
@@ -526,8 +526,8 @@ def dev_index(dev_dir: Path) -> str:
     <section class="panel">
       <h2>Development Builds</h2>
       <p class="muted">Development builds are intended for testing only. They are not connected to the public Joomla update channel.</p>
-      <p>Public releases use the <code>6.1.0-alpha-153</code> format. Development builds use the <code>6.1.0-alpha-154-dev</code> format.</p>
-      <p class="muted">Upload development ZIP files to <code>joomleague/dev/packages/</code> with names such as <code>pkg_joomleague-6.1.0-alpha-154-dev.zip</code>.</p>
+      <p>Public releases use the <code>6.1.0-alpha-154</code> format. Development builds use the <code>6.1.0-alpha-155-dev</code> format.</p>
+      <p class="muted">Upload development ZIP files to <code>joomleague/dev/packages/</code> with names such as <code>pkg_joomleague-6.1.0-alpha-155-dev.zip</code>.</p>
       <div class="actions">
         <a class="button secondary" href="../">JoomLeague downloads</a>
         <a class="button secondary" href="../releases/">Public releases</a>

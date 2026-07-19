@@ -7,7 +7,7 @@
 	<creationDate>2026-07</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.1.0-alpha-154-dev</version>
+	<version>6.1.0-alpha-154</version>
 	<description>MOD_JOOMLEAGUE_TEAMPLAYERS_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Teamplayers</namespace>
 	<files>
