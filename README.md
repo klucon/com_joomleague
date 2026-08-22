@@ -2,6 +2,16 @@
 
 Clean development line for JoomLeague 6.2.0.
 
+## Important compatibility warning
+
+The `6.2-dev` development line is **not compatible with JoomLeague 6.1.x**. Do not install it as a direct update over a 6.1.x installation and do not import a 6.1.x database or SQL export directly into the new schema.
+
+All migration testing for `6.2-dev` must use the new migration service:
+
+**https://migrate.klucon.cz/new**
+
+The migration service converts supported legacy JoomLeague data into the new universal, sport-profile-driven JoomLeague 6.2 schema. Always test the generated migration package on a separate development installation before using it with important data.
+
 ## Non-negotiable goals
 
 1. Sport-independent behavior driven by versioned sport profiles.
