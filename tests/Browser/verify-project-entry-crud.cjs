@@ -36,9 +36,9 @@ const { chromium } = require('playwright');
 			}
 		};
 		await page.goto(`${baseUrl}/administrator/`, { waitUntil: 'networkidle' });
-		await page.getByLabel('Username').fill(username);
-		await page.getByLabel('Password').fill(password);
-		await page.getByRole('button', { name: 'Log in' }).click();
+		await page.locator('#mod-login-username').fill(username);
+		await page.locator('#mod-login-password').fill(password);
+		await page.locator('form#form-login button[type="submit"]').click();
 		await page.waitForLoadState('networkidle');
 		await page.goto(`${baseUrl}/administrator/index.php?option=com_joomleague&view=projectentries&project_id=${projectId}`, { waitUntil: 'networkidle' });
 		await page.getByRole('button', { name: 'New' }).click();

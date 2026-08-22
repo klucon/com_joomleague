@@ -30,9 +30,9 @@ final class HtmlView extends BaseHtmlView
 		$user = Factory::getApplication()->getIdentity(); ToolbarHelper::title(Text::sprintf('COM_JOOMLEAGUE_ROUNDS_TITLE_STAGE', $this->stage->name), 'list');
 		$asset = 'com_joomleague.project.' . (int) $this->stage->project_id;
 		if ($user->authorise('joomleague.project.edit.schedule', $asset)) ToolbarHelper::link('index.php?option=com_joomleague&view=scheduleplanner&stage_id=' . (int) $this->stage->id, 'COM_JOOMLEAGUE_SCHEDULE_GENERATE', 'calendar');
-		if ($user->authorise('core.create', $asset)) ToolbarHelper::addNew('round.add'); if ($user->authorise('core.edit', $asset)) ToolbarHelper::editList('round.edit');
-		if ($user->authorise('core.edit.state', $asset)) { ToolbarHelper::publish('rounds.publish', 'JTOOLBAR_PUBLISH', true); ToolbarHelper::unpublish('rounds.unpublish', 'JTOOLBAR_UNPUBLISH', true); ToolbarHelper::checkin('rounds.checkin'); }
-		if ($user->authorise('core.delete', $asset)) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'rounds.delete');
+		if ($user->authorise('core.create', $asset)) ToolbarHelper::addNew('round.add'); if ($this->items !== [] && $user->authorise('core.edit', $asset)) ToolbarHelper::editList('round.edit');
+		if ($this->items !== [] && $user->authorise('core.edit.state', $asset)) { ToolbarHelper::publish('rounds.publish', 'JTOOLBAR_PUBLISH', true); ToolbarHelper::unpublish('rounds.unpublish', 'JTOOLBAR_UNPUBLISH', true); ToolbarHelper::checkin('rounds.checkin'); }
+		if ($this->items !== [] && $user->authorise('core.delete', $asset)) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'rounds.delete');
 		ToolbarHelper::link('index.php?option=com_joomleague&view=stages&project_id=' . (int) $this->stage->project_id, 'JTOOLBAR_CLOSE', 'cancel'); parent::display($tpl);
 	}
 }

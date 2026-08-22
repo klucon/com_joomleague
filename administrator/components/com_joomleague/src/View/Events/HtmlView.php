@@ -31,7 +31,14 @@ final class HtmlView extends BaseHtmlView
 		$this->activeFilters = $this->get('ActiveFilters');
 		if ($errors = $this->get('Errors')) throw new GenericDataException(implode("\n", $errors), 500);
 		$this->items = is_array($items) ? $items : [];
-		$user=Factory::getApplication()->getIdentity(); ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_EVENTS_TITLE'),'bolt'); if($user->authorise('core.create','com_joomleague'))ToolbarHelper::addNew('event.add');if($user->authorise('core.edit','com_joomleague'))ToolbarHelper::editList('event.edit');if($user->authorise('core.edit.state','com_joomleague')){ToolbarHelper::publish('events.publish','JTOOLBAR_PUBLISH',true);ToolbarHelper::unpublish('events.unpublish','JTOOLBAR_UNPUBLISH',true);ToolbarHelper::checkin('events.checkin');}if($user->authorise('core.delete','com_joomleague'))ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE','events.delete');
+		$user = Factory::getApplication()->getIdentity();
+		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_EVENTS_TITLE'), 'bolt');
+		if ($user->authorise('core.create', 'com_joomleague')) ToolbarHelper::addNew('event.add');
+		if ($this->items !== []) {
+			if ($user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('event.edit');
+			if ($user->authorise('core.edit.state', 'com_joomleague')) { ToolbarHelper::publish('events.publish', 'JTOOLBAR_PUBLISH', true); ToolbarHelper::unpublish('events.unpublish', 'JTOOLBAR_UNPUBLISH', true); ToolbarHelper::checkin('events.checkin'); }
+			if ($user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'events.delete');
+		}
 		parent::display($tpl);
 	}
 }

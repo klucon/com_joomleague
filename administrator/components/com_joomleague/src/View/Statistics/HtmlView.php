@@ -31,7 +31,14 @@ final class HtmlView extends BaseHtmlView
 		$this->activeFilters = $this->get('ActiveFilters');
 		if ($errors = $this->get('Errors')) throw new GenericDataException(implode("\n", $errors), 500);
 		$this->items = is_array($items) ? $items : [];
-		$user=Factory::getApplication()->getIdentity(); ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_STATISTICS_TITLE'),'chart');if($user->authorise('core.create','com_joomleague'))ToolbarHelper::addNew('statistic.add');if($user->authorise('core.edit','com_joomleague'))ToolbarHelper::editList('statistic.edit');if($user->authorise('core.edit.state','com_joomleague')){ToolbarHelper::publish('statistics.publish','JTOOLBAR_PUBLISH',true);ToolbarHelper::unpublish('statistics.unpublish','JTOOLBAR_UNPUBLISH',true);ToolbarHelper::checkin('statistics.checkin');}if($user->authorise('core.delete','com_joomleague'))ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE','statistics.delete');
+		$user = Factory::getApplication()->getIdentity();
+		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_STATISTICS_TITLE'), 'chart');
+		if ($user->authorise('core.create', 'com_joomleague')) ToolbarHelper::addNew('statistic.add');
+		if ($this->items !== []) {
+			if ($user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('statistic.edit');
+			if ($user->authorise('core.edit.state', 'com_joomleague')) { ToolbarHelper::publish('statistics.publish', 'JTOOLBAR_PUBLISH', true); ToolbarHelper::unpublish('statistics.unpublish', 'JTOOLBAR_UNPUBLISH', true); ToolbarHelper::checkin('statistics.checkin'); }
+			if ($user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'statistics.delete');
+		}
 		parent::display($tpl);
 	}
 }

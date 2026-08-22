@@ -37,12 +37,12 @@ final class HtmlView extends BaseHtmlView
 		$user = Factory::getApplication()->getIdentity();
 		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_SPORTTYPES_TITLE'), 'settings');
 		if ($user->authorise('core.create', 'com_joomleague')) ToolbarHelper::addNew('sporttype.add');
-		if ($user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('sporttype.edit');
-		if ($user->authorise('core.edit.state', 'com_joomleague')) {
+		if ($this->items !== [] && $user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('sporttype.edit');
+		if ($this->items !== [] && $user->authorise('core.edit.state', 'com_joomleague')) {
 			ToolbarHelper::publish('sporttypes.publish', 'JTOOLBAR_PUBLISH', true);
 			ToolbarHelper::unpublish('sporttypes.unpublish', 'JTOOLBAR_UNPUBLISH', true);
 			ToolbarHelper::checkin('sporttypes.checkin');
 		}
-		if ($user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'sporttypes.delete');
+		if ($this->items !== [] && $user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'sporttypes.delete');
 	}
 }

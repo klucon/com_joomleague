@@ -7,7 +7,7 @@ const { chromium } = require('playwright');
 	try {
 		const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 		await page.goto(`${baseUrl}/administrator/`, { waitUntil: 'networkidle' });
-		await page.getByLabel('Username').fill(username); await page.getByLabel('Password').fill(password); await page.getByRole('button', { name: 'Log in' }).click(); await page.waitForLoadState('networkidle');
+		await page.locator('#mod-login-username').fill(username); await page.locator('#mod-login-password').fill(password); await page.locator('form#form-login button[type="submit"]').click(); await page.waitForLoadState('networkidle');
 		await page.goto(`${baseUrl}/administrator/index.php?option=com_joomleague&view=stages&project_id=${projectId}`, { waitUntil: 'networkidle' });
 		await page.getByRole('button', { name: 'New' }).click(); await page.waitForLoadState('networkidle');
 		await page.getByLabel('Name').fill('Assignment stage'); await page.locator('#jform_code').fill('assignment_stage'); await page.locator('#jform_stage_type').fill('group');

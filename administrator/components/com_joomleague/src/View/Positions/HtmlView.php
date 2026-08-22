@@ -34,9 +34,11 @@ final class HtmlView extends BaseHtmlView
 		$user = Factory::getApplication()->getIdentity();
 		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_POSITIONS_TITLE'), 'address');
 		if ($user->authorise('core.create', 'com_joomleague')) ToolbarHelper::addNew('position.add');
-		if ($user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('position.edit');
-		if ($user->authorise('core.edit.state', 'com_joomleague')) { ToolbarHelper::publish('positions.publish', 'JTOOLBAR_PUBLISH', true); ToolbarHelper::unpublish('positions.unpublish', 'JTOOLBAR_UNPUBLISH', true); ToolbarHelper::checkin('positions.checkin'); }
-		if ($user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'positions.delete');
+		if ($this->items !== []) {
+			if ($user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('position.edit');
+			if ($user->authorise('core.edit.state', 'com_joomleague')) { ToolbarHelper::publish('positions.publish', 'JTOOLBAR_PUBLISH', true); ToolbarHelper::unpublish('positions.unpublish', 'JTOOLBAR_UNPUBLISH', true); ToolbarHelper::checkin('positions.checkin'); }
+			if ($user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'positions.delete');
+		}
 		parent::display($tpl);
 	}
 }

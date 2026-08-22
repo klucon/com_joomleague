@@ -10,9 +10,9 @@ const { chromium } = require('playwright');
 	try {
 		const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 		await page.goto(`${baseUrl}/administrator/`, { waitUntil: 'domcontentloaded' });
-		await page.getByLabel('Username').fill(username);
-		await page.getByLabel('Password').fill(password);
-		await Promise.all([page.waitForURL(/administrator\/index\.php/), page.getByRole('button', { name: 'Log in' }).click()]);
+		await page.locator('#mod-login-username').fill(username);
+		await page.locator('#mod-login-password').fill(password);
+		await Promise.all([page.waitForURL(/administrator\/index\.php/), page.locator('form#form-login button[type="submit"]').click()]);
 		const hideTour = page.getByRole('button', { name: 'Hide Forever' });
 		if (await hideTour.isVisible().catch(() => false)) await hideTour.click();
 

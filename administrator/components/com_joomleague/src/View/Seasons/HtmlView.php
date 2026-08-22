@@ -38,12 +38,12 @@ final class HtmlView extends BaseHtmlView
 		$user = Factory::getApplication()->getIdentity();
 		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_SEASONS_TITLE'), 'calendar');
 		if ($user->authorise('core.create', 'com_joomleague')) ToolbarHelper::addNew('season.add');
-		if ($user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('season.edit');
-		if ($user->authorise('core.edit.state', 'com_joomleague')) {
+		if ($this->items !== [] && $user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('season.edit');
+		if ($this->items !== [] && $user->authorise('core.edit.state', 'com_joomleague')) {
 			ToolbarHelper::publish('seasons.publish', 'JTOOLBAR_PUBLISH', true);
 			ToolbarHelper::unpublish('seasons.unpublish', 'JTOOLBAR_UNPUBLISH', true);
 			ToolbarHelper::checkin('seasons.checkin');
 		}
-		if ($user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'seasons.delete');
+		if ($this->items !== [] && $user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'seasons.delete');
 	}
 }

@@ -37,12 +37,12 @@ final class HtmlView extends BaseHtmlView
 		$user = Factory::getApplication()->getIdentity();
 		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_PERSONS_TITLE'), 'user');
 		if ($user->authorise('core.create', 'com_joomleague')) ToolbarHelper::addNew('person.add');
-		if ($user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('person.edit');
-		if ($user->authorise('core.edit.state', 'com_joomleague')) {
+		if ($this->items !== [] && $user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('person.edit');
+		if ($this->items !== [] && $user->authorise('core.edit.state', 'com_joomleague')) {
 			ToolbarHelper::publish('persons.publish', 'JTOOLBAR_PUBLISH', true);
 			ToolbarHelper::unpublish('persons.unpublish', 'JTOOLBAR_UNPUBLISH', true);
 			ToolbarHelper::checkin('persons.checkin');
 		}
-		if ($user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'persons.delete');
+		if ($this->items !== [] && $user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'persons.delete');
 	}
 }
