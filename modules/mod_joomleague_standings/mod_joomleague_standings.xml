@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="module" client="site" method="upgrade">
+	<name>mod_joomleague_standings</name>
+	<author>Ondřej Klučka (https://klucon.cz)</author>
+	<creationDate>2026-08</creationDate>
+	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>6.2.0-dev</version>
+	<description>MOD_JOOMLEAGUE_STANDINGS_XML_DESCRIPTION</description>
+	<namespace path="src">Joomleague\Module\Standings</namespace>
+	<files>
+		<folder module="mod_joomleague_standings">services</folder>
+		<folder>fields</folder>
+		<folder>src</folder>
+		<folder>tmpl</folder>
+	</files>
+	<languages>
+		<language tag="en-GB">language/en-GB/mod_joomleague_standings.ini</language>
+		<language tag="en-GB">language/en-GB/mod_joomleague_standings.sys.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_standings.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_standings.sys.ini</language>
+	</languages>
+	<config>
+		<fields name="params" addfieldpath="modules/mod_joomleague_standings/fields">
+			<fieldset name="basic">
+				<field
+					name="project_id"
+					type="sql"
+					required="true"
+					label="MOD_JOOMLEAGUE_STANDINGS_PROJECT_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_PROJECT_DESC"
+					query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id"
+					key_field="value"
+					value_field="text"
+				/>
+				<field
+					name="stage_id"
+					type="number"
+					default="0"
+					label="MOD_JOOMLEAGUE_STANDINGS_STAGE_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_STAGE_DESC"
+				/>
+				<field
+					name="highlight_entry_id"
+					type="entry"
+					default="0"
+					label="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_DESC"
+				>
+					<option value="0">MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_NONE</option>
+				</field>
+				<field
+					name="highlight_style"
+					type="list"
+					default="row"
+					label="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_STYLE_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_STYLE_DESC"
+				>
+					<option value="row">MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_STYLE_ROW</option>
+					<option value="text">MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_STYLE_TEXT</option>
+					<option value="none">MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_STYLE_NONE</option>
+				</field>
+				<field
+					name="highlight_color_row"
+					type="color"
+					default="#ffc107"
+					label="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_COLOR_ROW_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_COLOR_ROW_DESC"
+					showon="highlight_style:row"
+				/>
+				<field
+					name="highlight_color_text"
+					type="color"
+					default="#000000"
+					label="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_COLOR_TEXT_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_COLOR_TEXT_DESC"
+					showon="highlight_style!:none"
+				/>
+				<field
+					name="highlight_bold"
+					type="radio"
+					default="1"
+					label="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_BOLD_LABEL"
+					layout="joomla.form.field.radio.switcher"
+					showon="highlight_style!:none"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field
+					name="highlight_italic"
+					type="radio"
+					default="0"
+					label="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_ITALIC_LABEL"
+					layout="joomla.form.field.radio.switcher"
+					showon="highlight_style!:none"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field
+					name="highlight_underline"
+					type="radio"
+					default="0"
+					label="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_UNDERLINE_LABEL"
+					layout="joomla.form.field.radio.switcher"
+					showon="highlight_style!:none"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field
+					name="limit"
+					type="number"
+					default="0"
+					label="MOD_JOOMLEAGUE_STANDINGS_LIMIT_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_LIMIT_DESC"
+				/>
+				<field
+					name="metric_codes"
+					type="metrics"
+					label="MOD_JOOMLEAGUE_STANDINGS_METRICS_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_METRICS_DESC"
+				/>
+				<field
+					name="combined_score_format"
+					type="radio"
+					default="0"
+					label="MOD_JOOMLEAGUE_STANDINGS_COMBINED_SCORE_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_COMBINED_SCORE_DESC"
+					layout="joomla.form.field.radio.switcher"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field
+					name="short_labels"
+					type="radio"
+					default="0"
+					label="MOD_JOOMLEAGUE_STANDINGS_SHORT_LABELS_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_SHORT_LABELS_DESC"
+					layout="joomla.form.field.radio.switcher"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field
+					name="short_label_tooltips"
+					type="radio"
+					default="1"
+					label="MOD_JOOMLEAGUE_STANDINGS_SHORT_LABEL_TOOLTIPS_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_SHORT_LABEL_TOOLTIPS_DESC"
+					layout="joomla.form.field.radio.switcher"
+					showon="short_labels:1"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field
+					name="responsive_columns"
+					type="radio"
+					default="0"
+					label="MOD_JOOMLEAGUE_STANDINGS_RESPONSIVE_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_RESPONSIVE_DESC"
+					layout="joomla.form.field.radio.switcher"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field
+					name="show_project_name"
+					type="radio"
+					default="1"
+					label="MOD_JOOMLEAGUE_STANDINGS_SHOW_PROJECT_NAME_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_SHOW_PROJECT_NAME_DESC"
+					layout="joomla.form.field.radio.switcher"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+			</fieldset>
+
+			<fieldset name="zones" label="MOD_JOOMLEAGUE_STANDINGS_ZONES_FIELDSET_LABEL">
+				<field
+					name="zone_top_enabled"
+					type="radio"
+					default="0"
+					label="MOD_JOOMLEAGUE_STANDINGS_ZONE_TOP_ENABLED_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_ZONE_TOP_ENABLED_DESC"
+					layout="joomla.form.field.radio.switcher"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field
+					name="zone_top_count"
+					type="number"
+					default="3"
+					label="MOD_JOOMLEAGUE_STANDINGS_ZONE_TOP_COUNT_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_ZONE_TOP_COUNT_DESC"
+					showon="zone_top_enabled:1"
+				/>
+				<field
+					name="zone_top_color"
+					type="color"
+					default="#28a745"
+					label="MOD_JOOMLEAGUE_STANDINGS_ZONE_TOP_COLOR_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_ZONE_TOP_COLOR_DESC"
+					showon="zone_top_enabled:1"
+				/>
+				<field
+					name="zone_bottom_enabled"
+					type="radio"
+					default="0"
+					label="MOD_JOOMLEAGUE_STANDINGS_ZONE_BOTTOM_ENABLED_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_ZONE_BOTTOM_ENABLED_DESC"
+					layout="joomla.form.field.radio.switcher"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field
+					name="zone_bottom_count"
+					type="number"
+					default="3"
+					label="MOD_JOOMLEAGUE_STANDINGS_ZONE_BOTTOM_COUNT_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_ZONE_BOTTOM_COUNT_DESC"
+					showon="zone_bottom_enabled:1"
+				/>
+				<field
+					name="zone_bottom_color"
+					type="color"
+					default="#dc3545"
+					label="MOD_JOOMLEAGUE_STANDINGS_ZONE_BOTTOM_COLOR_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_ZONE_BOTTOM_COLOR_DESC"
+					showon="zone_bottom_enabled:1"
+				/>
+			</fieldset>
+
+			<fieldset name="form" label="MOD_JOOMLEAGUE_STANDINGS_FORM_FIELDSET_LABEL">
+				<field
+					name="form_enabled"
+					type="radio"
+					default="0"
+					label="MOD_JOOMLEAGUE_STANDINGS_FORM_ENABLED_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_FORM_ENABLED_DESC"
+					layout="joomla.form.field.radio.switcher"
+				>
+					<option value="0">JNO</option>
+					<option value="1">JYES</option>
+				</field>
+				<field
+					name="form_count"
+					type="number"
+					default="5"
+					label="MOD_JOOMLEAGUE_STANDINGS_FORM_COUNT_LABEL"
+					description="MOD_JOOMLEAGUE_STANDINGS_FORM_COUNT_DESC"
+					showon="form_enabled:1"
+				/>
+			</fieldset>
+
+			<fieldset name="advanced">
+				<field name="layout" type="modulelayout" label="JFIELD_ALT_LAYOUT_LABEL" />
+				<field name="moduleclass_sfx" type="textarea" label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL" rows="3" />
+				<field
+					name="cache"
+					type="list"
+					default="1"
+					label="COM_MODULES_FIELD_CACHING_LABEL"
+					filter="unset"
+				>
+					<option value="1">JGLOBAL_USE_GLOBAL</option>
+					<option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>
+				</field>
+				<field
+					name="cache_time"
+					type="number"
+					default="900"
+					label="COM_MODULES_FIELD_CACHE_TIME_LABEL"
+					filter="integer"
+				/>
+			</fieldset>
+		</fields>
+	</config>
+</extension>

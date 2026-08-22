@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
+		<field name="project_id" type="hidden" filter="integer" />
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_STAGE_TRANSITION_NAME_DESC" required="true" maxlength="255" />
+		<field name="code" type="text" label="COM_JOOMLEAGUE_FIELD_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_STAGE_TRANSITION_CODE_DESC" required="true" maxlength="100" filter="cmd" />
+		<field name="source_stage_id" type="projectstage" label="COM_JOOMLEAGUE_FIELD_SOURCE_STAGE_LABEL" description="COM_JOOMLEAGUE_FIELD_SOURCE_STAGE_DESC" required="true" filter="integer" />
+		<field name="target_stage_id" type="projectstage" label="COM_JOOMLEAGUE_FIELD_TARGET_STAGE_LABEL" description="COM_JOOMLEAGUE_FIELD_TARGET_STAGE_DESC" required="true" filter="integer" />
+		<field name="selector_type" type="list" label="COM_JOOMLEAGUE_FIELD_TRANSITION_SELECTOR_LABEL" description="COM_JOOMLEAGUE_FIELD_TRANSITION_SELECTOR_DESC" required="true" default="standing_rank_range" filter="cmd" validate="options"><option value="all_entries">COM_JOOMLEAGUE_TRANSITION_SELECTOR_ALL_ENTRIES</option><option value="standing_rank_range">COM_JOOMLEAGUE_TRANSITION_SELECTOR_STANDING_RANK_RANGE</option><option value="match_outcome">COM_JOOMLEAGUE_TRANSITION_SELECTOR_MATCH_OUTCOME</option><option value="manual">COM_JOOMLEAGUE_TRANSITION_SELECTOR_MANUAL</option></field>
+		<field name="selector_config_json" type="hidden" filter="raw" />
+		<field name="rank_from" type="number" label="COM_JOOMLEAGUE_FIELD_RANK_FROM_LABEL" description="COM_JOOMLEAGUE_FIELD_RANK_FROM_DESC" min="1" default="1" filter="integer" showon="selector_type:standing_rank_range" />
+		<field name="rank_to" type="number" label="COM_JOOMLEAGUE_FIELD_RANK_TO_LABEL" description="COM_JOOMLEAGUE_FIELD_RANK_TO_DESC" min="1" default="1" filter="integer" showon="selector_type:standing_rank_range" />
+		<field name="standing_scope" type="standingscope" label="COM_JOOMLEAGUE_FIELD_STANDING_SCOPE_LABEL" description="COM_JOOMLEAGUE_FIELD_TRANSITION_SCOPE_DESC" include_all="false" showon="selector_type:standing_rank_range" />
+		<field name="match_outcome" type="list" label="COM_JOOMLEAGUE_FIELD_MATCH_OUTCOME_LABEL" description="COM_JOOMLEAGUE_FIELD_MATCH_OUTCOME_DESC" filter="cmd" validate="options" showon="selector_type:match_outcome"><option value="winner">COM_JOOMLEAGUE_MATCH_OUTCOME_WINNER</option><option value="loser">COM_JOOMLEAGUE_MATCH_OUTCOME_LOSER</option></field>
+		<field name="source_round_id" type="sourceround" label="COM_JOOMLEAGUE_FIELD_SOURCE_ROUND_LABEL" description="COM_JOOMLEAGUE_FIELD_SOURCE_ROUND_DESC" filter="integer" showon="selector_type:match_outcome" />
+		<field name="carry_over_mode" type="list" label="COM_JOOMLEAGUE_FIELD_CARRY_OVER_MODE_LABEL" description="COM_JOOMLEAGUE_FIELD_CARRY_OVER_MODE_DESC" default="none" required="true" filter="cmd" validate="options"><option value="none">COM_JOOMLEAGUE_CARRY_OVER_NONE</option><option value="all_results">COM_JOOMLEAGUE_CARRY_OVER_ALL_RESULTS</option><option value="mutual_results">COM_JOOMLEAGUE_CARRY_OVER_MUTUAL_RESULTS</option></field>
+		<field name="target_seed_start" type="number" label="COM_JOOMLEAGUE_FIELD_TARGET_SEED_START_LABEL" description="COM_JOOMLEAGUE_FIELD_TARGET_SEED_START_DESC" min="1" filter="integer" />
+	</fieldset>
+	<fieldset name="publishing" label="JGLOBAL_FIELDSET_PUBLISHING"><field name="published" type="status" label="JSTATUS" default="1" /><field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" default="0" /><field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" readonly="true" class="readonly" default="0" /></fieldset>
+</form>

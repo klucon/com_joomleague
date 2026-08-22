@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fields name="filter">
+		<field name="search" type="text" label="COM_JOOMLEAGUE_FILTER_SEARCH_LABEL" description="COM_JOOMLEAGUE_FILTER_STATISTICS_SEARCH_DESC" hint="JSEARCH_FILTER" />
+		<field name="sport_type_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SPORT_TYPE_LABEL" description="COM_JOOMLEAGUE_FILTER_STATISTICS_SPORT_TYPE_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_sport_type WHERE published = 1 ORDER BY name" key_field="value" value_field="text" onchange="this.form.submit();"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_SPORT_TYPE</option></field>
+		<field name="statistic_type" type="list" label="COM_JOOMLEAGUE_FIELD_STATISTIC_TYPE_LABEL" onchange="this.form.submit();"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_STATISTIC_TYPE</option><option value="basic">COM_JOOMLEAGUE_STATISTIC_TYPE_BASIC</option><option value="advanced">COM_JOOMLEAGUE_STATISTIC_TYPE_ADVANCED</option><option value="calculated">COM_JOOMLEAGUE_STATISTIC_TYPE_CALCULATED</option></field>
+		<field name="scope" type="list" label="COM_JOOMLEAGUE_FIELD_SCOPE_LABEL" onchange="this.form.submit();"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_SCOPE</option><option value="player">COM_JOOMLEAGUE_PERSON_TYPE_PLAYER</option><option value="team">COM_JOOMLEAGUE_ENTRY_KIND_TEAM</option><option value="goalkeeper">COM_JOOMLEAGUE_SCOPE_GOALKEEPER</option><option value="participant">COM_JOOMLEAGUE_PERSON_TYPE_PARTICIPANT</option></field>
+		<field name="published" type="status" label="JOPTION_SELECT_PUBLISHED" onchange="this.form.submit();"><option value="">JOPTION_SELECT_PUBLISHED</option></field>
+	</fields>
+	<fields name="list">
+		<field name="fullordering" type="list" label="JGLOBAL_SORT_BY" onchange="this.form.submit();" default="statistic.id DESC">
+			<option value="">JGLOBAL_SORT_BY</option><option value="sport_type.name ASC">COM_JOOMLEAGUE_POSITION_SORT_SPORT_TYPE_ASC</option><option value="sport_type.name DESC">COM_JOOMLEAGUE_POSITION_SORT_SPORT_TYPE_DESC</option>
+			<option value="statistic.name ASC">JGLOBAL_TITLE_ASC</option><option value="statistic.name DESC">JGLOBAL_TITLE_DESC</option><option value="statistic.code ASC">COM_JOOMLEAGUE_POSITION_SORT_CODE_ASC</option><option value="statistic.code DESC">COM_JOOMLEAGUE_POSITION_SORT_CODE_DESC</option>
+			<option value="statistic.id ASC">JGRID_HEADING_ID_ASC</option><option value="statistic.id DESC">JGRID_HEADING_ID_DESC</option>
+		</field>
+		<field name="limit" type="limitbox" label="JGLOBAL_LIST_LIMIT" labelclass="visually-hidden" default="20" onchange="this.form.submit();" />
+	</fields>
+</form>

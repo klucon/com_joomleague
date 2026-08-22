@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" method="upgrade">
+	<name>COM_JOOMLEAGUE</name>
+	<author>KLUCON</author>
+	<creationDate>August 2026</creationDate>
+	<copyright>Copyright (C) 2026 KLUCON. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later</license>
+	<authorEmail>info@klucon.cz</authorEmail>
+	<authorUrl>https://klucon.cz</authorUrl>
+	<version>6.2.0-dev</version>
+	<description>COM_JOOMLEAGUE_XML_DESCRIPTION</description>
+	<namespace path="src">Joomleague\Component\Joomleague</namespace>
+	<scriptfile>script.php</scriptfile>
+	<install>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+			<file driver="postgresql" charset="utf8">sql/install.postgresql.sql</file>
+		</sql>
+	</install>
+	<uninstall>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+			<file driver="postgresql" charset="utf8">sql/uninstall.postgresql.sql</file>
+		</sql>
+	</uninstall>
+	<update>
+		<schemas>
+			<schemapath type="mysql">sql/updates/mysql</schemapath>
+			<schemapath type="postgresql">sql/updates/postgresql</schemapath>
+		</schemas>
+	</update>
+	<files folder="site">
+		<folder>src</folder>
+	</files>
+	<languages folder="site">
+		<language tag="en-GB">language/en-GB/com_joomleague.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/com_joomleague.ini</language>
+	</languages>
+	<media destination="com_joomleague" folder="media">
+		<filename>joomla.asset.json</filename>
+		<folder>js</folder>
+	</media>
+	<administration>
+		<menu img="class:joomleague">COM_JOOMLEAGUE</menu>
+		<submenu>
+			<menu link="option=com_joomleague&amp;view=dashboard">COM_JOOMLEAGUE_MENU_DASHBOARD</menu>
+			<menu link="option=com_joomleague&amp;view=sportprofiles">COM_JOOMLEAGUE_MENU_SPORTPROFILES</menu>
+			<menu link="option=com_joomleague&amp;view=sporttypes">COM_JOOMLEAGUE_MENU_SPORTTYPES</menu>
+			<menu link="option=com_joomleague&amp;view=competitions">COM_JOOMLEAGUE_MENU_COMPETITIONS</menu>
+			<menu link="option=com_joomleague&amp;view=seasons">COM_JOOMLEAGUE_MENU_SEASONS</menu>
+			<menu link="option=com_joomleague&amp;view=projects">COM_JOOMLEAGUE_MENU_PROJECTS</menu>
+			<menu link="option=com_joomleague&amp;view=clubs">COM_JOOMLEAGUE_MENU_CLUBS</menu>
+			<menu link="option=com_joomleague&amp;view=teams">COM_JOOMLEAGUE_MENU_TEAMS</menu>
+			<menu link="option=com_joomleague&amp;view=persons">COM_JOOMLEAGUE_MENU_PERSONS</menu>
+			<menu link="option=com_joomleague&amp;view=venues">COM_JOOMLEAGUE_MENU_VENUES</menu>
+			<menu link="option=com_joomleague&amp;view=positions">COM_JOOMLEAGUE_MENU_POSITIONS</menu>
+			<menu link="option=com_joomleague&amp;view=events">COM_JOOMLEAGUE_MENU_EVENTS</menu>
+			<menu link="option=com_joomleague&amp;view=statistics">COM_JOOMLEAGUE_MENU_STATISTICS</menu>
+			<menu link="option=com_joomleague&amp;view=templates">COM_JOOMLEAGUE_MENU_TEMPLATES</menu>
+			<menu link="option=com_joomleague&amp;view=rounds">COM_JOOMLEAGUE_MENU_ROUNDS</menu>
+			<menu link="option=com_joomleague&amp;view=matches">COM_JOOMLEAGUE_MENU_MATCHES</menu>
+			<menu link="option=com_joomleague&amp;view=standings">COM_JOOMLEAGUE_MENU_STANDINGS</menu>
+			<menu link="option=com_joomleague&amp;view=tools">COM_JOOMLEAGUE_MENU_TOOLS</menu>
+			<menu link="option=com_joomleague&amp;view=migrations">COM_JOOMLEAGUE_MENU_MIGRATIONS</menu>
+			<menu link="option=com_config&amp;view=component&amp;component=com_joomleague&amp;return=aW5kZXgucGhwP29wdGlvbj1jb21fam9vbWxlYWd1ZSZ2aWV3PWRhc2hib2FyZA%3D%3D">COM_JOOMLEAGUE_MENU_SETTINGS</menu>
+		</submenu>
+		<files folder="admin">
+			<filename>script.php</filename>
+			<filename>access.xml</filename>
+			<filename>config.xml</filename>
+			<filename>joomleague.xml</filename>
+			<folder>forms</folder>
+			<folder>language</folder>
+			<folder>resources</folder>
+			<folder>services</folder>
+			<folder>sql</folder>
+			<folder>src</folder>
+			<folder>tmpl</folder>
+		</files>
+	</administration>
+</extension>

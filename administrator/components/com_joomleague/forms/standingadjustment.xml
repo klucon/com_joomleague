@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
+		<field name="project_id" type="hidden" filter="uint" required="true" /><field name="stage_id" type="hidden" filter="uint" />
+		<field name="project_entry_id" type="projectstandingentry" label="COM_JOOMLEAGUE_FIELD_ENTRY_LABEL" description="COM_JOOMLEAGUE_FIELD_STANDING_ADJUSTMENT_ENTRY_DESC" required="true" filter="uint" />
+		<field name="scope_code" type="standingscope" label="COM_JOOMLEAGUE_FIELD_STANDING_SCOPE_LABEL" description="COM_JOOMLEAGUE_FIELD_STANDING_SCOPE_DESC" required="true" default="all" filter="cmd" validate="options" />
+		<field name="metric_code" type="standingmetric" label="COM_JOOMLEAGUE_FIELD_STANDING_METRIC_LABEL" description="COM_JOOMLEAGUE_FIELD_STANDING_METRIC_DESC" required="true" filter="cmd" validate="options" />
+		<field name="adjustment_value" type="number" label="COM_JOOMLEAGUE_FIELD_STANDING_ADJUSTMENT_VALUE_LABEL" description="COM_JOOMLEAGUE_FIELD_STANDING_ADJUSTMENT_VALUE_DESC" required="true" step="0.000000001" filter="string" />
+		<field name="reason" type="textarea" label="COM_JOOMLEAGUE_FIELD_REASON_LABEL" description="COM_JOOMLEAGUE_FIELD_STANDING_ADJUSTMENT_REASON_DESC" required="true" maxlength="500" rows="4" filter="string" />
+		<field name="effective_date" type="calendar" label="COM_JOOMLEAGUE_FIELD_EFFECTIVE_DATE_LABEL" description="COM_JOOMLEAGUE_FIELD_STANDING_ADJUSTMENT_EFFECTIVE_DATE_DESC" format="%Y-%m-%d" filter="string" showtime="false" todaybutton="true" />
+	</fieldset>
+	<fieldset name="publishing" label="JGLOBAL_FIELDSET_PUBLISHING"><field name="published" type="status" label="JSTATUS" description="COM_JOOMLEAGUE_FIELD_PUBLISHED_DESC" default="1" /><field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" description="COM_JOOMLEAGUE_FIELD_ORDERING_DESC" default="0" /><field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" readonly="true" class="readonly" default="0" /></fieldset>
+</form>

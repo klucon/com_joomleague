@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_BRACKET_VIEW_DEFAULT_TITLE">
+		<message>
+			<![CDATA[COM_JOOMLEAGUE_BRACKET_VIEW_DEFAULT_DESC]]>
+		</message>
+	</layout>
+
+	<!-- Added to the link's query string when this menu item is created/edited. -->
+	<fields name="request">
+		<fieldset name="request">
+			<field
+				name="project_id"
+				type="sql"
+				required="true"
+				label="COM_JOOMLEAGUE_BRACKET_REQUEST_PROJECT_LABEL"
+				description="COM_JOOMLEAGUE_BRACKET_REQUEST_PROJECT_DESC"
+				query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id"
+				key_field="value"
+				value_field="text"
+			/>
+			<field
+				name="stage_id"
+				type="sql"
+				required="true"
+				label="COM_JOOMLEAGUE_BRACKET_REQUEST_STAGE_LABEL"
+				description="COM_JOOMLEAGUE_BRACKET_REQUEST_STAGE_DESC"
+				query="SELECT id AS value, CONCAT(name, ' (', project_id, ')') AS text FROM #__joomleague_project_stage ORDER BY project_id, sequence_number, name"
+				key_field="value"
+				value_field="text"
+			/>
+		</fieldset>
+	</fields>
+</metadata>

@@ -1,0 +1,455 @@
+{
+    "schema_version": "1.4.0",
+    "code": "darts",
+    "version": "1.5.0",
+    "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS",
+    "description_key": "COM_JOOMLEAGUE_PROFILE_DARTS_DESC",
+    "scoring_model": "legs_sets",
+    "project_types": [
+        "league",
+        "tournament",
+        "cup",
+        "friendly",
+        "combined_stage"
+    ],
+    "entry_model": {
+        "allowed_kinds": [
+            "team",
+            "person",
+            "group"
+        ],
+        "default_kind": "person",
+        "members_supported": true,
+        "member_person_types": [
+            "player"
+        ]
+    },
+    "project_rule_schema": {
+        "schema_version": "1.0.0",
+        "fields": {
+            "/match_structure/starting_score": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+            },
+            "/match_structure/double_out": {
+                "type": "boolean"
+            },
+            "/match_structure/sets_supported": {
+                "type": "boolean"
+            },
+            "/match_structure/legs_to_win_set": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+            },
+            "/match_structure/default_start_time": {
+                "type": "string",
+                "pattern": "~^(?:[01]\\d|2[0-3]):[0-5]\\d$~"
+            }
+        }
+    },
+    "match_structure": {
+        "type": "legs_sets",
+        "period_name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_PERIOD_LEG",
+        "starting_score": 501,
+        "double_out": true,
+        "sets_supported": true,
+        "legs_to_win_set": 3,
+        "default_start_time": "19:00"
+    },
+    "lineup": {
+        "preferred_order": [
+            "player"
+        ]
+    },
+    "standings": {
+        "sort_order": [
+            "wins",
+            "sets_difference",
+            "legs_difference",
+            "three_dart_average",
+            "name"
+        ],
+        "columns": [
+            "rank",
+            "player",
+            "played",
+            "wins",
+            "losses",
+            "sets_for_against",
+            "legs_for_against",
+            "three_dart_average",
+            "points"
+        ],
+        "type": "competitor_table",
+        "calculation": {
+            "mode": "head_to_head",
+            "outcome_source": "root_numeric",
+            "included_result_statuses": [
+                "final"
+            ],
+            "metrics": [
+                {
+                    "code": "played",
+                    "operation": "count_matches",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "wins",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "win"
+                },
+                {
+                    "code": "draws",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "draw"
+                },
+                {
+                    "code": "losses",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "loss"
+                },
+                {
+                    "code": "score_for",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "own"
+                },
+                {
+                    "code": "score_against",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "score_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "score_for",
+                    "right_metric": "score_against"
+                },
+                {
+                    "code": "points",
+                    "operation": "sum_awards",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "sets_for",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "own"
+                },
+                {
+                    "code": "sets_against",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "sets_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "sets_for",
+                    "right_metric": "sets_against"
+                },
+                {
+                    "code": "sets_ratio",
+                    "operation": "ratio",
+                    "value_type": "decimal",
+                    "left_metric": "sets_for",
+                    "right_metric": "sets_against"
+                },
+                {
+                    "code": "legs_for",
+                    "operation": "sum_segment_wins",
+                    "value_type": "decimal",
+                    "segment_code": "leg",
+                    "perspective": "own"
+                },
+                {
+                    "code": "legs_against",
+                    "operation": "sum_segment_wins",
+                    "value_type": "decimal",
+                    "segment_code": "leg",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "legs_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "legs_for",
+                    "right_metric": "legs_against"
+                },
+                {
+                    "code": "legs_ratio",
+                    "operation": "ratio",
+                    "value_type": "decimal",
+                    "left_metric": "legs_for",
+                    "right_metric": "legs_against"
+                }
+            ],
+            "awards": {
+                "mode": "none",
+                "rule_strategy": "first_match",
+                "rules": [],
+                "bonus_rules": []
+            },
+            "ordering": [
+                {
+                    "metric": "wins",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "sets_difference",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "legs_difference",
+                    "direction": "desc",
+                    "nulls": "last"
+                }
+            ],
+            "scopes": [
+                {
+                    "code": "total",
+                    "filter": {
+                        "type": "always"
+                    }
+                }
+            ]
+        }
+    },
+    "result_rules": {
+        "supports_forfeit": true,
+        "supports_postponed": true,
+        "supports_cancelled": true,
+        "supports_abandoned": true
+    },
+    "positions": [
+        {
+            "code": "player",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_POSITION_PLAYER"
+        },
+        {
+            "code": "caller",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_POSITION_CALLER"
+        },
+        {
+            "code": "marker",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_POSITION_MARKER"
+        }
+    ],
+    "event_types": [
+        {
+            "code": "leg_won",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_EVENT_LEG_WON",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "statistic_code": "legs_won"
+        },
+        {
+            "code": "set_won",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_EVENT_SET_WON",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "statistic_code": "sets_won"
+        },
+        {
+            "code": "one_eighty",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_EVENT_ONE_EIGHTY",
+            "timeline": true,
+            "direction": 1,
+            "statistic_code": "one_eighties"
+        },
+        {
+            "code": "checkout",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_EVENT_CHECKOUT",
+            "timeline": true,
+            "direction": 1
+        },
+        {
+            "code": "bust",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_EVENT_BUST",
+            "timeline": true,
+            "direction": -1
+        }
+    ],
+    "statistics": [
+        {
+            "code": "three_dart_average",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_STAT_THREE_DART_AVERAGE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_DARTS_STAT_THREE_DART_AVERAGE_ABBR",
+            "statistic_type": "calculated",
+            "scope": "player",
+            "value_type": "decimal",
+            "source": "calculated"
+        },
+        {
+            "code": "one_eighties",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_STAT_ONE_EIGHTIES",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_DARTS_STAT_ONE_EIGHTIES_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "one_eighty"
+            ]
+        },
+        {
+            "code": "checkout_percentage",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_STAT_CHECKOUT_PERCENTAGE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_DARTS_STAT_CHECKOUT_PERCENTAGE_ABBR",
+            "statistic_type": "calculated",
+            "scope": "player",
+            "value_type": "percentage",
+            "source": "calculated"
+        },
+        {
+            "code": "legs_won",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_STAT_LEGS_WON",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_DARTS_STAT_LEGS_WON_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "leg_won"
+            ]
+        },
+        {
+            "code": "sets_won",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_STAT_SETS_WON",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_DARTS_STAT_SETS_WON_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "set_won"
+            ]
+        }
+    ],
+    "template_defaults": {
+        "results": {
+            "group_by_round": true
+        },
+        "ranking": {
+            "favorite_highlight_mode": "row"
+        },
+        "matchreport": {
+            "show_lineups": true,
+            "show_officials": true,
+            "show_timeline": true
+        }
+    },
+    "migration": {
+        "joomleague3_sport_keys": [
+            "DARTS"
+        ]
+    },
+    "sport_type_name_key": "COM_JOOMLEAGUE_ADMIN_SPORTTYPE_DARTS_NAME",
+    "contest": {
+        "type": "head_to_head"
+    },
+    "match": {
+        "structure": {
+            "type": "legs_sets",
+            "period_name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_PERIOD_LEG",
+            "starting_score": 501,
+            "double_out": true,
+            "sets_supported": true,
+            "legs_to_win_set": 3,
+            "default_start_time": "19:00"
+        },
+        "score": {
+            "type": "nested_score",
+            "unit": "match",
+            "value_type": "integer",
+            "higher_is_better": true,
+            "levels": [
+                {
+                    "code": "set",
+                    "unit": "sets",
+                    "win_by": 1
+                },
+                {
+                    "code": "leg",
+                    "unit": "legs",
+                    "win_by": 1
+                },
+                {
+                    "code": "point",
+                    "unit": "points",
+                    "win_by": 1
+                }
+            ],
+            "segment_types": [
+                {
+                    "code": "set",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_SET",
+                    "unit": "sets",
+                    "value_type": "integer",
+                    "parent_code": null,
+                    "ordinal": 10,
+                    "repeatable": true
+                },
+                {
+                    "code": "leg",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_LEG",
+                    "unit": "legs",
+                    "value_type": "integer",
+                    "parent_code": "set",
+                    "ordinal": 10,
+                    "repeatable": true
+                },
+                {
+                    "code": "point",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_POINT",
+                    "unit": "points",
+                    "value_type": "integer",
+                    "parent_code": "leg",
+                    "ordinal": 10,
+                    "repeatable": true
+                }
+            ],
+            "aggregation": {
+                "mode": "validate",
+                "from": [
+                    "set"
+                ],
+                "final_only": true
+            }
+        },
+        "result_rules": {
+            "supports_forfeit": true,
+            "supports_postponed": true,
+            "supports_cancelled": true,
+            "supports_abandoned": true
+        },
+        "result_status_codes": [
+            "draft",
+            "in_progress",
+            "final"
+        ],
+        "outcome_codes": [
+            "completed",
+            "forfeit"
+        ],
+        "participant_status_codes": [
+            "eligible",
+            "started",
+            "substitute",
+            "finished",
+            "disqualified"
+        ]
+    }
+}

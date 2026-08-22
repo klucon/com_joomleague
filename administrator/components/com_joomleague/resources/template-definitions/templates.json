@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0.0",
+  "definitions": {
+    "project": {
+      "name_key": "COM_JOOMLEAGUE_TEMPLATE_PROJECT",
+      "description_key": "COM_JOOMLEAGUE_TEMPLATE_PROJECT_DESC",
+      "defaults": {"show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true},
+      "fields": {
+        "show_hero": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_HERO", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_HERO_DESC"},
+        "show_sport": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SPORT", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SPORT_DESC"},
+        "show_season": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SEASON", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SEASON_DESC"},
+        "show_competition_info": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_COMPETITION_INFO", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_COMPETITION_INFO_DESC"}
+      }
+    },
+    "results": {
+      "name_key": "COM_JOOMLEAGUE_TEMPLATE_RESULTS",
+      "description_key": "COM_JOOMLEAGUE_TEMPLATE_RESULTS_DESC",
+      "defaults": {"group_by_round": true, "sort_rounds_by_date": true, "show_match_detail_button": true, "show_period_scores": false, "show_set_scores": false},
+      "fields": {
+        "group_by_round": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_GROUP_BY_ROUND", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_GROUP_BY_ROUND_DESC"},
+        "sort_rounds_by_date": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SORT_ROUNDS_BY_DATE", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SORT_ROUNDS_BY_DATE_DESC"},
+        "show_match_detail_button": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_MATCH_DETAIL", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_MATCH_DETAIL_DESC"},
+        "show_period_scores": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_PERIOD_SCORES", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_PERIOD_SCORES_DESC"},
+        "show_set_scores": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SET_SCORES", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SET_SCORES_DESC"}
+      }
+    },
+    "ranking": {
+      "name_key": "COM_JOOMLEAGUE_TEMPLATE_RANKING",
+      "description_key": "COM_JOOMLEAGUE_TEMPLATE_RANKING_DESC",
+      "defaults": {"show_score": true, "show_goal_difference": true, "show_sets": false, "show_points": true, "favorite_highlight_mode": "row"},
+      "fields": {
+        "show_score": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SCORE", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SCORE_DESC"},
+        "show_goal_difference": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SCORE_DIFFERENCE", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SCORE_DIFFERENCE_DESC"},
+        "show_sets": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SETS", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SETS_DESC"},
+        "show_points": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_POINTS", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_POINTS_DESC"},
+        "favorite_highlight_mode": {"type": "string", "enum": ["none", "name", "row"], "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_FAVORITE_HIGHLIGHT", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_FAVORITE_HIGHLIGHT_DESC"}
+      }
+    },
+    "matchreport": {
+      "name_key": "COM_JOOMLEAGUE_TEMPLATE_MATCHREPORT",
+      "description_key": "COM_JOOMLEAGUE_TEMPLATE_MATCHREPORT_DESC",
+      "defaults": {"show_lineups": true, "show_staff": true, "show_officials": true, "show_timeline": true, "show_schema_org": true},
+      "fields": {
+        "show_lineups": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_LINEUPS", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_LINEUPS_DESC"},
+        "show_staff": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_STAFF", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_STAFF_DESC"},
+        "show_officials": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_OFFICIALS", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_OFFICIALS_DESC"},
+        "show_timeline": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_TIMELINE", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_TIMELINE_DESC"},
+        "show_schema_org": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SCHEMA_ORG", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SCHEMA_ORG_DESC"}
+      }
+    },
+    "race_results": {
+      "name_key": "COM_JOOMLEAGUE_TEMPLATE_RACE_RESULTS",
+      "description_key": "COM_JOOMLEAGUE_TEMPLATE_RACE_RESULTS_DESC",
+      "defaults": {"show_filters": true, "show_categories": true, "show_splits": true, "show_team": true},
+      "fields": {
+        "show_filters": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_FILTERS", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_FILTERS_DESC"},
+        "show_categories": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_CATEGORIES", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_CATEGORIES_DESC"},
+        "show_splits": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SPLITS", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_SPLITS_DESC"},
+        "show_team": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_TEAM", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_TEAM_DESC"}
+      }
+    },
+    "participant": {
+      "name_key": "COM_JOOMLEAGUE_TEMPLATE_PARTICIPANT",
+      "description_key": "COM_JOOMLEAGUE_TEMPLATE_PARTICIPANT_DESC",
+      "defaults": {"show_personal_data": true, "show_results": true},
+      "fields": {
+        "show_personal_data": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_PERSONAL_DATA", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_PERSONAL_DATA_DESC"},
+        "show_results": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_RESULTS", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_RESULTS_DESC"}
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
+		<field name="entry_id" type="hidden" filter="uint" required="true" />
+		<field name="person_id" type="sql" label="COM_JOOMLEAGUE_FIELD_PERSON_LABEL" description="COM_JOOMLEAGUE_FIELD_ENTRYMEMBER_PERSON_DESC" query="SELECT id AS value, CONCAT(last_name, ', ', first_name) AS text FROM #__joomleague_person WHERE published = 1 ORDER BY last_name, first_name" key_field="value" value_field="text" required="true" validate="options">
+			<option value="">COM_JOOMLEAGUE_OPTION_SELECT_PERSON</option>
+		</field>
+		<field name="member_person_type" type="Entrymembertype" label="COM_JOOMLEAGUE_FIELD_PERSON_TYPE_LABEL" description="COM_JOOMLEAGUE_FIELD_ENTRYMEMBER_PERSON_TYPE_DESC" required="true" />
+		<field name="role_code" type="Entrymemberrole" label="COM_JOOMLEAGUE_FIELD_ROLE_LABEL" description="COM_JOOMLEAGUE_FIELD_ENTRYMEMBER_ROLE_DESC" />
+		<field name="shirt_number" type="text" label="COM_JOOMLEAGUE_FIELD_SHIRT_NUMBER_LABEL" description="COM_JOOMLEAGUE_FIELD_ENTRYMEMBER_SHIRT_NUMBER_DESC" maxlength="20" />
+		<field name="is_captain" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_FIELD_CAPTAIN_LABEL" description="COM_JOOMLEAGUE_FIELD_ENTRYMEMBER_CAPTAIN_DESC" default="0" filter="integer"><option value="0">JNO</option><option value="1">JYES</option></field>
+	</fieldset>
+	<fieldset name="status" label="COM_JOOMLEAGUE_FIELDSET_MEMBERSHIP_STATUS">
+		<field name="valid_from" type="calendar" label="COM_JOOMLEAGUE_FIELD_VALID_FROM_LABEL" description="COM_JOOMLEAGUE_FIELD_ENTRYMEMBER_VALID_FROM_DESC" format="%Y-%m-%d" filter="string" showtime="false" todaybutton="true" />
+		<field name="valid_until" type="calendar" label="COM_JOOMLEAGUE_FIELD_VALID_UNTIL_LABEL" description="COM_JOOMLEAGUE_FIELD_ENTRYMEMBER_VALID_UNTIL_DESC" format="%Y-%m-%d" filter="string" showtime="false" todaybutton="true" />
+		<field name="lifecycle_state" type="list" label="COM_JOOMLEAGUE_FIELD_LIFECYCLE_STATE_LABEL" description="COM_JOOMLEAGUE_FIELD_ENTRYMEMBER_LIFECYCLE_DESC" default="active" filter="cmd" validate="options">
+			<option value="active">COM_JOOMLEAGUE_LIFECYCLE_ACTIVE</option><option value="inactive">COM_JOOMLEAGUE_LIFECYCLE_INACTIVE</option><option value="injured">COM_JOOMLEAGUE_LIFECYCLE_INJURED</option><option value="suspended">COM_JOOMLEAGUE_LIFECYCLE_SUSPENDED</option><option value="departed">COM_JOOMLEAGUE_LIFECYCLE_DEPARTED</option>
+		</field>
+		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES_LABEL" description="COM_JOOMLEAGUE_FIELD_ENTRYMEMBER_NOTES_DESC" rows="5" filter="safehtml" />
+	</fieldset>
+	<fieldset name="publishing" label="JGLOBAL_FIELDSET_PUBLISHING">
+		<field name="published" type="status" label="JSTATUS" description="COM_JOOMLEAGUE_FIELD_PUBLISHED_DESC" default="1" />
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" description="COM_JOOMLEAGUE_FIELD_ORDERING_DESC" default="0" />
+		<field name="uuid" type="text" label="COM_JOOMLEAGUE_FIELD_UUID_LABEL" description="COM_JOOMLEAGUE_FIELD_UUID_DESC" readonly="true" />
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" readonly="true" class="readonly" default="0" />
+	</fieldset>
+</form>

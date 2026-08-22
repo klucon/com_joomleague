@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS" addfieldprefix="Joomla\Component\Contact\Administrator\Field">
+		<field name="first_name" type="text" label="COM_JOOMLEAGUE_FIELD_FIRST_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_FIRST_NAME_DESC" maxlength="100" />
+		<field name="last_name" type="text" label="COM_JOOMLEAGUE_FIELD_LAST_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_LAST_NAME_DESC" maxlength="100" />
+		<field name="nickname" type="text" label="COM_JOOMLEAGUE_FIELD_NICKNAME_LABEL" description="COM_JOOMLEAGUE_FIELD_NICKNAME_DESC" maxlength="100" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_ALIAS_DESC" maxlength="255" />
+		<field name="country_code" type="text" label="COM_JOOMLEAGUE_FIELD_COUNTRY_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_COUNTRY_CODE_DESC" maxlength="8" size="8" filter="cmd" />
+		<field name="contact_id" type="modal_contact" label="COM_JOOMLEAGUE_FIELD_CONTACT_LABEL" description="COM_JOOMLEAGUE_FIELD_CONTACT_DESC" select="true" new="true" edit="true" clear="true" />
+			<field name="club_id" type="sql" label="COM_JOOMLEAGUE_FIELD_CLUB_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_CLUB_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name" key_field="value" value_field="text" default="0" required="false">
+				<option value="0">COM_JOOMLEAGUE_OPTION_NO_CLUB</option>
+			</field>
+		<field name="external_code" type="text" label="COM_JOOMLEAGUE_FIELD_EXTERNAL_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_EXTERNAL_CODE_DESC" maxlength="191" />
+	</fieldset>
+	<fieldset name="biography" label="COM_JOOMLEAGUE_FIELDSET_BIOGRAPHY">
+		<field name="birth_date" type="calendar" label="COM_JOOMLEAGUE_FIELD_BIRTH_DATE_LABEL" description="COM_JOOMLEAGUE_FIELD_BIRTH_DATE_DESC" format="%Y-%m-%d" filter="user_utc" showtime="false" todaybutton="true" translateformat="true" />
+		<field name="death_date" type="calendar" label="COM_JOOMLEAGUE_FIELD_DEATH_DATE_LABEL" description="COM_JOOMLEAGUE_FIELD_DEATH_DATE_DESC" format="%Y-%m-%d" filter="user_utc" showtime="false" todaybutton="true" translateformat="true" />
+	</fieldset>
+	<fieldset name="media" label="COM_JOOMLEAGUE_FIELDSET_MEDIA">
+		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_PERSON_PICTURE_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_PICTURE_DESC" types="images" directory="com_joomleague/persons" />
+	</fieldset>
+	<fieldset name="description" label="JGLOBAL_DESCRIPTION">
+		<field name="description" type="editor" label="JGLOBAL_DESCRIPTION" description="COM_JOOMLEAGUE_FIELD_PERSON_DESCRIPTION_DESC" filter="safehtml" buttons="true" />
+	</fieldset>
+	<fieldset name="publishing" label="JGLOBAL_FIELDSET_PUBLISHING">
+		<field name="published" type="status" label="JSTATUS" description="COM_JOOMLEAGUE_FIELD_PUBLISHED_DESC" default="1" />
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" description="COM_JOOMLEAGUE_FIELD_ORDERING_DESC" default="0" />
+		<field name="uuid" type="text" label="COM_JOOMLEAGUE_FIELD_UUID_LABEL" description="COM_JOOMLEAGUE_FIELD_UUID_DESC" readonly="true" />
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" readonly="true" class="readonly" default="0" />
+	</fieldset>
+</form>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="history">
+		<field name="id" type="hidden" filter="integer" />
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_HISTORICAL_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_HISTORICAL_NAME_DESC" required="true" maxlength="255" />
+		<field name="short_name" type="text" label="COM_JOOMLEAGUE_FIELD_HISTORICAL_SHORT_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_HISTORICAL_SHORT_NAME_DESC" maxlength="100" />
+		<field name="valid_from" type="calendar" label="COM_JOOMLEAGUE_FIELD_VALID_FROM_LABEL" description="COM_JOOMLEAGUE_FIELD_HISTORY_VALID_FROM_DESC" format="%Y-%m-%d" filter="raw" showtime="false" todaybutton="true" translateformat="true" />
+		<field name="valid_to" type="calendar" label="COM_JOOMLEAGUE_FIELD_VALID_TO_LABEL" description="COM_JOOMLEAGUE_FIELD_HISTORY_VALID_TO_DESC" format="%Y-%m-%d" filter="raw" showtime="false" todaybutton="true" translateformat="true" />
+		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES_LABEL" description="COM_JOOMLEAGUE_FIELD_HISTORY_NOTES_DESC" rows="2" filter="safehtml" />
+		<field name="remove_record" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_FIELD_HISTORY_REMOVE_LABEL" description="COM_JOOMLEAGUE_FIELD_HISTORY_REMOVE_DESC" default="0" filter="integer"><option value="0">JNO</option><option value="1">JYES</option></field>
+	</fieldset>
+</form>

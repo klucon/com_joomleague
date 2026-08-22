@@ -1,0 +1,480 @@
+{
+    "schema_version": "1.4.0",
+    "code": "esports",
+    "version": "1.5.0",
+    "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS",
+    "description_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_DESC",
+    "scoring_model": "maps_rounds",
+    "project_types": [
+        "league",
+        "cup",
+        "tournament",
+        "friendly",
+        "combined_stage"
+    ],
+    "entry_model": {
+        "allowed_kinds": [
+            "team"
+        ],
+        "default_kind": "team",
+        "members_supported": true,
+        "member_person_types": [
+            "player",
+            "staff"
+        ]
+    },
+    "project_rule_schema": {
+        "schema_version": "1.0.0",
+        "fields": {
+            "/match_structure/series_formats": {
+                "type": "array",
+                "min_items": 1,
+                "max_items": 10,
+                "items": {
+                    "type": "string"
+                }
+            },
+            "/match_structure/rounds_supported": {
+                "type": "boolean"
+            },
+            "/match_structure/overtime_supported": {
+                "type": "boolean"
+            },
+            "/match_structure/default_start_time": {
+                "type": "string",
+                "pattern": "~^(?:[01]\\d|2[0-3]):[0-5]\\d$~"
+            }
+        }
+    },
+    "match_structure": {
+        "type": "maps",
+        "period_name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_PERIOD_MAP",
+        "series_formats": [
+            "bo1",
+            "bo3",
+            "bo5"
+        ],
+        "rounds_supported": true,
+        "overtime_supported": true,
+        "default_start_time": "19:00"
+    },
+    "lineup": {
+        "preferred_order": [
+            "player",
+            "igl"
+        ]
+    },
+    "standings": {
+        "sort_order": [
+            "points",
+            "map_difference",
+            "round_difference",
+            "wins",
+            "name"
+        ],
+        "columns": [
+            "rank",
+            "team",
+            "played",
+            "wins",
+            "losses",
+            "maps_for_against",
+            "rounds_for_against",
+            "round_difference",
+            "points"
+        ],
+        "type": "team_table",
+        "calculation": {
+            "mode": "head_to_head",
+            "outcome_source": "root_numeric",
+            "included_result_statuses": [
+                "final"
+            ],
+            "metrics": [
+                {
+                    "code": "played",
+                    "operation": "count_matches",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "wins",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "win"
+                },
+                {
+                    "code": "draws",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "draw"
+                },
+                {
+                    "code": "losses",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "loss"
+                },
+                {
+                    "code": "score_for",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "own"
+                },
+                {
+                    "code": "score_against",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "score_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "score_for",
+                    "right_metric": "score_against"
+                },
+                {
+                    "code": "points",
+                    "operation": "sum_awards",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "maps_for",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "own"
+                },
+                {
+                    "code": "maps_against",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "maps_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "maps_for",
+                    "right_metric": "maps_against"
+                },
+                {
+                    "code": "maps_ratio",
+                    "operation": "ratio",
+                    "value_type": "decimal",
+                    "left_metric": "maps_for",
+                    "right_metric": "maps_against"
+                },
+                {
+                    "code": "rounds_for",
+                    "operation": "sum_segment_wins",
+                    "value_type": "decimal",
+                    "segment_code": "round",
+                    "perspective": "own"
+                },
+                {
+                    "code": "rounds_against",
+                    "operation": "sum_segment_wins",
+                    "value_type": "decimal",
+                    "segment_code": "round",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "rounds_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "rounds_for",
+                    "right_metric": "rounds_against"
+                },
+                {
+                    "code": "rounds_ratio",
+                    "operation": "ratio",
+                    "value_type": "decimal",
+                    "left_metric": "rounds_for",
+                    "right_metric": "rounds_against"
+                }
+            ],
+            "awards": {
+                "mode": "none",
+                "rule_strategy": "first_match",
+                "rules": [],
+                "bonus_rules": []
+            },
+            "ordering": [
+                {
+                    "metric": "maps_difference",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "rounds_difference",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "wins",
+                    "direction": "desc",
+                    "nulls": "last"
+                }
+            ],
+            "scopes": [
+                {
+                    "code": "total",
+                    "filter": {
+                        "type": "always"
+                    }
+                }
+            ]
+        }
+    },
+    "result_rules": {
+        "supports_forfeit": true,
+        "supports_postponed": true,
+        "supports_cancelled": true,
+        "supports_abandoned": true
+    },
+    "positions": [
+        {
+            "code": "player",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_PLAYER"
+        },
+        {
+            "code": "igl",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_IGL"
+        },
+        {
+            "code": "coach",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_COACH"
+        },
+        {
+            "code": "analyst",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_ANALYST"
+        },
+        {
+            "code": "admin",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_ADMIN"
+        },
+        {
+            "code": "observer",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_OBSERVER"
+        }
+    ],
+    "event_types": [
+        {
+            "code": "map_won",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_EVENT_MAP_WON",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "statistic_code": "maps_won"
+        },
+        {
+            "code": "round_won",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_EVENT_ROUND_WON",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "statistic_code": "rounds_won"
+        },
+        {
+            "code": "kill",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_EVENT_KILL",
+            "timeline": true,
+            "direction": 1,
+            "statistic_code": "kills"
+        },
+        {
+            "code": "death",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_EVENT_DEATH",
+            "timeline": true,
+            "direction": -1,
+            "statistic_code": "deaths"
+        },
+        {
+            "code": "assist",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_EVENT_ASSIST",
+            "timeline": true,
+            "direction": 1,
+            "statistic_code": "assists"
+        },
+        {
+            "code": "pause",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_EVENT_PAUSE",
+            "timeline": true
+        }
+    ],
+    "statistics": [
+        {
+            "code": "kills",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_KILLS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_KILLS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "kill"
+            ]
+        },
+        {
+            "code": "deaths",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_DEATHS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_DEATHS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "death"
+            ]
+        },
+        {
+            "code": "assists",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_ASSISTS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_ASSISTS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "assist"
+            ]
+        },
+        {
+            "code": "kd_ratio",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_KD_RATIO",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_KD_RATIO_ABBR",
+            "statistic_type": "calculated",
+            "scope": "player",
+            "value_type": "decimal",
+            "source": "calculated"
+        },
+        {
+            "code": "maps_won",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_MAPS_WON",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_MAPS_WON_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "map_won"
+            ]
+        },
+        {
+            "code": "rounds_won",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_ROUNDS_WON",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_STAT_ROUNDS_WON_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "round_won"
+            ]
+        }
+    ],
+    "template_defaults": {
+        "results": {
+            "group_by_round": true
+        },
+        "ranking": {
+            "favorite_highlight_mode": "row"
+        },
+        "matchreport": {
+            "show_lineups": true,
+            "show_officials": true,
+            "show_timeline": true
+        }
+    },
+    "migration": {
+        "joomleague3_sport_keys": [
+            "ESPORTS"
+        ]
+    },
+    "sport_type_name_key": "COM_JOOMLEAGUE_ADMIN_SPORTTYPE_ESPORTS_NAME",
+    "contest": {
+        "type": "head_to_head"
+    },
+    "match": {
+        "structure": {
+            "type": "maps",
+            "period_name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_PERIOD_MAP",
+            "series_formats": [
+                "bo1",
+                "bo3",
+                "bo5"
+            ],
+            "rounds_supported": true,
+            "overtime_supported": true,
+            "default_start_time": "19:00"
+        },
+        "score": {
+            "type": "nested_score",
+            "unit": "series",
+            "value_type": "integer",
+            "higher_is_better": true,
+            "levels": [
+                {
+                    "code": "map",
+                    "unit": "maps",
+                    "win_by": 1
+                },
+                {
+                    "code": "round",
+                    "unit": "rounds",
+                    "win_by": 1
+                }
+            ],
+            "segment_types": [
+                {
+                    "code": "map",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_MAP",
+                    "unit": "maps",
+                    "value_type": "integer",
+                    "parent_code": null,
+                    "ordinal": 10,
+                    "repeatable": true
+                },
+                {
+                    "code": "round",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_ROUND",
+                    "unit": "rounds",
+                    "value_type": "integer",
+                    "parent_code": "map",
+                    "ordinal": 10,
+                    "repeatable": true
+                }
+            ],
+            "aggregation": {
+                "mode": "validate",
+                "from": [
+                    "map"
+                ],
+                "final_only": true
+            }
+        },
+        "result_rules": {
+            "supports_forfeit": true,
+            "supports_postponed": true,
+            "supports_cancelled": true,
+            "supports_abandoned": true
+        },
+        "result_status_codes": [
+            "draft",
+            "in_progress",
+            "final"
+        ],
+        "outcome_codes": [
+            "completed",
+            "forfeit"
+        ],
+        "participant_status_codes": [
+            "eligible",
+            "started",
+            "substitute",
+            "finished",
+            "disqualified"
+        ]
+    }
+}

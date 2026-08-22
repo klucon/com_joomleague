@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_PROJECT_DETAILS">
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_NAME_DESC" required="true" maxlength="255" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_ALIAS_DESC" maxlength="255" />
+		<field name="competition_id" type="sql" label="COM_JOOMLEAGUE_FIELD_COMPETITION_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_COMPETITION_DESC" required="true" query="SELECT id AS value, name AS text FROM #__joomleague_competition WHERE published = 1 ORDER BY name" key_field="value" value_field="text"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_COMPETITION</option></field>
+		<field name="season_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SEASON_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_SEASON_DESC" required="true" query="SELECT id AS value, name AS text FROM #__joomleague_season WHERE published = 1 ORDER BY ordering, name" key_field="value" value_field="text"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_SEASON</option></field>
+		<field name="sport_type_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SPORT_TYPE_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_SPORT_TYPE_DESC" required="true" query="SELECT id AS value, name AS text FROM #__joomleague_sport_type WHERE published = 1 AND profile_version_id IS NOT NULL ORDER BY ordering, name" key_field="value" value_field="text"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_SPORT_TYPE</option></field>
+		<field name="project_type" type="list" label="COM_JOOMLEAGUE_FIELD_PROJECT_TYPE_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_TYPE_DESC" required="true"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_PROJECT_TYPE</option><option value="league">COM_JOOMLEAGUE_PROJECT_TYPE_LEAGUE</option><option value="cup">COM_JOOMLEAGUE_PROJECT_TYPE_CUP</option><option value="tournament">COM_JOOMLEAGUE_PROJECT_TYPE_TOURNAMENT</option><option value="friendly">COM_JOOMLEAGUE_PROJECT_TYPE_FRIENDLY</option><option value="combined_stage">COM_JOOMLEAGUE_PROJECT_TYPE_COMBINED_STAGE</option><option value="playoff">COM_JOOMLEAGUE_PROJECT_TYPE_PLAYOFF</option><option value="championship">COM_JOOMLEAGUE_PROJECT_TYPE_CHAMPIONSHIP</option><option value="fight_card">COM_JOOMLEAGUE_PROJECT_TYPE_FIGHT_CARD</option><option value="race">COM_JOOMLEAGUE_PROJECT_TYPE_RACE</option><option value="race_series">COM_JOOMLEAGUE_PROJECT_TYPE_RACE_SERIES</option><option value="race_weekend">COM_JOOMLEAGUE_PROJECT_TYPE_RACE_WEEKEND</option></field>
+		<field name="code" type="text" label="COM_JOOMLEAGUE_FIELD_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_CODE_DESC" maxlength="100" />
+		<field name="external_code" type="text" label="COM_JOOMLEAGUE_FIELD_EXTERNAL_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_EXTERNAL_CODE_DESC" maxlength="191" />
+	</fieldset>
+	<fieldset name="schedule" label="COM_JOOMLEAGUE_FIELDSET_PROJECT_SCHEDULE">
+		<field name="timezone" type="timezone" label="COM_JOOMLEAGUE_FIELD_TIMEZONE_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_TIMEZONE_DESC" default="" layout="joomla.form.field.groupedlist-fancy-select"><option value="">COM_JOOMLEAGUE_PROJECT_OPTION_USE_DEFAULT_TIMEZONE</option></field>
+		<field name="start_date" type="calendar" label="COM_JOOMLEAGUE_FIELD_START_DATE_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_START_DATE_DESC" format="%Y-%m-%d" filter="user_utc" showtime="false" todaybutton="true" filltable="false" />
+		<field name="end_date" type="calendar" label="COM_JOOMLEAGUE_FIELD_END_DATE_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_END_DATE_DESC" format="%Y-%m-%d" filter="user_utc" showtime="false" todaybutton="true" filltable="false" />
+		<field name="default_start_time" type="text" label="COM_JOOMLEAGUE_FIELD_DEFAULT_START_TIME_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_DEFAULT_START_TIME_DESC" maxlength="5" size="6" hint="17:00" />
+	</fieldset>
+	<fieldset name="automation" label="COM_JOOMLEAGUE_FIELDSET_PROJECT_AUTOMATION">
+		<field name="current_round_mode" type="list" label="COM_JOOMLEAGUE_FIELD_CURRENT_ROUND_MODE_LABEL" description="COM_JOOMLEAGUE_FIELD_CURRENT_ROUND_MODE_DESC" default="start"><option value="manual">COM_JOOMLEAGUE_ROUND_MODE_MANUAL</option><option value="start">COM_JOOMLEAGUE_ROUND_MODE_START</option><option value="end">COM_JOOMLEAGUE_ROUND_MODE_END</option><option value="first_match">COM_JOOMLEAGUE_ROUND_MODE_FIRST_MATCH</option><option value="last_match">COM_JOOMLEAGUE_ROUND_MODE_LAST_MATCH</option></field>
+		<field name="auto_advance_seconds" type="number" label="COM_JOOMLEAGUE_FIELD_AUTO_ADVANCE_SECONDS_LABEL" description="COM_JOOMLEAGUE_FIELD_AUTO_ADVANCE_SECONDS_DESC" default="7200" min="0" step="1" />
+	</fieldset>
+	<fieldset name="presentation" label="COM_JOOMLEAGUE_FIELDSET_PROJECT_PRESENTATION">
+		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_PROJECT_PICTURE_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECT_PICTURE_DESC" types="images" directory="com_joomleague" />
+	</fieldset>
+	<fieldset name="description" label="JGLOBAL_DESCRIPTION">
+		<field name="description" type="editor" label="JGLOBAL_DESCRIPTION" description="COM_JOOMLEAGUE_FIELD_PROJECT_DESCRIPTION_DESC" filter="safehtml" buttons="true" />
+	</fieldset>
+	<fieldset name="publishing" label="JGLOBAL_FIELDSET_PUBLISHING">
+		<field name="lifecycle_state" type="list" label="COM_JOOMLEAGUE_FIELD_LIFECYCLE_STATE_LABEL" description="COM_JOOMLEAGUE_FIELD_LIFECYCLE_STATE_DESC" default="draft" filter="cmd" validate="options"><option value="draft">COM_JOOMLEAGUE_LIFECYCLE_DRAFT</option><option value="active">COM_JOOMLEAGUE_LIFECYCLE_ACTIVE</option><option value="completed">COM_JOOMLEAGUE_LIFECYCLE_COMPLETED</option><option value="archived">COM_JOOMLEAGUE_LIFECYCLE_ARCHIVED</option></field>
+		<field name="published" type="status" label="JSTATUS" description="COM_JOOMLEAGUE_FIELD_PUBLISHED_DESC" default="0" />
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" description="COM_JOOMLEAGUE_FIELD_ORDERING_DESC" default="0" />
+		<field name="uuid" type="text" label="COM_JOOMLEAGUE_FIELD_UUID_LABEL" description="COM_JOOMLEAGUE_FIELD_UUID_DESC" readonly="true" />
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" readonly="true" class="readonly" default="0" />
+	</fieldset>
+	<fieldset name="permissions" label="JFIELD_RULES_LABEL">
+		<field name="rules" type="rules" label="JFIELD_RULES_LABEL" translate_label="false"
+			filter="rules" component="com_joomleague" section="project" validate="rules" />
+	</fieldset>
+</form>

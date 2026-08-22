@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS">
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_NAME_DESC" required="true" maxlength="255" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_ALIAS_DESC" maxlength="255" />
+		<field name="short_name" type="text" label="COM_JOOMLEAGUE_FIELD_SHORT_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_SHORT_NAME_DESC" maxlength="100" />
+		<field name="nickname" type="text" label="COM_JOOMLEAGUE_FIELD_NICKNAME_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_NICKNAME_DESC" maxlength="100" />
+		<field name="owner_club_id" type="sql" label="COM_JOOMLEAGUE_FIELD_VENUE_OWNER_CLUB_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_OWNER_CLUB_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name" key_field="value" value_field="text" default="0"><option value="0">COM_JOOMLEAGUE_OPTION_NO_OWNER_CLUB</option></field>
+		<field name="external_code" type="text" label="COM_JOOMLEAGUE_FIELD_EXTERNAL_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_EXTERNAL_CODE_DESC" maxlength="191" />
+	</fieldset>
+	<fieldset name="location" label="COM_JOOMLEAGUE_FIELDSET_LOCATION">
+		<field name="address" type="text" label="COM_JOOMLEAGUE_FIELD_ADDRESS_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_ADDRESS_DESC" maxlength="255" />
+		<field name="postal_code" type="text" label="COM_JOOMLEAGUE_FIELD_POSTAL_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_POSTAL_CODE_DESC" maxlength="20" />
+		<field name="city" type="text" label="COM_JOOMLEAGUE_FIELD_CITY_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_CITY_DESC" maxlength="100" />
+		<field name="region" type="text" label="COM_JOOMLEAGUE_FIELD_REGION_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_REGION_DESC" maxlength="100" />
+		<field name="country_code" type="text" label="COM_JOOMLEAGUE_FIELD_COUNTRY_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_COUNTRY_DESC" maxlength="8" />
+		<field name="latitude" type="number" label="COM_JOOMLEAGUE_FIELD_LATITUDE_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_LATITUDE_DESC" min="-90" max="90" step="0.0000001" />
+		<field name="longitude" type="number" label="COM_JOOMLEAGUE_FIELD_LONGITUDE_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_LONGITUDE_DESC" min="-180" max="180" step="0.0000001" />
+		<field name="timezone" type="timezone" label="COM_JOOMLEAGUE_FIELD_VENUE_TIMEZONE_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_TIMEZONE_DESC"><option value="">COM_JOOMLEAGUE_FIELD_VENUE_TIMEZONE_DEFAULT</option></field>
+	</fieldset>
+	<fieldset name="facilities" label="COM_JOOMLEAGUE_FIELDSET_FACILITIES">
+		<field name="capacity" type="number" label="COM_JOOMLEAGUE_FIELD_CAPACITY_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_CAPACITY_DESC" min="0" step="1" />
+		<field name="website" type="url" label="COM_JOOMLEAGUE_FIELD_WEBSITE_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_WEBSITE_DESC" maxlength="2048" filter="url" />
+	</fieldset>
+	<fieldset name="media" label="COM_JOOMLEAGUE_FIELDSET_MEDIA">
+		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_VENUE_PICTURE_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_PICTURE_DESC" types="images" directory="com_joomleague/venues" />
+	</fieldset>
+	<fieldset name="description" label="JGLOBAL_DESCRIPTION">
+		<field name="description" type="editor" label="JGLOBAL_DESCRIPTION" description="COM_JOOMLEAGUE_FIELD_VENUE_DESCRIPTION_DESC" filter="safehtml" buttons="true" />
+	</fieldset>
+	<fieldset name="publishing" label="JGLOBAL_FIELDSET_PUBLISHING">
+		<field name="published" type="status" label="JSTATUS" description="COM_JOOMLEAGUE_FIELD_PUBLISHED_DESC" default="1" />
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" description="COM_JOOMLEAGUE_FIELD_ORDERING_DESC" default="0" />
+		<field name="uuid" type="text" label="COM_JOOMLEAGUE_FIELD_UUID_LABEL" description="COM_JOOMLEAGUE_FIELD_UUID_DESC" readonly="true" />
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" readonly="true" class="readonly" default="0" />
+	</fieldset>
+</form>

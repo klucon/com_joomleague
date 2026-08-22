@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<fieldset name="general" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_GENERAL_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_GENERAL_DESC">
+		<field name="organisation_name" type="text" label="COM_JOOMLEAGUE_CONFIG_ORGANISATION_NAME_LABEL" description="COM_JOOMLEAGUE_CONFIG_ORGANISATION_NAME_DESC" filter="string" />
+		<field name="site_club_id" type="sql" label="COM_JOOMLEAGUE_CONFIG_SITE_CLUB_LABEL" description="COM_JOOMLEAGUE_CONFIG_SITE_CLUB_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name" key_field="value" value_field="text" filter="integer" layout="joomla.form.field.list-fancy-select">
+			<option value="0">COM_JOOMLEAGUE_CONFIG_OPTION_NO_SITE_CLUB</option>
+		</field>
+		<field name="default_timezone" type="timezone" label="COM_JOOMLEAGUE_CONFIG_DEFAULT_TIMEZONE_LABEL" description="COM_JOOMLEAGUE_CONFIG_DEFAULT_TIMEZONE_DESC" default="" layout="joomla.form.field.groupedlist-fancy-select">
+			<option value="">COM_JOOMLEAGUE_CONFIG_OPTION_USE_DEFAULT_TIMEZONE</option>
+		</field>
+		<field name="person_name_format" type="list" label="COM_JOOMLEAGUE_CONFIG_PERSON_NAME_FORMAT_LABEL" description="COM_JOOMLEAGUE_CONFIG_PERSON_NAME_FORMAT_DESC" default="first_nickname_last">
+			<option value="first_last">COM_JOOMLEAGUE_CONFIG_NAME_FIRST_LAST</option>
+			<option value="last_first">COM_JOOMLEAGUE_CONFIG_NAME_LAST_FIRST</option>
+			<option value="first_nickname_last">COM_JOOMLEAGUE_CONFIG_NAME_FIRST_NICKNAME_LAST</option>
+		</field>
+		<field name="favorite_highlight_mode" type="list" label="COM_JOOMLEAGUE_CONFIG_FAVORITE_HIGHLIGHT_LABEL" description="COM_JOOMLEAGUE_CONFIG_FAVORITE_HIGHLIGHT_DESC" default="row">
+			<option value="none">JNONE</option>
+			<option value="name">COM_JOOMLEAGUE_CONFIG_HIGHLIGHT_NAME</option>
+			<option value="row">COM_JOOMLEAGUE_CONFIG_HIGHLIGHT_ROW</option>
+		</field>
+	</fieldset>
+
+	<fieldset name="dashboard" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_DASHBOARD_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_DASHBOARD_DESC">
+		<field name="dashboard_match_limit" type="number" label="COM_JOOMLEAGUE_CONFIG_DASHBOARD_MATCH_LIMIT_LABEL" description="COM_JOOMLEAGUE_CONFIG_DASHBOARD_MATCH_LIMIT_DESC" default="9" min="1" max="50" step="1" filter="integer" />
+		<field name="dashboard_match_link" type="list" label="COM_JOOMLEAGUE_CONFIG_DASHBOARD_MATCH_LINK_LABEL" description="COM_JOOMLEAGUE_CONFIG_DASHBOARD_MATCH_LINK_DESC" default="match">
+			<option value="match">COM_JOOMLEAGUE_CONFIG_MATCH_LINK_MATCH</option>
+			<option value="round">COM_JOOMLEAGUE_CONFIG_MATCH_LINK_ROUND</option>
+			<option value="project">COM_JOOMLEAGUE_CONFIG_MATCH_LINK_PROJECT</option>
+		</field>
+		<field name="dashboard_schedule_display" type="list" label="COM_JOOMLEAGUE_CONFIG_DASHBOARD_SCHEDULE_DISPLAY_LABEL" description="COM_JOOMLEAGUE_CONFIG_DASHBOARD_SCHEDULE_DISPLAY_DESC" default="all">
+			<option value="hide">COM_JOOMLEAGUE_CONFIG_SCHEDULE_DISPLAY_HIDE</option>
+			<option value="all">COM_JOOMLEAGUE_CONFIG_SCHEDULE_DISPLAY_ALL</option>
+			<option value="collapse">COM_JOOMLEAGUE_CONFIG_SCHEDULE_DISPLAY_COLLAPSE</option>
+		</field>
+	</fieldset>
+
+	<fieldset name="notifications" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_NOTIFICATIONS_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_NOTIFICATIONS_DESC">
+		<field name="notify_club_changes" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_CONFIG_NOTIFY_CLUB_CHANGES_LABEL" description="COM_JOOMLEAGUE_CONFIG_NOTIFY_CLUB_CHANGES_DESC" default="0" filter="integer">
+			<option value="0">JNO</option><option value="1">JYES</option>
+		</field>
+		<field name="notify_person_changes" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_CONFIG_NOTIFY_PERSON_CHANGES_LABEL" description="COM_JOOMLEAGUE_CONFIG_NOTIFY_PERSON_CHANGES_DESC" default="0" filter="integer">
+			<option value="0">JNO</option><option value="1">JYES</option>
+		</field>
+	</fieldset>
+
+	<fieldset name="imports" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_IMPORTS_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_IMPORTS_DESC">
+		<field name="import_time_limit" type="number" label="COM_JOOMLEAGUE_CONFIG_IMPORT_TIME_LIMIT_LABEL" description="COM_JOOMLEAGUE_CONFIG_IMPORT_TIME_LIMIT_DESC" default="900" min="30" max="7200" step="30" filter="integer" />
+		<field name="import_batch_size" type="number" label="COM_JOOMLEAGUE_CONFIG_IMPORT_BATCH_SIZE_LABEL" description="COM_JOOMLEAGUE_CONFIG_IMPORT_BATCH_SIZE_DESC" default="500" min="10" max="10000" step="10" filter="integer" />
+		<field name="preserve_migration_payload" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_CONFIG_PRESERVE_MIGRATION_PAYLOAD_LABEL" description="COM_JOOMLEAGUE_CONFIG_PRESERVE_MIGRATION_PAYLOAD_DESC" default="1" filter="integer">
+			<option value="0">JNO</option><option value="1">JYES</option>
+		</field>
+	</fieldset>
+
+	<fieldset name="media" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_MEDIA_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_MEDIA_DESC">
+		<field name="images_base_path" type="text" label="COM_JOOMLEAGUE_CONFIG_IMAGES_BASE_PATH_LABEL" description="COM_JOOMLEAGUE_CONFIG_IMAGES_BASE_PATH_DESC" default="images/com_joomleague" filter="path" />
+		<field name="placeholder_club_logo" type="media" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_CLUB_LOGO_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_CLUB_LOGO_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
+		<field name="placeholder_person_picture" type="media" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PERSON_PICTURE_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PERSON_PICTURE_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
+		<field name="placeholder_venue_picture" type="media" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_VENUE_PICTURE_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_VENUE_PICTURE_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
+		<field name="placeholder_team_picture" type="media" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PICTURE_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PICTURE_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
+	</fieldset>
+
+	<fieldset name="telemetry" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_TELEMETRY_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_TELEMETRY_DESC">
+		<field name="telemetry_information" type="note" label="COM_JOOMLEAGUE_CONFIG_TELEMETRY_INFORMATION_LABEL" description="COM_JOOMLEAGUE_CONFIG_TELEMETRY_INFORMATION_DESC" />
+		<field name="telemetry_consent" type="list" label="COM_JOOMLEAGUE_CONFIG_TELEMETRY_CONSENT_LABEL" description="COM_JOOMLEAGUE_CONFIG_TELEMETRY_CONSENT_DESC" default="never">
+			<option value="never">COM_JOOMLEAGUE_CONFIG_TELEMETRY_NEVER</option>
+			<option value="once">COM_JOOMLEAGUE_CONFIG_TELEMETRY_ONCE</option>
+			<option value="monthly">COM_JOOMLEAGUE_CONFIG_TELEMETRY_MONTHLY</option>
+		</field>
+	</fieldset>
+
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL">
+		<field name="rules" type="rules" component="com_joomleague" section="component" label="JCONFIG_PERMISSIONS_LABEL" filter="rules" validate="rules" />
+	</fieldset>
+</config>

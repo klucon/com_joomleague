@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS">
+		<field name="project_id" type="hidden" filter="uint" /><field name="stage_id" type="hidden" filter="uint" required="true" />
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_NAME_DESC" required="true" maxlength="255" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_ALIAS_DESC" maxlength="255" />
+		<field name="code" type="text" label="COM_JOOMLEAGUE_FIELD_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_CODE_DESC" required="true" maxlength="100" filter="cmd" />
+		<field name="round_type" type="text" label="COM_JOOMLEAGUE_FIELD_ROUND_TYPE_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_TYPE_DESC" required="true" default="standard" maxlength="100" filter="cmd" />
+		<field name="sequence_number" type="number" label="COM_JOOMLEAGUE_FIELD_ROUND_NUMBER_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_NUMBER_DESC" required="true" min="1" filter="uint" />
+		<field name="start_date" type="calendar" label="COM_JOOMLEAGUE_FIELD_START_DATE_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_START_DATE_DESC" format="%Y-%m-%d" filter="string" showtime="false" todaybutton="true" />
+		<field name="end_date" type="calendar" label="COM_JOOMLEAGUE_FIELD_END_DATE_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_END_DATE_DESC" format="%Y-%m-%d" filter="string" showtime="false" todaybutton="true" />
+		<field name="lifecycle_state" type="list" label="COM_JOOMLEAGUE_FIELD_LIFECYCLE_STATE_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_LIFECYCLE_DESC" default="draft" required="true" filter="cmd" validate="options"><option value="draft">COM_JOOMLEAGUE_LIFECYCLE_DRAFT</option><option value="active">COM_JOOMLEAGUE_LIFECYCLE_ACTIVE</option><option value="completed">COM_JOOMLEAGUE_LIFECYCLE_COMPLETED</option><option value="cancelled">COM_JOOMLEAGUE_LIFECYCLE_CANCELLED</option></field>
+	</fieldset>
+	<fieldset name="description" label="COM_JOOMLEAGUE_FIELDSET_DESCRIPTION"><field name="description" type="editor" label="COM_JOOMLEAGUE_FIELD_DESCRIPTION_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_DESCRIPTION_DESC" filter="safehtml" buttons="true" /></fieldset>
+	<fieldset name="publishing" label="JGLOBAL_FIELDSET_PUBLISHING"><field name="published" type="status" label="JSTATUS" description="COM_JOOMLEAGUE_FIELD_PUBLISHED_DESC" default="0" /><field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" description="COM_JOOMLEAGUE_FIELD_ORDERING_DESC" default="0" /><field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" readonly="true" class="readonly" default="0" /></fieldset>
+</form>

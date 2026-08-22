@@ -1,0 +1,553 @@
+{
+    "schema_version": "1.4.0",
+    "code": "running_race",
+    "version": "1.5.0",
+    "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE",
+    "description_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_DESC",
+    "scoring_model": "time",
+    "project_types": [
+        "race",
+        "race_series",
+        "cup",
+        "championship"
+    ],
+    "entry_model": {
+        "allowed_kinds": [
+            "person",
+            "team",
+            "group"
+        ],
+        "default_kind": "person",
+        "members_supported": true,
+        "member_person_types": [
+            "participant",
+            "staff"
+        ]
+    },
+    "project_rule_schema": {
+        "schema_version": "1.0.0",
+        "fields": {
+            "/match_structure/result_precision": {
+                "type": "string",
+                "enum": [
+                    "seconds",
+                    "milliseconds",
+                    "microseconds"
+                ]
+            },
+            "/match_structure/supports_chip_time": {
+                "type": "boolean"
+            },
+            "/match_structure/supports_gun_time": {
+                "type": "boolean"
+            },
+            "/match_structure/supports_splits": {
+                "type": "boolean"
+            },
+            "/match_structure/supports_laps": {
+                "type": "boolean"
+            },
+            "/match_structure/supports_wave_starts": {
+                "type": "boolean"
+            },
+            "/match_structure/supports_mass_start": {
+                "type": "boolean"
+            },
+            "/match_structure/default_start_time": {
+                "type": "string",
+                "pattern": "~^(?:[01]\\d|2[0-3]):[0-5]\\d$~"
+            },
+            "/race_rules/category_ranking": {
+                "type": "boolean"
+            },
+            "/race_rules/overall_ranking": {
+                "type": "boolean"
+            },
+            "/race_rules/team_ranking": {
+                "type": "boolean"
+            },
+            "/race_rules/gender_ranking": {
+                "type": "boolean"
+            },
+            "/race_rules/age_category_ranking": {
+                "type": "boolean"
+            }
+        }
+    },
+    "match_structure": {
+        "type": "race",
+        "period_name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_PERIOD_RACE",
+        "uses_match_clock": false,
+        "result_precision": "milliseconds",
+        "supports_chip_time": true,
+        "supports_gun_time": true,
+        "supports_splits": true,
+        "supports_laps": true,
+        "supports_wave_starts": true,
+        "supports_mass_start": true,
+        "default_start_time": "10:00"
+    },
+    "race_rules": {
+        "ranking_basis": "finish_time",
+        "category_ranking": true,
+        "overall_ranking": true,
+        "team_ranking": true,
+        "gender_ranking": true,
+        "age_category_ranking": true,
+        "allow_manual_results": true,
+        "allow_imported_results": true,
+        "supports_dns": true,
+        "supports_dnf": true,
+        "supports_dsq": true,
+        "supports_lapped_participants": true
+    },
+    "standings": {
+        "sort_order": [
+            "finish_time",
+            "rank",
+            "last_name",
+            "first_name"
+        ],
+        "columns": [
+            "rank",
+            "bib",
+            "participant",
+            "club",
+            "category",
+            "gun_time",
+            "chip_time",
+            "pace",
+            "gap",
+            "status"
+        ],
+        "scopes": [
+            "overall",
+            "category",
+            "gender",
+            "team"
+        ],
+        "type": "race_results",
+        "calculation": {
+            "mode": "classification",
+            "included_result_statuses": [
+                "final"
+            ],
+            "metrics": [
+                {
+                    "code": "races",
+                    "operation": "count_matches",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "status_order",
+                    "operation": "status_order",
+                    "value_type": "decimal",
+                    "status_precedence": [
+                        "finished",
+                        "dnf",
+                        "dns",
+                        "dsq"
+                    ]
+                },
+                {
+                    "code": "result_rank",
+                    "operation": "best_rank",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "elapsed",
+                    "operation": "sum_root",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "points",
+                    "operation": "sum_awards",
+                    "value_type": "decimal"
+                }
+            ],
+            "awards": {
+                "mode": "none",
+                "rule_strategy": "first_match",
+                "rules": [],
+                "bonus_rules": []
+            },
+            "ordering": [
+                {
+                    "metric": "status_order",
+                    "direction": "asc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "result_rank",
+                    "direction": "asc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "elapsed",
+                    "direction": "asc",
+                    "nulls": "last"
+                }
+            ],
+            "classification": {
+                "primary": "result_rank",
+                "direction": "asc",
+                "status_precedence": [
+                    "finished",
+                    "dnf",
+                    "dns",
+                    "dsq"
+                ]
+            },
+            "scopes": [
+                {
+                    "code": "overall",
+                    "filter": {
+                        "type": "always"
+                    }
+                }
+            ]
+        }
+    },
+    "positions": [
+        {
+            "code": "participant",
+            "person_type": "participant",
+            "lineup_group": "participant",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_PARTICIPANT",
+            "has_statistics": 1,
+            "has_events": 1
+        },
+        {
+            "code": "guide_runner",
+            "person_type": "participant",
+            "lineup_group": "participant",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_GUIDE_RUNNER",
+            "has_statistics": 1,
+            "has_events": 1
+        },
+        {
+            "code": "organizer",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_ORGANIZER"
+        },
+        {
+            "code": "race_director",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_RACE_DIRECTOR"
+        },
+        {
+            "code": "course_manager",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_COURSE_MANAGER"
+        },
+        {
+            "code": "medical_staff",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_MEDICAL_STAFF"
+        },
+        {
+            "code": "timekeeper",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_TIMEKEEPER"
+        },
+        {
+            "code": "start_referee",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_START_REFEREE"
+        },
+        {
+            "code": "finish_referee",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_FINISH_REFEREE"
+        },
+        {
+            "code": "course_referee",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_COURSE_REFEREE"
+        }
+    ],
+    "event_types": [
+        {
+            "code": "start",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_EVENT_START",
+            "system_event": true,
+            "timeline": true
+        },
+        {
+            "code": "wave_start",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_EVENT_WAVE_START",
+            "system_event": true,
+            "timeline": true
+        },
+        {
+            "code": "split",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_EVENT_SPLIT",
+            "timeline": true,
+            "statistic_code": "split_time"
+        },
+        {
+            "code": "lap",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_EVENT_LAP",
+            "timeline": true,
+            "statistic_code": "lap_time"
+        },
+        {
+            "code": "finish",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_EVENT_FINISH",
+            "timeline": true,
+            "statistic_code": "finish_time"
+        },
+        {
+            "code": "dns",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_EVENT_DNS",
+            "direction": -1,
+            "timeline": true
+        },
+        {
+            "code": "dnf",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_EVENT_DNF",
+            "direction": -1,
+            "timeline": true
+        },
+        {
+            "code": "dsq",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_EVENT_DSQ",
+            "direction": -1,
+            "timeline": true
+        },
+        {
+            "code": "penalty",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_EVENT_PENALTY",
+            "direction": -1,
+            "timeline": true,
+            "statistic_code": "penalty_time"
+        }
+    ],
+    "statistics": [
+        {
+            "code": "finish_time",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_FINISH_TIME",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_FINISH_TIME_ABBR",
+            "statistic_type": "basic",
+            "scope": "participant",
+            "value_type": "duration",
+            "source": "event",
+            "event_codes": [
+                "finish"
+            ]
+        },
+        {
+            "code": "gun_time",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_GUN_TIME",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_GUN_TIME_ABBR",
+            "statistic_type": "basic",
+            "scope": "participant",
+            "value_type": "duration",
+            "source": "manual_or_import"
+        },
+        {
+            "code": "chip_time",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_CHIP_TIME",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_CHIP_TIME_ABBR",
+            "statistic_type": "basic",
+            "scope": "participant",
+            "value_type": "duration",
+            "source": "manual_or_import"
+        },
+        {
+            "code": "split_time",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_SPLIT_TIME",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_SPLIT_TIME_ABBR",
+            "statistic_type": "basic",
+            "scope": "participant",
+            "value_type": "duration",
+            "source": "event",
+            "event_codes": [
+                "split"
+            ]
+        },
+        {
+            "code": "lap_time",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_LAP_TIME",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_LAP_TIME_ABBR",
+            "statistic_type": "basic",
+            "scope": "participant",
+            "value_type": "duration",
+            "source": "event",
+            "event_codes": [
+                "lap"
+            ]
+        },
+        {
+            "code": "rank",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_RANK",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_RANK_ABBR",
+            "statistic_type": "calculated",
+            "scope": "participant",
+            "source": "calculated"
+        },
+        {
+            "code": "category_rank",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_CATEGORY_RANK",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_CATEGORY_RANK_ABBR",
+            "statistic_type": "calculated",
+            "scope": "participant",
+            "source": "calculated"
+        },
+        {
+            "code": "pace",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_PACE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_PACE_ABBR",
+            "statistic_type": "calculated",
+            "scope": "participant",
+            "source": "calculated"
+        },
+        {
+            "code": "gap",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_GAP",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_GAP_ABBR",
+            "statistic_type": "calculated",
+            "scope": "participant",
+            "source": "calculated"
+        },
+        {
+            "code": "penalty_time",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_PENALTY_TIME",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_STAT_PENALTY_TIME_ABBR",
+            "statistic_type": "basic",
+            "scope": "participant",
+            "value_type": "duration",
+            "source": "event",
+            "event_codes": [
+                "penalty"
+            ]
+        }
+    ],
+    "template_defaults": {
+        "race_results": {
+            "show_filters": true,
+            "show_categories": true,
+            "show_splits": true,
+            "show_team": true
+        },
+        "participant": {
+            "show_personal_data": true,
+            "show_results": true
+        },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true
+        }
+    },
+    "migration": {
+        "joomleague3_sport_keys": [
+            "RUNNING",
+            "RUNNING_RACE",
+            "RACE"
+        ],
+        "result_status_aliases": {
+            "dns": [
+                "dns",
+                "did_not_start"
+            ],
+            "dnf": [
+                "dnf",
+                "did_not_finish"
+            ],
+            "dsq": [
+                "dsq",
+                "disqualified"
+            ]
+        }
+    },
+    "sport_type_name_key": "COM_JOOMLEAGUE_ADMIN_SPORTTYPE_RUNNING_RACE_NAME",
+    "contest": {
+        "type": "race"
+    },
+    "match": {
+        "structure": {
+            "type": "race",
+            "period_name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_PERIOD_RACE",
+            "uses_match_clock": false,
+            "result_precision": "milliseconds",
+            "supports_chip_time": true,
+            "supports_gun_time": true,
+            "supports_splits": true,
+            "supports_laps": true,
+            "supports_wave_starts": true,
+            "supports_mass_start": true,
+            "default_start_time": "10:00"
+        },
+        "score": {
+            "type": "time_result",
+            "unit": "milliseconds",
+            "value_type": "duration",
+            "higher_is_better": false,
+            "precision": "milliseconds",
+            "segment_types": [
+                {
+                    "code": "gun_time",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_GUN_TIME",
+                    "unit": "gun_times",
+                    "value_type": "duration",
+                    "parent_code": null,
+                    "ordinal": 10,
+                    "repeatable": false,
+                    "expected_count": 1
+                },
+                {
+                    "code": "chip_time",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_CHIP_TIME",
+                    "unit": "chip_times",
+                    "value_type": "duration",
+                    "parent_code": null,
+                    "ordinal": 20,
+                    "repeatable": false,
+                    "expected_count": 1
+                },
+                {
+                    "code": "split",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_SPLIT",
+                    "unit": "splits",
+                    "value_type": "duration",
+                    "parent_code": null,
+                    "ordinal": 30,
+                    "repeatable": true
+                },
+                {
+                    "code": "lap",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_LAP",
+                    "unit": "laps",
+                    "value_type": "duration",
+                    "parent_code": null,
+                    "ordinal": 40,
+                    "repeatable": true
+                }
+            ],
+            "aggregation": {
+                "mode": "none",
+                "from": [],
+                "final_only": true
+            }
+        },
+        "result_rules": [],
+        "result_status_codes": [
+            "draft",
+            "in_progress",
+            "final"
+        ],
+        "outcome_codes": [
+            "completed",
+            "classified"
+        ],
+        "participant_status_codes": [
+            "registered",
+            "started",
+            "finished",
+            "dns",
+            "dnf",
+            "dsq"
+        ]
+    }
+}

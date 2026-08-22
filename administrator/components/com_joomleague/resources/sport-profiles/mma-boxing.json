@@ -1,0 +1,432 @@
+{
+    "schema_version": "1.4.0",
+    "code": "mma_boxing",
+    "version": "1.5.0",
+    "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING",
+    "description_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_DESC",
+    "scoring_model": "decision_result",
+    "project_types": [
+        "fight_card",
+        "tournament",
+        "league",
+        "friendly",
+        "combined_stage"
+    ],
+    "entry_model": {
+        "allowed_kinds": [
+            "person"
+        ],
+        "default_kind": "person",
+        "members_supported": false,
+        "member_person_types": []
+    },
+    "project_rule_schema": {
+        "schema_version": "1.0.0",
+        "fields": {
+            "/match_structure/period_count": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+            },
+            "/match_structure/period_length_minutes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 120
+            },
+            "/match_structure/championship_rounds": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+            },
+            "/match_structure/break_minutes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 120
+            },
+            "/match_structure/supports_weight_classes": {
+                "type": "boolean"
+            },
+            "/match_structure/default_start_time": {
+                "type": "string",
+                "pattern": "~^(?:[01]\\d|2[0-3]):[0-5]\\d$~"
+            }
+        },
+        "constraints": [
+            {
+                "code": "championship_round_limit",
+                "operator": "lte",
+                "left": {
+                    "terms": [
+                        {
+                            "path": "/match_structure/period_count"
+                        }
+                    ]
+                },
+                "right": {
+                    "terms": [
+                        {
+                            "path": "/match_structure/championship_rounds"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "match_structure": {
+        "type": "combat_rounds",
+        "period_name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_PERIOD_ROUND",
+        "period_count": 3,
+        "period_length_minutes": 5,
+        "championship_rounds": 5,
+        "break_minutes": 1,
+        "default_start_time": "20:00",
+        "supports_weight_classes": true
+    },
+    "lineup": {
+        "preferred_order": [
+            "fighter"
+        ]
+    },
+    "standings": {
+        "sort_order": [
+            "wins",
+            "finishes",
+            "points",
+            "name"
+        ],
+        "columns": [
+            "rank",
+            "fighter",
+            "fights",
+            "wins",
+            "losses",
+            "draws",
+            "ko_tko",
+            "submission",
+            "decision",
+            "points"
+        ],
+        "type": "competitor_table",
+        "calculation": {
+            "mode": "head_to_head",
+            "outcome_source": "participant_status",
+            "included_result_statuses": [
+                "final"
+            ],
+            "metrics": [
+                {
+                    "code": "played",
+                    "operation": "count_matches",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "wins",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "win"
+                },
+                {
+                    "code": "draws",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "draw"
+                },
+                {
+                    "code": "losses",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "loss"
+                },
+                {
+                    "code": "score_for",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "own"
+                },
+                {
+                    "code": "score_against",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "score_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "score_for",
+                    "right_metric": "score_against"
+                },
+                {
+                    "code": "points",
+                    "operation": "sum_awards",
+                    "value_type": "decimal"
+                }
+            ],
+            "awards": {
+                "mode": "none",
+                "rule_strategy": "first_match",
+                "rules": [],
+                "bonus_rules": []
+            },
+            "ordering": [
+                {
+                    "metric": "wins",
+                    "direction": "desc",
+                    "nulls": "last"
+                }
+            ],
+            "scopes": [
+                {
+                    "code": "total",
+                    "filter": {
+                        "type": "always"
+                    }
+                }
+            ]
+        }
+    },
+    "result_rules": {
+        "supports_forfeit": true,
+        "supports_postponed": true,
+        "supports_cancelled": true,
+        "supports_abandoned": true
+    },
+    "positions": [
+        {
+            "code": "fighter",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_FIGHTER"
+        },
+        {
+            "code": "cornerman",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_CORNERMAN"
+        },
+        {
+            "code": "coach",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_COACH"
+        },
+        {
+            "code": "referee",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_REFEREE"
+        },
+        {
+            "code": "judge",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_JUDGE"
+        },
+        {
+            "code": "doctor",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_DOCTOR"
+        }
+    ],
+    "event_types": [
+        {
+            "code": "ko_tko",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_EVENT_KO_TKO",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "statistic_code": "ko_tko_wins"
+        },
+        {
+            "code": "submission",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_EVENT_SUBMISSION",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "statistic_code": "submission_wins"
+        },
+        {
+            "code": "decision",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_EVENT_DECISION",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "statistic_code": "decision_wins"
+        },
+        {
+            "code": "knockdown",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_EVENT_KNOCKDOWN",
+            "timeline": true,
+            "direction": 1,
+            "statistic_code": "knockdowns"
+        },
+        {
+            "code": "point_deduction",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_EVENT_POINT_DEDUCTION",
+            "timeline": true,
+            "direction": -1,
+            "statistic_code": "point_deductions"
+        },
+        {
+            "code": "doctor_stoppage",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_EVENT_DOCTOR_STOPPAGE",
+            "timeline": true,
+            "direction": 1
+        }
+    ],
+    "statistics": [
+        {
+            "code": "wins",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_WINS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_WINS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import"
+        },
+        {
+            "code": "ko_tko_wins",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_KO_TKO_WINS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_KO_TKO_WINS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "ko_tko"
+            ]
+        },
+        {
+            "code": "submission_wins",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_SUBMISSION_WINS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_SUBMISSION_WINS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "submission"
+            ]
+        },
+        {
+            "code": "decision_wins",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_DECISION_WINS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_DECISION_WINS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "decision"
+            ]
+        },
+        {
+            "code": "knockdowns",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_KNOCKDOWNS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_KNOCKDOWNS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "knockdown"
+            ]
+        },
+        {
+            "code": "point_deductions",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_POINT_DEDUCTIONS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_POINT_DEDUCTIONS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "point_deduction"
+            ]
+        }
+    ],
+    "template_defaults": {
+        "results": {
+            "group_by_round": true
+        },
+        "ranking": {
+            "favorite_highlight_mode": "row"
+        },
+        "matchreport": {
+            "show_lineups": true,
+            "show_officials": true,
+            "show_timeline": true
+        }
+    },
+    "migration": {
+        "joomleague3_sport_keys": [
+            "MMA_BOXING",
+            "MMABOXING"
+        ]
+    },
+    "sport_type_name_key": "COM_JOOMLEAGUE_ADMIN_SPORTTYPE_MMA_BOXING_NAME",
+    "contest": {
+        "type": "head_to_head"
+    },
+    "match": {
+        "structure": {
+            "type": "combat_rounds",
+            "period_name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_PERIOD_ROUND",
+            "period_count": 3,
+            "period_length_minutes": 5,
+            "championship_rounds": 5,
+            "break_minutes": 1,
+            "default_start_time": "20:00",
+            "supports_weight_classes": true
+        },
+        "score": {
+            "type": "decision_result",
+            "unit": "decision",
+            "value_type": "structured",
+            "editor_control": "status_rank",
+            "higher_is_better": null,
+            "segment_types": [
+                {
+                    "code": "judge",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_JUDGE",
+                    "unit": "judges",
+                    "value_type": "structured",
+                    "editor_control": "none",
+                    "parent_code": null,
+                    "ordinal": 10,
+                    "repeatable": true
+                },
+                {
+                    "code": "round",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_ROUND",
+                    "unit": "rounds",
+                    "value_type": "decimal",
+                    "parent_code": "judge",
+                    "ordinal": 10,
+                    "repeatable": true,
+                    "maximum_count": 5
+                }
+            ],
+            "aggregation": {
+                "mode": "none",
+                "from": [],
+                "final_only": true
+            }
+        },
+        "result_rules": {
+            "supports_forfeit": true,
+            "supports_postponed": true,
+            "supports_cancelled": true,
+            "supports_abandoned": true
+        },
+        "result_status_codes": [
+            "draft",
+            "in_progress",
+            "final"
+        ],
+        "outcome_codes": [
+            "completed",
+            "forfeit",
+            "ko_tko",
+            "submission",
+            "decision",
+            "doctor_stoppage"
+        ],
+        "participant_status_codes": [
+            "active",
+            "winner",
+            "loser",
+            "draw",
+            "no_contest"
+        ]
+    }
+}

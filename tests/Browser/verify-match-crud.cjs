@@ -1,0 +1,66 @@
+const { chromium } = require('playwright');
+
+(async () => {
+	const { JOOMLA_BASE_URL: baseUrl, JOOMLA_USERNAME: username, JOOMLA_PASSWORD: password, JOOMLEAGUE_PROJECT_ID: projectId } = process.env;
+	if (!baseUrl || !username || !password || !projectId) throw new Error('Joomla credentials and JOOMLEAGUE_PROJECT_ID are required.');
+	const browser = await chromium.launch({ headless: true });
+	try {
+		const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+		const confirmDelete = async () => {
+			const native = page.waitForEvent('dialog', { timeout: 2000 }).then(dialog => dialog.accept()).catch(() => null);
+			await page.getByRole('button', { name: 'Delete' }).click(); const yes = page.getByRole('button', { name: 'Yes', exact: true });
+			if (await yes.waitFor({ state: 'visible', timeout: 2500 }).then(() => true).catch(() => false)) await yes.click(); else await native;
+			await page.waitForLoadState('networkidle');
+		};
+		await page.goto(`${baseUrl}/administrator/`, { waitUntil: 'networkidle' }); await page.getByLabel('Username').fill(username); await page.getByLabel('Password').fill(password); await page.getByRole('button', { name: 'Log in' }).click(); await page.waitForLoadState('networkidle');
+		await page.goto(`${baseUrl}/administrator/index.php?option=com_joomleague&view=stages&project_id=${projectId}`, { waitUntil: 'networkidle' }); await page.getByRole('button', { name: 'New' }).click(); await page.waitForLoadState('networkidle');
+		await page.getByLabel('Name').fill('Match fixture stage'); await page.locator('#jform_code').fill('match_fixture_stage'); await page.locator('#jform_stage_type').fill('league_phase'); await page.getByRole('button', { name: 'Save & Close' }).click(); await page.waitForLoadState('networkidle');
+		const stageRow = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Match fixture stage', exact: true }) }); await stageRow.getByRole('link', { name: 'Manage stage rounds' }).click(); await page.waitForLoadState('networkidle');
+		await page.getByRole('button', { name: 'New' }).click(); await page.waitForLoadState('networkidle'); await page.getByLabel('Name').fill('Match fixture round'); await page.locator('#jform_code').fill('match_fixture_round'); await page.getByLabel('Round type').fill('standard'); await page.getByLabel('Round number').fill('1'); await page.getByRole('button', { name: 'Save & Close' }).click(); await page.waitForLoadState('networkidle');
+		const roundRow = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Match fixture round', exact: true }) }); await roundRow.getByRole('link', { name: 'Manage round matches' }).click(); await page.waitForLoadState('networkidle');
+		await page.getByRole('button', { name: 'New' }).click(); await page.waitForLoadState('networkidle');
+		if (await page.locator('.main-card joomla-tab-element').count() !== 3) throw new Error('Match form must contain three Joomla tabs.');
+		await page.getByLabel('Match number').fill('M-001'); await page.getByLabel('Match format').selectOption('head_to_head'); await page.getByLabel('Scheduled start').fill('2026-08-15 16:30:00'); await page.getByLabel('Expected duration').fill('105'); await page.getByLabel('Match status').fill('scheduled');
+		await page.getByRole('button', { name: 'Save & Close' }).click(); await page.waitForLoadState('networkidle');
+		const matchRow = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'M-001', exact: true }) }); await matchRow.getByRole('link', { name: 'M-001', exact: true }).click(); await page.waitForLoadState('networkidle'); await page.getByLabel('Match number').fill('M-001A'); await page.getByRole('button', { name: 'Save & Close' }).click(); await page.waitForLoadState('networkidle');
+		const editedRow = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'M-001A', exact: true }) });
+		await editedRow.getByRole('link', { name: 'Open match result' }).click(); await page.waitForLoadState('networkidle');
+		if (await page.locator('joomla-tab-element').count() !== 2) throw new Error('Match result view must contain two Joomla tabs.');
+		await page.getByRole('tab', { name: 'Overview' }).click();
+		await page.getByText('numeric_score', { exact: true }).waitFor(); await page.getByRole('tab', { name: 'Result' }).click(); await page.getByLabel('Result status').waitFor();
+		await page.getByRole('button', { name: 'Close', exact: true }).click(); await page.waitForLoadState('networkidle');
+		if (!page.url().includes('view=matches')) throw new Error(`Match result close action did not return to the round matches: ${page.url()}`);
+		const matchesUrl = page.url();
+		let returnedRow = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'M-001A', exact: true }) });
+		await returnedRow.getByRole('link', { name: 'Manage match officials' }).click(); await page.waitForLoadState('networkidle');
+		await page.getByRole('heading', { name: 'Match officials', exact: true }).waitFor();
+		if (/COM_JOOMLEAGUE_[A-Z0-9_]+/.test(await page.locator('body').innerText())) throw new Error('Match officials contains an untranslated language key.');
+		await page.getByRole('link', { name: 'Manage project officials' }).click(); await page.waitForLoadState('networkidle');
+		await page.getByRole('heading', { name: /^Project officials:/ }).waitFor();
+		if (/COM_JOOMLEAGUE_[A-Z0-9_]+/.test(await page.locator('body').innerText())) throw new Error('Project officials contains an untranslated language key.');
+		if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error('Project officials overflows horizontally.');
+		await page.goto(matchesUrl, { waitUntil: 'networkidle' });
+		returnedRow = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'M-001A', exact: true }) });
+		await returnedRow.getByRole('link', { name: 'Manage match events' }).click(); await page.waitForLoadState('networkidle');
+		await page.getByRole('heading', { name: 'Match events', exact: true }).waitFor();
+		await page.getByRole('button', { name: 'Add event', exact: true }).waitFor();
+		if (/COM_JOOMLEAGUE_[A-Z0-9_]+/.test(await page.locator('body').innerText())) throw new Error('Match events contains an untranslated language key.');
+		if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error('Match events overflows horizontally.');
+		await page.getByRole('link', { name: 'Close', exact: true }).click(); await page.waitForLoadState('networkidle');
+		if (!page.url().includes('view=matches')) throw new Error(`Match events close action did not return to round matches: ${page.url()}`);
+		returnedRow = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'M-001A', exact: true }) });
+		await returnedRow.getByRole('link', { name: 'Manage match statistics' }).click(); await page.waitForLoadState('networkidle');
+		await page.getByRole('heading', { name: 'Match statistics', exact: true }).waitFor();
+		if (/COM_JOOMLEAGUE_[A-Z0-9_]+/.test(await page.locator('body').innerText())) throw new Error('Match statistics contains an untranslated language key.');
+		if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error('Match statistics overflows horizontally.');
+		await page.getByRole('link', { name: 'Close', exact: true }).click(); await page.waitForLoadState('networkidle');
+		if (!page.url().includes('view=matches')) throw new Error(`Match statistics close action did not return to round matches: ${page.url()}`);
+		returnedRow = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'M-001A', exact: true }) }); await returnedRow.getByRole('checkbox').check(); await confirmDelete();
+		if (await page.getByRole('link', { name: 'M-001A', exact: true }).count()) throw new Error('Temporary match was not deleted.');
+		await page.getByRole('link', { name: 'Close' }).click(); await page.waitForLoadState('networkidle');
+		const cleanupRound = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Match fixture round', exact: true }) }); await cleanupRound.getByRole('checkbox').check(); await confirmDelete();
+		await page.getByRole('link', { name: 'Close' }).click(); await page.waitForLoadState('networkidle');
+		const cleanupStage = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Match fixture stage', exact: true }) }); await cleanupStage.getByRole('checkbox').check(); await confirmDelete();
+	} finally { await browser.close(); }
+	console.log('Universal match scheduling create/edit/delete workflow OK');
+})();

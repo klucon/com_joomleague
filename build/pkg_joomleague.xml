@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="package" method="upgrade">
+	<name>PKG_JOOMLEAGUE</name>
+	<packagename>joomleague</packagename>
+	<version>6.2.0-dev</version>
+	<creationDate>August 2026</creationDate>
+	<author>KLUCON</author>
+	<authorEmail>info@klucon.cz</authorEmail>
+	<authorUrl>https://klucon.cz</authorUrl>
+	<copyright>Copyright (C) 2026 KLUCON. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later</license>
+	<description>JoomLeague administrator component and integrations.</description>
+	<scriptfile>pkg_script.php</scriptfile>
+	<files>
+		<file type="component" id="com_joomleague">com_joomleague-6.2.0-dev.zip</file>
+		<file type="plugin" id="joomleague" group="quickicon">plg_quickicon_joomleague-6.2.0-dev.zip</file>
+		<file type="plugin" id="joomleague" group="console">plg_console_joomleague-6.2.0-dev.zip</file>
+		<file type="plugin" id="joomleague" group="task">plg_task_joomleague-6.2.0-dev.zip</file>
+	</files>
+</extension>

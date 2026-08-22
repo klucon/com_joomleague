@@ -1,0 +1,1 @@
+-- Schema version anchor. Structural changes are defined in the preceding updates.

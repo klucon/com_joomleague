@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS">
+		<field name="sport_type_id" type="sql" label="COM_JOOMLEAGUE_FIELD_SPORT_TYPE_LABEL" description="COM_JOOMLEAGUE_FIELD_POSITION_SPORT_TYPE_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_sport_type ORDER BY name" key_field="value" value_field="text" required="true"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_SPORT_TYPE</option></field>
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_POSITION_NAME_DESC" required="true" maxlength="255" />
+		<field name="code" type="text" label="COM_JOOMLEAGUE_FIELD_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_POSITION_CODE_DESC" required="true" maxlength="100" filter="cmd" />
+		<field name="person_type" type="text" label="COM_JOOMLEAGUE_FIELD_PERSON_TYPE_LABEL" description="COM_JOOMLEAGUE_FIELD_POSITION_PERSON_TYPE_DESC" required="true" maxlength="100" filter="cmd" />
+		<field name="lineup_group" type="text" label="COM_JOOMLEAGUE_FIELD_LINEUP_GROUP_LABEL" description="COM_JOOMLEAGUE_FIELD_POSITION_LINEUP_GROUP_DESC" maxlength="100" filter="cmd" />
+		<field name="parent_id" type="sql" label="COM_JOOMLEAGUE_FIELD_PARENT_POSITION_LABEL" description="COM_JOOMLEAGUE_FIELD_POSITION_PARENT_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_sport_position ORDER BY name" key_field="value" value_field="text" filter="integer"><option value="">JNONE</option></field>
+		<field name="has_events" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_FIELD_HAS_EVENTS_LABEL" description="COM_JOOMLEAGUE_FIELD_POSITION_HAS_EVENTS_DESC" default="1" filter="integer"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="has_statistics" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_FIELD_HAS_STATISTICS_LABEL" description="COM_JOOMLEAGUE_FIELD_POSITION_HAS_STATISTICS_DESC" default="1" filter="integer"><option value="0">JNO</option><option value="1">JYES</option></field>
+	</fieldset>
+	<fieldset name="publishing" label="JGLOBAL_FIELDSET_PUBLISHING">
+		<field name="published" type="status" label="JSTATUS" description="COM_JOOMLEAGUE_FIELD_PUBLISHED_DESC" default="1" />
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" description="COM_JOOMLEAGUE_FIELD_ORDERING_DESC" default="0" />
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" readonly="true" class="readonly" default="0" />
+	</fieldset>
+</form>

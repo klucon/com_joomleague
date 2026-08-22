@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+  "name": "com_joomleague",
+  "version": "6.2.0",
+  "description": "JoomLeague 6.2 web assets",
+  "license": "GPL-2.0-or-later",
+	"assets": [
+		{"name":"com_joomleague.duallist","type":"script","uri":"com_joomleague/js/duallist.js","attributes":{"defer":true},"version":"1.0.0"},
+		{"name":"com_joomleague.entrymember","type":"script","uri":"com_joomleague/js/entrymember.js","attributes":{"defer":true},"version":"1.0.0"},
+		{"name":"com_joomleague.matches-autosave","type":"script","uri":"com_joomleague/js/matches-autosave.js","attributes":{"defer":true},"version":"1.0.0"}
+	]
+}

@@ -1,0 +1,409 @@
+{
+    "schema_version": "1.4.0",
+    "code": "motorsport",
+    "version": "1.5.0",
+    "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT",
+    "description_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_DESC",
+    "scoring_model": "time_points",
+    "project_types": [
+        "championship",
+        "race_weekend",
+        "cup",
+        "friendly",
+        "combined_stage"
+    ],
+    "entry_model": {
+        "allowed_kinds": [
+            "person",
+            "team",
+            "group"
+        ],
+        "default_kind": "person",
+        "members_supported": true,
+        "member_person_types": [
+            "player",
+            "staff"
+        ]
+    },
+    "project_rule_schema": {
+        "schema_version": "1.0.0",
+        "fields": {
+            "/match_structure/sessions": {
+                "type": "array",
+                "min_items": 1,
+                "max_items": 20,
+                "items": {
+                    "type": "string"
+                }
+            },
+            "/match_structure/supports_grid": {
+                "type": "boolean"
+            },
+            "/match_structure/supports_laps": {
+                "type": "boolean"
+            },
+            "/match_structure/supports_time_penalties": {
+                "type": "boolean"
+            },
+            "/match_structure/default_start_time": {
+                "type": "string",
+                "pattern": "~^(?:[01]\\d|2[0-3]):[0-5]\\d$~"
+            }
+        }
+    },
+    "match_structure": {
+        "type": "race_session",
+        "period_name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_PERIOD_RACE",
+        "sessions": [
+            "practice",
+            "qualifying",
+            "race"
+        ],
+        "supports_grid": true,
+        "supports_laps": true,
+        "supports_time_penalties": true,
+        "default_start_time": "14:00"
+    },
+    "lineup": {
+        "preferred_order": [
+            "driver",
+            "co_driver"
+        ]
+    },
+    "standings": {
+        "sort_order": [
+            "points",
+            "wins",
+            "podiums",
+            "finish_time",
+            "name"
+        ],
+        "columns": [
+            "rank",
+            "driver_or_team",
+            "races",
+            "wins",
+            "podiums",
+            "poles",
+            "fastest_laps",
+            "points"
+        ],
+        "type": "race_results",
+        "calculation": {
+            "mode": "classification",
+            "included_result_statuses": [
+                "final"
+            ],
+            "metrics": [
+                {
+                    "code": "races",
+                    "operation": "count_matches",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "status_order",
+                    "operation": "status_order",
+                    "value_type": "decimal",
+                    "status_precedence": [
+                        "finished",
+                        "dnf",
+                        "dns",
+                        "dsq"
+                    ]
+                },
+                {
+                    "code": "result_rank",
+                    "operation": "best_rank",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "elapsed",
+                    "operation": "sum_root",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "points",
+                    "operation": "sum_awards",
+                    "value_type": "decimal"
+                }
+            ],
+            "awards": {
+                "mode": "none",
+                "rule_strategy": "first_match",
+                "rules": [],
+                "bonus_rules": []
+            },
+            "ordering": [
+                {
+                    "metric": "status_order",
+                    "direction": "asc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "result_rank",
+                    "direction": "asc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "elapsed",
+                    "direction": "asc",
+                    "nulls": "last"
+                }
+            ],
+            "classification": {
+                "primary": "result_rank",
+                "direction": "asc",
+                "status_precedence": [
+                    "finished",
+                    "dnf",
+                    "dns",
+                    "dsq"
+                ]
+            },
+            "scopes": [
+                {
+                    "code": "overall",
+                    "filter": {
+                        "type": "always"
+                    }
+                }
+            ]
+        }
+    },
+    "result_rules": {
+        "supports_forfeit": true,
+        "supports_postponed": true,
+        "supports_cancelled": true,
+        "supports_abandoned": true
+    },
+    "positions": [
+        {
+            "code": "driver",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_DRIVER"
+        },
+        {
+            "code": "co_driver",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_CO_DRIVER"
+        },
+        {
+            "code": "team_principal",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_TEAM_PRINCIPAL"
+        },
+        {
+            "code": "race_director",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_RACE_DIRECTOR"
+        },
+        {
+            "code": "steward",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_STEWARD"
+        },
+        {
+            "code": "marshal",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_MARSHAL"
+        }
+    ],
+    "event_types": [
+        {
+            "code": "pole_position",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_EVENT_POLE_POSITION",
+            "timeline": true,
+            "direction": 1,
+            "statistic_code": "poles"
+        },
+        {
+            "code": "race_win",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_EVENT_RACE_WIN",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "statistic_code": "wins"
+        },
+        {
+            "code": "fastest_lap",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_EVENT_FASTEST_LAP",
+            "timeline": true,
+            "direction": 1,
+            "statistic_code": "fastest_laps"
+        },
+        {
+            "code": "time_penalty",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_EVENT_TIME_PENALTY",
+            "timeline": true,
+            "direction": -1,
+            "statistic_code": "penalties"
+        },
+        {
+            "code": "dnf",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_EVENT_DNF",
+            "timeline": true,
+            "direction": -1
+        },
+        {
+            "code": "dsq",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_EVENT_DSQ",
+            "timeline": true,
+            "direction": -1
+        }
+    ],
+    "statistics": [
+        {
+            "code": "points",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_POINTS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_POINTS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import"
+        },
+        {
+            "code": "wins",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_WINS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_WINS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "race_win"
+            ]
+        },
+        {
+            "code": "podiums",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_PODIUMS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_PODIUMS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import"
+        },
+        {
+            "code": "poles",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_POLES",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_POLES_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "pole_position"
+            ]
+        },
+        {
+            "code": "fastest_laps",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_FASTEST_LAPS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_FASTEST_LAPS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "fastest_lap"
+            ]
+        },
+        {
+            "code": "penalties",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_PENALTIES",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_STAT_PENALTIES_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "time_penalty"
+            ]
+        }
+    ],
+    "template_defaults": {
+        "results": {
+            "group_by_round": true
+        },
+        "ranking": {
+            "favorite_highlight_mode": "row"
+        },
+        "matchreport": {
+            "show_lineups": true,
+            "show_officials": true,
+            "show_timeline": true
+        }
+    },
+    "migration": {
+        "joomleague3_sport_keys": [
+            "MOTORSPORT"
+        ]
+    },
+    "sport_type_name_key": "COM_JOOMLEAGUE_ADMIN_SPORTTYPE_MOTORSPORT_NAME",
+    "contest": {
+        "type": "race"
+    },
+    "match": {
+        "structure": {
+            "type": "race_session",
+            "period_name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_PERIOD_RACE",
+            "sessions": [
+                "practice",
+                "qualifying",
+                "race"
+            ],
+            "supports_grid": true,
+            "supports_laps": true,
+            "supports_time_penalties": true,
+            "default_start_time": "14:00"
+        },
+        "score": {
+            "type": "time_result",
+            "unit": "milliseconds",
+            "value_type": "duration",
+            "higher_is_better": false,
+            "precision": "milliseconds",
+            "segment_types": [
+                {
+                    "code": "session",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_SESSION",
+                    "unit": "sessions",
+                    "value_type": "duration",
+                    "parent_code": null,
+                    "ordinal": 10,
+                    "repeatable": true,
+                    "expected_count": 3
+                },
+                {
+                    "code": "lap",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_LAP",
+                    "unit": "laps",
+                    "value_type": "duration",
+                    "parent_code": "session",
+                    "ordinal": 10,
+                    "repeatable": true
+                }
+            ],
+            "aggregation": {
+                "mode": "none",
+                "from": [],
+                "final_only": true
+            }
+        },
+        "result_rules": {
+            "supports_forfeit": true,
+            "supports_postponed": true,
+            "supports_cancelled": true,
+            "supports_abandoned": true
+        },
+        "result_status_codes": [
+            "draft",
+            "in_progress",
+            "final"
+        ],
+        "outcome_codes": [
+            "completed",
+            "forfeit",
+            "classified"
+        ],
+        "participant_status_codes": [
+            "active",
+            "finished",
+            "dnf",
+            "dns",
+            "dsq"
+        ]
+    }
+}

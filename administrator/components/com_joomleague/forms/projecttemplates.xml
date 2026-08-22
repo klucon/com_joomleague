@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<field name="project_id" type="hidden" filter="integer" />
+	<fields name="templates"><fieldset name="templates" label="COM_JOOMLEAGUE_PROJECTTEMPLATES_FIELDSET_TEMPLATES" /></fields>
+</form>

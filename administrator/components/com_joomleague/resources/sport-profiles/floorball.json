@@ -1,0 +1,537 @@
+{
+    "schema_version": "1.4.0",
+    "code": "floorball",
+    "version": "1.5.0",
+    "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL",
+    "description_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_DESC",
+    "scoring_model": "goals",
+    "project_types": [
+        "league",
+        "cup",
+        "tournament",
+        "friendly",
+        "combined_stage"
+    ],
+    "entry_model": {
+        "allowed_kinds": [
+            "team"
+        ],
+        "default_kind": "team",
+        "members_supported": true,
+        "member_person_types": [
+            "player",
+            "staff"
+        ]
+    },
+    "project_rule_schema": {
+        "schema_version": "1.0.0",
+        "fields": {
+            "/match_structure/period_count": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 20
+            },
+            "/match_structure/period_length_minutes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 120
+            },
+            "/match_structure/default_start_time": {
+                "type": "string",
+                "pattern": "~^(?:[01]\\d|2[0-3]):[0-5]\\d$~"
+            },
+            "/match_structure/extra_time/enabled": {
+                "type": "boolean"
+            },
+            "/match_structure/extra_time/period_length_minutes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 120
+            },
+            "/match_structure/shootout/enabled": {
+                "type": "boolean"
+            },
+            "/match_structure/shootout/initial_attempts_per_team": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+            },
+            "/standings/points_regular": {
+                "type": "array",
+                "min_items": 3,
+                "max_items": 3,
+                "items": {
+                    "type": "number"
+                }
+            },
+            "/standings/points_overtime": {
+                "type": "array",
+                "min_items": 3,
+                "max_items": 3,
+                "items": {
+                    "type": "number"
+                }
+            }
+        }
+    },
+    "match_structure": {
+        "type": "timed_periods",
+        "period_name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_PERIOD_PERIOD",
+        "period_count": 3,
+        "period_length_minutes": 20,
+        "clock_mode": "mixed",
+        "default_start_time": "18:00",
+        "default_match_duration_minutes": 90,
+        "extra_time": {
+            "enabled": true,
+            "period_count": 1,
+            "period_name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_PERIOD_OVERTIME",
+            "period_length_minutes": 5,
+            "sudden_death": true
+        },
+        "shootout": {
+            "enabled": true,
+            "initial_attempts_per_team": 3
+        }
+    },
+    "lineup": {
+        "preferred_order": [
+            "goalkeeper",
+            "defender",
+            "center",
+            "winger"
+        ]
+    },
+    "standings": {
+        "points_regular": [
+            3,
+            1,
+            0
+        ],
+        "points_overtime": [
+            2,
+            0,
+            1
+        ],
+        "show_score": true,
+        "show_goal_difference": true,
+        "sort_order": [
+            "points",
+            "goal_difference",
+            "goals_for",
+            "wins",
+            "name"
+        ],
+        "columns": [
+            "rank",
+            "team",
+            "played",
+            "wins",
+            "draws",
+            "losses",
+            "goals_for_against",
+            "goal_difference",
+            "points"
+        ],
+        "type": "team_table",
+        "points": {
+            "regular": {
+                "win": 3,
+                "draw": 1,
+                "loss": 0,
+                "draw_supported": true
+            },
+            "after_extra_time": {
+                "win": 2,
+                "loss": 1
+            }
+        },
+        "calculation": {
+            "mode": "head_to_head",
+            "outcome_source": "root_numeric",
+            "included_result_statuses": [
+                "final"
+            ],
+            "metrics": [
+                {
+                    "code": "played",
+                    "operation": "count_matches",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "wins",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "win"
+                },
+                {
+                    "code": "draws",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "draw"
+                },
+                {
+                    "code": "losses",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "loss"
+                },
+                {
+                    "code": "score_for",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "own"
+                },
+                {
+                    "code": "score_against",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "score_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "score_for",
+                    "right_metric": "score_against"
+                },
+                {
+                    "code": "points",
+                    "operation": "sum_awards",
+                    "value_type": "decimal"
+                }
+            ],
+            "awards": {
+                "mode": "outcome_rules",
+                "rule_strategy": "first_match",
+                "rules": [
+                    {
+                        "when": {
+                            "type": "decision_segment",
+                            "operator": "present",
+                            "code": "shootout"
+                        },
+                        "values": {
+                            "winner": 2,
+                            "draw": 0,
+                            "loser": 1
+                        }
+                    },
+                    {
+                        "when": {
+                            "type": "decision_segment",
+                            "operator": "present",
+                            "code": "extra_time"
+                        },
+                        "values": {
+                            "winner": 2,
+                            "draw": 0,
+                            "loser": 1
+                        }
+                    },
+                    {
+                        "when": {
+                            "type": "always"
+                        },
+                        "values": {
+                            "winner": 3,
+                            "draw": 1,
+                            "loser": 0
+                        }
+                    }
+                ],
+                "bonus_rules": []
+            },
+            "ordering": [
+                {
+                    "metric": "points",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "score_difference",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "score_for",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "wins",
+                    "direction": "desc",
+                    "nulls": "last"
+                }
+            ],
+            "scopes": [
+                {
+                    "code": "total",
+                    "filter": {
+                        "type": "always"
+                    }
+                }
+            ]
+        }
+    },
+    "result_rules": {
+        "supports_forfeit": true,
+        "supports_postponed": true,
+        "supports_cancelled": true,
+        "supports_abandoned": true
+    },
+    "positions": [
+        {
+            "code": "goalkeeper",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_GOALKEEPER"
+        },
+        {
+            "code": "defender",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_DEFENDER"
+        },
+        {
+            "code": "center",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_CENTER"
+        },
+        {
+            "code": "winger",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_WINGER"
+        },
+        {
+            "code": "head_coach",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_HEAD_COACH"
+        },
+        {
+            "code": "referee",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_REFEREE"
+        },
+        {
+            "code": "delegate",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_DELEGATE"
+        }
+    ],
+    "event_types": [
+        {
+            "code": "goal",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_EVENT_GOAL",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "statistic_code": "goals"
+        },
+        {
+            "code": "assist",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_EVENT_ASSIST",
+            "timeline": true,
+            "direction": 1,
+            "statistic_code": "assists"
+        },
+        {
+            "code": "penalty_two_minutes",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_EVENT_PENALTY_TWO_MINUTES",
+            "timeline": true,
+            "direction": -1,
+            "penalty_minutes": 2,
+            "statistic_code": "penalty_minutes"
+        },
+        {
+            "code": "penalty_five_minutes",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_EVENT_PENALTY_FIVE_MINUTES",
+            "timeline": true,
+            "direction": -1,
+            "penalty_minutes": 5,
+            "statistic_code": "penalty_minutes"
+        },
+        {
+            "code": "goalkeeper_change",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_EVENT_GOALKEEPER_CHANGE",
+            "timeline": true,
+            "requires_second_person": 1
+        }
+    ],
+    "statistics": [
+        {
+            "code": "goals",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_GOALS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_GOALS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "goal"
+            ]
+        },
+        {
+            "code": "assists",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_ASSISTS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_ASSISTS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "assist"
+            ]
+        },
+        {
+            "code": "points",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_POINTS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_POINTS_ABBR",
+            "statistic_type": "calculated",
+            "scope": "player",
+            "source": "calculated"
+        },
+        {
+            "code": "penalty_minutes",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_PENALTY_MINUTES",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_PENALTY_MINUTES_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "penalty_two_minutes",
+                "penalty_five_minutes"
+            ]
+        },
+        {
+            "code": "saves",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_SAVES",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_SAVES_ABBR",
+            "statistic_type": "advanced",
+            "scope": "goalkeeper",
+            "source": "manual_or_import"
+        },
+        {
+            "code": "shots_on_goal",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_SHOTS_ON_GOAL",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_STAT_SHOTS_ON_GOAL_ABBR",
+            "statistic_type": "advanced",
+            "scope": "team",
+            "source": "manual_or_import"
+        }
+    ],
+    "template_defaults": {
+        "results": {
+            "group_by_round": true
+        },
+        "ranking": {
+            "favorite_highlight_mode": "row"
+        },
+        "matchreport": {
+            "show_lineups": true,
+            "show_officials": true,
+            "show_timeline": true
+        }
+    },
+    "migration": {
+        "joomleague3_sport_keys": [
+            "COM_JOOMLEAGUE_ST_FLOORBALL",
+            "FLOORBALL"
+        ]
+    },
+    "sport_type_name_key": "COM_JOOMLEAGUE_ADMIN_SPORTTYPE_FLOORBALL_NAME",
+    "contest": {
+        "type": "head_to_head"
+    },
+    "match": {
+        "structure": {
+            "type": "timed_periods",
+            "period_name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_PERIOD_PERIOD",
+            "period_count": 3,
+            "period_length_minutes": 20,
+            "clock_mode": "mixed",
+            "default_start_time": "18:00",
+            "default_match_duration_minutes": 90,
+            "extra_time": {
+                "enabled": true,
+                "period_count": 1,
+                "period_name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_PERIOD_OVERTIME",
+                "period_length_minutes": 5,
+                "sudden_death": true
+            },
+            "shootout": {
+                "enabled": true,
+                "initial_attempts_per_team": 3
+            }
+        },
+        "score": {
+            "type": "numeric_score",
+            "unit": "goals",
+            "value_type": "integer",
+            "higher_is_better": true,
+            "supports_period_scores": true,
+            "supports_extra_time_score": true,
+            "supports_shootout_score": true,
+            "segment_types": [
+                {
+                    "code": "period",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_PERIOD",
+                    "unit": "periods",
+                    "value_type": "integer",
+                    "parent_code": null,
+                    "ordinal": 10,
+                    "repeatable": true,
+                    "expected_count": 3
+                },
+                {
+                    "code": "extra_time",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_EXTRA_TIME",
+                    "unit": "extra_time_periods",
+                    "value_type": "integer",
+                    "parent_code": null,
+                    "ordinal": 20,
+                    "repeatable": true,
+                    "expected_count": 1,
+                    "condition_code": "tied_after_regulation"
+                },
+                {
+                    "code": "shootout",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_SHOOTOUT",
+                    "unit": "shootouts",
+                    "value_type": "integer",
+                    "parent_code": null,
+                    "ordinal": 30,
+                    "repeatable": false,
+                    "expected_count": 1,
+                    "condition_code": "tied_after_extra_time"
+                }
+            ],
+            "aggregation": {
+                "mode": "validate",
+                "from": [
+                    "period",
+                    "extra_time"
+                ],
+                "final_only": true
+            }
+        },
+        "result_rules": {
+            "supports_forfeit": true,
+            "supports_postponed": true,
+            "supports_cancelled": true,
+            "supports_abandoned": true
+        },
+        "result_status_codes": [
+            "draft",
+            "in_progress",
+            "final"
+        ],
+        "outcome_codes": [
+            "completed",
+            "forfeit"
+        ],
+        "participant_status_codes": [
+            "eligible",
+            "started",
+            "substitute",
+            "finished",
+            "disqualified"
+        ]
+    }
+}

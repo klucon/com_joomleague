@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="console" method="upgrade">
+	<name>PLG_CONSOLE_JOOMLEAGUE</name>
+	<author>KLUCON</author>
+	<creationDate>August 2026</creationDate>
+	<copyright>Copyright (C) 2026 KLUCON. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later</license>
+	<version>6.2.0-dev</version>
+	<description>PLG_CONSOLE_JOOMLEAGUE_XML_DESCRIPTION</description>
+	<namespace path="src">Joomleague\Plugin\Console\Joomleague</namespace>
+	<files>
+		<folder plugin="joomleague">services</folder>
+		<folder>src</folder>
+		<folder>language</folder>
+	</files>
+</extension>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS">
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_COMPETITION_NAME_DESC" required="true" maxlength="255" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_ALIAS_DESC" maxlength="255" />
+		<field name="middle_name" type="text" label="COM_JOOMLEAGUE_FIELD_MIDDLE_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_MIDDLE_NAME_DESC" maxlength="100" />
+		<field name="short_name" type="text" label="COM_JOOMLEAGUE_FIELD_SHORT_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_SHORT_NAME_DESC" maxlength="50" />
+		<field name="code" type="text" label="COM_JOOMLEAGUE_FIELD_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_COMPETITION_CODE_DESC" maxlength="100" />
+		<field name="external_code" type="text" label="COM_JOOMLEAGUE_FIELD_EXTERNAL_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_EXTERNAL_CODE_DESC" maxlength="191" />
+		<field name="organisation" type="text" label="COM_JOOMLEAGUE_FIELD_ORGANISATION_LABEL" description="COM_JOOMLEAGUE_FIELD_ORGANISATION_DESC" maxlength="255" />
+		<field name="country_code" type="text" label="COM_JOOMLEAGUE_FIELD_COUNTRY_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_COUNTRY_CODE_DESC" maxlength="8" size="8" filter="cmd" />
+	</fieldset>
+	<fieldset name="description" label="JGLOBAL_DESCRIPTION">
+		<field name="description" type="editor" label="JGLOBAL_DESCRIPTION" description="COM_JOOMLEAGUE_FIELD_COMPETITION_DESCRIPTION_DESC" filter="safehtml" buttons="true" />
+	</fieldset>
+	<fieldset name="publishing" label="JGLOBAL_FIELDSET_PUBLISHING">
+		<field name="published" type="status" label="JSTATUS" description="COM_JOOMLEAGUE_FIELD_PUBLISHED_DESC" default="1" />
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" description="COM_JOOMLEAGUE_FIELD_ORDERING_DESC" default="0" />
+		<field name="uuid" type="text" label="COM_JOOMLEAGUE_FIELD_UUID_LABEL" description="COM_JOOMLEAGUE_FIELD_UUID_DESC" readonly="true" />
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" readonly="true" class="readonly" default="0" />
+	</fieldset>
+</form>

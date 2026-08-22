@@ -1,0 +1,15 @@
+{
+  "templateFamily": "schedule",
+  "templateId": "race-mass-start-v1",
+  "type": "race",
+  "generation": "repeatable",
+  "version": 1,
+  "labelKey": "COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_RACE_MASS_START",
+  "descriptionKey": "COM_JOOMLEAGUE_SCHEDULE_TEMPLATE_RACE_MASS_START_DESC",
+  "supportedTeamCounts": { "min": 1, "max": 10000 },
+  "properties": {
+    "allParticipantsPerContest": true,
+    "supportsMultipleRounds": true,
+    "staticSchedule": true
+  }
+}

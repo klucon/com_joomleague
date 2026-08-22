@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_TEAMPLAN_VIEW_DEFAULT_TITLE">
+		<message>
+			<![CDATA[COM_JOOMLEAGUE_TEAMPLAN_VIEW_DEFAULT_DESC]]>
+		</message>
+	</layout>
+
+	<!-- Added to the link's query string when this menu item is created/edited. -->
+	<fields name="request" addfieldpath="components/com_joomleague/fields">
+		<fieldset name="request">
+			<field
+				name="project_id"
+				type="sql"
+				required="true"
+				label="COM_JOOMLEAGUE_TEAMPLAN_REQUEST_PROJECT_LABEL"
+				description="COM_JOOMLEAGUE_TEAMPLAN_REQUEST_PROJECT_DESC"
+				query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id"
+				key_field="value"
+				value_field="text"
+			/>
+			<!--
+				Not required="true": this field's options depend on project_id, which
+				is only known once the item has been saved once — on first creation the
+				request fieldset is inserted fresh (project_id = 0), so no entry can be
+				listed yet. required="true" would make the browser refuse to submit that
+				first save at all, permanently blocking a brand-new item. Real enforcement
+				lives server-side in TeamplanModel::getPlan() instead (COM_JOOMLEAGUE_TEAMPLAN_NO_ENTRY).
+				Same two-step workflow as the module/standings-view "entry" field: save once
+				with just project_id set, then re-open the item to pick the actual entry.
+			-->
+			<field
+				name="entry_id"
+				type="entry"
+				default="0"
+				label="COM_JOOMLEAGUE_TEAMPLAN_REQUEST_ENTRY_LABEL"
+				description="COM_JOOMLEAGUE_TEAMPLAN_REQUEST_ENTRY_DESC"
+			>
+				<option value="0">COM_JOOMLEAGUE_TEAMPLAN_REQUEST_ENTRY_NONE</option>
+			</field>
+		</fieldset>
+	</fields>
+
+	<!-- Saved into the menu item's own params (Registry), read via $app->getParams(). -->
+	<fields name="params">
+		<fieldset name="params" label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_FIELDSET_LABEL">
+			<field
+				name="scope"
+				type="list"
+				default="all"
+				label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SCOPE_LABEL"
+				description="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SCOPE_DESC"
+			>
+				<option value="all">COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SCOPE_ALL</option>
+				<option value="upcoming">COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SCOPE_UPCOMING</option>
+				<option value="played">COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SCOPE_PLAYED</option>
+			</field>
+			<field
+				name="order_desc"
+				type="radio"
+				default="0"
+				label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_ORDER_DESC_LABEL"
+				description="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_ORDER_DESC_DESC"
+				layout="joomla.form.field.radio.switcher"
+			>
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+			<field
+				name="limit"
+				type="number"
+				default="0"
+				label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_LIMIT_LABEL"
+				description="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_LIMIT_DESC"
+			/>
+			<field
+				name="highlight_next"
+				type="radio"
+				default="1"
+				label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_HIGHLIGHT_NEXT_LABEL"
+				description="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_HIGHLIGHT_NEXT_DESC"
+				layout="joomla.form.field.radio.switcher"
+			>
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+			<field
+				name="show_round"
+				type="radio"
+				default="1"
+				label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SHOW_ROUND_LABEL"
+				description="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SHOW_ROUND_DESC"
+				layout="joomla.form.field.radio.switcher"
+			>
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+			<field
+				name="show_venue"
+				type="radio"
+				default="1"
+				label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SHOW_VENUE_LABEL"
+				description="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SHOW_VENUE_DESC"
+				layout="joomla.form.field.radio.switcher"
+			>
+				<option value="0">JNO</option>
+				<option value="1">JYES</option>
+			</field>
+		</fieldset>
+	</fields>
+</metadata>

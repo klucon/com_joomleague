@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_SPORTTYPE_DETAILS">
+		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_SPORTTYPE_NAME_DESC" required="true" maxlength="255" />
+		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_ALIAS_DESC" maxlength="255" />
+		<field name="code" type="text" label="COM_JOOMLEAGUE_FIELD_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_SPORTTYPE_CODE_DESC" required="true" maxlength="100" filter="cmd" />
+		<field name="profile_version_id" type="list" label="COM_JOOMLEAGUE_FIELD_PROFILE_VERSION_LABEL" description="COM_JOOMLEAGUE_FIELD_SPORTTYPE_PROFILE_VERSION_DESC" required="true"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_PROFILE_VERSION</option></field>
+	</fieldset>
+	<fieldset name="initialization" label="COM_JOOMLEAGUE_FIELDSET_SPORTTYPE_INITIALIZATION">
+		<field name="create_positions" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_FIELD_CREATE_POSITIONS_LABEL" description="COM_JOOMLEAGUE_FIELD_CREATE_POSITIONS_DESC" default="1" filter="integer">
+			<option value="0">JNO</option><option value="1">JYES</option>
+		</field>
+		<field name="create_event_types" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_FIELD_CREATE_EVENT_TYPES_LABEL" description="COM_JOOMLEAGUE_FIELD_CREATE_EVENT_TYPES_DESC" default="1" filter="integer">
+			<option value="0">JNO</option><option value="1">JYES</option>
+		</field>
+		<field name="create_statistics" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_FIELD_CREATE_STATISTICS_LABEL" description="COM_JOOMLEAGUE_FIELD_CREATE_STATISTICS_DESC" default="1" filter="integer">
+			<option value="0">JNO</option><option value="1">JYES</option>
+		</field>
+	</fieldset>
+	<fieldset name="publishing" label="JGLOBAL_FIELDSET_PUBLISHING">
+		<field name="published" type="status" label="JSTATUS" description="COM_JOOMLEAGUE_FIELD_PUBLISHED_DESC" default="1" />
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" description="COM_JOOMLEAGUE_FIELD_ORDERING_DESC" default="0" />
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" readonly="true" class="readonly" default="0" />
+	</fieldset>
+</form>

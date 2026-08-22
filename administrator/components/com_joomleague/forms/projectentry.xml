@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
+		<field name="project_id" type="hidden" filter="uint" required="true" />
+		<field name="entry_kind" type="Projectentrykind" label="COM_JOOMLEAGUE_PROJECTENTRIES_COLUMN_KIND" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_KIND_DESC" required="true" />
+		<field name="team_id" type="sql" label="COM_JOOMLEAGUE_FIELD_TEAM_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_TEAM_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_team WHERE published = 1 ORDER BY name" key_field="value" value_field="text" showon="entry_kind:team" default="0" validate="options">
+			<option value="0">COM_JOOMLEAGUE_OPTION_SELECT_TEAM</option>
+		</field>
+		<field name="person_id" type="sql" label="COM_JOOMLEAGUE_FIELD_PERSON_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_PERSON_DESC" query="SELECT id AS value, CONCAT(last_name, ', ', first_name) AS text FROM #__joomleague_person WHERE published = 1 ORDER BY last_name, first_name" key_field="value" value_field="text" showon="entry_kind:person" default="0" validate="options">
+			<option value="0">COM_JOOMLEAGUE_OPTION_SELECT_PERSON</option>
+		</field>
+		<field name="display_name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_GROUP_NAME_DESC" maxlength="255" showon="entry_kind:group" />
+		<field name="entry_code" type="text" label="COM_JOOMLEAGUE_PROJECTENTRIES_COLUMN_CODE" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_CODE_DESC" maxlength="100" />
+	</fieldset>
+	<fieldset name="competition" label="COM_JOOMLEAGUE_FIELDSET_COMPETITION_DATA">
+		<field name="seed_number" type="number" label="COM_JOOMLEAGUE_PROJECTENTRIES_COLUMN_SEED" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_SEED_DESC" min="1" filter="uint" />
+		<field name="bib_number" type="text" label="COM_JOOMLEAGUE_FIELD_BIB_NUMBER_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_BIB_DESC" maxlength="50" />
+		<field name="included_in_standings" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_FIELD_INCLUDED_IN_STANDINGS_LABEL" description="COM_JOOMLEAGUE_FIELD_INCLUDED_IN_STANDINGS_DESC" default="1" filter="integer">
+			<option value="0">JNO</option><option value="1">JYES</option>
+		</field>
+		<field name="lifecycle_state" type="list" label="COM_JOOMLEAGUE_FIELD_LIFECYCLE_STATE_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_LIFECYCLE_DESC" default="active" filter="cmd" validate="options">
+			<option value="active">COM_JOOMLEAGUE_LIFECYCLE_ACTIVE</option>
+			<option value="inactive">COM_JOOMLEAGUE_LIFECYCLE_INACTIVE</option>
+			<option value="withdrawn">COM_JOOMLEAGUE_LIFECYCLE_WITHDRAWN</option>
+			<option value="disqualified">COM_JOOMLEAGUE_LIFECYCLE_DISQUALIFIED</option>
+		</field>
+		<field name="notes" type="textarea" label="COM_JOOMLEAGUE_FIELD_NOTES_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_NOTES_DESC" rows="5" filter="safehtml" />
+	</fieldset>
+	<fieldset name="publishing" label="JGLOBAL_FIELDSET_PUBLISHING">
+		<field name="published" type="status" label="JSTATUS" description="COM_JOOMLEAGUE_FIELD_PUBLISHED_DESC" default="1" />
+		<field name="ordering" type="number" label="JFIELD_ORDERING_LABEL" description="COM_JOOMLEAGUE_FIELD_ORDERING_DESC" default="0" />
+		<field name="uuid" type="text" label="COM_JOOMLEAGUE_FIELD_UUID_LABEL" description="COM_JOOMLEAGUE_FIELD_UUID_DESC" readonly="true" />
+		<field name="id" type="text" label="JGLOBAL_FIELD_ID_LABEL" description="JGLOBAL_FIELD_ID_DESC" readonly="true" class="readonly" default="0" />
+	</fieldset>
+</form>

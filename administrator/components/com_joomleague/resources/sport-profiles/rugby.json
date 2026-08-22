@@ -1,0 +1,525 @@
+{
+    "schema_version": "1.4.0",
+    "code": "rugby",
+    "version": "1.5.0",
+    "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY",
+    "description_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_DESC",
+    "scoring_model": "points",
+    "project_types": [
+        "league",
+        "cup",
+        "tournament",
+        "friendly",
+        "combined_stage"
+    ],
+    "entry_model": {
+        "allowed_kinds": [
+            "team"
+        ],
+        "default_kind": "team",
+        "members_supported": true,
+        "member_person_types": [
+            "player",
+            "staff"
+        ]
+    },
+    "project_rule_schema": {
+        "schema_version": "1.0.0",
+        "fields": {
+            "/match_structure/period_count": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 20
+            },
+            "/match_structure/period_length_minutes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 120
+            },
+            "/match_structure/default_start_time": {
+                "type": "string",
+                "pattern": "~^(?:[01]\\d|2[0-3]):[0-5]\\d$~"
+            },
+            "/standings/points_regular": {
+                "type": "array",
+                "min_items": 3,
+                "max_items": 3,
+                "items": {
+                    "type": "number"
+                }
+            },
+            "/standings/bonus_try": {
+                "type": "number",
+                "minimum": 0
+            },
+            "/standings/bonus_losing": {
+                "type": "number",
+                "minimum": 0
+            }
+        }
+    },
+    "match_structure": {
+        "type": "timed_periods",
+        "period_name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_PERIOD_HALF",
+        "period_count": 2,
+        "period_length_minutes": 40,
+        "default_start_time": "15:00",
+        "default_match_duration_minutes": 100
+    },
+    "lineup": {
+        "preferred_order": [
+            "prop",
+            "hooker",
+            "lock",
+            "flanker",
+            "scrum_half",
+            "fly_half",
+            "centre",
+            "wing",
+            "full_back"
+        ]
+    },
+    "standings": {
+        "points_regular": [
+            4,
+            2,
+            0
+        ],
+        "bonus_try": 1,
+        "bonus_losing": 1,
+        "show_score": true,
+        "show_point_difference": true,
+        "sort_order": [
+            "points",
+            "wins",
+            "point_difference",
+            "points_for",
+            "name"
+        ],
+        "columns": [
+            "rank",
+            "team",
+            "played",
+            "wins",
+            "draws",
+            "losses",
+            "points_for_against",
+            "point_difference",
+            "bonus_points",
+            "points"
+        ],
+        "type": "team_table",
+        "points": {
+            "regular": {
+                "win": 4,
+                "draw": 2,
+                "loss": 0,
+                "draw_supported": true
+            },
+            "bonus": {
+                "try": 1,
+                "losing": 1
+            }
+        },
+        "calculation": {
+            "mode": "head_to_head",
+            "outcome_source": "root_numeric",
+            "included_result_statuses": [
+                "final"
+            ],
+            "metrics": [
+                {
+                    "code": "played",
+                    "operation": "count_matches",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "wins",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "win"
+                },
+                {
+                    "code": "draws",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "draw"
+                },
+                {
+                    "code": "losses",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "loss"
+                },
+                {
+                    "code": "score_for",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "own"
+                },
+                {
+                    "code": "score_against",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "score_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "score_for",
+                    "right_metric": "score_against"
+                },
+                {
+                    "code": "points",
+                    "operation": "sum_awards",
+                    "value_type": "decimal"
+                }
+            ],
+            "awards": {
+                "mode": "outcome_rules",
+                "rule_strategy": "first_match",
+                "rules": [
+                    {
+                        "when": {
+                            "type": "always"
+                        },
+                        "values": {
+                            "winner": 4,
+                            "draw": 2,
+                            "loser": 0
+                        }
+                    }
+                ],
+                "bonus_rules": [
+                    {
+                        "when": {
+                            "type": "statistic",
+                            "operator": "gte",
+                            "code": "tries",
+                            "value": 4
+                        },
+                        "value": 1
+                    },
+                    {
+                        "when": {
+                            "type": "all",
+                            "conditions": [
+                                {
+                                    "type": "outcome",
+                                    "operator": "eq",
+                                    "value": "loss"
+                                },
+                                {
+                                    "type": "score_difference",
+                                    "operator": "gte",
+                                    "value": -7
+                                }
+                            ]
+                        },
+                        "value": 1
+                    }
+                ]
+            },
+            "ordering": [
+                {
+                    "metric": "points",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "wins",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "score_difference",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "score_for",
+                    "direction": "desc",
+                    "nulls": "last"
+                }
+            ],
+            "scopes": [
+                {
+                    "code": "total",
+                    "filter": {
+                        "type": "always"
+                    }
+                }
+            ]
+        }
+    },
+    "result_rules": {
+        "supports_forfeit": true,
+        "supports_postponed": true,
+        "supports_cancelled": true,
+        "supports_abandoned": true
+    },
+    "positions": [
+        {
+            "code": "prop",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_PROP"
+        },
+        {
+            "code": "hooker",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_HOOKER"
+        },
+        {
+            "code": "lock",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_LOCK"
+        },
+        {
+            "code": "flanker",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_FLANKER"
+        },
+        {
+            "code": "scrum_half",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_SCRUM_HALF"
+        },
+        {
+            "code": "fly_half",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_FLY_HALF"
+        },
+        {
+            "code": "centre",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_CENTRE"
+        },
+        {
+            "code": "wing",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_WING"
+        },
+        {
+            "code": "full_back",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_FULL_BACK"
+        },
+        {
+            "code": "head_coach",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_HEAD_COACH"
+        },
+        {
+            "code": "referee",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_REFEREE"
+        },
+        {
+            "code": "touch_judge",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_TOUCH_JUDGE"
+        }
+    ],
+    "event_types": [
+        {
+            "code": "try",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_EVENT_TRY",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "points": 5,
+            "statistic_code": "tries"
+        },
+        {
+            "code": "conversion",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_EVENT_CONVERSION",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "points": 2,
+            "statistic_code": "conversions"
+        },
+        {
+            "code": "penalty_goal",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_EVENT_PENALTY_GOAL",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "points": 3,
+            "statistic_code": "penalty_goals"
+        },
+        {
+            "code": "drop_goal",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_EVENT_DROP_GOAL",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "points": 3,
+            "statistic_code": "drop_goals"
+        },
+        {
+            "code": "yellow_card",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_EVENT_YELLOW_CARD",
+            "timeline": true,
+            "direction": -1,
+            "penalty_minutes": 10,
+            "statistic_code": "yellow_cards"
+        },
+        {
+            "code": "red_card",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_EVENT_RED_CARD",
+            "timeline": true,
+            "direction": -1,
+            "leads_to_suspension": 1,
+            "statistic_code": "red_cards"
+        }
+    ],
+    "statistics": [
+        {
+            "code": "tries",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_TRIES",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_TRIES_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "try"
+            ]
+        },
+        {
+            "code": "conversions",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_CONVERSIONS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_CONVERSIONS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "conversion"
+            ]
+        },
+        {
+            "code": "penalty_goals",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_PENALTY_GOALS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_PENALTY_GOALS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "penalty_goal"
+            ]
+        },
+        {
+            "code": "drop_goals",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_DROP_GOALS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_DROP_GOALS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "drop_goal"
+            ]
+        },
+        {
+            "code": "yellow_cards",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_YELLOW_CARDS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_YELLOW_CARDS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "yellow_card"
+            ]
+        },
+        {
+            "code": "red_cards",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_RED_CARDS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_STAT_RED_CARDS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "red_card"
+            ]
+        }
+    ],
+    "template_defaults": {
+        "results": {
+            "group_by_round": true
+        },
+        "ranking": {
+            "favorite_highlight_mode": "row"
+        },
+        "matchreport": {
+            "show_lineups": true,
+            "show_officials": true,
+            "show_timeline": true
+        }
+    },
+    "migration": {
+        "joomleague3_sport_keys": [
+            "RUGBY"
+        ]
+    },
+    "sport_type_name_key": "COM_JOOMLEAGUE_ADMIN_SPORTTYPE_RUGBY_NAME",
+    "contest": {
+        "type": "head_to_head"
+    },
+    "match": {
+        "structure": {
+            "type": "timed_periods",
+            "period_name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_PERIOD_HALF",
+            "period_count": 2,
+            "period_length_minutes": 40,
+            "default_start_time": "15:00",
+            "default_match_duration_minutes": 100
+        },
+        "score": {
+            "type": "numeric_score",
+            "unit": "points",
+            "value_type": "integer",
+            "higher_is_better": true,
+            "segment_types": [
+                {
+                    "code": "period",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_PERIOD",
+                    "unit": "periods",
+                    "value_type": "integer",
+                    "parent_code": null,
+                    "ordinal": 10,
+                    "repeatable": true,
+                    "expected_count": 2
+                }
+            ],
+            "aggregation": {
+                "mode": "validate",
+                "from": [
+                    "period"
+                ],
+                "final_only": true
+            }
+        },
+        "result_rules": {
+            "supports_forfeit": true,
+            "supports_postponed": true,
+            "supports_cancelled": true,
+            "supports_abandoned": true
+        },
+        "result_status_codes": [
+            "draft",
+            "in_progress",
+            "final"
+        ],
+        "outcome_codes": [
+            "completed",
+            "forfeit"
+        ],
+        "participant_status_codes": [
+            "eligible",
+            "started",
+            "substitute",
+            "finished",
+            "disqualified"
+        ]
+    }
+}

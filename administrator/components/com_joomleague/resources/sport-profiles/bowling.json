@@ -1,0 +1,386 @@
+{
+    "schema_version": "1.4.0",
+    "code": "bowling",
+    "version": "1.5.0",
+    "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING",
+    "description_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_DESC",
+    "scoring_model": "pins",
+    "project_types": [
+        "league",
+        "cup",
+        "tournament",
+        "friendly",
+        "combined_stage"
+    ],
+    "entry_model": {
+        "allowed_kinds": [
+            "team",
+            "person"
+        ],
+        "default_kind": "team",
+        "members_supported": true,
+        "member_person_types": [
+            "player",
+            "staff"
+        ]
+    },
+    "project_rule_schema": {
+        "schema_version": "1.0.0",
+        "fields": {
+            "/match_structure/frames_supported": {
+                "type": "boolean"
+            },
+            "/match_structure/throws_supported": {
+                "type": "boolean"
+            },
+            "/match_structure/lanes_supported": {
+                "type": "boolean"
+            },
+            "/match_structure/handicap_supported": {
+                "type": "boolean"
+            },
+            "/match_structure/default_start_time": {
+                "type": "string",
+                "pattern": "~^(?:[01]\\d|2[0-3]):[0-5]\\d$~"
+            }
+        }
+    },
+    "match_structure": {
+        "type": "throw_totals",
+        "period_name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_PERIOD_GAME",
+        "frames_supported": true,
+        "throws_supported": true,
+        "lanes_supported": true,
+        "handicap_supported": true,
+        "default_start_time": "18:00"
+    },
+    "lineup": {
+        "preferred_order": [
+            "player"
+        ]
+    },
+    "standings": {
+        "sort_order": [
+            "points",
+            "pin_difference",
+            "pins_for",
+            "wins",
+            "name"
+        ],
+        "columns": [
+            "rank",
+            "team_or_player",
+            "played",
+            "wins",
+            "losses",
+            "pins_for_against",
+            "pin_difference",
+            "handicap",
+            "points"
+        ],
+        "type": "team_table",
+        "calculation": {
+            "mode": "head_to_head",
+            "outcome_source": "root_numeric",
+            "included_result_statuses": [
+                "final"
+            ],
+            "metrics": [
+                {
+                    "code": "played",
+                    "operation": "count_matches",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "wins",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "win"
+                },
+                {
+                    "code": "draws",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "draw"
+                },
+                {
+                    "code": "losses",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "loss"
+                },
+                {
+                    "code": "score_for",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "own"
+                },
+                {
+                    "code": "score_against",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "score_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "score_for",
+                    "right_metric": "score_against"
+                },
+                {
+                    "code": "points",
+                    "operation": "sum_awards",
+                    "value_type": "decimal"
+                }
+            ],
+            "awards": {
+                "mode": "none",
+                "rule_strategy": "first_match",
+                "rules": [],
+                "bonus_rules": []
+            },
+            "ordering": [
+                {
+                    "metric": "score_difference",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "score_for",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "wins",
+                    "direction": "desc",
+                    "nulls": "last"
+                }
+            ],
+            "scopes": [
+                {
+                    "code": "total",
+                    "filter": {
+                        "type": "always"
+                    }
+                }
+            ]
+        }
+    },
+    "result_rules": {
+        "supports_forfeit": true,
+        "supports_postponed": true,
+        "supports_cancelled": true,
+        "supports_abandoned": true
+    },
+    "positions": [
+        {
+            "code": "player",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_PLAYER"
+        },
+        {
+            "code": "captain",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_CAPTAIN"
+        },
+        {
+            "code": "coach",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_COACH"
+        },
+        {
+            "code": "referee",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_REFEREE"
+        },
+        {
+            "code": "lane_official",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_LANE_OFFICIAL"
+        }
+    ],
+    "event_types": [
+        {
+            "code": "game_total",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_EVENT_GAME_TOTAL",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": true,
+            "statistic_code": "pins"
+        },
+        {
+            "code": "strike",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_EVENT_STRIKE",
+            "timeline": true,
+            "direction": 1,
+            "statistic_code": "strikes"
+        },
+        {
+            "code": "spare",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_EVENT_SPARE",
+            "timeline": true,
+            "direction": 1,
+            "statistic_code": "spares"
+        },
+        {
+            "code": "handicap",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_EVENT_HANDICAP",
+            "timeline": true,
+            "direction": 1,
+            "statistic_code": "handicap"
+        },
+        {
+            "code": "foul",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_EVENT_FOUL",
+            "timeline": true,
+            "direction": -1,
+            "statistic_code": "fouls"
+        }
+    ],
+    "statistics": [
+        {
+            "code": "pins",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_PINS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_PINS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "game_total"
+            ]
+        },
+        {
+            "code": "average",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_AVERAGE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_AVERAGE_ABBR",
+            "statistic_type": "calculated",
+            "scope": "player",
+            "value_type": "decimal",
+            "source": "calculated"
+        },
+        {
+            "code": "strikes",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_STRIKES",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_STRIKES_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "strike"
+            ]
+        },
+        {
+            "code": "spares",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_SPARES",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_SPARES_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "spare"
+            ]
+        },
+        {
+            "code": "handicap",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_HANDICAP",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_HANDICAP_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "handicap"
+            ]
+        },
+        {
+            "code": "fouls",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_FOULS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_STAT_FOULS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "event",
+            "event_codes": [
+                "foul"
+            ]
+        }
+    ],
+    "template_defaults": {
+        "results": {
+            "group_by_round": true
+        },
+        "ranking": {
+            "favorite_highlight_mode": "row"
+        },
+        "matchreport": {
+            "show_lineups": true,
+            "show_officials": true,
+            "show_timeline": true
+        }
+    },
+    "migration": {
+        "joomleague3_sport_keys": [
+            "BOWLING",
+            "NINE_PIN_BOWLING",
+            "KUZELKY"
+        ]
+    },
+    "sport_type_name_key": "COM_JOOMLEAGUE_ADMIN_SPORTTYPE_BOWLING_NAME",
+    "contest": {
+        "type": "head_to_head"
+    },
+    "match": {
+        "structure": {
+            "type": "throw_totals",
+            "period_name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_PERIOD_GAME",
+            "frames_supported": true,
+            "throws_supported": true,
+            "lanes_supported": true,
+            "handicap_supported": true,
+            "default_start_time": "18:00"
+        },
+        "score": {
+            "type": "numeric_score",
+            "unit": "pins",
+            "value_type": "integer",
+            "higher_is_better": true,
+            "segment_types": [
+                {
+                    "code": "game",
+                    "name_key": "COM_JOOMLEAGUE_SCORE_SEGMENT_GAME",
+                    "unit": "games",
+                    "value_type": "integer",
+                    "parent_code": null,
+                    "ordinal": 10,
+                    "repeatable": true
+                }
+            ],
+            "aggregation": {
+                "mode": "none",
+                "from": [],
+                "final_only": true
+            }
+        },
+        "result_rules": {
+            "supports_forfeit": true,
+            "supports_postponed": true,
+            "supports_cancelled": true,
+            "supports_abandoned": true
+        },
+        "result_status_codes": [
+            "draft",
+            "in_progress",
+            "final"
+        ],
+        "outcome_codes": [
+            "completed",
+            "forfeit"
+        ],
+        "participant_status_codes": [
+            "eligible",
+            "started",
+            "substitute",
+            "finished",
+            "disqualified"
+        ]
+    }
+}
