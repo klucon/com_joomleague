@@ -44,8 +44,8 @@ final class HtmlView extends BaseHtmlView
 		$this->canEdit = $user->authorise('core.edit', $asset);
 		ToolbarHelper::title(Text::sprintf('COM_JOOMLEAGUE_ENTRYMEMBERS_TITLE', $this->entry->resolved_name), 'users');
 		if ($user->authorise('core.create', $asset)) ToolbarHelper::addNew('entrymember.add');
-		if ($this->items !== [] && $this->canEdit) ToolbarHelper::editList('entrymember.edit');
-		if ($this->items !== [] && $user->authorise('core.delete', $asset)) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'entrymembers.delete');
+			if ($this->members !== [] && $this->canEdit) ToolbarHelper::editList('entrymember.edit');
+			if ($this->members !== [] && $user->authorise('core.delete', $asset)) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'entrymembers.delete');
 		ToolbarHelper::link('index.php?option=com_joomleague&view=projectentries&project_id=' . (int) $this->entry->project_id, 'JTOOLBAR_CLOSE', 'cancel');
 		parent::display($tpl);
 	}

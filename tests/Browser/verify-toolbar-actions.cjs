@@ -45,6 +45,11 @@ const { chromium } = require('playwright');
 		if (!sqlDownload.suggestedFilename().endsWith('.sql')) throw new Error('Table export did not download an SQL file.');
 
 		if (projectId) {
+			await page.goto(`${baseUrl}/administrator/index.php?option=com_joomleague&view=projectentries&project_id=${projectId}`, { waitUntil: 'networkidle' });
+			if ((await page.locator('body').innerText()).includes('Warning: Undefined property')) {
+				throw new Error('Project entries renders an undefined-property warning.');
+			}
+
 			await page.goto(`${baseUrl}/administrator/index.php?option=com_joomleague&view=projectschedule&project_id=${projectId}`, { waitUntil: 'networkidle' });
 			const [csvDownload] = await Promise.all([
 				page.waitForEvent('download'),
