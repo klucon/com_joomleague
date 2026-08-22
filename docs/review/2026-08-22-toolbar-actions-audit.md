@@ -28,6 +28,7 @@ Date: 2026-08-22
 - Sport-profile synchronization, project asset rebuild, schedule preview and standings recalculation completed without runtime errors.
 - Match batch modal opened through its toolbar button after the web-asset correction.
 - List edit navigation passed for clubs, competitions, persons, projects, seasons, sport types, teams, venues, stages, rounds, matches and project entries.
+- Project duplication created a complete copy, redirected to its editor and the test copy was then deleted successfully.
 - A temporary club exercised unpublish, publish, check-in and confirmed delete; cleanup completed.
 - Club, team, person and venue create/delete browser workflows passed.
 - Match participant and lineup custom actions returned safely when no row was selected.
