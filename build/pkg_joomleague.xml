@@ -9,8 +9,14 @@
 	<authorUrl>https://klucon.cz</authorUrl>
 	<copyright>Copyright (C) 2026 KLUCON. All rights reserved.</copyright>
 	<license>GNU General Public License version 2 or later</license>
-	<description>JoomLeague administrator component and integrations.</description>
+	<description>PKG_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<scriptfile>pkg_script.php</scriptfile>
+	<languages folder="language">
+		<language tag="en-GB">en-GB/pkg_joomleague.ini</language>
+		<language tag="en-GB">en-GB/pkg_joomleague.sys.ini</language>
+		<language tag="cs-CZ">cs-CZ/pkg_joomleague.ini</language>
+		<language tag="cs-CZ">cs-CZ/pkg_joomleague.sys.ini</language>
+	</languages>
 	<files>
 		<file type="component" id="com_joomleague">com_joomleague-6.2.0-dev.zip</file>
 		<file type="plugin" id="joomleague" group="quickicon">plg_quickicon_joomleague-6.2.0-dev.zip</file>

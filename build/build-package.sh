@@ -56,6 +56,7 @@ PACKAGE_STAGE="$(mktemp -d)"
 trap 'find "${PACKAGE_STAGE}" -mindepth 1 -delete; rmdir "${PACKAGE_STAGE}"' EXIT
 cp "${ROOT}/build/pkg_joomleague.xml" "${PACKAGE_STAGE}/pkg_joomleague.xml"
 cp "${ROOT}/build/pkg_script.php" "${PACKAGE_STAGE}/pkg_script.php"
+cp -a "${ROOT}/build/language" "${PACKAGE_STAGE}/language"
 cp "${PACKAGE}" "${PLUGIN_PACKAGE}" "${CONSOLE_PLUGIN_PACKAGE}" "${TASK_PLUGIN_PACKAGE}" "${STANDINGS_MODULE_PACKAGE}" "${PACKAGE_STAGE}/"
 (
 	cd "${PACKAGE_STAGE}"

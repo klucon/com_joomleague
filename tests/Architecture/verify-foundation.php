@@ -26,6 +26,16 @@ $consolePlugin = $root . '/plugins/console/joomleague';
 $taskPlugin = $root . '/plugins/task/joomleague';
 $packageManifest = (string) file_get_contents($root . '/build/pkg_joomleague.xml');
 
+foreach (['en-GB', 'cs-CZ'] as $packageLanguage) {
+	foreach (['pkg_joomleague.ini', 'pkg_joomleague.sys.ini'] as $packageLanguageFile) {
+		$languagePath = $root . '/build/language/' . $packageLanguage . '/' . $packageLanguageFile;
+
+		if (!is_file($languagePath) || !str_contains((string) file_get_contents($languagePath), 'PKG_JOOMLEAGUE="JoomLeague"')) {
+			throw new RuntimeException(sprintf('Package language %s/%s is missing or incomplete.', $packageLanguage, $packageLanguageFile));
+		}
+	}
+}
+
 if (preg_match('/<uninstall>\s*<sql>/i', $manifest) === 1) {
 	throw new RuntimeException('The component manifest must not run destructive SQL during uninstallation.');
 }
