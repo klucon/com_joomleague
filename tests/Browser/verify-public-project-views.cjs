@@ -8,13 +8,14 @@ const { chromium } = require('playwright');
 	const participantPath = process.env.JOOMLA_PARTICIPANT_MENU_PATH;
 	const personPath = process.env.JOOMLA_PERSON_MENU_PATH;
 	const clubPath = process.env.JOOMLA_CLUB_MENU_PATH;
+	const teamPath = process.env.JOOMLA_TEAM_MENU_PATH;
 	const expectedProject = process.env.JOOMLA_EXPECTED_PROJECT;
 	const expectedParticipant = process.env.JOOMLA_EXPECTED_PARTICIPANT;
 	const expectedMember = process.env.JOOMLA_EXPECTED_MEMBER;
 	const expectedClub = process.env.JOOMLA_EXPECTED_CLUB;
 	const expectedSecondTeam = process.env.JOOMLA_EXPECTED_SECOND_TEAM;
 
-	if (!baseUrl || !projectsPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam) {
+	if (!baseUrl || !projectsPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !teamPath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam) {
 		throw new Error('Public project view browser test environment is incomplete.');
 	}
 
@@ -133,10 +134,30 @@ const { chromium } = require('playwright');
 				throw new Error(`Public club profile failed at ${viewport.width}px: overflow=${clubOverflow}, errors=${errors.join('; ')}`);
 			}
 
+			const teamLink = page.locator('main a').filter({ hasText: expectedParticipant }).first();
+			if (await teamLink.count() !== 1) {
+				throw new Error(`Team profile link is missing at ${viewport.width}px.`);
+			}
+
+			await page.goto(new URL(teamPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
+			await page.locator('main').waitFor();
+			const teamText = await page.locator('main').innerText();
+			const teamOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+			if (!teamText.includes(expectedParticipant)
+				|| !teamText.includes(expectedClub)
+				|| !teamText.includes(expectedProject)
+				|| !/Účast v soutěžích|Competition participation/.test(teamText)
+				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(teamText)
+				|| teamOverflow > 1
+				|| errors.length > 0) {
+				throw new Error(`Public team profile failed at ${viewport.width}px: overflow=${teamOverflow}, errors=${errors.join('; ')}`);
+			}
+
 			await page.close();
 		}
 
-		console.log('Public competition catalogue, overview, participants, participant, member and club profiles passed desktop and mobile menu routes.');
+		console.log('Public competition catalogue, overview, participants, participant, member, club and team profiles passed desktop and mobile menu routes.');
 	} finally {
 		await browser.close();
 	}

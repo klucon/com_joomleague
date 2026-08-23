@@ -51,7 +51,7 @@ $data = $this->club;
 					<div class="col"><article class="card h-100"><div class="card-body">
 						<div class="d-flex gap-3 align-items-start">
 							<?php if ($media) : ?><img src="<?php echo htmlspecialchars((string) $media, ENT_QUOTES, 'UTF-8'); ?>" alt="" class="img-fluid" width="72" height="72" loading="lazy"><?php else : ?><span class="icon-users fs-2 text-body-secondary" aria-hidden="true"></span><?php endif; ?>
-							<div class="flex-grow-1"><h3 class="h5 mb-1"><?php echo htmlspecialchars((string) $team->name, ENT_QUOTES, 'UTF-8'); ?></h3><?php if ($team->middle_name || $team->short_name) : ?><div class="text-body-secondary"><?php echo htmlspecialchars((string) ($team->middle_name ?: $team->short_name), ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?></div>
+							<div class="flex-grow-1"><h3 class="h5 mb-1"><a href="<?php echo Route::_('index.php?option=com_joomleague&view=team&team_id=' . (int) $team->id); ?>"><?php echo htmlspecialchars((string) $team->name, ENT_QUOTES, 'UTF-8'); ?></a></h3><?php if ($team->middle_name || $team->short_name) : ?><div class="text-body-secondary"><?php echo htmlspecialchars((string) ($team->middle_name ?: $team->short_name), ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?></div>
 						</div>
 						<?php if (trim((string) $team->description) !== '') : ?><p class="mt-3 mb-0"><?php echo nl2br(htmlspecialchars((string) $team->description, ENT_QUOTES, 'UTF-8')); ?></p><?php endif; ?>
 						<?php if ($team->projects !== []) : ?>
