@@ -25,6 +25,18 @@ $quickIcon = $root . '/plugins/quickicon/joomleague';
 $consolePlugin = $root . '/plugins/console/joomleague';
 $taskPlugin = $root . '/plugins/task/joomleague';
 
+if (preg_match('/<uninstall>\s*<sql>/i', $manifest) === 1) {
+	throw new RuntimeException('The component manifest must not run destructive SQL during uninstallation.');
+}
+
+foreach (['mysql', 'postgresql'] as $driver) {
+	$uninstallSql = (string) file_get_contents($admin . '/sql/uninstall.' . ($driver === 'mysql' ? 'mysql.utf8' : 'postgresql') . '.sql');
+
+	if (preg_match('/\bDROP\s+TABLE\b/i', $uninstallSql) === 1) {
+		throw new RuntimeException(sprintf('%s uninstall SQL must preserve JoomLeague data tables.', $driver));
+	}
+}
+
 $installerScript = (string) file_get_contents($admin . '/script.php');
 
 foreach (['ProjectRuleValidator.php', 'EntryModelValidator.php', 'StandingsContractValidator.php', 'SportProfileSchemaValidator.php'] as $installerDependency) {
