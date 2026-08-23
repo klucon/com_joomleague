@@ -126,6 +126,9 @@ $programItemModelSource = (string) file_get_contents($site . '/src/Model/Program
 if (!str_contains($programItemModelSource, "if (\$item->result_status === 'final')")) {
 	throw new RuntimeException('The public programme item must not expose non-final score payloads.');
 }
+if (!str_contains($programItemModelSource, "entry.entry_kind = 'team' AND team.id IS NOT NULL")) {
+	throw new RuntimeException('The public programme item must not expose entries linked to unpublished entities.');
+}
 
 foreach (['mysql', 'postgresql'] as $driver) {
 	$uninstallSql = (string) file_get_contents($admin . '/sql/uninstall.' . ($driver === 'mysql' ? 'mysql.utf8' : 'postgresql') . '.sql');
@@ -1058,7 +1061,8 @@ $siteResultsTemplate = (string) file_get_contents($root . '/components/com_jooml
 if (!str_contains($siteResultsModel, "result.status_code = 'final'")
 	|| !str_contains($siteResultsModel, 'participant.slot_number ASC')
 	|| !str_contains($siteResultsModel, 'value.text_value')
-	|| !str_contains($siteResultsModel, 'value.result_rank')) {
+	|| !str_contains($siteResultsModel, 'value.result_rank')
+	|| !str_contains($siteResultsModel, "entry.entry_kind = 'person' AND person.id IS NOT NULL")) {
 	throw new RuntimeException('Public programme must support ordered participants and expose finalized universal result values only.');
 }
 foreach (['home_score', 'away_score', 'show_scorers', "'goal'", "'own_goal'"] as $footballOnlyToken) {
@@ -1068,6 +1072,19 @@ foreach (['home_score', 'away_score', 'show_scorers', "'goal'", "'own_goal'"] as
 }
 if (preg_match('/<style\b|style\s*=|<script\b/i', $siteResultsTemplate) === 1) {
 	throw new RuntimeException('Public programme must use native Joomla styling without embedded CSS or scripts.');
+}
+
+$siteBracketModel = (string) file_get_contents($root . '/components/com_joomleague/src/Model/BracketModel.php');
+$siteBracketTemplate = (string) file_get_contents($root . '/components/com_joomleague/tmpl/bracket/default.php');
+foreach (['project_entry_id', "result.status_code = 'final'", 'value.text_value', 'value.result_rank', 'PARTICIPANT_HEIGHT'] as $bracketRequirement) {
+	if (!str_contains($siteBracketModel, $bracketRequirement)) {
+		throw new RuntimeException(sprintf('Public progression bracket is missing universal requirement %s.', $bracketRequirement));
+	}
+}
+foreach (['home_score', 'away_score', 'home_shootout', 'away_shootout', "['home']", "['away']"] as $headToHeadToken) {
+	if (str_contains($siteBracketModel . $siteBracketTemplate, $headToHeadToken)) {
+		throw new RuntimeException(sprintf('Public progression bracket contains head-to-head token %s.', $headToHeadToken));
+	}
 }
 
 printf(

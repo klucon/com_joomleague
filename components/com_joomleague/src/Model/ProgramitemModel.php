@@ -72,6 +72,7 @@ final class ProgramitemModel extends BaseDatabaseModel
 				->leftJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id AND person.published = 1')
 				->where('participant.match_id = :matchId')
 				->where('participant.published = 1')
+				->where("((entry.entry_kind = 'team' AND team.id IS NOT NULL) OR (entry.entry_kind = 'person' AND person.id IS NOT NULL) OR entry.entry_kind = 'group')")
 				->bind(':matchId', $matchId, ParameterType::INTEGER)
 				->order('participant.slot_number ASC, participant.id ASC')
 		)->loadObjectList();

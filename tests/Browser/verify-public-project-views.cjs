@@ -14,6 +14,7 @@ const { chromium } = require('playwright');
 	const venuePath = process.env.JOOMLA_VENUE_MENU_PATH;
 	const programItemPath = process.env.JOOMLA_PROGRAMITEM_MENU_PATH;
 	const resultsPath = process.env.JOOMLA_RESULTS_MENU_PATH;
+	const bracketPath = process.env.JOOMLA_BRACKET_MENU_PATH;
 	const expectedProject = process.env.JOOMLA_EXPECTED_PROJECT;
 	const expectedParticipant = process.env.JOOMLA_EXPECTED_PARTICIPANT;
 	const expectedMember = process.env.JOOMLA_EXPECTED_MEMBER;
@@ -21,7 +22,7 @@ const { chromium } = require('playwright');
 	const expectedSecondTeam = process.env.JOOMLA_EXPECTED_SECOND_TEAM;
 	const expectedVenue = process.env.JOOMLA_EXPECTED_VENUE;
 
-	if (!baseUrl || !projectsPath || !clubsPath || !venuesPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !teamPath || !venuePath || !programItemPath || !resultsPath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam || !expectedVenue) {
+	if (!baseUrl || !projectsPath || !clubsPath || !venuesPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !teamPath || !venuePath || !programItemPath || !resultsPath || !bracketPath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam || !expectedVenue) {
 		throw new Error('Public project view browser test environment is incomplete.');
 	}
 
@@ -261,10 +262,30 @@ const { chromium } = require('playwright');
 				throw new Error(`Public programme failed at ${viewport.width}px: overflow=${resultsOverflow}, errors=${errors.join('; ')}`);
 			}
 
+			await page.goto(new URL(bracketPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
+			await page.locator('.jl-bracket-canvas').waitFor();
+			const bracketText = await page.locator('main').innerText();
+			const bracketOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+			if (!bracketText.includes(expectedProject)
+				|| !bracketText.includes(expectedParticipant)
+				|| !bracketText.includes(expectedSecondTeam)
+				|| !bracketText.toLowerCase().includes('demo round 1')
+				|| !bracketText.toLowerCase().includes('demo final round')
+				|| !/Vyřazovací pavouk|Bracket/.test(bracketText)
+				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(bracketText)
+				|| bracketOverflow > 1
+				|| errors.length > 0) {
+				throw new Error(`Public progression bracket failed at ${viewport.width}px: overflow=${bracketOverflow}, errors=${errors.join('; ')}`);
+			}
+			await page.locator('.jl-bracket-match__name[data-entry]').first().click();
+			if (await page.locator('.jl-bracket-match--active').count() < 2) {
+				throw new Error(`Progression tracing did not highlight the participant path at ${viewport.width}px.`);
+			}
+
 			await page.close();
 		}
 
-		console.log('Public catalogues, programme and participant, member, club, team, venue and programme-item details passed desktop and mobile menu routes.');
+		console.log('Public catalogues, programme, progression bracket and all current detail views passed desktop and mobile menu routes.');
 	} finally {
 		await browser.close();
 	}
