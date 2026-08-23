@@ -36,7 +36,7 @@ $personTypeLabels = [
 					<h1 class="mb-1"><?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?></h1>
 					<?php if (trim((string) $person->nickname) !== '') : ?><div class="text-body-secondary"><?php echo Text::sprintf('COM_JOOMLEAGUE_PERSON_NICKNAME', htmlspecialchars((string) $person->nickname, ENT_QUOTES, 'UTF-8')); ?></div><?php endif; ?>
 					<div class="d-flex flex-wrap gap-3 mt-2 small text-body-secondary">
-						<?php if ($person->club_name) : ?><span><?php echo htmlspecialchars((string) $person->club_name, ENT_QUOTES, 'UTF-8'); ?></span><?php endif; ?>
+						<?php if ($person->club_name) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=club&club_id=' . (int) $person->club_id); ?>"><?php echo htmlspecialchars((string) $person->club_name, ENT_QUOTES, 'UTF-8'); ?></a><?php endif; ?>
 						<?php if ($person->country_code) : ?><span><?php echo htmlspecialchars((string) $person->country_code, ENT_QUOTES, 'UTF-8'); ?></span><?php endif; ?>
 					</div>
 				</div>

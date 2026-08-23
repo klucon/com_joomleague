@@ -55,7 +55,7 @@ $kindLabels = [
 										<h2 class="h5 mb-1"><a class="stretched-link text-decoration-none" href="<?php echo Route::_('index.php?option=com_joomleague&view=participant&project_id=' . (int) $data['project']->id . '&entry_id=' . (int) $participant->id); ?>"><?php echo htmlspecialchars((string) $participant->display_name, ENT_QUOTES, 'UTF-8'); ?></a></h2>
 										<span class="badge text-bg-secondary"><?php echo Text::_($kindLabels[(string) $participant->entry_kind] ?? 'COM_JOOMLEAGUE_PARTICIPANTS_KIND_GROUP'); ?></span>
 									</div>
-									<?php if ($participant->club_name) : ?><div class="text-body-secondary mb-2"><?php echo htmlspecialchars((string) $participant->club_name, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
+									<?php if ($participant->club_name) : ?><div class="mb-2"><a class="position-relative z-2 text-body-secondary" href="<?php echo Route::_('index.php?option=com_joomleague&view=club&club_id=' . (int) $participant->club_id); ?>"><?php echo htmlspecialchars((string) $participant->club_name, ENT_QUOTES, 'UTF-8'); ?></a></div><?php endif; ?>
 									<div class="d-flex flex-wrap gap-3 small text-body-secondary">
 										<?php if ($participant->seed_number !== null) : ?><span><?php echo Text::sprintf('COM_JOOMLEAGUE_PARTICIPANTS_SEED', (int) $participant->seed_number); ?></span><?php endif; ?>
 										<?php if ($participant->bib_number !== null && $participant->bib_number !== '') : ?><span><?php echo Text::sprintf('COM_JOOMLEAGUE_PARTICIPANTS_BIB', htmlspecialchars((string) $participant->bib_number, ENT_QUOTES, 'UTF-8')); ?></span><?php endif; ?>

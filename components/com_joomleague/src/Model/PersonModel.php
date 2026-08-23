@@ -40,7 +40,7 @@ final class PersonModel extends BaseDatabaseModel
 			$db->getQuery(true)
 				->select([
 					'person.id', 'person.first_name', 'person.last_name', 'person.nickname', 'person.country_code',
-					'person.picture', 'person.description', $db->quoteName('club.name', 'club_name'),
+					'person.picture', 'person.description', $db->quoteName('club.id', 'club_id'), $db->quoteName('club.name', 'club_name'),
 				])
 				->from($db->quoteName('#__joomleague_person', 'person'))
 				->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = person.club_id AND club.published = 1')

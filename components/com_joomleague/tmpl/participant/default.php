@@ -47,7 +47,7 @@ $personTypeLabels = [
 						<span class="badge text-bg-secondary"><?php echo Text::_($kindLabels[(string) $participant->entry_kind] ?? 'COM_JOOMLEAGUE_PARTICIPANTS_KIND_GROUP'); ?></span>
 					</div>
 					<div class="d-flex flex-wrap gap-3 mt-2 small text-body-secondary">
-						<?php if ($participant->club_name) : ?><span><?php echo htmlspecialchars((string) $participant->club_name, ENT_QUOTES, 'UTF-8'); ?></span><?php endif; ?>
+						<?php if ($participant->club_name) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=club&club_id=' . (int) $participant->club_id); ?>"><?php echo htmlspecialchars((string) $participant->club_name, ENT_QUOTES, 'UTF-8'); ?></a><?php endif; ?>
 						<?php if ($participant->seed_number !== null) : ?><span><?php echo Text::sprintf('COM_JOOMLEAGUE_PARTICIPANTS_SEED', (int) $participant->seed_number); ?></span><?php endif; ?>
 						<?php if ($participant->bib_number) : ?><span><?php echo Text::sprintf('COM_JOOMLEAGUE_PARTICIPANTS_BIB', htmlspecialchars((string) $participant->bib_number, ENT_QUOTES, 'UTF-8')); ?></span><?php endif; ?>
 					</div>

@@ -63,7 +63,7 @@ final class ParticipantsModel extends BaseDatabaseModel
 			->select([
 				'entry.id', 'entry.entry_kind', 'entry.entry_code', 'entry.seed_number', 'entry.bib_number',
 				$db->quoteName('team.logo', 'team_logo'), $db->quoteName('team.picture', 'team_picture'),
-				$db->quoteName('person.picture', 'person_picture'), $db->quoteName('club.name', 'club_name'),
+				$db->quoteName('person.picture', 'person_picture'), $db->quoteName('club.id', 'club_id'), $db->quoteName('club.name', 'club_name'),
 				'COALESCE(NULLIF(' . $db->quoteName('entry.display_name') . ", ''), "
 					. $db->quoteName('team.name') . ', NULLIF(TRIM(CONCAT('
 					. $db->quoteName('person.first_name') . ", ' ', " . $db->quoteName('person.last_name')
