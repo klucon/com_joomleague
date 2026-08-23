@@ -3,6 +3,7 @@ const { chromium } = require('playwright');
 (async () => {
 	const baseUrl = process.env.JOOMLA_BASE_URL;
 	const projectsPath = process.env.JOOMLA_PROJECTS_MENU_PATH;
+	const clubsPath = process.env.JOOMLA_CLUBS_MENU_PATH;
 	const projectPath = process.env.JOOMLA_PROJECT_MENU_PATH;
 	const participantsPath = process.env.JOOMLA_PARTICIPANTS_MENU_PATH;
 	const participantPath = process.env.JOOMLA_PARTICIPANT_MENU_PATH;
@@ -15,7 +16,7 @@ const { chromium } = require('playwright');
 	const expectedClub = process.env.JOOMLA_EXPECTED_CLUB;
 	const expectedSecondTeam = process.env.JOOMLA_EXPECTED_SECOND_TEAM;
 
-	if (!baseUrl || !projectsPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !teamPath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam) {
+	if (!baseUrl || !projectsPath || !clubsPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !teamPath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam) {
 		throw new Error('Public project view browser test environment is incomplete.');
 	}
 
@@ -41,6 +42,31 @@ const { chromium } = require('playwright');
 			const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 			if (overflow > 1) {
 				throw new Error(`Competition catalogue overflows by ${overflow}px at ${viewport.width}px.`);
+			}
+
+			await page.goto(new URL(clubsPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
+			await page.locator('main').waitFor();
+			const clubsText = await page.locator('main').innerText();
+			const clubsOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+			if (!clubsText.includes(expectedClub)
+				|| !/Týmy: 2|Teams: 2/.test(clubsText)
+				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(clubsText)
+				|| clubsOverflow > 1
+				|| errors.length > 0) {
+				throw new Error(`Club catalogue failed at ${viewport.width}px: overflow=${clubsOverflow}, errors=${errors.join('; ')}`);
+			}
+
+			if (await page.locator('#filter_country_code option[value="CZ"]').count() !== 1) {
+				throw new Error(`Club country filter is incomplete at ${viewport.width}px.`);
+			}
+
+			await page.locator('#filter_search').fill('club-that-does-not-exist');
+			await page.locator('form').filter({ has: page.locator('#filter_search') }).locator('button[type="submit"]').click();
+			await page.waitForLoadState('domcontentloaded');
+			const filteredText = await page.locator('main').innerText();
+			if (!/No published clubs|neodpovídá žádný zveřejněný klub/.test(filteredText)) {
+				throw new Error(`Club search filter did not return the expected empty state at ${viewport.width}px.`);
 			}
 
 			await page.goto(new URL(projectPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
@@ -157,7 +183,7 @@ const { chromium } = require('playwright');
 			await page.close();
 		}
 
-		console.log('Public competition catalogue, overview, participants, participant, member, club and team profiles passed desktop and mobile menu routes.');
+		console.log('Public competition and club catalogues plus participant, member, club and team profiles passed desktop and mobile menu routes.');
 	} finally {
 		await browser.close();
 	}
