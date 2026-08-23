@@ -25,6 +25,28 @@ $quickIcon = $root . '/plugins/quickicon/joomleague';
 $consolePlugin = $root . '/plugins/console/joomleague';
 $taskPlugin = $root . '/plugins/task/joomleague';
 $packageManifest = (string) file_get_contents($root . '/build/pkg_joomleague.xml');
+$packageInstaller = (string) file_get_contents($root . '/build/pkg_script.php');
+
+if ($packageInstaller === '') {
+	throw new RuntimeException('Package installer script cannot be read.');
+}
+
+if (preg_match('/<style\b|\sstyle\s*=/i', $packageInstaller) === 1) {
+	throw new RuntimeException('Package installer UI must use Joomla and Bootstrap classes without custom CSS.');
+}
+
+foreach ([
+	'PKG_JOOMLEAGUE_INSTALL_PLATFORM_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_CONTENT_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_INTEGRATIONS_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_STEP_PROFILE_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_STEP_PROJECT_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_STEP_PUBLISH_TITLE',
+] as $installerLanguageKey) {
+	if (!str_contains($packageInstaller, $installerLanguageKey)) {
+		throw new RuntimeException(sprintf('Package installer report is missing section key %s.', $installerLanguageKey));
+	}
+}
 
 foreach (['en-GB', 'cs-CZ'] as $packageLanguage) {
 	foreach (['pkg_joomleague.ini', 'pkg_joomleague.sys.ini'] as $packageLanguageFile) {
@@ -32,6 +54,21 @@ foreach (['en-GB', 'cs-CZ'] as $packageLanguage) {
 
 		if (!is_file($languagePath) || !str_contains((string) file_get_contents($languagePath), 'PKG_JOOMLEAGUE="JoomLeague"')) {
 			throw new RuntimeException(sprintf('Package language %s/%s is missing or incomplete.', $packageLanguage, $packageLanguageFile));
+		}
+	}
+
+	$packageIni = (string) file_get_contents($root . '/build/language/' . $packageLanguage . '/pkg_joomleague.ini');
+
+	foreach ([
+		'PKG_JOOMLEAGUE_INSTALL_PLATFORM_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_CONTENT_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_INTEGRATIONS_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_STEP_PROFILE_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_STEP_PROJECT_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_STEP_PUBLISH_TITLE',
+	] as $installerLanguageKey) {
+		if (!str_contains($packageIni, $installerLanguageKey . '=')) {
+			throw new RuntimeException(sprintf('Package language %s is missing installer key %s.', $packageLanguage, $installerLanguageKey));
 		}
 	}
 }
