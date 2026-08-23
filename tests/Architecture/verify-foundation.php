@@ -88,7 +88,7 @@ foreach (['<folder>fields</folder>', '<folder>src</folder>', '<folder>tmpl</fold
 	}
 }
 
-foreach (['projects', 'project', 'participants'] as $siteView) {
+foreach (['projects', 'project', 'participants', 'participant'] as $siteView) {
 	foreach ([
 		'/src/Model/' . ucfirst($siteView) . 'Model.php',
 		'/src/View/' . ucfirst($siteView) . '/HtmlView.php',
@@ -105,7 +105,7 @@ foreach (['en-GB', 'cs-CZ'] as $siteLanguageTag) {
 	$siteLanguage = (string) file_get_contents($site . '/language/' . $siteLanguageTag . '/com_joomleague.ini');
 	$adminSystemLanguage = (string) file_get_contents($admin . '/language/' . $siteLanguageTag . '/com_joomleague.sys.ini');
 
-	foreach (['COM_JOOMLEAGUE_PROJECTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PROJECT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANTS_VIEW_DEFAULT_TITLE'] as $menuViewKey) {
+	foreach (['COM_JOOMLEAGUE_PROJECTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PROJECT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANT_VIEW_DEFAULT_TITLE'] as $menuViewKey) {
 		if (!str_contains($siteLanguage, $menuViewKey . '=') || !str_contains($adminSystemLanguage, $menuViewKey . '=')) {
 			throw new RuntimeException(sprintf('Public menu view key %s is incomplete for %s.', $menuViewKey, $siteLanguageTag));
 		}

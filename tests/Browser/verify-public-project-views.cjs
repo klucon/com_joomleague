@@ -5,10 +5,12 @@ const { chromium } = require('playwright');
 	const projectsPath = process.env.JOOMLA_PROJECTS_MENU_PATH;
 	const projectPath = process.env.JOOMLA_PROJECT_MENU_PATH;
 	const participantsPath = process.env.JOOMLA_PARTICIPANTS_MENU_PATH;
+	const participantPath = process.env.JOOMLA_PARTICIPANT_MENU_PATH;
 	const expectedProject = process.env.JOOMLA_EXPECTED_PROJECT;
 	const expectedParticipant = process.env.JOOMLA_EXPECTED_PARTICIPANT;
+	const expectedMember = process.env.JOOMLA_EXPECTED_MEMBER;
 
-	if (!baseUrl || !projectsPath || !projectPath || !participantsPath || !expectedProject || !expectedParticipant) {
+	if (!baseUrl || !projectsPath || !projectPath || !participantsPath || !participantPath || !expectedProject || !expectedParticipant || !expectedMember) {
 		throw new Error('Public project view browser test environment is incomplete.');
 	}
 
@@ -67,10 +69,30 @@ const { chromium } = require('playwright');
 				throw new Error(`Competition participants failed at ${viewport.width}px: overflow=${participantsOverflow}, errors=${errors.join('; ')}`);
 			}
 
+			const participantLink = page.locator('main a').filter({ hasText: expectedParticipant }).first();
+			if (await participantLink.count() !== 1) {
+				throw new Error(`Competition participant link is missing at ${viewport.width}px.`);
+			}
+
+			await page.goto(new URL(participantPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
+			await page.locator('main').waitFor();
+			const participantText = await page.locator('main').innerText();
+			const participantOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+			if (!participantText.includes(expectedProject)
+				|| !participantText.includes(expectedParticipant)
+				|| !participantText.includes(expectedMember)
+				|| !/Program|Programme/.test(participantText)
+				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(participantText)
+				|| participantOverflow > 1
+				|| errors.length > 0) {
+				throw new Error(`Competition participant detail failed at ${viewport.width}px: overflow=${participantOverflow}, errors=${errors.join('; ')}`);
+			}
+
 			await page.close();
 		}
 
-		console.log('Public competition catalogue, overview and participants passed desktop and mobile menu routes.');
+		console.log('Public competition catalogue, overview, participants and participant detail passed desktop and mobile menu routes.');
 	} finally {
 		await browser.close();
 	}
