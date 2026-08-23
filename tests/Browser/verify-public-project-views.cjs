@@ -4,10 +4,12 @@ const { chromium } = require('playwright');
 	const baseUrl = process.env.JOOMLA_BASE_URL;
 	const projectsPath = process.env.JOOMLA_PROJECTS_MENU_PATH;
 	const projectPath = process.env.JOOMLA_PROJECT_MENU_PATH;
+	const participantsPath = process.env.JOOMLA_PARTICIPANTS_MENU_PATH;
 	const expectedProject = process.env.JOOMLA_EXPECTED_PROJECT;
+	const expectedParticipant = process.env.JOOMLA_EXPECTED_PARTICIPANT;
 
-	if (!baseUrl || !projectsPath || !projectPath || !expectedProject) {
-		throw new Error('JOOMLA_BASE_URL, JOOMLA_PROJECTS_MENU_PATH, JOOMLA_PROJECT_MENU_PATH and JOOMLA_EXPECTED_PROJECT are required.');
+	if (!baseUrl || !projectsPath || !projectPath || !participantsPath || !expectedProject || !expectedParticipant) {
+		throw new Error('Public project view browser test environment is incomplete.');
 	}
 
 	const browser = await chromium.launch({ headless: true });
@@ -39,6 +41,7 @@ const { chromium } = require('playwright');
 			const projectText = await page.locator('main').innerText();
 
 			if (!projectText.includes(expectedProject)
+				|| !/Účastníci|Participants/.test(projectText)
 				|| !/Program a výsledky|Programme and results/.test(projectText)
 				|| !/Pořadí|Standings/.test(projectText)
 				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(projectText)) {
@@ -50,10 +53,24 @@ const { chromium } = require('playwright');
 				throw new Error(`Competition overview failed at ${viewport.width}px: overflow=${detailOverflow}, errors=${errors.join('; ')}`);
 			}
 
+			await page.goto(new URL(participantsPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
+			await page.locator('main').waitFor();
+			const participantsText = await page.locator('main').innerText();
+			const participantsOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+			if (!participantsText.includes(expectedProject)
+				|| !participantsText.includes(expectedParticipant)
+				|| !/Tým|Team|Jednotlivec|Individual|Skupina|Group/.test(participantsText)
+				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(participantsText)
+				|| participantsOverflow > 1
+				|| errors.length > 0) {
+				throw new Error(`Competition participants failed at ${viewport.width}px: overflow=${participantsOverflow}, errors=${errors.join('; ')}`);
+			}
+
 			await page.close();
 		}
 
-		console.log('Public competition catalogue and overview passed desktop and mobile menu routes.');
+		console.log('Public competition catalogue, overview and participants passed desktop and mobile menu routes.');
 	} finally {
 		await browser.close();
 	}

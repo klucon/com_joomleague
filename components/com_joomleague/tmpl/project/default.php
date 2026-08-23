@@ -53,6 +53,10 @@ $data = $this->project;
 
 		<h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAVIGATION_TITLE'); ?></h2>
 		<div class="list-group">
+			<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="<?php echo Route::_('index.php?option=com_joomleague&view=participants&project_id=' . (int) $project->id); ?>">
+				<span><strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PARTICIPANTS'); ?></strong><br><small class="text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PARTICIPANTS_DESC'); ?></small></span>
+				<span class="icon-chevron-right" aria-hidden="true"></span>
+			</a>
 			<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="<?php echo Route::_('index.php?option=com_joomleague&view=results&project_id=' . (int) $project->id); ?>">
 				<span><strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PROGRAM'); ?></strong><br><small class="text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PROGRAM_DESC'); ?></small></span>
 				<span class="icon-chevron-right" aria-hidden="true"></span>
