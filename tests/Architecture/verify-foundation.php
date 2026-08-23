@@ -1015,6 +1015,22 @@ if (str_contains($standingsReader, 'recalculate') || str_contains($standingsRead
 	throw new RuntimeException('StandingsReader must stay read-only — no write/recalculation logic belongs there.');
 }
 
+$siteStandingsModel = (string) file_get_contents($root . '/components/com_joomleague/src/Model/StandingsModel.php');
+$siteStandingsTemplate = (string) file_get_contents($root . '/components/com_joomleague/tmpl/standings/default.php');
+
+foreach (['project.published = 1', 'competition.published = 1', 'season.published = 1', 'sport_type.published = 1', 'stage.published = 1'] as $publishedGuard) {
+	if (!str_contains($siteStandingsModel, $publishedGuard)) {
+		throw new RuntimeException('Public standings are missing the publication guard: ' . $publishedGuard);
+	}
+}
+
+if (!str_contains($siteStandingsModel, "['status_order']")
+	|| !str_contains($siteStandingsTemplate, 'STANDINGS_TYPE_')
+	|| !str_contains($siteStandingsTemplate, 'STANDINGS_SCOPE_')
+	|| !str_contains($siteStandingsTemplate, "\$code === 'elapsed'")) {
+	throw new RuntimeException('Public standings are no longer profile-aware across table, competitor and race classifications.');
+}
+
 $modelIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($admin . '/src/Model', FilesystemIterator::SKIP_DOTS));
 foreach ($modelIterator as $modelFile) {
 	if (!$modelFile->isFile() || $modelFile->getExtension() !== 'php') continue;

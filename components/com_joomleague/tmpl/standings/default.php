@@ -11,17 +11,39 @@ declare(strict_types=1);
  */
 
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 
 defined('_JEXEC') or die;
 
 /** @var Joomleague\Component\Joomleague\Site\View\Standings\HtmlView $this */
 $standings = $this->standings;
+$translateCode = static function (string $prefix, string $code): string {
+	$key = $prefix . strtoupper($code);
+	$translated = Text::_($key);
+
+	return $translated === $key ? ucwords(str_replace('_', ' ', $code)) : $translated;
+};
 ?>
 <div class="com-joomleague-standings">
 	<?php if (isset($standings['error'])) : ?>
 		<div class="alert alert-warning"><?php echo Text::_($standings['error']); ?></div>
 	<?php else : ?>
 		<h1 class="com-joomleague-standings__title"><?php echo htmlspecialchars((string) $standings['project']->name, ENT_QUOTES, 'UTF-8'); ?></h1>
+		<p class="text-body-secondary mb-3">
+			<?php echo htmlspecialchars($translateCode('COM_JOOMLEAGUE_STANDINGS_TYPE_', (string) $standings['standings_type']), ENT_QUOTES, 'UTF-8'); ?>
+			<?php if ($standings['stage'] !== null) : ?>
+				<span aria-hidden="true"> · </span><?php echo htmlspecialchars((string) $standings['stage']->name, ENT_QUOTES, 'UTF-8'); ?>
+			<?php endif; ?>
+		</p>
+		<?php if (\count($standings['available_scopes']) > 1) : ?>
+			<nav class="nav nav-tabs mb-3" aria-label="<?php echo htmlspecialchars(Text::_('COM_JOOMLEAGUE_STANDINGS_SCOPE_NAV_LABEL'), ENT_QUOTES, 'UTF-8'); ?>">
+				<?php foreach ($standings['available_scopes'] as $availableScope) : ?>
+					<a class="nav-link<?php echo $availableScope === $standings['scope'] ? ' active' : ''; ?>"
+						href="<?php echo Route::_('index.php?option=com_joomleague&view=standings&project_id=' . (int) $standings['project']->id . ($standings['stage'] !== null ? '&stage_id=' . (int) $standings['stage']->id : '') . '&scope=' . rawurlencode((string) $availableScope)); ?>"
+						<?php echo $availableScope === $standings['scope'] ? ' aria-current="page"' : ''; ?>><?php echo htmlspecialchars($translateCode('COM_JOOMLEAGUE_STANDINGS_SCOPE_', (string) $availableScope), ENT_QUOTES, 'UTF-8'); ?></a>
+				<?php endforeach; ?>
+			</nav>
+		<?php endif; ?>
 		<?php
 		$columns = $standings['columns'];
 		$columnCount = \count($columns);
@@ -71,6 +93,20 @@ $standings = $this->standings;
 		// always visible; earlier columns collapse below the "md" breakpoint
 		// instead of forcing the table to scroll sideways.
 		$responsiveClass = static fn (int $columnIndex): string => $responsiveColumns && $columnIndex < $columnCount - 1 ? ' d-none d-md-table-cell' : '';
+		$formatValue = static function (mixed $value, array $column): string {
+			if ($value === null) {
+				return Text::_('JNONE');
+			}
+
+			$code = (string) ($column['code'] ?? '');
+			if ($code === 'elapsed' && is_numeric($value)) {
+				$seconds = max(0, (int) round((float) $value));
+				$hours = intdiv($seconds, 3600);
+				return sprintf('%d:%02d:%02d', $hours, intdiv($seconds % 3600, 60), $seconds % 60);
+			}
+
+			return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+		};
 		?>
 		<div class="table-responsive">
 			<table class="table table-sm table-striped align-middle mb-1">
@@ -143,7 +179,7 @@ $standings = $this->standings;
 										: htmlspecialchars((string) $forValue, ENT_QUOTES, 'UTF-8') . ':' . htmlspecialchars((string) $againstValue, ENT_QUOTES, 'UTF-8');
 								} else {
 									$value = $row->metrics[$column['code']] ?? null;
-									$cellText = $value === null ? Text::_('JNONE') : htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+									$cellText = $formatValue($value, $column);
 								}
 							?>
 								<td class="text-center<?php echo $responsiveClass($i); ?>"<?php echo $cellStyle !== '' ? ' style="' . $cellStyle . '"' : ''; ?>><?php echo $cellText; ?></td>

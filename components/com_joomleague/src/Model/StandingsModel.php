@@ -57,6 +57,11 @@ final class StandingsModel extends BaseDatabaseModel
 		Factory::getApplication()->bootComponent('com_joomleague');
 
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
+
+		if (!$this->isPublishedContext($database, $projectId, $this->getState('stage_id'))) {
+			return ['error' => 'COM_JOOMLEAGUE_STANDINGS_UNAVAILABLE'];
+		}
+
 		$reader = new StandingsReader($database);
 		$stageId = $this->getState('stage_id');
 
@@ -82,9 +87,9 @@ final class StandingsModel extends BaseDatabaseModel
 		$highlightEntryId = (int) $params->get('highlight_entry_id', 0);
 		$limit = (int) $params->get('limit', 0);
 
-		// Zone boundaries are absolute ranks (rank 3 of 14 stays rank 3 of
-		// 14 regardless of the row-limit window below), so they must be
-		// resolved against the full row count before any windowing happens.
+		// Zone boundaries are absolute row positions. A tied rank can occur
+		// on several rows, so rank_number cannot identify a single boundary.
+		// Resolve positions before any row-limit windowing happens.
 		$this->markZoneBoundaries($rows, $params);
 
 		// The row-limit window still centres on the highlighted entry even
@@ -94,7 +99,10 @@ final class StandingsModel extends BaseDatabaseModel
 			$rows = $this->windowRows($rows, $limit, $highlightEntryId);
 		}
 
-		$formEnabled = (int) $params->get('form_enabled', 0) === 1;
+		$standingsType = (string) ($context['standings_type'] ?? 'team_table');
+		$formEnabled = $standingsType !== 'race_results'
+			&& (string) ($context['profile']['contest']['type'] ?? '') === 'head_to_head'
+			&& (int) $params->get('form_enabled', 0) === 1;
 		$form = [];
 		if ($formEnabled) {
 			$formCount = max(1, (int) $params->get('form_count', 5));
@@ -124,6 +132,8 @@ final class StandingsModel extends BaseDatabaseModel
 		// always submits a value, whichever way the admin sets it.
 		return [
 			'project' => $context['project'],
+			'stage' => $context['stage'],
+			'standings_type' => $standingsType,
 			'columns' => $this->buildColumns($context['contract']['metrics'] ?? [], $params->get('metric_codes', []), (int) $params->get('combined_score_format', 0) === 1),
 			'short_labels' => (int) $params->get('short_labels', 0) === 1,
 			'short_label_tooltips' => (int) $params->get('short_label_tooltips', 1) === 1,
@@ -144,6 +154,31 @@ final class StandingsModel extends BaseDatabaseModel
 		];
 	}
 
+	private function isPublishedContext(DatabaseInterface $database, int $projectId, mixed $stageId): bool
+	{
+		$query = $database->getQuery(true)
+			->select('COUNT(*)')
+			->from($database->quoteName('#__joomleague_project', 'project'))
+			->innerJoin($database->quoteName('#__joomleague_competition', 'competition') . ' ON competition.id = project.competition_id')
+			->innerJoin($database->quoteName('#__joomleague_season', 'season') . ' ON season.id = project.season_id')
+			->innerJoin($database->quoteName('#__joomleague_sport_type', 'sport_type') . ' ON sport_type.id = project.sport_type_id')
+			->where('project.id = :project')
+			->where('project.published = 1')
+			->where('competition.published = 1')
+			->where('season.published = 1')
+			->where('sport_type.published = 1')
+			->bind(':project', $projectId, \Joomla\Database\ParameterType::INTEGER);
+
+		if ($stageId !== null) {
+			$query->innerJoin($database->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.project_id = project.id')
+				->where('stage.id = :stage')
+				->where('stage.published = 1')
+				->bind(':stage', $stageId, \Joomla\Database\ParameterType::INTEGER);
+		}
+
+		return (int) $database->setQuery($query)->loadResult() === 1;
+	}
+
 	private function sanitizeColor(string $color, string $fallback): string
 	{
 		return preg_match('/^#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?$/', $color) ? $color : $fallback;
@@ -153,8 +188,8 @@ final class StandingsModel extends BaseDatabaseModel
 	 * Marks each row with whether it's the boundary row of a top/bottom
 	 * zone (e.g. promotion/relegation), by mutating a `zone_top`/
 	 * `zone_bottom` property directly onto the row objects — same approach
-	 * StandingsReader already uses for `->metrics`. Ranks are absolute
-	 * positions in the full table, so this must run before any row-limit
+	 * StandingsReader already uses for `->metrics`. Row positions in the
+	 * full table are absolute, so this must run before any row-limit
 	 * window slices $rows down.
 	 *
 	 * @param list<object> $rows
@@ -171,10 +206,10 @@ final class StandingsModel extends BaseDatabaseModel
 		$bottomCount = max(0, (int) $params->get('zone_bottom_count', 3));
 		$bottomColor = $this->sanitizeColor((string) $params->get('zone_bottom_color', '#dc3545'), '#dc3545');
 
-		foreach ($rows as $row) {
-			$rank = (int) $row->rank_number;
-			$row->zone_top = ($topEnabled && $topCount > 0 && $topCount < $total && $rank === $topCount) ? $topColor : null;
-			$row->zone_bottom = ($bottomEnabled && $bottomCount > 0 && $bottomCount < $total && $rank === $total - $bottomCount + 1) ? $bottomColor : null;
+		foreach ($rows as $index => $row) {
+			$position = $index + 1;
+			$row->zone_top = ($topEnabled && $topCount > 0 && $topCount < $total && $position === $topCount) ? $topColor : null;
+			$row->zone_bottom = ($bottomEnabled && $bottomCount > 0 && $bottomCount < $total && $position === $total - $bottomCount + 1) ? $bottomColor : null;
 		}
 	}
 
@@ -217,7 +252,10 @@ final class StandingsModel extends BaseDatabaseModel
 		$allowed = array_filter(array_map(static fn ($code) => strtolower(trim((string) $code)), $codes));
 
 		if ($allowed === []) {
-			return $metrics;
+			return array_values(array_filter(
+				$metrics,
+				static fn (array $metric): bool => !\in_array((string) ($metric['operation'] ?? ''), ['status_order'], true)
+			));
 		}
 
 		return array_values(array_filter(
@@ -242,9 +280,13 @@ final class StandingsModel extends BaseDatabaseModel
 	{
 		$metrics = $this->filterMetrics($metrics, $metricCodes);
 		$codes = array_map(static fn (array $m) => (string) $m['code'], $metrics);
+		$definitions = [];
+		foreach ($metrics as $metric) {
+			$definitions[(string) $metric['code']] = $metric;
+		}
 
 		if (!$combine) {
-			return array_map(static fn (string $code) => ['type' => 'single', 'code' => $code], $codes);
+			return array_map(static fn (string $code) => ['type' => 'single', 'code' => $code, 'definition' => $definitions[$code]], $codes);
 		}
 
 		$present = array_fill_keys($codes, true);
@@ -280,7 +322,7 @@ final class StandingsModel extends BaseDatabaseModel
 				continue;
 			}
 
-			$columns[] = ['type' => 'single', 'code' => $code];
+			$columns[] = ['type' => 'single', 'code' => $code, 'definition' => $definitions[$code]];
 		}
 
 		return $columns;
