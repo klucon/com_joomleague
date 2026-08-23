@@ -107,7 +107,7 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 
 	private function availableCode(int $projectId, string $name): string
 	{
-		$base = ApplicationHelper::stringURLSafe($name) ?: 'stage';
+		$base = str_replace('-', '_', ApplicationHelper::stringURLSafe($name)) ?: 'stage';
 		$code = $base;
 		$suffix = 2;
 

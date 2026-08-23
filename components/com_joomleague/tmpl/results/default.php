@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 
 defined('_JEXEC') or die;
 
@@ -38,7 +39,7 @@ $goalLabel = ['goal' => '', 'penalty_goal' => ' (pen.)', 'own_goal' => ' (vl.)']
 			<h2 class="h5 mt-4"><?php echo htmlspecialchars($round['name'], ENT_QUOTES, 'UTF-8'); ?></h2>
 			<div class="list-group mb-3">
 				<?php foreach ($round['matches'] as $match) : ?>
-					<div class="list-group-item">
+					<a class="list-group-item list-group-item-action" href="<?php echo Route::_('index.php?option=com_joomleague&amp;view=programitem&amp;match_id=' . (int) $match['id']); ?>">
 						<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
 							<div class="com-joomleague-results__teams">
 								<span class="fw-bold"><?php echo htmlspecialchars($match['home'], ENT_QUOTES, 'UTF-8'); ?></span>
@@ -85,7 +86,7 @@ $goalLabel = ['goal' => '', 'penalty_goal' => ' (pen.)', 'own_goal' => ' (vl.)']
 								</div>
 							</div>
 						<?php endif; ?>
-					</div>
+					</a>
 				<?php endforeach; ?>
 			</div>
 		<?php endforeach; ?>

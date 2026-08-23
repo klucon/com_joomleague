@@ -12,6 +12,7 @@ const { chromium } = require('playwright');
 	const clubPath = process.env.JOOMLA_CLUB_MENU_PATH;
 	const teamPath = process.env.JOOMLA_TEAM_MENU_PATH;
 	const venuePath = process.env.JOOMLA_VENUE_MENU_PATH;
+	const programItemPath = process.env.JOOMLA_PROGRAMITEM_MENU_PATH;
 	const expectedProject = process.env.JOOMLA_EXPECTED_PROJECT;
 	const expectedParticipant = process.env.JOOMLA_EXPECTED_PARTICIPANT;
 	const expectedMember = process.env.JOOMLA_EXPECTED_MEMBER;
@@ -19,7 +20,7 @@ const { chromium } = require('playwright');
 	const expectedSecondTeam = process.env.JOOMLA_EXPECTED_SECOND_TEAM;
 	const expectedVenue = process.env.JOOMLA_EXPECTED_VENUE;
 
-	if (!baseUrl || !projectsPath || !clubsPath || !venuesPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !teamPath || !venuePath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam || !expectedVenue) {
+	if (!baseUrl || !projectsPath || !clubsPath || !venuesPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !teamPath || !venuePath || !programItemPath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam || !expectedVenue) {
 		throw new Error('Public project view browser test environment is incomplete.');
 	}
 
@@ -225,10 +226,27 @@ const { chromium } = require('playwright');
 				throw new Error(`Public venue profile failed at ${viewport.width}px: overflow=${venueOverflow}, errors=${errors.join('; ')}`);
 			}
 
+			await page.goto(new URL(programItemPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
+			await page.locator('main').waitFor();
+			const programItemText = await page.locator('main').innerText();
+			const programItemOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+			if (!programItemText.includes(expectedProject)
+				|| !programItemText.includes(expectedParticipant)
+				|| !programItemText.includes(expectedSecondTeam)
+				|| !programItemText.includes(expectedVenue)
+				|| !programItemText.includes('DEMO-001')
+				|| !/Položka programu|Programme item/.test(programItemText)
+				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(programItemText)
+				|| programItemOverflow > 1
+				|| errors.length > 0) {
+				throw new Error(`Public programme item failed at ${viewport.width}px: overflow=${programItemOverflow}, errors=${errors.join('; ')}`);
+			}
+
 			await page.close();
 		}
 
-		console.log('Public competition, club and venue catalogues plus participant, member, club, team and venue profiles passed desktop and mobile menu routes.');
+		console.log('Public catalogues and participant, member, club, team, venue and programme-item details passed desktop and mobile menu routes.');
 	} finally {
 		await browser.close();
 	}

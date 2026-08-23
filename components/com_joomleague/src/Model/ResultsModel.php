@@ -187,6 +187,7 @@ final class ResultsModel extends BaseDatabaseModel
         foreach ($matches as $match) {
             $matchId = (int) $match->id;
             $matchesByRound[(int) $match->round_id][] = [
+				'id' => $matchId,
                 'home' => $entryNameByMatchSlot[$matchId][1] ?? '',
                 'away' => $entryNameByMatchSlot[$matchId][2] ?? '',
                 'home_score' => $scoreByMatch[$matchId][1] ?? null,

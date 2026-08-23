@@ -105,11 +105,22 @@ foreach (['en-GB', 'cs-CZ'] as $siteLanguageTag) {
 	$siteLanguage = (string) file_get_contents($site . '/language/' . $siteLanguageTag . '/com_joomleague.ini');
 	$adminSystemLanguage = (string) file_get_contents($admin . '/language/' . $siteLanguageTag . '/com_joomleague.sys.ini');
 
-	foreach (['COM_JOOMLEAGUE_PROJECTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PROJECT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PERSON_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_CLUBS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_CLUB_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_TEAM_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_VENUES_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_VENUE_VIEW_DEFAULT_TITLE'] as $menuViewKey) {
+	foreach (['COM_JOOMLEAGUE_PROJECTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PROJECT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PERSON_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_CLUBS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_CLUB_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_TEAM_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_VENUES_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_VENUE_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PROGRAMITEM_VIEW_DEFAULT_TITLE'] as $menuViewKey) {
 		if (!str_contains($siteLanguage, $menuViewKey . '=') || !str_contains($adminSystemLanguage, $menuViewKey . '=')) {
 			throw new RuntimeException(sprintf('Public menu view key %s is incomplete for %s.', $menuViewKey, $siteLanguageTag));
 		}
 	}
+}
+
+$stageModelSource = (string) file_get_contents($admin . '/src/Model/StageModel.php');
+if (!str_contains($stageModelSource, "str_replace('-', '_', ApplicationHelper::stringURLSafe(\$name))")) {
+	throw new RuntimeException('Automatic stage codes must use the underscore format accepted by StageTable.');
+}
+$matchFormSource = (string) file_get_contents($admin . '/forms/match.xml');
+$matchScheduleSource = (string) file_get_contents($admin . '/src/Service/MatchScheduleEditor.php');
+if (preg_match('/name="participant_slot_[12]"[^>]*validate="options"/', $matchFormSource)
+	|| !str_contains($matchScheduleSource, 'StageEntryOptionsProvider($this->database))->contains')) {
+	throw new RuntimeException('Dynamic match participants must use the context-aware server-side allowlist.');
 }
 
 foreach (['mysql', 'postgresql'] as $driver) {
