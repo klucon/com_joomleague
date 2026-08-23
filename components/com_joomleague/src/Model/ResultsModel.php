@@ -19,202 +19,142 @@ use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 
-/**
- * Reads a project's rounds and match results, grouped by round, for the
- * site "results" view — the second site page this component has, alongside
- * "standings" (see docs/FRONTEND_MODULE_ROADMAP.md). Deliberately
- * self-contained (plain SQL, no shared Domain\Service reader) since its
- * purpose right now is to be a small, readable second example of a menu
- * item view rather than to introduce new shared read infrastructure.
- */
+/** Published programme items and finalized results for one project. */
 final class ResultsModel extends BaseDatabaseModel
 {
-    protected function populateState($ordering = null, $direction = null)
-    {
-        $input = Factory::getApplication()->getInput();
+	protected function populateState($ordering = null, $direction = null): void
+	{
+		$input = Factory::getApplication()->getInput();
+		$this->setState('project_id', $input->getInt('project_id', 0));
+		$stageId = $input->getInt('stage_id', 0);
+		$this->setState('stage_id', $stageId > 0 ? $stageId : null);
+	}
 
-        // project_id/stage_id are "request" menu-item fields, same as the
-        // standings view — part of the menu item's own link query string.
-        $this->setState('project_id', $input->getInt('project_id', 0));
+	/** @return array<string,mixed> */
+	public function getResults(): array
+	{
+		$projectId = (int) $this->getState('project_id');
+		if ($projectId < 1) {
+			return ['error' => 'COM_JOOMLEAGUE_RESULTS_NO_PROJECT'];
+		}
 
-        $stageId = $input->getInt('stage_id', 0);
-        $this->setState('stage_id', $stageId > 0 ? $stageId : null);
-    }
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
+		$project = $db->setQuery(
+			$db->getQuery(true)
+				->select(['project.id', 'project.name', 'project.timezone', 'sporttype.name AS sport_name'])
+				->from($db->quoteName('#__joomleague_project', 'project'))
+				->innerJoin($db->quoteName('#__joomleague_competition', 'competition') . ' ON competition.id = project.competition_id AND competition.published = 1')
+				->innerJoin($db->quoteName('#__joomleague_season', 'season') . ' ON season.id = project.season_id AND season.published = 1')
+				->innerJoin($db->quoteName('#__joomleague_sport_type', 'sporttype') . ' ON sporttype.id = project.sport_type_id AND sporttype.published = 1')
+				->where('project.id = :projectId')->where('project.published = 1')
+				->bind(':projectId', $projectId, ParameterType::INTEGER)
+		)->loadObject();
 
-    /** @return array<string,mixed> */
-    public function getResults(): array
-    {
-        $projectId = (int) $this->getState('project_id');
+		if (!$project) {
+			return ['error' => 'COM_JOOMLEAGUE_RESULTS_UNAVAILABLE'];
+		}
 
-        if ($projectId < 1) {
-            return ['error' => 'COM_JOOMLEAGUE_RESULTS_NO_PROJECT'];
-        }
+		$query = $db->getQuery(true)
+			->select([
+				'item.id', 'item.round_id', 'item.match_number', 'item.scheduled_start', 'item.timezone',
+				'item.attendance', 'item.status_code', 'venue.name AS venue_name',
+				'round.name AS round_name', 'stage.id AS stage_id', 'stage.name AS stage_name',
+				'result.status_code AS result_status', 'result.notes AS result_notes',
+			])
+			->from($db->quoteName('#__joomleague_project_match', 'item'))
+			->innerJoin($db->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = item.stage_id AND stage.published = 1')
+			->innerJoin($db->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = item.round_id AND round.published = 1')
+			->leftJoin($db->quoteName('#__joomleague_venue', 'venue') . ' ON venue.id = item.venue_id AND venue.published = 1')
+			->leftJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = item.id AND result.status_code = 'final'")
+			->where('item.project_id = :projectId')->where('item.published = 1')
+			->bind(':projectId', $projectId, ParameterType::INTEGER)
+			->order('stage.sequence_number ASC, stage.id ASC, round.sequence_number ASC, round.id ASC, item.scheduled_start ASC, item.id ASC');
 
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+		$stageId = $this->getState('stage_id');
+		if ($stageId !== null) {
+			$query->where('stage.id = :stageId')->bind(':stageId', $stageId, ParameterType::INTEGER);
+		}
 
-        $project = $db->setQuery(
-            $db->getQuery(true)->select(['id', 'name'])
-                ->from($db->quoteName('#__joomleague_project'))
-                ->where($db->quoteName('id') . ' = :projectId')
-                ->bind(':projectId', $projectId, ParameterType::INTEGER)
-        )->loadObject();
+		$items = $db->setQuery($query)->loadObjectList();
+		if ($items === []) {
+			return ['error' => 'COM_JOOMLEAGUE_RESULTS_VIEW_EMPTY', 'project' => $project];
+		}
 
-        if (!$project) {
-            return ['error' => 'COM_JOOMLEAGUE_RESULTS_UNAVAILABLE'];
-        }
+		$itemIds = array_map(static fn (object $item): int => (int) $item->id, $items);
+		$participants = $db->setQuery(
+			$db->getQuery(true)
+				->select([
+					'participant.id', 'participant.match_id', 'participant.slot_number', 'participant.role_code',
+					'participant.result_status', 'participant.result_rank', 'entry.id AS entry_id',
+					'entry.display_name', 'team.name AS team_name', 'person.first_name', 'person.last_name',
+				])
+				->from($db->quoteName('#__joomleague_match_participant', 'participant'))
+				->innerJoin($db->quoteName('#__joomleague_project_entry', 'entry') . ' ON entry.id = participant.project_entry_id AND entry.published = 1')
+				->leftJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.published = 1')
+				->leftJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id AND person.published = 1')
+				->whereIn('participant.match_id', $itemIds, ParameterType::INTEGER)->where('participant.published = 1')
+				->order('participant.match_id ASC, participant.slot_number ASC, participant.id ASC')
+		)->loadObjectList();
 
-        $stageId = $this->getState('stage_id');
+		$participantsByItem = [];
+		$participantById = [];
+		foreach ($participants as $participant) {
+			$personName = trim((string) $participant->first_name . ' ' . (string) $participant->last_name);
+			$participant->name = (string) ($participant->display_name ?: $participant->team_name ?: $personName ?: ('ID ' . $participant->entry_id));
+			$participant->result_value = null;
+			$participantsByItem[(int) $participant->match_id][] = $participant;
+			$participantById[(int) $participant->id] = $participant;
+		}
 
-        // round.sequence_number is only unique WITHIN its stage, so ordering by it alone
-        // interleaves rounds from different stages once a project has more than one
-        // (e.g. "Kvalifikace" round 1 and "Vyřazovací fáze" round 1 both = 1) — order by
-        // the parent stage's own sequence first to keep whole stages together.
-        $roundQuery = $db->getQuery(true)
-            ->select(['round.id', 'round.name', 'round.sequence_number'])
-            ->from($db->quoteName('#__joomleague_project_round', 'round'))
-            ->innerJoin($db->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = round.stage_id')
-            ->where($db->quoteName('round.project_id') . ' = :projectId')
-            ->bind(':projectId', $projectId, ParameterType::INTEGER)
-            ->order($db->quoteName('stage.sequence_number') . ' ASC, ' . $db->quoteName('round.sequence_number') . ' ASC');
+		$finalItemIds = array_values(array_map(
+			static fn (object $item): int => (int) $item->id,
+			array_filter($items, static fn (object $item): bool => $item->result_status === 'final')
+		));
+		if ($finalItemIds !== []) {
+			$values = $db->setQuery(
+				$db->getQuery(true)
+					->select(['value.participant_id', 'value.numeric_value', 'value.text_value', 'value.status_code', 'value.result_rank'])
+					->from($db->quoteName('#__joomleague_match_score_value', 'value'))
+					->innerJoin($db->quoteName('#__joomleague_match_score_segment', 'segment') . ' ON segment.id = value.segment_id AND segment.parent_id IS NULL')
+					->whereIn('value.match_id', $finalItemIds, ParameterType::INTEGER)
+			)->loadObjectList();
+			foreach ($values as $value) {
+				if (isset($participantById[(int) $value->participant_id])) {
+					$participantById[(int) $value->participant_id]->result_value = $value;
+				}
+			}
+		}
 
-        if ($stageId !== null) {
-            $roundQuery->where($db->quoteName('round.stage_id') . ' = :stageId')->bind(':stageId', $stageId, ParameterType::INTEGER);
-        }
+		$params = Factory::getApplication()->getParams();
+		$showEvents = (int) $params->get('show_events', 1) === 1;
+		$showVenue = (int) $params->get('show_venue', 1) === 1;
+		$eventsByItem = [];
+		if ($showEvents) {
+			$events = $db->setQuery(
+				$db->getQuery(true)
+					->select(['event.match_id', 'event.event_name_key', 'event.primary_name_snapshot', 'event.clock_value', 'event.clock_unit'])
+					->from($db->quoteName('#__joomleague_match_event', 'event'))
+					->whereIn('event.match_id', $itemIds, ParameterType::INTEGER)->where('event.published = 1')
+					->order('event.match_id ASC, event.sequence_number ASC, event.id ASC')
+			)->loadObjectList();
+			foreach ($events as $event) {
+				$eventsByItem[(int) $event->match_id][] = $event;
+			}
+		}
 
-        $rounds = $db->setQuery($roundQuery)->loadObjectList();
+		$rounds = [];
+		foreach ($items as $item) {
+			$item->participants = $participantsByItem[(int) $item->id] ?? [];
+			$item->events = $eventsByItem[(int) $item->id] ?? [];
+			if (!$showVenue) {
+				$item->venue_name = null;
+				$item->attendance = null;
+			}
+			$key = (int) $item->round_id;
+			$rounds[$key] ??= ['stage_name' => (string) $item->stage_name, 'name' => (string) $item->round_name, 'items' => []];
+			$rounds[$key]['items'][] = $item;
+		}
 
-        if ($rounds === []) {
-            return ['error' => 'COM_JOOMLEAGUE_RESULTS_VIEW_EMPTY', 'project' => $project];
-        }
-
-        $roundIds = array_map(static fn (object $round): int => (int) $round->id, $rounds);
-
-        $matches = $db->setQuery(
-            $db->getQuery(true)
-                ->select(['match.id', 'match.round_id', 'match.scheduled_start', 'match.attendance', 'venue.name AS venue_name'])
-                ->from($db->quoteName('#__joomleague_project_match', 'match'))
-                ->leftJoin($db->quoteName('#__joomleague_venue', 'venue') . ' ON venue.id = match.venue_id')
-                ->whereIn($db->quoteName('match.round_id'), $roundIds, ParameterType::INTEGER)
-                ->order($db->quoteName('match.scheduled_start') . ' ASC, match.id ASC')
-        )->loadObjectList();
-
-        if ($matches === []) {
-            return ['error' => 'COM_JOOMLEAGUE_RESULTS_VIEW_EMPTY', 'project' => $project];
-        }
-
-        $matchIds = array_map(static fn (object $match): int => (int) $match->id, $matches);
-
-        // entry.display_name is frequently left blank (it only overrides the
-        // linked team/person's own name) — fall back to team.name / person's
-        // full name, same as the "entry" menu-field and MatchesReader do, or
-        // every match shows blank team names instead of falling back.
-        $participants = $db->setQuery(
-            $db->getQuery(true)
-                ->select([
-                    'participant.match_id', 'participant.slot_number',
-                    'COALESCE(NULLIF(' . $db->quoteName('entry.display_name') . ", ''), "
-                        . $db->quoteName('team.name') . ', NULLIF(TRIM(CONCAT('
-                        . $db->quoteName('person.first_name') . ", ' ', " . $db->quoteName('person.last_name')
-                        . ")), ''), CONCAT('ID ', " . $db->quoteName('entry.id') . ')) AS ' . $db->quoteName('display_name'),
-                ])
-                ->from($db->quoteName('#__joomleague_match_participant', 'participant'))
-                ->innerJoin($db->quoteName('#__joomleague_project_entry', 'entry') . ' ON entry.id = participant.project_entry_id')
-                ->leftJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id')
-                ->leftJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id')
-                ->whereIn($db->quoteName('participant.match_id'), $matchIds, ParameterType::INTEGER)
-        )->loadObjectList();
-
-        $entryNameByMatchSlot = [];
-        foreach ($participants as $participant) {
-            $entryNameByMatchSlot[(int) $participant->match_id][(int) $participant->slot_number] = (string) $participant->display_name;
-        }
-
-        $notes = $db->setQuery(
-            $db->getQuery(true)->select(['match_id', 'notes'])
-                ->from($db->quoteName('#__joomleague_match_result'))
-                ->whereIn($db->quoteName('match_id'), $matchIds, ParameterType::INTEGER)
-        )->loadAssocList('match_id');
-
-        $scoreValues = $db->setQuery(
-            $db->getQuery(true)
-                ->select(['segment.match_id', 'segment.level_code', 'participant.slot_number', 'value.numeric_value'])
-                ->from($db->quoteName('#__joomleague_match_score_segment', 'segment'))
-                ->innerJoin($db->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id = segment.id')
-                ->innerJoin($db->quoteName('#__joomleague_match_participant', 'participant') . ' ON participant.id = value.participant_id')
-                ->whereIn($db->quoteName('segment.match_id'), $matchIds, ParameterType::INTEGER)
-                ->where($db->quoteName('segment.level_code') . " IN ('result', 'shootout')")
-        )->loadObjectList();
-
-        $scoreByMatch = [];
-        $shootoutByMatch = [];
-        foreach ($scoreValues as $value) {
-            $matchId = (int) $value->match_id;
-            $slot = (int) $value->slot_number;
-            if ($value->level_code === 'result') {
-                $scoreByMatch[$matchId][$slot] = $value->numeric_value;
-            } else {
-                $shootoutByMatch[$matchId][$slot] = $value->numeric_value;
-            }
-        }
-
-        $params = Factory::getApplication()->getParams();
-        $showScorers = (int) $params->get('show_scorers', 1) === 1;
-        $showVenue = (int) $params->get('show_venue', 1) === 1;
-
-        $goalsByMatch = [];
-        if ($showScorers) {
-            $events = $db->setQuery(
-                $db->getQuery(true)
-                    ->select(['event.match_id', 'event.event_code', 'event.primary_name_snapshot', 'event.clock_value', 'participant.slot_number'])
-                    ->from($db->quoteName('#__joomleague_match_event', 'event'))
-                    ->innerJoin($db->quoteName('#__joomleague_match_participant', 'participant') . ' ON participant.id = event.match_participant_id')
-                    ->whereIn($db->quoteName('event.match_id'), $matchIds, ParameterType::INTEGER)
-                    ->whereIn($db->quoteName('event.event_code'), ['goal', 'own_goal', 'penalty_goal'])
-                    ->order($db->quoteName('event.match_id') . ' ASC, event.clock_value ASC')
-            )->loadObjectList();
-
-            foreach ($events as $event) {
-                $goalsByMatch[(int) $event->match_id][] = [
-                    'slot' => (int) $event->slot_number,
-                    'player' => (string) $event->primary_name_snapshot,
-                    'minute' => rtrim(rtrim((string) $event->clock_value, '0'), '.'),
-                    'type' => (string) $event->event_code,
-                ];
-            }
-        }
-
-        $matchesByRound = [];
-        foreach ($matches as $match) {
-            $matchId = (int) $match->id;
-            $matchesByRound[(int) $match->round_id][] = [
-				'id' => $matchId,
-                'home' => $entryNameByMatchSlot[$matchId][1] ?? '',
-                'away' => $entryNameByMatchSlot[$matchId][2] ?? '',
-                'home_score' => $scoreByMatch[$matchId][1] ?? null,
-                'away_score' => $scoreByMatch[$matchId][2] ?? null,
-                'home_shootout' => $shootoutByMatch[$matchId][1] ?? null,
-                'away_shootout' => $shootoutByMatch[$matchId][2] ?? null,
-                'scheduled_start' => $match->scheduled_start,
-                'venue' => $showVenue ? $match->venue_name : null,
-                'attendance' => $showVenue ? $match->attendance : null,
-                'notes' => $notes[$matchId]['notes'] ?? null,
-                'goals' => $goalsByMatch[$matchId] ?? [],
-            ];
-        }
-
-        $roundsOut = [];
-        foreach ($rounds as $round) {
-            $roundsOut[] = [
-                'name' => (string) $round->name,
-                'matches' => $matchesByRound[(int) $round->id] ?? [],
-            ];
-        }
-
-        return [
-            'project' => $project,
-            'rounds' => $roundsOut,
-            'show_scorers' => $showScorers,
-            'show_venue' => $showVenue,
-        ];
-    }
+		return ['project' => $project, 'rounds' => array_values($rounds), 'show_events' => $showEvents, 'show_venue' => $showVenue];
+	}
 }

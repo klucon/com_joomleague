@@ -122,6 +122,10 @@ if (preg_match('/name="participant_slot_[12]"[^>]*validate="options"/', $matchFo
 	|| !str_contains($matchScheduleSource, 'StageEntryOptionsProvider($this->database))->contains')) {
 	throw new RuntimeException('Dynamic match participants must use the context-aware server-side allowlist.');
 }
+$programItemModelSource = (string) file_get_contents($site . '/src/Model/ProgramitemModel.php');
+if (!str_contains($programItemModelSource, "if (\$item->result_status === 'final')")) {
+	throw new RuntimeException('The public programme item must not expose non-final score payloads.');
+}
 
 foreach (['mysql', 'postgresql'] as $driver) {
 	$uninstallSql = (string) file_get_contents($admin . '/sql/uninstall.' . ($driver === 'mysql' ? 'mysql.utf8' : 'postgresql') . '.sql');
@@ -1047,6 +1051,23 @@ if (!str_contains($standingsController, 'Session::checkToken()')
 	|| !str_contains($standingsTemplate, "HTMLHelper::_('form.token')")
 	|| preg_match('/<style\b|style\s*=|<script\b/i', $standingsTemplate) === 1) {
 	throw new RuntimeException('Standings administration must retain Joomla CSRF, ACL, logging and native styling.');
+}
+
+$siteResultsModel = (string) file_get_contents($root . '/components/com_joomleague/src/Model/ResultsModel.php');
+$siteResultsTemplate = (string) file_get_contents($root . '/components/com_joomleague/tmpl/results/default.php');
+if (!str_contains($siteResultsModel, "result.status_code = 'final'")
+	|| !str_contains($siteResultsModel, 'participant.slot_number ASC')
+	|| !str_contains($siteResultsModel, 'value.text_value')
+	|| !str_contains($siteResultsModel, 'value.result_rank')) {
+	throw new RuntimeException('Public programme must support ordered participants and expose finalized universal result values only.');
+}
+foreach (['home_score', 'away_score', 'show_scorers', "'goal'", "'own_goal'"] as $footballOnlyToken) {
+	if (str_contains($siteResultsModel . $siteResultsTemplate, $footballOnlyToken)) {
+		throw new RuntimeException(sprintf('Public programme contains sport-specific token %s.', $footballOnlyToken));
+	}
+}
+if (preg_match('/<style\b|style\s*=|<script\b/i', $siteResultsTemplate) === 1) {
+	throw new RuntimeException('Public programme must use native Joomla styling without embedded CSS or scripts.');
 }
 
 printf(

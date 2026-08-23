@@ -81,26 +81,29 @@ final class ProgramitemModel extends BaseDatabaseModel
 			$participant->name = (string) ($participant->display_name ?: $participant->team_name ?: $personName ?: ('ID ' . $participant->entry_id));
 		}
 
-		$segments = $db->setQuery(
+		$segments = [];
+		$valuesBySegment = [];
+		if ($item->result_status === 'final') {
+			$segments = $db->setQuery(
 			$db->getQuery(true)
 				->select(['segment.id', 'segment.parent_id', 'segment.level_code', 'segment.sequence_number', 'segment.status_code'])
 				->from($db->quoteName('#__joomleague_match_score_segment', 'segment'))
 				->where('segment.match_id = :matchId')
 				->bind(':matchId', $matchId, ParameterType::INTEGER)
 				->order('segment.parent_id ASC, segment.sequence_number ASC, segment.id ASC')
-		)->loadObjectList();
+			)->loadObjectList();
 
-		$values = $db->setQuery(
+			$values = $db->setQuery(
 			$db->getQuery(true)
 				->select(['value.segment_id', 'value.participant_id', 'value.numeric_value', 'value.text_value', 'value.status_code', 'value.result_rank'])
 				->from($db->quoteName('#__joomleague_match_score_value', 'value'))
 				->where('value.match_id = :matchId')
 				->bind(':matchId', $matchId, ParameterType::INTEGER)
-		)->loadObjectList();
+			)->loadObjectList();
 
-		$valuesBySegment = [];
-		foreach ($values as $value) {
-			$valuesBySegment[(int) $value->segment_id][(int) $value->participant_id] = $value;
+			foreach ($values as $value) {
+				$valuesBySegment[(int) $value->segment_id][(int) $value->participant_id] = $value;
+			}
 		}
 
 		$events = $db->setQuery(
