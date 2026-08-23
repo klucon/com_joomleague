@@ -62,10 +62,18 @@ final class Pkg_JoomleagueInstallerScript
 	{
 		$language = Factory::getApplication()->getLanguage();
 		$source = (string) $adapter->getParent()->getPath('source');
-		$language->load('pkg_joomleague', JPATH_ADMINISTRATOR, null, true);
+		$loaded = false;
 
 		if ($source !== '') {
-			$language->load('pkg_joomleague', $source . '/language', null, true);
+			$loaded = $language->load('pkg_joomleague', $source, null, true);
+		}
+
+		if (!$loaded) {
+			$loaded = $language->load('pkg_joomleague', JPATH_SITE, null, true);
+		}
+
+		if (!$loaded) {
+			throw new RuntimeException('Unable to load the JoomLeague package language.');
 		}
 	}
 
