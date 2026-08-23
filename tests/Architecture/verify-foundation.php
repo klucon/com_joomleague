@@ -24,6 +24,7 @@ $admin = $root . '/administrator/components/com_joomleague';
 $quickIcon = $root . '/plugins/quickicon/joomleague';
 $consolePlugin = $root . '/plugins/console/joomleague';
 $taskPlugin = $root . '/plugins/task/joomleague';
+$packageManifest = (string) file_get_contents($root . '/build/pkg_joomleague.xml');
 
 if (preg_match('/<uninstall>\s*<sql>/i', $manifest) === 1) {
 	throw new RuntimeException('The component manifest must not run destructive SQL during uninstallation.');
@@ -142,6 +143,19 @@ foreach (['joomleague.xml', 'services/provider.php', 'src/Extension/Joomleague.p
 foreach (['joomleague.xml', 'services/provider.php', 'src/Extension/Joomleague.php', 'language/en-GB/plg_task_joomleague.ini', 'language/en-GB/plg_task_joomleague.sys.ini'] as $pluginFile) {
 	if (!is_file($taskPlugin . '/' . $pluginFile)) {
 		throw new RuntimeException(sprintf('Task plugin is missing %s.', $pluginFile));
+	}
+}
+
+foreach (glob($root . '/modules/mod_*', GLOB_ONLYDIR) ?: [] as $moduleDirectory) {
+	$module = basename($moduleDirectory);
+	$moduleManifest = $moduleDirectory . '/' . $module . '.xml';
+
+	if (!is_file($moduleManifest)) {
+		throw new RuntimeException(sprintf('Module %s is missing its manifest.', $module));
+	}
+
+	if (!str_contains($packageManifest, 'id="' . $module . '"')) {
+		throw new RuntimeException(sprintf('Module %s is not included in the JoomLeague package.', $module));
 	}
 }
 

@@ -16,5 +16,6 @@
 		<file type="plugin" id="joomleague" group="quickicon">plg_quickicon_joomleague-6.2.0-dev.zip</file>
 		<file type="plugin" id="joomleague" group="console">plg_console_joomleague-6.2.0-dev.zip</file>
 		<file type="plugin" id="joomleague" group="task">plg_task_joomleague-6.2.0-dev.zip</file>
+		<file type="module" id="mod_joomleague_standings" client="site">mod_joomleague_standings-6.2.0-dev.zip</file>
 	</files>
 </extension>

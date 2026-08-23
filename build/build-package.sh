@@ -9,6 +9,7 @@ PACKAGE="${DIST_DIR}/com_joomleague-6.2.0-dev.zip"
 PLUGIN_PACKAGE="${DIST_DIR}/plg_quickicon_joomleague-6.2.0-dev.zip"
 CONSOLE_PLUGIN_PACKAGE="${DIST_DIR}/plg_console_joomleague-6.2.0-dev.zip"
 TASK_PLUGIN_PACKAGE="${DIST_DIR}/plg_task_joomleague-6.2.0-dev.zip"
+STANDINGS_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_standings-6.2.0-dev.zip"
 SUITE_PACKAGE="${DIST_DIR}/pkg_joomleague-6.2.0-dev.zip"
 
 if [[ -d "${BUILD_DIR}" ]]; then
@@ -30,7 +31,7 @@ find "${DIST_DIR}" -maxdepth 1 -type f -name "$(basename "${PACKAGE}")" -delete
 
 printf '%s\n' "${PACKAGE}"
 
-find "${DIST_DIR}" -maxdepth 1 -type f \( -name "$(basename "${PLUGIN_PACKAGE}")" -o -name "$(basename "${CONSOLE_PLUGIN_PACKAGE}")" -o -name "$(basename "${TASK_PLUGIN_PACKAGE}")" -o -name "$(basename "${SUITE_PACKAGE}")" \) -delete
+find "${DIST_DIR}" -maxdepth 1 -type f \( -name "$(basename "${PLUGIN_PACKAGE}")" -o -name "$(basename "${CONSOLE_PLUGIN_PACKAGE}")" -o -name "$(basename "${TASK_PLUGIN_PACKAGE}")" -o -name "$(basename "${STANDINGS_MODULE_PACKAGE}")" -o -name "$(basename "${SUITE_PACKAGE}")" \) -delete
 (
 	cd "${ROOT}/plugins/quickicon/joomleague"
 	zip -qr "${PLUGIN_PACKAGE}" .
@@ -46,14 +47,19 @@ find "${DIST_DIR}" -maxdepth 1 -type f \( -name "$(basename "${PLUGIN_PACKAGE}")
 	zip -qr "${TASK_PLUGIN_PACKAGE}" .
 )
 
+(
+	cd "${ROOT}/modules/mod_joomleague_standings"
+	zip -qr "${STANDINGS_MODULE_PACKAGE}" .
+)
+
 PACKAGE_STAGE="$(mktemp -d)"
 trap 'find "${PACKAGE_STAGE}" -mindepth 1 -delete; rmdir "${PACKAGE_STAGE}"' EXIT
 cp "${ROOT}/build/pkg_joomleague.xml" "${PACKAGE_STAGE}/pkg_joomleague.xml"
 cp "${ROOT}/build/pkg_script.php" "${PACKAGE_STAGE}/pkg_script.php"
-cp "${PACKAGE}" "${PLUGIN_PACKAGE}" "${CONSOLE_PLUGIN_PACKAGE}" "${TASK_PLUGIN_PACKAGE}" "${PACKAGE_STAGE}/"
+cp "${PACKAGE}" "${PLUGIN_PACKAGE}" "${CONSOLE_PLUGIN_PACKAGE}" "${TASK_PLUGIN_PACKAGE}" "${STANDINGS_MODULE_PACKAGE}" "${PACKAGE_STAGE}/"
 (
 	cd "${PACKAGE_STAGE}"
 	zip -qr "${SUITE_PACKAGE}" .
 )
 
-printf '%s\n%s\n%s\n%s\n' "${PLUGIN_PACKAGE}" "${CONSOLE_PLUGIN_PACKAGE}" "${TASK_PLUGIN_PACKAGE}" "${SUITE_PACKAGE}"
+printf '%s\n%s\n%s\n%s\n%s\n' "${PLUGIN_PACKAGE}" "${CONSOLE_PLUGIN_PACKAGE}" "${TASK_PLUGIN_PACKAGE}" "${STANDINGS_MODULE_PACKAGE}" "${SUITE_PACKAGE}"
