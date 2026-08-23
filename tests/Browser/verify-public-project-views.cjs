@@ -267,18 +267,22 @@ const { chromium } = require('playwright');
 			const bracketText = await page.locator('main').innerText();
 			const bracketOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 			if (!bracketText.includes(expectedProject)
-				|| !bracketText.includes(expectedParticipant)
-				|| !bracketText.includes(expectedSecondTeam)
-				|| !bracketText.toLowerCase().includes('demo round 1')
-				|| !bracketText.toLowerCase().includes('demo final round')
+				|| !bracketText.includes('Demo Team 1')
+				|| !bracketText.includes('Demo Team 8')
+				|| !bracketText.toLowerCase().includes('demo quarterfinals')
+				|| !bracketText.toLowerCase().includes('demo semifinals')
+				|| !bracketText.toLowerCase().includes('demo final')
 				|| !/Vyřazovací pavouk|Bracket/.test(bracketText)
 				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(bracketText)
 				|| bracketOverflow > 1
 				|| errors.length > 0) {
 				throw new Error(`Public progression bracket failed at ${viewport.width}px: overflow=${bracketOverflow}, errors=${errors.join('; ')}`);
 			}
-			await page.locator('.jl-bracket-match__name[data-entry]').first().click();
-			if (await page.locator('.jl-bracket-match--active').count() < 2) {
+			if (await page.locator('.jl-bracket-match').count() !== 7) {
+				throw new Error(`Progression bracket does not contain the expected seven programme items at ${viewport.width}px.`);
+			}
+			await page.locator('.jl-bracket-match__name', { hasText: 'Demo Team 1' }).first().click();
+			if (await page.locator('.jl-bracket-match--active').count() !== 3) {
 				throw new Error(`Progression tracing did not highlight the participant path at ${viewport.width}px.`);
 			}
 

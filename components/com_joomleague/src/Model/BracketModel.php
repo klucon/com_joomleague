@@ -66,21 +66,12 @@ final class BracketModel extends BaseDatabaseModel
 			return ['error' => 'COM_JOOMLEAGUE_BRACKET_UNAVAILABLE'];
 		}
 
-		$stages = $db->setQuery(
-			$db->getQuery(true)->select(['id', 'name'])
-				->from($db->quoteName('#__joomleague_project_stage'))
-				->where('project_id = :projectId')->where('sequence_number <= :maxSequence')->where('published = 1')
-				->bind(':projectId', $projectId, ParameterType::INTEGER)
-				->bind(':maxSequence', $targetStage->sequence_number, ParameterType::INTEGER)
-				->order('sequence_number ASC, id ASC')
-		)->loadObjectList();
-		$stageIds = array_map(static fn (object $stage): int => (int) $stage->id, $stages);
-
 		$rounds = $db->setQuery(
 			$db->getQuery(true)->select(['round.id', 'round.name', 'round.stage_id'])
 				->from($db->quoteName('#__joomleague_project_round', 'round'))
 				->innerJoin($db->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = round.stage_id AND stage.published = 1')
-				->whereIn('round.stage_id', $stageIds, ParameterType::INTEGER)->where('round.published = 1')
+				->where('round.stage_id = :stageId')->where('round.published = 1')
+				->bind(':stageId', $stageId, ParameterType::INTEGER)
 				->order('stage.sequence_number ASC, stage.id ASC, round.sequence_number ASC, round.id ASC')
 		)->loadObjectList();
 		if (count($rounds) < 2) {
