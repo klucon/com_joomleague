@@ -77,7 +77,7 @@ final class ParticipantModel extends BaseDatabaseModel
 		$memberQuery = $db->getQuery(true)
 			->select([
 				'member.id', 'member.member_person_type', 'member.shirt_number', 'member.is_captain',
-				'person.first_name', 'person.last_name', 'person.nickname', 'person.picture',
+				$db->quoteName('person.id', 'person_id'), 'person.first_name', 'person.last_name', 'person.nickname', 'person.picture',
 			])
 			->from($db->quoteName('#__joomleague_project_entry_member', 'member'))
 			->innerJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = member.person_id AND person.published = 1')
