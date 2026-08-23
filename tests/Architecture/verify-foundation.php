@@ -43,6 +43,7 @@ foreach ([
 	'PKG_JOOMLEAGUE_INSTALL_STEP_PROJECT_TITLE',
 	'PKG_JOOMLEAGUE_INSTALL_STEP_PUBLISH_TITLE',
 	'PKG_JOOMLEAGUE_INSTALL_START_GUIDE',
+	'PKG_JOOMLEAGUE_INSTALL_CREATE_COMPETITION_GUIDE',
 ] as $installerLanguageKey) {
 	if (!str_contains($packageInstaller, $installerLanguageKey)) {
 		throw new RuntimeException(sprintf('Package installer report is missing section key %s.', $installerLanguageKey));
@@ -68,6 +69,7 @@ foreach (['en-GB', 'cs-CZ'] as $packageLanguage) {
 		'PKG_JOOMLEAGUE_INSTALL_STEP_PROJECT_TITLE',
 		'PKG_JOOMLEAGUE_INSTALL_STEP_PUBLISH_TITLE',
 		'PKG_JOOMLEAGUE_INSTALL_START_GUIDE',
+		'PKG_JOOMLEAGUE_INSTALL_CREATE_COMPETITION_GUIDE',
 	] as $installerLanguageKey) {
 		if (!str_contains($packageIni, $installerLanguageKey . '=')) {
 			throw new RuntimeException(sprintf('Package language %s is missing installer key %s.', $packageLanguage, $installerLanguageKey));
@@ -95,14 +97,14 @@ foreach (['ProjectRuleValidator.php', 'EntryModelValidator.php', 'StandingsContr
 	}
 }
 
-foreach (['com_joomleague.getting-started', '#__guidedtours', '#__guidedtour_steps', 'synchroniseGuidedTour'] as $guidedTourRequirement) {
+foreach (['com_joomleague.getting-started', 'com_joomleague.create-competition', '#__guidedtours', '#__guidedtour_steps', 'synchroniseGuidedTours'] as $guidedTourRequirement) {
 	if (!str_contains($installerScript, $guidedTourRequirement)) {
 		throw new RuntimeException(sprintf('Installer guided tour integration is missing %s.', $guidedTourRequirement));
 	}
 }
 
 foreach (['en-GB', 'cs-CZ'] as $languageTag) {
-	foreach (['com_joomleague.getting_started.ini', 'com_joomleague.getting_started_steps.ini'] as $tourLanguageFile) {
+	foreach (['com_joomleague.getting_started.ini', 'com_joomleague.getting_started_steps.ini', 'com_joomleague.create_competition.ini', 'com_joomleague.create_competition_steps.ini'] as $tourLanguageFile) {
 		if (!is_file($admin . '/language/' . $languageTag . '/' . $tourLanguageFile)) {
 			throw new RuntimeException(sprintf('Guided tour language file %s/%s is missing.', $languageTag, $tourLanguageFile));
 		}

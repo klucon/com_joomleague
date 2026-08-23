@@ -160,7 +160,9 @@ final class Pkg_JoomleagueInstallerScript
 			. '<a class="btn btn-outline-secondary" href="' . $this->escape($modulesUrl) . '"><span class="icon-cube" aria-hidden="true"></span> '
 			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_OPEN_MODULES')) . '</a>'
 			. '<button type="button" class="button-start-guidedtour btn btn-outline-success" data-gt-uid="com_joomleague.getting-started">'
-			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_START_GUIDE')) . '</button></div></section>';
+			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_START_GUIDE')) . '</button>'
+			. '<button type="button" class="button-start-guidedtour btn btn-success" data-gt-uid="com_joomleague.create-competition">'
+			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_CREATE_COMPETITION_GUIDE')) . '</button></div></section>';
 	}
 
 	private function escape(string $value): string
