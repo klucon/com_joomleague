@@ -24,7 +24,9 @@
 		</schemas>
 	</update>
 	<files folder="site">
+		<folder>fields</folder>
 		<folder>src</folder>
+		<folder>tmpl</folder>
 	</files>
 	<languages folder="site">
 		<language tag="en-GB">language/en-GB/com_joomleague.ini</language>
