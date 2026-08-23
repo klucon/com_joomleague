@@ -363,6 +363,10 @@ foreach (['mysql' => $mysqlTables, 'postgresql' => $postgresTables] as $driver =
 	if (preg_match('/ADD\s+COLUMN\s+IF\s+NOT\s+EXISTS/i', $updateSql) === 1) {
 		throw new RuntimeException(sprintf('%s updates use ADD COLUMN IF NOT EXISTS, which Joomla Database Checker parses incorrectly.', $driver));
 	}
+
+	if (preg_match('/CREATE\s+(?:UNIQUE\s+)?INDEX\s+IF\s+NOT\s+EXISTS/i', $updateSql) === 1) {
+		throw new RuntimeException(sprintf('%s updates use CREATE INDEX IF NOT EXISTS, which Joomla Database Checker parses incorrectly.', $driver));
+	}
 }
 
 $stageForm = file_get_contents($root . '/administrator/components/com_joomleague/forms/stage.xml');
