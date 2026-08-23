@@ -4,19 +4,22 @@ const { chromium } = require('playwright');
 	const baseUrl = process.env.JOOMLA_BASE_URL;
 	const projectsPath = process.env.JOOMLA_PROJECTS_MENU_PATH;
 	const clubsPath = process.env.JOOMLA_CLUBS_MENU_PATH;
+	const venuesPath = process.env.JOOMLA_VENUES_MENU_PATH;
 	const projectPath = process.env.JOOMLA_PROJECT_MENU_PATH;
 	const participantsPath = process.env.JOOMLA_PARTICIPANTS_MENU_PATH;
 	const participantPath = process.env.JOOMLA_PARTICIPANT_MENU_PATH;
 	const personPath = process.env.JOOMLA_PERSON_MENU_PATH;
 	const clubPath = process.env.JOOMLA_CLUB_MENU_PATH;
 	const teamPath = process.env.JOOMLA_TEAM_MENU_PATH;
+	const venuePath = process.env.JOOMLA_VENUE_MENU_PATH;
 	const expectedProject = process.env.JOOMLA_EXPECTED_PROJECT;
 	const expectedParticipant = process.env.JOOMLA_EXPECTED_PARTICIPANT;
 	const expectedMember = process.env.JOOMLA_EXPECTED_MEMBER;
 	const expectedClub = process.env.JOOMLA_EXPECTED_CLUB;
 	const expectedSecondTeam = process.env.JOOMLA_EXPECTED_SECOND_TEAM;
+	const expectedVenue = process.env.JOOMLA_EXPECTED_VENUE;
 
-	if (!baseUrl || !projectsPath || !clubsPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !teamPath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam) {
+	if (!baseUrl || !projectsPath || !clubsPath || !venuesPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !teamPath || !venuePath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam || !expectedVenue) {
 		throw new Error('Public project view browser test environment is incomplete.');
 	}
 
@@ -67,6 +70,32 @@ const { chromium } = require('playwright');
 			const filteredText = await page.locator('main').innerText();
 			if (!/No published clubs|neodpovídá žádný zveřejněný klub/.test(filteredText)) {
 				throw new Error(`Club search filter did not return the expected empty state at ${viewport.width}px.`);
+			}
+
+			await page.goto(new URL(venuesPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
+			await page.locator('main').waitFor();
+			const venuesText = await page.locator('main').innerText();
+			const venuesOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+			if (!venuesText.includes(expectedVenue)
+				|| !venuesText.includes('Brno')
+				|| !/Kapacita: 2500|Capacity: 2500/.test(venuesText)
+				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(venuesText)
+				|| venuesOverflow > 1
+				|| errors.length > 0) {
+				throw new Error(`Venue catalogue failed at ${viewport.width}px: overflow=${venuesOverflow}, errors=${errors.join('; ')}`);
+			}
+
+			if (await page.locator('#filter_country_code option[value="CZ"]').count() !== 1) {
+				throw new Error(`Venue country filter is incomplete at ${viewport.width}px.`);
+			}
+
+			await page.locator('#filter_search').fill('venue-that-does-not-exist');
+			await page.locator('form').filter({ has: page.locator('#filter_search') }).locator('button[type="submit"]').click();
+			await page.waitForLoadState('domcontentloaded');
+			const filteredVenuesText = await page.locator('main').innerText();
+			if (!/No published venues|neodpovídá žádné zveřejněné sportoviště/.test(filteredVenuesText)) {
+				throw new Error(`Venue search filter did not return the expected empty state at ${viewport.width}px.`);
 			}
 
 			await page.goto(new URL(projectPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
@@ -180,10 +209,26 @@ const { chromium } = require('playwright');
 				throw new Error(`Public team profile failed at ${viewport.width}px: overflow=${teamOverflow}, errors=${errors.join('; ')}`);
 			}
 
+			await page.goto(new URL(venuePath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
+			await page.locator('main').waitFor();
+			const venueText = await page.locator('main').innerText();
+			const venueOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+
+			if (!venueText.includes(expectedVenue)
+				|| !venueText.includes(expectedClub)
+				|| !venueText.includes('Sportovní 1')
+				|| !venueText.includes('Europe/Prague')
+				|| !venueText.includes('49.1951000, 16.6068000')
+				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(venueText)
+				|| venueOverflow > 1
+				|| errors.length > 0) {
+				throw new Error(`Public venue profile failed at ${viewport.width}px: overflow=${venueOverflow}, errors=${errors.join('; ')}`);
+			}
+
 			await page.close();
 		}
 
-		console.log('Public competition and club catalogues plus participant, member, club and team profiles passed desktop and mobile menu routes.');
+		console.log('Public competition, club and venue catalogues plus participant, member, club, team and venue profiles passed desktop and mobile menu routes.');
 	} finally {
 		await browser.close();
 	}
