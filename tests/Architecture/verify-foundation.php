@@ -42,6 +42,7 @@ foreach ([
 	'PKG_JOOMLEAGUE_INSTALL_STEP_PROFILE_TITLE',
 	'PKG_JOOMLEAGUE_INSTALL_STEP_PROJECT_TITLE',
 	'PKG_JOOMLEAGUE_INSTALL_STEP_PUBLISH_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_START_GUIDE',
 ] as $installerLanguageKey) {
 	if (!str_contains($packageInstaller, $installerLanguageKey)) {
 		throw new RuntimeException(sprintf('Package installer report is missing section key %s.', $installerLanguageKey));
@@ -66,6 +67,7 @@ foreach (['en-GB', 'cs-CZ'] as $packageLanguage) {
 		'PKG_JOOMLEAGUE_INSTALL_STEP_PROFILE_TITLE',
 		'PKG_JOOMLEAGUE_INSTALL_STEP_PROJECT_TITLE',
 		'PKG_JOOMLEAGUE_INSTALL_STEP_PUBLISH_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_START_GUIDE',
 	] as $installerLanguageKey) {
 		if (!str_contains($packageIni, $installerLanguageKey . '=')) {
 			throw new RuntimeException(sprintf('Package language %s is missing installer key %s.', $packageLanguage, $installerLanguageKey));
@@ -90,6 +92,20 @@ $installerScript = (string) file_get_contents($admin . '/script.php');
 foreach (['ProjectRuleValidator.php', 'EntryModelValidator.php', 'StandingsContractValidator.php', 'SportProfileSchemaValidator.php'] as $installerDependency) {
 	if (!str_contains($installerScript, $installerDependency)) {
 		throw new RuntimeException(sprintf('Installer profile synchronisation is missing the explicit %s bootstrap.', $installerDependency));
+	}
+}
+
+foreach (['com_joomleague.getting-started', '#__guidedtours', '#__guidedtour_steps', 'synchroniseGuidedTour'] as $guidedTourRequirement) {
+	if (!str_contains($installerScript, $guidedTourRequirement)) {
+		throw new RuntimeException(sprintf('Installer guided tour integration is missing %s.', $guidedTourRequirement));
+	}
+}
+
+foreach (['en-GB', 'cs-CZ'] as $languageTag) {
+	foreach (['com_joomleague.getting_started.ini', 'com_joomleague.getting_started_steps.ini'] as $tourLanguageFile) {
+		if (!is_file($admin . '/language/' . $languageTag . '/' . $tourLanguageFile)) {
+			throw new RuntimeException(sprintf('Guided tour language file %s/%s is missing.', $languageTag, $tourLanguageFile));
+		}
 	}
 }
 
@@ -467,10 +483,7 @@ foreach (['mysql' => '`lifecycle_state`', 'postgresql' => '"lifecycle_state"'] a
 	}
 }
 
-$languageFiles = [
-	$admin . '/language/en-GB/com_joomleague.ini',
-	$admin . '/language/en-GB/com_joomleague.sys.ini',
-];
+$languageFiles = glob($admin . '/language/en-GB/*.ini') ?: [];
 $definedLanguageKeys = [];
 $languageDirectories = array_map('basename', glob($admin . '/language/*', GLOB_ONLYDIR) ?: []);
 
@@ -480,7 +493,10 @@ if ($languageDirectories !== ['cs-CZ', 'en-GB']) {
 	throw new RuntimeException('The component package must contain exactly the canonical en-GB source and bundled cs-CZ translation.');
 }
 
-foreach (['com_joomleague.ini', 'com_joomleague.sys.ini'] as $languageFilename) {
+$languageFilenames = array_map('basename', $languageFiles);
+sort($languageFilenames);
+
+foreach ($languageFilenames as $languageFilename) {
 	$keySets = [];
 
 	foreach (['en-GB', 'cs-CZ'] as $languageTag) {

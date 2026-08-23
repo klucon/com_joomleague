@@ -131,7 +131,7 @@ final class Pkg_JoomleagueInstallerScript
 
 		foreach ($steps as $step) {
 			$stepItems .= '<div class="col-12 col-lg-4"><div class="d-flex gap-3 h-100">'
-				. '<span class="badge rounded-pill text-bg-primary align-self-start">' . $step['number'] . '</span><div>'
+				. '<span class="badge rounded-circle text-bg-primary fs-3 px-3 py-2 shadow-sm align-self-start">' . $step['number'] . '</span><div class="pt-1">'
 				. '<h3 class="h6 mb-1">' . $this->escape(Text::_($step['title'])) . '</h3>'
 				. '<p class="text-muted small mb-0">' . $this->escape(Text::_($step['description'])) . '</p>'
 				. '</div></div></div>';
@@ -158,7 +158,9 @@ final class Pkg_JoomleagueInstallerScript
 			. '<a class="btn btn-outline-primary" href="' . $this->escape($settingsUrl) . '"><span class="icon-options" aria-hidden="true"></span> '
 			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_OPEN_SETTINGS')) . '</a>'
 			. '<a class="btn btn-outline-secondary" href="' . $this->escape($modulesUrl) . '"><span class="icon-cube" aria-hidden="true"></span> '
-			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_OPEN_MODULES')) . '</a></div></section>';
+			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_OPEN_MODULES')) . '</a>'
+			. '<button type="button" class="button-start-guidedtour btn btn-outline-success" data-gt-uid="com_joomleague.getting-started">'
+			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_START_GUIDE')) . '</button></div></section>';
 	}
 
 	private function escape(string $value): string

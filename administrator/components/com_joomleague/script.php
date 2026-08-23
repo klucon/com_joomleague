@@ -6,6 +6,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Installer\Adapter\ComponentAdapter;
 use Joomla\CMS\Language\Text;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 use Joomleague\Component\Joomleague\Administrator\Service\ProjectRuleValidator;
 use Joomleague\Component\Joomleague\Administrator\Service\EntryModelValidator;
@@ -74,6 +75,7 @@ final class Com_JoomleagueInstallerScript
 		$this->removeObsoleteFiles();
 		try {
 			$this->synchroniseBundledProfiles();
+			$this->synchroniseGuidedTour();
 		} catch (Throwable $exception) {
 			Factory::getApplication()->enqueueMessage($exception->getMessage(), 'error');
 
@@ -81,6 +83,99 @@ final class Com_JoomleagueInstallerScript
 		}
 
 		return true;
+	}
+
+	private function synchroniseGuidedTour(): void
+	{
+		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$tableNames = $database->getTableList();
+
+		foreach (['#__guidedtours', '#__guidedtour_steps'] as $tableName) {
+			if (!in_array($database->replacePrefix($tableName), $tableNames, true)) {
+				return;
+			}
+		}
+
+		$uid = 'com_joomleague.getting-started';
+		$database->transactionStart();
+
+		try {
+			$query = $database->getQuery(true)
+				->select($database->quoteName('id'))
+				->from($database->quoteName('#__guidedtours'))
+				->where($database->quoteName('uid') . ' = :uid')
+				->bind(':uid', $uid);
+			$tourId = (int) $database->setQuery($query)->loadResult();
+			$now = Factory::getDate()->toSql();
+			$tour = (object) [
+				'id' => $tourId,
+				'title' => 'COM_JOOMLEAGUE_GUIDEDTOUR_GETTING_STARTED_TITLE',
+				'uid' => $uid,
+				'description' => 'COM_JOOMLEAGUE_GUIDEDTOUR_GETTING_STARTED_DESCRIPTION',
+				'ordering' => 0,
+				'extensions' => '["com_joomleague"]',
+				'url' => 'administrator/index.php?option=com_joomleague&view=dashboard',
+				'created' => $now,
+				'created_by' => 0,
+				'modified' => $now,
+				'modified_by' => 0,
+				'published' => 1,
+				'language' => '*',
+				'note' => '',
+				'access' => 1,
+				'autostart' => 0,
+			];
+
+			if ($tourId > 0) {
+				unset($tour->created, $tour->created_by);
+				$database->updateObject('#__guidedtours', $tour, 'id');
+			} else {
+				$database->insertObject('#__guidedtours', $tour, 'id');
+				$tourId = (int) $tour->id;
+			}
+
+			$query = $database->getQuery(true)
+				->delete($database->quoteName('#__guidedtour_steps'))
+				->where($database->quoteName('tour_id') . ' = :tourId')
+				->bind(':tourId', $tourId, ParameterType::INTEGER);
+			$database->setQuery($query)->execute();
+
+			$steps = [
+				['overview', 'bottom', '.container-fluid > .card:first-of-type'],
+				['profiles', 'right', 'a[href*="view=sportprofiles"]'],
+				['competitions', 'right', 'a[href*="view=competitions"]'],
+				['projects', 'right', 'a[href*="view=projects"]'],
+				['templates', 'left', 'a[href*="view=templates"]'],
+				['tools', 'left', 'a[href*="view=tools"]'],
+			];
+
+			foreach ($steps as $ordering => [$code, $position, $target]) {
+				$step = (object) [
+					'tour_id' => $tourId,
+					'title' => 'COM_JOOMLEAGUE_GUIDEDTOUR_STEP_' . strtoupper($code) . '_TITLE',
+					'published' => 1,
+					'description' => 'COM_JOOMLEAGUE_GUIDEDTOUR_STEP_' . strtoupper($code) . '_DESCRIPTION',
+					'ordering' => $ordering + 1,
+					'position' => $position,
+					'target' => $target,
+					'type' => 0,
+					'interactive_type' => 1,
+					'url' => '',
+					'created' => $now,
+					'created_by' => 0,
+					'modified' => $now,
+					'modified_by' => 0,
+					'language' => '*',
+					'note' => '',
+					'params' => '{"required":1,"requiredvalue":""}',
+				];
+				$database->insertObject('#__guidedtour_steps', $step, 'id');
+			}
+			$database->transactionCommit();
+		} catch (Throwable $exception) {
+			$database->transactionRollback();
+			throw $exception;
+		}
 	}
 
 	/** @return array{processed: int} */
