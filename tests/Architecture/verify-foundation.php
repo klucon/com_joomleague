@@ -907,8 +907,10 @@ $matchResultController = (string) file_get_contents($admin . '/src/Controller/Ma
 
 if (!str_contains($matchResultModel, 'MatchResultFormStateMutator')
 	|| substr_count($matchResultModel, 'clearTransient($matchId)') < 1
-	|| !str_contains($matchResultModel, 'MatchResultPayloadValidator')) {
-	throw new RuntimeException('Match result mutations must be profile-validated and transient state must be cleared after persistence.');
+	|| !str_contains($matchResultModel, 'MatchResultPayloadValidator')
+	|| !str_contains($matchResultModel, 'StandingsCascadeTrigger')
+	|| !str_contains($matchResultModel, 'cascadeStandings($matchId, $actorId)')) {
+	throw new RuntimeException('Match result mutations must be profile-validated, clear transient state and automatically refresh standings.');
 }
 
 if (!str_contains($matchResultPayloadValidator, 'MatchResultAggregationValidator')

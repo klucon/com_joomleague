@@ -137,13 +137,24 @@ try {
 	if ($manualFlag !== 1) throw new RuntimeException('Automatic progression overwrote a manual target-stage assignment.');
 	$targetSnapshot = $recalculator->recalculate($projectId, $targetStageId, 'total', 0); $targetRows = $reader->current($projectId, $targetStageId, 'total')['rows'];
 	if ($targetSnapshot < 1 || count($targetRows) !== 2 || $targetRows[0]->metrics['points'] !== '4') throw new RuntimeException('All-results carry-over was not applied to target standings.');
+	$entryPoints = static function (string $scope, int $entryId) use ($reader, $projectId): string {
+		foreach ($reader->current($projectId, null, $scope)['rows'] as $row) if ((int) $row->entry_id_snapshot === $entryId) return (string) $row->metrics['points'];
+		throw new RuntimeException('Entry is missing from the ' . $scope . ' scope.');
+	};
 
 	[$changedMatchId, $changedParticipants] = $matches[1];
 	$resultRepository->replace($changedMatchId, $resultPayload($changedParticipants, [[0, 1], [0, 2]]), 0);
-	$secondSnapshot = $recalculator->recalculate($projectId, null, 'total', 0);
+	(new StandingsCascadeTrigger($database))->trigger($projectId, $stageId, 0);
 	$current = $reader->current($projectId, null, 'total');
-	if ($secondSnapshot === $firstSnapshot || (int) $current['snapshot']->id !== $secondSnapshot) throw new RuntimeException('Changed standings input did not publish a new snapshot.');
+	$secondSnapshot = (int) $current['snapshot']->id;
+	if ($secondSnapshot === $firstSnapshot) throw new RuntimeException('Changed standings input did not publish a new snapshot.');
 	if ($current['rows'][0]->entry_name_snapshot !== 'Beta' || $current['rows'][0]->metrics['points'] !== '3' || $current['rows'][1]->metrics['points'] !== '3') throw new RuntimeException('Tie-break ordering after result replacement is incorrect.');
+	if ($entryPoints('home', $entries[0]) !== '3' || $entryPoints('away', $entries[1]) !== '3') throw new RuntimeException('Changed final result did not refresh home and away scopes.');
+	$draftPayload = $resultPayload($changedParticipants, [[0, 1], [0, 2]]); $draftPayload['status_code'] = 'draft'; $draftPayload['finalized_at'] = null;
+	$resultRepository->replace($changedMatchId, $draftPayload, 0); (new StandingsCascadeTrigger($database))->trigger($projectId, $stageId, 0);
+	if ($entryPoints('total', $entries[0]) !== '3' || $entryPoints('total', $entries[1]) !== '0' || $entryPoints('away', $entries[1]) !== '0') throw new RuntimeException('Draft result remained included in published standings.');
+	$resultRepository->replace($changedMatchId, $resultPayload($changedParticipants, [[0, 1], [0, 2]]), 0); (new StandingsCascadeTrigger($database))->trigger($projectId, $stageId, 0);
+	if ($entryPoints('total', $entries[0]) !== '3' || $entryPoints('total', $entries[1]) !== '3' || $entryPoints('away', $entries[1]) !== '3') throw new RuntimeException('Finalized result was not restored to every standings scope.');
 	foreach ($context['available_scopes'] as $scope) $recalculator->recalculate($projectId, null, (string) $scope, 0);
 	$points = static function (string $scope) use ($reader, $projectId, $entries): string {
 		foreach ($reader->current($projectId, null, $scope)['rows'] as $row) if ((int) $row->entry_id_snapshot === $entries[0]) return (string) $row->metrics['points'];
@@ -214,7 +225,7 @@ try {
 	$snapshotCount = (int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult();
 	if ($snapshotCount < 25) throw new RuntimeException('Immutable standings history was not retained across adjustment lifecycle changes.');
 
-	printf("Standings repository OK on %s: calculation, automatic scopes and adjustment lifecycle verified\n", $database->getName());
+	printf("Standings repository OK on %s: result lifecycle, automatic scopes and adjustment lifecycle verified\n", $database->getName());
 } finally {
 	$database->setQuery($database->getQuery(true)->delete($database->quoteName('#__joomleague_project'))->where('id = ' . $projectId))->execute();
 	foreach ([['#__joomleague_sport_type', $sportTypeId], ['#__joomleague_competition', $competitionId], ['#__joomleague_season', $seasonId]] as [$table, $id]) $database->setQuery($database->getQuery(true)->delete($database->quoteName($table))->where('id = ' . $id))->execute();
