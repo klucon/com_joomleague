@@ -162,8 +162,16 @@ try {
 	if (!$adjustment->delete($adjustmentId)) throw new RuntimeException('Standing adjustment could not be deleted: ' . $adjustment->getError());
 	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
 	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope]) throw new RuntimeException('Deleted adjustment did not restore the ' . $scope . ' scope.');
+	$homeAdjustment = new StandingadjustmentTable($database); $homeAdjustment->bind(array_replace($adjustmentData, ['scope_code' => 'home', 'adjustment_value' => '-3', 'reason' => 'Home scope isolation test'])); $homeAdjustment->uuid = UuidFactory::v4();
+	if (!$homeAdjustment->check() || !$homeAdjustment->store()) throw new RuntimeException('Home-only adjustment could not be created: ' . $homeAdjustment->getError());
+	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	if ((float) $points('home') !== (float) $baseline['home'] - 3.0) throw new RuntimeException('Home-only adjustment did not refresh the home scope.');
+	foreach (['total', 'away'] as $scope) if ((float) $points($scope) !== (float) $baseline[$scope]) throw new RuntimeException('Home-only adjustment leaked into the ' . $scope . ' scope.');
+	if (!$homeAdjustment->delete((int) $homeAdjustment->id)) throw new RuntimeException('Home-only adjustment could not be deleted: ' . $homeAdjustment->getError());
+	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope]) throw new RuntimeException('Deleting the home-only adjustment did not restore the ' . $scope . ' scope.');
 	$snapshotCount = (int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult();
-	if ($snapshotCount < 14) throw new RuntimeException('Immutable standings history was not retained across adjustment lifecycle changes.');
+	if ($snapshotCount < 15) throw new RuntimeException('Immutable standings history was not retained across adjustment lifecycle changes.');
 
 	printf("Standings repository OK on %s: calculation, automatic scopes and adjustment lifecycle verified\n", $database->getName());
 } finally {
