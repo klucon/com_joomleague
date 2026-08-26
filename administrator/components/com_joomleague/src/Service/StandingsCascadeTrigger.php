@@ -55,6 +55,16 @@ final class StandingsCascadeTrigger
 		$this->triggerContexts($projectId, $stageIds, $actorId);
 	}
 
+	/** Republishes only the affected stage after its participant selection changes. */
+	public function triggerStage(int $projectId, int $stageId, int $actorId): void
+	{
+		if ($projectId < 1 || $stageId < 1) {
+			return;
+		}
+
+		$this->triggerContexts($projectId, [$stageId], $actorId);
+	}
+
 	/** @param list<?int> $stageIds */
 	private function triggerContexts(int $projectId, array $stageIds, int $actorId): void
 	{

@@ -16,12 +16,15 @@ foreach (['UuidFactory.php', 'CanonicalJson.php', 'StageTransitionValidator.php'
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/StagetransitionTable.php';
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/StandingadjustmentTable.php';
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/StandingsCascadeTrigger.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Extension/JoomleagueComponent.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Model/StageentriesModel.php';
 
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomleague\Component\Joomleague\Administrator\Service\MatchResultRepository;
 use Joomleague\Component\Joomleague\Administrator\Service\StageProgressionService;
 use Joomleague\Component\Joomleague\Administrator\Service\StandingsCascadeTrigger;
+use Joomleague\Component\Joomleague\Administrator\Model\StageentriesModel;
 use Joomleague\Component\Joomleague\Administrator\Table\StandingadjustmentTable;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsRecalculator;
@@ -135,7 +138,7 @@ try {
 	if ($runCount !== 1) throw new RuntimeException('Identical stage progression input created duplicate audit runs.');
 	$manualFlag = (int) $database->setQuery($database->getQuery(true)->select('manual_assignment')->from($database->quoteName('#__joomleague_stage_entry'))->where('stage_id = ' . $targetStageId)->where('entry_id = ' . $entries[1]))->loadResult();
 	if ($manualFlag !== 1) throw new RuntimeException('Automatic progression overwrote a manual target-stage assignment.');
-	$targetSnapshot = $recalculator->recalculate($projectId, $targetStageId, 'total', 0); $targetRows = $reader->current($projectId, $targetStageId, 'total')['rows'];
+	$targetSnapshot = (int) $reader->current($projectId, $targetStageId, 'total')['snapshot']->id; $targetRows = $reader->current($projectId, $targetStageId, 'total')['rows'];
 	if ($targetSnapshot < 1 || count($targetRows) !== 2 || $targetRows[0]->metrics['points'] !== '4') throw new RuntimeException('All-results carry-over was not applied to target standings.');
 	$entryPoints = static function (string $scope, int $entryId) use ($reader, $projectId): string {
 		foreach ($reader->current($projectId, null, $scope)['rows'] as $row) if ((int) $row->entry_id_snapshot === $entryId) return (string) $row->metrics['points'];
@@ -240,10 +243,18 @@ try {
 	$database->setQuery($database->getQuery(true)->delete($database->quoteName('#__joomleague_project_entry'))->where('id = ' . $temporaryEntryId))->execute();
 	(new StandingsCascadeTrigger($database))->triggerProject($projectId, 0);
 	if (count($reader->current($projectId, null, 'total')['rows']) !== 2 || count($reader->current($projectId, $stageId, 'total')['rows']) !== 2) throw new RuntimeException('Deleting a project entry did not restore standings.');
+	$stageEntriesModel = new StageentriesModel(['dbo' => $database]);
+	$stageEntriesModel->saveAssignments($targetStageId, 'explicit', [$entries[0]]);
+	if (count($reader->current($projectId, $targetStageId, 'total')['rows']) !== 1) throw new RuntimeException('Manual stage assignment did not refresh target-stage standings.');
+	if (count($reader->current($projectId, null, 'total')['rows']) !== 2 || count($reader->current($projectId, $stageId, 'total')['rows']) !== 2) throw new RuntimeException('Manual stage assignment leaked into another standings context.');
+	$stageEntriesModel->saveAssignments($targetStageId, 'explicit', $entries);
+	if (count($reader->current($projectId, $targetStageId, 'total')['rows']) !== 2) throw new RuntimeException('Restoring explicit stage assignments did not refresh target-stage standings.');
+	$stageEntriesModel->saveAssignments($targetStageId, 'inherit_project', []);
+	if (count($reader->current($projectId, $targetStageId, 'total')['rows']) !== 2) throw new RuntimeException('Switching a stage to inherited entries did not refresh target-stage standings.');
 	$snapshotCount = (int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult();
 	if ($snapshotCount < 25) throw new RuntimeException('Immutable standings history was not retained across adjustment lifecycle changes.');
 
-	printf("Standings repository OK on %s: result, adjustment and project-entry lifecycles verified\n", $database->getName());
+	printf("Standings repository OK on %s: result, adjustment, project-entry and stage-entry lifecycles verified\n", $database->getName());
 } finally {
 	$database->setQuery($database->getQuery(true)->delete($database->quoteName('#__joomleague_project'))->where('id = ' . $projectId))->execute();
 	foreach ([['#__joomleague_sport_type', $sportTypeId], ['#__joomleague_competition', $competitionId], ['#__joomleague_season', $seasonId]] as [$table, $id]) $database->setQuery($database->getQuery(true)->delete($database->quoteName($table))->where('id = ' . $id))->execute();

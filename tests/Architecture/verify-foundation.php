@@ -875,6 +875,18 @@ if (!str_contains($projectEntryModel, 'StandingsCascadeTrigger')
 	throw new RuntimeException('Project participant save, publication and deletion must automatically refresh project and stage standings.');
 }
 
+$stageEntriesModel = (string) file_get_contents($admin . '/src/Model/StageentriesModel.php');
+$stageProgressionService = (string) file_get_contents($admin . '/src/Service/StageProgressionService.php');
+$standingsCascadeTrigger = (string) file_get_contents($admin . '/src/Service/StandingsCascadeTrigger.php');
+
+if (!str_contains($standingsCascadeTrigger, 'public function triggerStage(')
+	|| !str_contains($stageEntriesModel, 'StandingsCascadeTrigger')
+	|| !str_contains($stageEntriesModel, 'triggerStage(')
+	|| !str_contains($stageProgressionService, 'refreshTargetStandings(')
+	|| !str_contains($stageProgressionService, 'triggerStage(')) {
+	throw new RuntimeException('Manual and automatic stage participant changes must automatically refresh target-stage standings.');
+}
+
 $entryMemberController = (string) file_get_contents($admin . '/src/Controller/EntrymemberController.php');
 $entryMembersTemplate = (string) file_get_contents($admin . '/tmpl/entrymembers/default.php');
 $entryMemberModel = (string) file_get_contents($admin . '/src/Model/EntrymemberModel.php');
