@@ -45,8 +45,9 @@ final class VenuesModel extends ListModel
 				$db->quoteName('club.id', 'club_id'), $db->quoteName('club.name', 'club_name'),
 			])
 			->from($db->quoteName('#__joomleague_venue', 'venue'))
-			->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = venue.owner_club_id AND club.published = 1')
-			->where('venue.published = 1');
+			->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = venue.owner_club_id AND club.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'club'))
+			->where('venue.published = 1')
+			->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'venue'));
 
 		$search = (string) $this->getState('filter.search');
 
@@ -73,8 +74,9 @@ final class VenuesModel extends ListModel
 		return $db->setQuery(
 			$db->getQuery(true)
 				->select('DISTINCT country_code')
-				->from($db->quoteName('#__joomleague_venue'))
-				->where('published = 1')
+				->from($db->quoteName('#__joomleague_venue', 'venue'))
+				->where('venue.published = 1')
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'venue'))
 				->where('country_code IS NOT NULL')
 				->where("country_code <> ''")
 				->order('country_code ASC')

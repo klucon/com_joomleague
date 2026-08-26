@@ -19,9 +19,9 @@ mkdir -p "${BUILD_DIR}/admin" "${BUILD_DIR}/site" "${BUILD_DIR}/media" "${DIST_D
 
 cp "${ROOT}/administrator/components/com_joomleague/joomleague.xml" "${BUILD_DIR}/joomleague.xml"
 cp "${ROOT}/administrator/components/com_joomleague/script.php" "${BUILD_DIR}/script.php"
-cp -a "${ROOT}/administrator/components/com_joomleague/." "${BUILD_DIR}/admin/"
-cp -a "${ROOT}/components/com_joomleague/." "${BUILD_DIR}/site/"
-cp -a "${ROOT}/media/com_joomleague/." "${BUILD_DIR}/media/"
+cp -R "${ROOT}/administrator/components/com_joomleague/." "${BUILD_DIR}/admin/"
+cp -R "${ROOT}/components/com_joomleague/." "${BUILD_DIR}/site/"
+cp -R "${ROOT}/media/com_joomleague/." "${BUILD_DIR}/media/"
 
 find "${DIST_DIR}" -maxdepth 1 -type f -name "$(basename "${PACKAGE}")" -delete
 (
@@ -56,7 +56,7 @@ PACKAGE_STAGE="$(mktemp -d)"
 trap 'find "${PACKAGE_STAGE}" -mindepth 1 -delete; rmdir "${PACKAGE_STAGE}"' EXIT
 cp "${ROOT}/build/pkg_joomleague.xml" "${PACKAGE_STAGE}/pkg_joomleague.xml"
 cp "${ROOT}/build/pkg_script.php" "${PACKAGE_STAGE}/pkg_script.php"
-cp -a "${ROOT}/build/language" "${PACKAGE_STAGE}/language"
+cp -R "${ROOT}/build/language" "${PACKAGE_STAGE}/language"
 cp "${PACKAGE}" "${PLUGIN_PACKAGE}" "${CONSOLE_PLUGIN_PACKAGE}" "${TASK_PLUGIN_PACKAGE}" "${STANDINGS_MODULE_PACKAGE}" "${PACKAGE_STAGE}/"
 (
 	cd "${PACKAGE_STAGE}"

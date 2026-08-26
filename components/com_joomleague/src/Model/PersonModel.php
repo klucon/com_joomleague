@@ -43,9 +43,10 @@ final class PersonModel extends BaseDatabaseModel
 					'person.picture', 'person.description', $db->quoteName('club.id', 'club_id'), $db->quoteName('club.name', 'club_name'),
 				])
 				->from($db->quoteName('#__joomleague_person', 'person'))
-				->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = person.club_id AND club.published = 1')
+				->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = person.club_id AND club.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'club'))
 				->where('person.id = :personId')
 				->where('person.published = 1')
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'person'))
 				->bind(':personId', $personId, ParameterType::INTEGER)
 		)->loadObject();
 
@@ -75,6 +76,9 @@ final class PersonModel extends BaseDatabaseModel
 				->leftJoin($db->quoteName('#__joomleague_person', 'entry_person') . ' ON entry_person.id = entry.person_id AND entry_person.published = 1')
 				->where('member.person_id = :personId')
 				->where('member.published = 1')
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'project'))
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'competition'))
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'season'))
 				->where('(member.valid_from IS NULL OR member.valid_from <= :todayFrom)')
 				->where('(member.valid_until IS NULL OR member.valid_until >= :todayUntil)')
 				->where("(entry.entry_kind = 'group' OR (entry.entry_kind = 'team' AND team.id IS NOT NULL) OR (entry.entry_kind = 'person' AND entry_person.id IS NOT NULL))")

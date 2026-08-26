@@ -167,6 +167,9 @@ final class StandingsModel extends BaseDatabaseModel
 			->where('competition.published = 1')
 			->where('season.published = 1')
 			->where('sport_type.published = 1')
+			->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($database, 'project'))
+			->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($database, 'competition'))
+			->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($database, 'season'))
 			->bind(':project', $projectId, \Joomla\Database\ParameterType::INTEGER);
 
 		if ($stageId !== null) {

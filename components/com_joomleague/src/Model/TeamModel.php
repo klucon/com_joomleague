@@ -44,9 +44,10 @@ final class TeamModel extends BaseDatabaseModel
 					$db->quoteName('club.id', 'club_id'), $db->quoteName('club.name', 'club_name'),
 				])
 				->from($db->quoteName('#__joomleague_team', 'team'))
-				->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = team.club_id AND club.published = 1')
+				->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = team.club_id AND club.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'club'))
 				->where('team.id = :teamId')
 				->where('team.published = 1')
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'team'))
 				->bind(':teamId', $teamId, ParameterType::INTEGER)
 		)->loadObject();
 
@@ -71,6 +72,9 @@ final class TeamModel extends BaseDatabaseModel
 				->where('entry.team_id = :teamId')
 				->where('entry.entry_kind = ' . $db->quote('team'))
 				->where('entry.published = 1')
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'project'))
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'competition'))
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'season'))
 				->bind(':teamId', $teamId, ParameterType::INTEGER)
 				->order('season.name DESC, project.name ASC, entry.id ASC')
 		)->loadObjectList();

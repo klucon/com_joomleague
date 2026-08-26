@@ -26,7 +26,7 @@ final class MatchparticipantsModel extends BaseDatabaseModel
 	public function getContext(int $matchId): array
 	{
 		$match = $this->matchRow($matchId);
-		$project = (new ProjectContextRepository($this->getDatabase()))->get((int) $match->project_id);
+		$contestType = $this->assertVariableParticipants($match);
 		$assigned = $this->assignedParticipants($matchId);
 		$assignedEntryIds = array_column($assigned, 'entry_id');
 		$available = array_values(array_filter(
@@ -36,7 +36,7 @@ final class MatchparticipantsModel extends BaseDatabaseModel
 
 		return [
 			'match' => $match,
-			'contestType' => (string) ($project->profile['contest']['type'] ?? 'head_to_head'),
+			'contestType' => $contestType,
 			'locked' => (new MatchCompetitionDataGuard($this->getDatabase()))->hasCompetitionData($matchId),
 			'assigned' => $assigned,
 			'available' => $available,
@@ -47,6 +47,7 @@ final class MatchparticipantsModel extends BaseDatabaseModel
 	public function add(int $matchId, array $entryIds, int $userId): void
 	{
 		$match = $this->matchRow($matchId);
+		$this->assertVariableParticipants($match);
 		if ((new MatchCompetitionDataGuard($this->getDatabase()))->hasCompetitionData($matchId)) {
 			throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_MATCH_PARTICIPANTS_LOCKED'));
 		}
@@ -89,6 +90,9 @@ final class MatchparticipantsModel extends BaseDatabaseModel
 	/** @param list<int> $participantIds */
 	public function remove(int $matchId, array $participantIds): void
 	{
+		$match = $this->matchRow($matchId);
+		$this->assertVariableParticipants($match);
+
 		if ((new MatchCompetitionDataGuard($this->getDatabase()))->hasCompetitionData($matchId)) {
 			throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_MATCH_PARTICIPANTS_LOCKED'));
 		}
@@ -103,6 +107,18 @@ final class MatchparticipantsModel extends BaseDatabaseModel
 			->where($db->quoteName('match_id') . ' = :matchId')->bind(':matchId', $matchId, ParameterType::INTEGER)
 			->whereIn($db->quoteName('id'), $participantIds, ParameterType::INTEGER);
 		$db->setQuery($query)->execute();
+	}
+
+	private function assertVariableParticipants(object $match): string
+	{
+		$project = (new ProjectContextRepository($this->getDatabase()))->get((int) $match->project_id);
+		$contestType = (string) ($project->profile['contest']['type'] ?? 'head_to_head');
+
+		if ($contestType === 'head_to_head') {
+			throw new \UnexpectedValueException(Text::_('COM_JOOMLEAGUE_ERROR_MATCH_PARTICIPANTS_FIXED'));
+		}
+
+		return $contestType;
 	}
 
 	private function matchRow(int $matchId): object

@@ -51,6 +51,9 @@ final class ProjectModel extends BaseDatabaseModel
 				->innerJoin($db->quoteName('#__joomleague_sport_type', 'sport_type') . ' ON sport_type.id = project.sport_type_id AND sport_type.published = 1')
 				->where('project.id = :projectId')
 				->where('project.published = 1')
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'project'))
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'competition'))
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'season'))
 				->bind(':projectId', $projectId, ParameterType::INTEGER)
 		)->loadObject();
 
@@ -61,8 +64,8 @@ final class ProjectModel extends BaseDatabaseModel
 		$entryCountQuery = $db->getQuery(true)
 			->select('COUNT(*)')
 			->from($db->quoteName('#__joomleague_project_entry', 'entry'))
-			->leftJoin($db->quoteName('#__joomleague_team', 'entry_team') . ' ON entry_team.id = entry.team_id AND entry_team.published = 1')
-			->leftJoin($db->quoteName('#__joomleague_person', 'entry_person') . ' ON entry_person.id = entry.person_id AND entry_person.published = 1')
+			->leftJoin($db->quoteName('#__joomleague_team', 'entry_team') . ' ON entry_team.id = entry.team_id AND entry_team.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'entry_team'))
+			->leftJoin($db->quoteName('#__joomleague_person', 'entry_person') . ' ON entry_person.id = entry.person_id AND entry_person.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'entry_person'))
 			->where('entry.project_id = :projectId')
 			->where('entry.published = 1')
 			->where("(entry.entry_kind = 'group' OR (entry.entry_kind = 'team' AND entry_team.id IS NOT NULL) OR (entry.entry_kind = 'person' AND entry_person.id IS NOT NULL))")

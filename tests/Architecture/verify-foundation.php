@@ -496,7 +496,7 @@ foreach (['mysql' => $mysqlTables, 'postgresql' => $postgresTables] as $driver =
 	sort($updateFiles, SORT_STRING);
 	$latestUpdate = basename((string) end($updateFiles));
 
-	if ($latestUpdate !== '6.2.0-2026081601.sql') {
+	if ($latestUpdate !== '6.2.0-2026082501.sql') {
 		throw new RuntimeException(sprintf('%s update ordering must end at the schema anchor.', $driver));
 	}
 
@@ -507,6 +507,30 @@ foreach (['mysql' => $mysqlTables, 'postgresql' => $postgresTables] as $driver =
 	if (preg_match('/CREATE\s+(?:UNIQUE\s+)?INDEX\s+IF\s+NOT\s+EXISTS/i', $updateSql) === 1) {
 		throw new RuntimeException(sprintf('%s updates use CREATE INDEX IF NOT EXISTS, which Joomla Database Checker parses incorrectly.', $driver));
 	}
+}
+
+foreach (['competition', 'season', 'project', 'club', 'team', 'person', 'venue'] as $publicEntity) {
+	foreach (['mysql' => $mysqlInstall, 'postgresql' => $postgresInstall] as $driver => $schema) {
+		$quote = $driver === 'mysql' ? '`' : '"';
+		$start = strpos($schema, 'CREATE TABLE IF NOT EXISTS ' . $quote . '#__joomleague_' . $publicEntity . $quote);
+		$endMarker = $driver === 'mysql' ? ') ENGINE=' : ');';
+		$end = $start === false ? false : strpos($schema, $endMarker, $start);
+		$definition = ($start === false || $end === false) ? '' : substr($schema, $start, $end - $start);
+		if (!str_contains($definition, $quote . 'access' . $quote)) {
+			throw new RuntimeException(sprintf('%s public entity %s is missing its access level.', $driver, $publicEntity));
+		}
+	}
+}
+
+$routerSource = (string) file_get_contents($root . '/components/com_joomleague/src/Service/Router.php');
+$providerSource = (string) file_get_contents($admin . '/services/provider.php');
+if (!str_contains($routerSource, 'extends RouterView') || !str_contains($providerSource, 'new RouterFactory')) {
+	throw new RuntimeException('The site component must register its native Joomla router.');
+}
+
+$participantModelSource = (string) file_get_contents($admin . '/src/Model/MatchparticipantsModel.php');
+if (!str_contains($participantModelSource, 'assertVariableParticipants') || !str_contains($participantModelSource, "contestType === 'head_to_head'")) {
+	throw new RuntimeException('Variable match participant management must reject fixed head-to-head contests.');
 }
 
 $stageForm = file_get_contents($root . '/administrator/components/com_joomleague/forms/stage.xml');

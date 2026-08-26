@@ -42,9 +42,9 @@ final class ClubModel extends BaseDatabaseModel
 					'id', 'name', 'short_name', 'country_code', 'website', 'logo',
 					'founded_date', 'dissolved_date', 'description',
 				])
-				->from($db->quoteName('#__joomleague_club'))
+				->from($db->quoteName('#__joomleague_club', 'club'))
 				->where('id = :clubId')
-				->where('published = 1')
+				->where('club.published = 1')->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'club'))
 				->bind(':clubId', $clubId, ParameterType::INTEGER)
 		)->loadObject();
 
@@ -55,9 +55,9 @@ final class ClubModel extends BaseDatabaseModel
 		$teams = $db->setQuery(
 			$db->getQuery(true)
 				->select(['id', 'name', 'middle_name', 'short_name', 'website', 'logo', 'picture', 'description'])
-				->from($db->quoteName('#__joomleague_team'))
+				->from($db->quoteName('#__joomleague_team', 'team'))
 				->where('club_id = :clubId')
-				->where('published = 1')
+				->where('team.published = 1')->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'team'))
 				->bind(':clubId', $clubId, ParameterType::INTEGER)
 				->order('ordering ASC, name ASC, id ASC')
 		)->loadObjectList();
@@ -85,6 +85,9 @@ final class ClubModel extends BaseDatabaseModel
 					->whereIn('entry.team_id', array_keys($teamsById), ParameterType::INTEGER)
 					->where('entry.entry_kind = ' . $db->quote('team'))
 					->where('entry.published = 1')
+					->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'project'))
+					->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'competition'))
+					->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'season'))
 					->order('project.name ASC, entry.id ASC')
 			)->loadObjectList();
 

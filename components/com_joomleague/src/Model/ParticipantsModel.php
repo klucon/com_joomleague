@@ -45,6 +45,9 @@ final class ParticipantsModel extends BaseDatabaseModel
 				->innerJoin($db->quoteName('#__joomleague_sport_type', 'sport_type') . ' ON sport_type.id = project.sport_type_id AND sport_type.published = 1')
 				->where('project.id = :projectId')
 				->where('project.published = 1')
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'project'))
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'competition'))
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'season'))
 				->bind(':projectId', $projectId, ParameterType::INTEGER)
 		)->loadObject();
 
@@ -55,7 +58,7 @@ final class ParticipantsModel extends BaseDatabaseModel
 		$memberCount = $db->getQuery(true)
 			->select('COUNT(*)')
 			->from($db->quoteName('#__joomleague_project_entry_member', 'member'))
-			->innerJoin($db->quoteName('#__joomleague_person', 'member_person') . ' ON member_person.id = member.person_id AND member_person.published = 1')
+			->innerJoin($db->quoteName('#__joomleague_person', 'member_person') . ' ON member_person.id = member.person_id AND member_person.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'member_person'))
 			->where('member.entry_id = entry.id')
 			->where('member.published = 1');
 
@@ -71,9 +74,9 @@ final class ParticipantsModel extends BaseDatabaseModel
 				'(' . $memberCount . ') AS member_count',
 			])
 			->from($db->quoteName('#__joomleague_project_entry', 'entry'))
-			->leftJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.published = 1')
-			->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = team.club_id AND club.published = 1')
-			->leftJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id AND person.published = 1')
+			->leftJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'team'))
+			->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = team.club_id AND club.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'club'))
+			->leftJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id AND person.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'person'))
 			->where('entry.project_id = :projectId')
 			->where('entry.published = 1')
 			->where("(entry.entry_kind = 'group' OR (entry.entry_kind = 'team' AND team.id IS NOT NULL) OR (entry.entry_kind = 'person' AND person.id IS NOT NULL))")

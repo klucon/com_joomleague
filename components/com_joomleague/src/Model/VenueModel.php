@@ -46,9 +46,10 @@ final class VenueModel extends BaseDatabaseModel
 					$db->quoteName('club.id', 'club_id'), $db->quoteName('club.name', 'club_name'),
 				])
 				->from($db->quoteName('#__joomleague_venue', 'venue'))
-				->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = venue.owner_club_id AND club.published = 1')
+				->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = venue.owner_club_id AND club.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'club'))
 				->where('venue.id = :venueId')
 				->where('venue.published = 1')
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'venue'))
 				->bind(':venueId', $venueId, ParameterType::INTEGER)
 		)->loadObject();
 

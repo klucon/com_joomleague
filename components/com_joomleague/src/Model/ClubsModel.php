@@ -43,13 +43,15 @@ final class ClubsModel extends ListModel
 			->from($db->quoteName('#__joomleague_team', 'team'))
 			->where('team.club_id = club.id')
 			->where('team.published = 1');
+		$teamCount->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'team'));
 		$query = $db->getQuery(true)
 			->select([
 				'club.id', 'club.name', 'club.short_name', 'club.country_code', 'club.logo',
 				'club.founded_date', 'club.description', '(' . $teamCount . ') AS team_count',
 			])
 			->from($db->quoteName('#__joomleague_club', 'club'))
-			->where('club.published = 1');
+			->where('club.published = 1')
+			->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'club'));
 
 		$search = (string) $this->getState('filter.search');
 
@@ -77,8 +79,9 @@ final class ClubsModel extends ListModel
 		return $db->setQuery(
 			$db->getQuery(true)
 				->select('DISTINCT country_code')
-				->from($db->quoteName('#__joomleague_club'))
-				->where('published = 1')
+				->from($db->quoteName('#__joomleague_club', 'club'))
+				->where('club.published = 1')
+				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'club'))
 				->where('country_code IS NOT NULL')
 				->where("country_code <> ''")
 				->order('country_code ASC')
