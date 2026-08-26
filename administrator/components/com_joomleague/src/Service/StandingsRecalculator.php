@@ -84,6 +84,7 @@ final class StandingsRecalculator
 	private function adjustments(int $projectId, ?int $stageId, string $scope): array
 	{
 		$stageKey = $stageId ?? 0;
+		$effectiveDate = gmdate('Y-m-d');
 		$query = $this->database->getQuery(true)
 			->select(['project_entry_id', 'metric_code', 'adjustment_value'])
 			->from($this->database->quoteName('#__joomleague_standing_adjustment'))
@@ -91,9 +92,11 @@ final class StandingsRecalculator
 			->where('stage_key = :stage')
 			->where('(scope_code = :scope OR scope_code = ' . $this->database->quote('all') . ')')
 			->where('published = 1')
+			->where('(effective_date IS NULL OR effective_date <= :effectiveDate)')
 			->bind(':project', $projectId, ParameterType::INTEGER)
 			->bind(':stage', $stageKey, ParameterType::INTEGER)
 			->bind(':scope', $scope)
+			->bind(':effectiveDate', $effectiveDate)
 			->order(['ordering ASC', 'id ASC']);
 		$result = [];
 		foreach ($this->database->setQuery($query)->loadObjectList() as $row) $result[] = ['entry_id' => (int) $row->project_entry_id, 'metric' => (string) $row->metric_code, 'value' => (string) $row->adjustment_value];

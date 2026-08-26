@@ -170,8 +170,49 @@ try {
 	if (!$homeAdjustment->delete((int) $homeAdjustment->id)) throw new RuntimeException('Home-only adjustment could not be deleted: ' . $homeAdjustment->getError());
 	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
 	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope]) throw new RuntimeException('Deleting the home-only adjustment did not restore the ' . $scope . ' scope.');
+	$futureAdjustment = new StandingadjustmentTable($database); $futureAdjustment->bind(array_replace($adjustmentData, ['adjustment_value' => '-10', 'reason' => 'Future adjustment test', 'effective_date' => gmdate('Y-m-d', strtotime('+1 day'))])); $futureAdjustment->uuid = UuidFactory::v4();
+	if (!$futureAdjustment->check() || !$futureAdjustment->store()) throw new RuntimeException('Future adjustment could not be created: ' . $futureAdjustment->getError());
+	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope]) throw new RuntimeException('Future adjustment was applied early to the ' . $scope . ' scope.');
+	$futureAdjustment->effective_date = gmdate('Y-m-d', strtotime('-1 day')); $futureAdjustment->published = 0;
+	if (!$futureAdjustment->check() || !$futureAdjustment->store()) throw new RuntimeException('Future adjustment could not be rescheduled as unpublished.');
+	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope]) throw new RuntimeException('Unpublished adjustment affected the ' . $scope . ' scope.');
+	$futureAdjustment->published = 1;
+	if (!$futureAdjustment->check() || !$futureAdjustment->store()) throw new RuntimeException('Adjustment could not be published.');
+	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope] - 10.0) throw new RuntimeException('Published effective adjustment did not refresh the ' . $scope . ' scope.');
+	$futureAdjustment->published = 0;
+	if (!$futureAdjustment->check() || !$futureAdjustment->store()) throw new RuntimeException('Adjustment could not be unpublished.');
+	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope]) throw new RuntimeException('Unpublishing an adjustment did not restore the ' . $scope . ' scope.');
+	if (!$futureAdjustment->delete((int) $futureAdjustment->id)) throw new RuntimeException('Future adjustment could not be deleted.');
+	$decimalAdjustments = [];
+	foreach ([['-0.5', 'First decimal adjustment'], ['-1.25', 'Second decimal adjustment']] as [$value, $reason]) {
+		$table = new StandingadjustmentTable($database); $table->bind(array_replace($adjustmentData, ['adjustment_value' => $value, 'reason' => $reason])); $table->uuid = UuidFactory::v4();
+		if (!$table->check() || !$table->store()) throw new RuntimeException('Decimal adjustment could not be created: ' . $table->getError());
+		$decimalAdjustments[] = $table;
+	}
+	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope] - 1.75) throw new RuntimeException('Multiple decimal adjustments were not accumulated in the ' . $scope . ' scope.');
+	foreach ($decimalAdjustments as $table) if (!$table->delete((int) $table->id)) throw new RuntimeException('Decimal adjustment could not be deleted.');
+	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope]) throw new RuntimeException('Deleting decimal adjustments did not restore the ' . $scope . ' scope.');
+	$recalculator->recalculate($projectId, $stageId, 'total', 0); $stageBaseline = null;
+	foreach ($reader->current($projectId, $stageId, 'total')['rows'] as $row) if ((int) $row->entry_id_snapshot === $entries[0]) $stageBaseline = (string) $row->metrics['points'];
+	if ($stageBaseline === null) throw new RuntimeException('Stage adjustment baseline is unavailable.');
+	$stageAdjustment = new StandingadjustmentTable($database); $stageAdjustment->bind(array_replace($adjustmentData, ['stage_id' => $stageId, 'adjustment_value' => '-2', 'reason' => 'Stage isolation test'])); $stageAdjustment->uuid = UuidFactory::v4();
+	if (!$stageAdjustment->check() || !$stageAdjustment->store()) throw new RuntimeException('Stage adjustment could not be created: ' . $stageAdjustment->getError());
+	(new StandingsCascadeTrigger($database))->trigger($projectId, $stageId, 0); $stageAdjusted = null;
+	foreach ($reader->current($projectId, $stageId, 'total')['rows'] as $row) if ((int) $row->entry_id_snapshot === $entries[0]) $stageAdjusted = (string) $row->metrics['points'];
+	if ((float) $stageAdjusted !== (float) $stageBaseline - 2.0) throw new RuntimeException('Stage adjustment was not applied to its stage.');
+	if ((float) $points('total') !== (float) $baseline['total']) throw new RuntimeException('Stage adjustment leaked into project-wide standings.');
+	if (!$stageAdjustment->delete((int) $stageAdjustment->id)) throw new RuntimeException('Stage adjustment could not be deleted.');
+	(new StandingsCascadeTrigger($database))->trigger($projectId, $stageId, 0); $stageRestored = null;
+	foreach ($reader->current($projectId, $stageId, 'total')['rows'] as $row) if ((int) $row->entry_id_snapshot === $entries[0]) $stageRestored = (string) $row->metrics['points'];
+	if ((float) $stageRestored !== (float) $stageBaseline) throw new RuntimeException('Deleting stage adjustment did not restore stage standings.');
 	$snapshotCount = (int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult();
-	if ($snapshotCount < 15) throw new RuntimeException('Immutable standings history was not retained across adjustment lifecycle changes.');
+	if ($snapshotCount < 25) throw new RuntimeException('Immutable standings history was not retained across adjustment lifecycle changes.');
 
 	printf("Standings repository OK on %s: calculation, automatic scopes and adjustment lifecycle verified\n", $database->getName());
 } finally {
