@@ -222,10 +222,28 @@ try {
 	(new StandingsCascadeTrigger($database))->trigger($projectId, $stageId, 0); $stageRestored = null;
 	foreach ($reader->current($projectId, $stageId, 'total')['rows'] as $row) if ((int) $row->entry_id_snapshot === $entries[0]) $stageRestored = (string) $row->metrics['points'];
 	if ((float) $stageRestored !== (float) $stageBaseline) throw new RuntimeException('Deleting stage adjustment did not restore stage standings.');
+	$database->setQuery($database->getQuery(true)->update($database->quoteName('#__joomleague_project_entry'))->set('included_in_standings = 0')->where('id = ' . $entries[0]))->execute();
+	(new StandingsCascadeTrigger($database))->triggerProject($projectId, 0);
+	if (count($reader->current($projectId, null, 'total')['rows']) !== 1 || count($reader->current($projectId, $stageId, 'total')['rows']) !== 1 || count($reader->current($projectId, $targetStageId, 'total')['rows']) !== 1) throw new RuntimeException('Excluding a project entry did not refresh project and stage standings.');
+	$database->setQuery($database->getQuery(true)->update($database->quoteName('#__joomleague_project_entry'))->set('included_in_standings = 1')->where('id = ' . $entries[0]))->execute();
+	(new StandingsCascadeTrigger($database))->triggerProject($projectId, 0);
+	if (count($reader->current($projectId, null, 'total')['rows']) !== 2 || count($reader->current($projectId, $stageId, 'total')['rows']) !== 2 || count($reader->current($projectId, $targetStageId, 'total')['rows']) !== 2) throw new RuntimeException('Re-including a project entry did not refresh project and stage standings.');
+	$database->setQuery($database->getQuery(true)->update($database->quoteName('#__joomleague_project_entry'))->set('published = 0')->where('id = ' . $entries[1]))->execute();
+	(new StandingsCascadeTrigger($database))->triggerProject($projectId, 0);
+	if (count($reader->current($projectId, null, 'total')['rows']) !== 1 || count($reader->current($projectId, $stageId, 'total')['rows']) !== 1) throw new RuntimeException('Unpublishing a project entry did not refresh standings.');
+	$database->setQuery($database->getQuery(true)->update($database->quoteName('#__joomleague_project_entry'))->set('published = 1')->where('id = ' . $entries[1]))->execute();
+	(new StandingsCascadeTrigger($database))->triggerProject($projectId, 0);
+	if (count($reader->current($projectId, null, 'total')['rows']) !== 2 || count($reader->current($projectId, $stageId, 'total')['rows']) !== 2) throw new RuntimeException('Republishing a project entry did not restore standings.');
+	$temporaryEntryId = $insert('#__joomleague_project_entry', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'entry_kind' => 'group', 'display_name' => 'Temporary entry']);
+	(new StandingsCascadeTrigger($database))->triggerProject($projectId, 0);
+	if (count($reader->current($projectId, null, 'total')['rows']) !== 3 || count($reader->current($projectId, $stageId, 'total')['rows']) !== 3 || count($reader->current($projectId, $targetStageId, 'total')['rows']) !== 2) throw new RuntimeException('Adding a project entry did not respect inherited and explicit stage entry selection.');
+	$database->setQuery($database->getQuery(true)->delete($database->quoteName('#__joomleague_project_entry'))->where('id = ' . $temporaryEntryId))->execute();
+	(new StandingsCascadeTrigger($database))->triggerProject($projectId, 0);
+	if (count($reader->current($projectId, null, 'total')['rows']) !== 2 || count($reader->current($projectId, $stageId, 'total')['rows']) !== 2) throw new RuntimeException('Deleting a project entry did not restore standings.');
 	$snapshotCount = (int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult();
 	if ($snapshotCount < 25) throw new RuntimeException('Immutable standings history was not retained across adjustment lifecycle changes.');
 
-	printf("Standings repository OK on %s: result lifecycle, automatic scopes and adjustment lifecycle verified\n", $database->getName());
+	printf("Standings repository OK on %s: result, adjustment and project-entry lifecycles verified\n", $database->getName());
 } finally {
 	$database->setQuery($database->getQuery(true)->delete($database->quoteName('#__joomleague_project'))->where('id = ' . $projectId))->execute();
 	foreach ([['#__joomleague_sport_type', $sportTypeId], ['#__joomleague_competition', $competitionId], ['#__joomleague_season', $seasonId]] as [$table, $id]) $database->setQuery($database->getQuery(true)->delete($database->quoteName($table))->where('id = ' . $id))->execute();

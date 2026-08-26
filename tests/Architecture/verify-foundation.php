@@ -868,6 +868,13 @@ if (!str_contains($projectEntryModel, 'loadStoredProjectId($entryId)')) {
 	throw new RuntimeException('Project participant edits must retain their stored project boundary.');
 }
 
+if (!str_contains($projectEntryModel, 'StandingsCascadeTrigger')
+	|| !str_contains($projectEntryModel, 'triggerProject(')
+	|| !str_contains($projectEntryModel, 'public function publish(')
+	|| !str_contains($projectEntryModel, 'public function delete(')) {
+	throw new RuntimeException('Project participant save, publication and deletion must automatically refresh project and stage standings.');
+}
+
 $entryMemberController = (string) file_get_contents($admin . '/src/Controller/EntrymemberController.php');
 $entryMembersTemplate = (string) file_get_contents($admin . '/tmpl/entrymembers/default.php');
 $entryMemberModel = (string) file_get_contents($admin . '/src/Model/EntrymemberModel.php');
