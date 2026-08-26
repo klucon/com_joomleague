@@ -9,17 +9,20 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
-use Joomleague\Component\Joomleague\Domain\Service\StandingsRecalculator;
+use Joomleague\Component\Joomleague\Domain\Service\StandingsSnapshotSynchronizer;
 
 final class StandingsModel extends BaseDatabaseModel
 {
 	private function reader(): StandingsReader { return new StandingsReader($this->getDatabase()); }
-	private function recalculator(): StandingsRecalculator { return new StandingsRecalculator($this->getDatabase(), $this->reader()); }
 	public function getContext(int $projectId, ?int $stageId): array { return $this->reader()->describe($projectId, $stageId); }
-	public function getCurrent(int $projectId, ?int $stageId, string $scope): array
+	/** @param array<string,mixed>|null $context */
+	public function getAllCurrent(int $projectId, ?int $stageId, ?array $context = null): array
 	{
-		$this->recalculator()->recalculate($projectId, $stageId, $scope, (int) Factory::getApplication()->getIdentity()->id);
-		return $this->reader()->current($projectId, $stageId, $scope);
+		$context ??= $this->getContext($projectId, $stageId);
+		(new StandingsSnapshotSynchronizer($this->getDatabase()))->synchronize($projectId, $stageId, (int) Factory::getApplication()->getIdentity()->id, $context);
+		$reader = $this->reader();
+		$current = [];
+		foreach ($context['available_scopes'] as $scope) $current[(string) $scope] = $reader->current($projectId, $stageId, (string) $scope);
+		return $current;
 	}
-	public function recalculate(int $projectId, ?int $stageId, string $scope): int { return $this->recalculator()->recalculate($projectId, $stageId, $scope, (int) Factory::getApplication()->getIdentity()->id); }
 }

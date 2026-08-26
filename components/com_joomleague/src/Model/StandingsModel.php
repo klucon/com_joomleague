@@ -19,6 +19,7 @@ use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Registry\Registry;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
+use Joomleague\Component\Joomleague\Domain\Service\StandingsSnapshotSynchronizer;
 
 /**
  * Reads a published standings snapshot for the site "standings" view — the
@@ -67,6 +68,7 @@ final class StandingsModel extends BaseDatabaseModel
 
 		try {
 			$context = $reader->describe($projectId, $stageId);
+			(new StandingsSnapshotSynchronizer($database))->synchronize($projectId, $stageId, 0, $context);
 
 			$scope = (string) $this->getState('scope');
 			if ($scope === '' || !\in_array($scope, $context['available_scopes'], true)) {

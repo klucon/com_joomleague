@@ -7,7 +7,7 @@ define('JPATH_BASE', '/var/www/html');
 require_once JPATH_BASE . '/includes/defines.php';
 require_once JPATH_BASE . '/includes/framework.php';
 
-foreach (['UuidFactory.php', 'CanonicalJson.php', 'StageTransitionValidator.php', 'StageProgressionService.php', 'MatchResultValidationException.php', 'MatchResultDecimal.php', 'MatchResultAggregationValidator.php', 'MatchResultPayloadValidator.php', 'MatchResultRepository.php', 'StandingsContractValidator.php', 'StandingsDecimal.php', 'StandingsCalculator.php', 'StandingsReader.php', 'StandingsRecalculator.php'] as $service) {
+foreach (['UuidFactory.php', 'CanonicalJson.php', 'StageTransitionValidator.php', 'StageProgressionService.php', 'MatchResultValidationException.php', 'MatchResultDecimal.php', 'MatchResultAggregationValidator.php', 'MatchResultPayloadValidator.php', 'MatchResultRepository.php', 'StandingsContractValidator.php', 'StandingsDecimal.php', 'StandingsCalculator.php', 'StandingsReader.php', 'StandingsRecalculator.php', 'StandingsSnapshotSynchronizer.php'] as $service) {
 	require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/' . $service;
 }
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/StagetransitionTable.php';
@@ -18,6 +18,7 @@ use Joomleague\Component\Joomleague\Administrator\Service\MatchResultRepository;
 use Joomleague\Component\Joomleague\Administrator\Service\StageProgressionService;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsRecalculator;
+use Joomleague\Component\Joomleague\Domain\Service\StandingsSnapshotSynchronizer;
 use Joomleague\Component\Joomleague\Domain\Service\UuidFactory;
 use Joomleague\Component\Joomleague\Administrator\Table\StagetransitionTable;
 
@@ -106,8 +107,11 @@ try {
 	if ($firstSnapshot < 1 || count($current['rows']) !== 2) throw new RuntimeException('Initial standings snapshot was not published.');
 	if ($current['rows'][0]->entry_name_snapshot !== 'Alpha' || $current['rows'][0]->metrics['points'] !== '4' || $current['rows'][1]->metrics['points'] !== '1') throw new RuntimeException('Football points were calculated incorrectly.');
 	if ($recalculator->recalculate($projectId, null, 'total', 0) !== $firstSnapshot) throw new RuntimeException('Identical standings input created a duplicate snapshot.');
-	$homeSnapshot = $recalculator->recalculate($projectId, null, 'home', 0);
-	if ($homeSnapshot < 1 || count($reader->current($projectId, null, 'home')['rows']) !== 2) throw new RuntimeException('Profile-defined home scope was not published.');
+	(new StandingsSnapshotSynchronizer($database))->synchronize($projectId, null, 0, $context);
+	if (count($reader->current($projectId, null, 'home')['rows']) !== 2 || count($reader->current($projectId, null, 'away')['rows']) !== 2) throw new RuntimeException('Missing profile-defined scopes were not published automatically.');
+	$automaticSnapshotCount = (int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult();
+	(new StandingsSnapshotSynchronizer($database))->synchronize($projectId, null, 0, $context);
+	if ((int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult() !== $automaticSnapshotCount) throw new RuntimeException('Complete standings scopes were recalculated during a read.');
 	$stageSnapshot = $recalculator->recalculate($projectId, $stageId, 'total', 0);
 	if ($stageSnapshot < 1 || count($reader->current($projectId, $stageId, 'total')['rows']) !== 2) throw new RuntimeException('A stage inheriting project participants did not publish a complete table.');
 	$outcomeTransition = new StagetransitionTable($database); $outcomeTransition->bind(['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'source_stage_id' => $stageId, 'target_stage_id' => $targetStageId, 'code' => 'winners_to_final', 'name' => 'Winners to final', 'selector_type' => 'match_outcome', 'selector_config_json' => '{"outcome":"winner"}', 'carry_over_mode' => 'none']);
@@ -138,7 +142,7 @@ try {
 	$adjustedByEntry = []; foreach ($adjusted['rows'] as $row) $adjustedByEntry[(int) $row->entry_id_snapshot] = $row;
 	if ($adjustedSnapshot === $secondSnapshot || $adjustedByEntry[$entries[0]]->metrics['points'] !== '2') throw new RuntimeException('Published standings adjustment was not included in the snapshot.');
 	$snapshotCount = (int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult();
-	if ($snapshotCount !== 6) throw new RuntimeException('Immutable project and stage standings history was not retained.');
+	if ($snapshotCount !== 7) throw new RuntimeException('Immutable project and stage standings history was not retained.');
 
 	printf("Standings repository OK on %s: calculation, idempotency, publication and history verified\n", $database->getName());
 } finally {

@@ -1019,12 +1019,11 @@ if (!str_contains($matchLineupRepository, 'available_member_count')
 	throw new RuntimeException('Match lineup administration must automatically select and summarize an available participant roster.');
 }
 
-// Standings read/write logic is split across two Domain\Service classes:
-// StandingsReader (read-only, safe for admin/site/modules) and
-// StandingsRecalculator (write-only, admin-exclusive). Together they must
-// still own every standings table.
+// StandingsReader remains read-only. The recalculator owns publication and
+// the synchronizer repairs missing profile scopes after external imports.
 $standingsReader = (string) file_get_contents($admin . '/src/Service/StandingsReader.php');
 $standingsRecalculator = (string) file_get_contents($admin . '/src/Service/StandingsRecalculator.php');
+$standingsSynchronizer = (string) file_get_contents($admin . '/src/Service/StandingsSnapshotSynchronizer.php');
 $standingsRepository = $standingsReader . "\n" . $standingsRecalculator;
 $standingsController = (string) file_get_contents($admin . '/src/Controller/StandingsController.php');
 $standingsTemplate = (string) file_get_contents($admin . '/tmpl/standings/default.php');
@@ -1041,6 +1040,12 @@ if (str_contains($standingsReader, 'recalculate') || str_contains($standingsRead
 
 $siteStandingsModel = (string) file_get_contents($root . '/components/com_joomleague/src/Model/StandingsModel.php');
 $siteStandingsTemplate = (string) file_get_contents($root . '/components/com_joomleague/tmpl/standings/default.php');
+
+if (!str_contains($siteStandingsModel, 'StandingsSnapshotSynchronizer')
+	|| !str_contains($standingsSynchronizer, "['available_scopes']")
+	|| !str_contains($standingsSynchronizer, "['snapshot'] === null")) {
+	throw new RuntimeException('Public standings must automatically publish every missing profile-defined scope.');
+}
 
 foreach (['project.published = 1', 'competition.published = 1', 'season.published = 1', 'sport_type.published = 1', 'stage.published = 1'] as $publishedGuard) {
 	if (!str_contains($siteStandingsModel, $publishedGuard)) {
@@ -1091,9 +1096,10 @@ if (!str_contains($adminDomainCatalog, "'standings' => self::item('STANDINGS', '
 if (!str_contains($standingsController, 'Session::checkToken()')
 	|| !str_contains($standingsController, "authorise('core.edit', \$asset)")
 	|| !str_contains($standingsController, 'Log::add(')
-	|| !str_contains($standingsTemplate, "HTMLHelper::_('form.token')")
+	|| !str_contains($standingsTemplate, "HTMLHelper::_('uitab.startTabSet'")
+	|| str_contains($standingsTemplate, 'standings.recalculate')
 	|| preg_match('/<style\b|style\s*=|<script\b/i', $standingsTemplate) === 1) {
-	throw new RuntimeException('Standings administration must retain Joomla CSRF, ACL, logging and native styling.');
+	throw new RuntimeException('Standings administration must retain protected writes, automatic scope tabs and native Joomla styling.');
 }
 
 $siteResultsModel = (string) file_get_contents($root . '/components/com_joomleague/src/Model/ResultsModel.php');

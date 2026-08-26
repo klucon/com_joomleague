@@ -13,9 +13,9 @@ use Joomleague\Component\Joomleague\Domain\Service\StandingsDecimal;
 use Joomleague\Component\Joomleague\Domain\Service\UuidFactory;
 
 /**
- * Recalculates and publishes standings snapshots. Write-side only — admin
- * use exclusively. Never instantiate this from site views or modules; use
- * StandingsReader for read access instead.
+ * Recalculates and publishes standings snapshots. Ordinary site reads use
+ * StandingsReader; StandingsSnapshotSynchronizer may invoke this service to
+ * repair scopes missing after an external import.
  */
 final class StandingsRecalculator
 {
