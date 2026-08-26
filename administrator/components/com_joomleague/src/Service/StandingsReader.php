@@ -111,11 +111,16 @@ final class StandingsReader
 				$this->database->quoteName('value.status_code'),
 			])
 			->from($this->database->quoteName('#__joomleague_project_match', 'match'))
+			->innerJoin($this->database->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = match.round_id')
+			->innerJoin($this->database->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = match.stage_id')
 			->innerJoin($this->database->quoteName('#__joomleague_match_result', 'result') . ' ON result.match_id = match.id')
 			->innerJoin($this->database->quoteName('#__joomleague_match_participant', 'participant') . ' ON participant.match_id = match.id')
 			->innerJoin($this->database->quoteName('#__joomleague_match_score_segment', 'segment') . ' ON segment.match_id = match.id AND segment.parent_id IS NULL')
 			->leftJoin($this->database->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id = segment.id AND value.participant_id = participant.id')
 			->where('match.project_id = :project')
+			->where('match.published = 1')
+			->where('round.published = 1')
+			->where('stage.published = 1')
 			->whereIn($this->database->quoteName('result.status_code'), $includedStatuses, ParameterType::STRING)
 			->order('match.scheduled_start DESC')
 			->bind(':project', $projectId, ParameterType::INTEGER);

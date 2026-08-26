@@ -16,6 +16,7 @@ use Joomla\CMS\User\CurrentUserInterface;
 use Joomla\CMS\User\CurrentUserTrait;
 use Joomla\Database\ParameterType;
 use Joomleague\Component\Joomleague\Administrator\Service\ProjectContextRepository;
+use Joomleague\Component\Joomleague\Administrator\Service\StandingsCascadeTrigger;
 use Joomleague\Component\Joomleague\Domain\Service\UuidFactory;
 
 final class StageModel extends AdminModel implements CurrentUserInterface
@@ -59,6 +60,7 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 	public function save($data): bool
 	{
 		$id = (int) ($data['id'] ?? 0);
+		$oldPublished = $id > 0 ? $this->storedPublished($id) : null;
 
 		try {
 			$projectId = $id > 0 ? $this->storedProjectId($id) : (int) ($data['project_id'] ?? 0);
@@ -74,7 +76,25 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 			$data['code'] = $this->availableCode($projectId, (string) ($data['name'] ?? 'stage'));
 		}
 
-		return parent::save($data);
+		$result = parent::save($data);
+		if ($result && $oldPublished !== null && array_key_exists('published', $data) && (int) $data['published'] !== $oldPublished) $this->refreshStandings([[$projectId, $id]]);
+		return $result;
+	}
+
+	public function publish(&$pks, $value = 1): bool
+	{
+		$contexts = $this->standingsContexts((array) $pks);
+		$result = parent::publish($pks, $value);
+		if ($result) $this->refreshStandings($contexts);
+		return $result;
+	}
+
+	public function delete(&$pks): bool
+	{
+		$contexts = $this->standingsContexts((array) $pks);
+		$result = parent::delete($pks);
+		if ($result) $this->refreshStandings($contexts);
+		return $result;
 	}
 
 	protected function prepareTable($table): void
@@ -105,6 +125,14 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 		return $projectId;
 	}
 
+	private function storedPublished(int $id): int
+	{
+		$query = $this->getDatabase()->getQuery(true)->select($this->getDatabase()->quoteName('published'))
+			->from($this->getDatabase()->quoteName('#__joomleague_project_stage'))
+			->where($this->getDatabase()->quoteName('id') . ' = :id')->bind(':id', $id, ParameterType::INTEGER);
+		return (int) $this->getDatabase()->setQuery($query)->loadResult();
+	}
+
 	private function availableCode(int $projectId, string $name): string
 	{
 		$base = str_replace('-', '_', ApplicationHelper::stringURLSafe($name)) ?: 'stage';
@@ -119,5 +147,21 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 			if ((int) $this->getDatabase()->setQuery($query)->loadResult() === 0) return $code;
 			$code = $base . '-' . $suffix++;
 		}
+	}
+
+	/** @param list<int|string> $ids @return list<array{0:int,1:int}> */
+	private function standingsContexts(array $ids): array
+	{
+		$ids = array_values(array_unique(array_filter(array_map('intval', $ids), static fn (int $id): bool => $id > 0)));
+		if ($ids === []) return [];
+		$query = $this->getDatabase()->getQuery(true)->select(['project_id', 'id'])->from($this->getDatabase()->quoteName('#__joomleague_project_stage'))->whereIn('id', $ids, ParameterType::INTEGER)->group(['project_id', 'id']);
+		return array_map(static fn (object $row): array => [(int) $row->project_id, (int) $row->id], $this->getDatabase()->setQuery($query)->loadObjectList());
+	}
+
+	/** @param list<array{0:int,1:int}> $contexts */
+	private function refreshStandings(array $contexts): void
+	{
+		$trigger = new StandingsCascadeTrigger($this->getDatabase());
+		foreach ($contexts as [$projectId, $stageId]) $trigger->trigger($projectId, $stageId, (int) $this->getCurrentUser()->id);
 	}
 }

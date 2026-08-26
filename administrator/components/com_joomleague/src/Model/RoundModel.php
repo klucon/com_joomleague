@@ -15,6 +15,7 @@ use Joomla\CMS\User\CurrentUserInterface;
 use Joomla\CMS\User\CurrentUserTrait;
 use Joomla\Database\ParameterType;
 use Joomleague\Component\Joomleague\Domain\Service\UuidFactory;
+use Joomleague\Component\Joomleague\Administrator\Service\StandingsCascadeTrigger;
 
 final class RoundModel extends AdminModel implements CurrentUserInterface
 {
@@ -47,9 +48,28 @@ final class RoundModel extends AdminModel implements CurrentUserInterface
 	public function save($data): bool
 	{
 		$id = (int) ($data['id'] ?? 0);
-		if ($id > 0) { $stored = $this->storedOwner($id); $data['stage_id'] = $stored->stage_id; $data['project_id'] = $stored->project_id; }
+		$oldPublished = null;
+		if ($id > 0) { $stored = $this->storedOwner($id); $data['stage_id'] = $stored->stage_id; $data['project_id'] = $stored->project_id; $oldPublished = (int) $stored->published; }
 		else { $stage = $this->getStage((int) ($data['stage_id'] ?? 0)); $data['project_id'] = (int) $stage->project_id; }
-		return parent::save($data);
+		$result = parent::save($data);
+		if ($result && $oldPublished !== null && array_key_exists('published', $data) && (int) $data['published'] !== $oldPublished) $this->refreshStandings([[(int) $data['project_id'], (int) $data['stage_id']]]);
+		return $result;
+	}
+
+	public function publish(&$pks, $value = 1): bool
+	{
+		$contexts = $this->standingsContexts((array) $pks);
+		$result = parent::publish($pks, $value);
+		if ($result) $this->refreshStandings($contexts);
+		return $result;
+	}
+
+	public function delete(&$pks): bool
+	{
+		$contexts = $this->standingsContexts((array) $pks);
+		$result = parent::delete($pks);
+		if ($result) $this->refreshStandings($contexts);
+		return $result;
 	}
 
 	protected function prepareTable($table): void
@@ -61,7 +81,23 @@ final class RoundModel extends AdminModel implements CurrentUserInterface
 
 	private function storedOwner(int $id): object
 	{
-		$query = $this->getDatabase()->getQuery(true)->select(['stage_id', 'project_id'])->from($this->getDatabase()->quoteName('#__joomleague_project_round'))->where($this->getDatabase()->quoteName('id') . ' = :id')->bind(':id', $id, ParameterType::INTEGER);
+		$query = $this->getDatabase()->getQuery(true)->select(['stage_id', 'project_id', 'published'])->from($this->getDatabase()->quoteName('#__joomleague_project_round'))->where($this->getDatabase()->quoteName('id') . ' = :id')->bind(':id', $id, ParameterType::INTEGER);
 		$owner = $this->getDatabase()->setQuery($query)->loadObject(); if (!$owner) throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_ROUND_INVALID')); return $owner;
+	}
+
+	/** @param list<int|string> $ids @return list<array{0:int,1:int}> */
+	private function standingsContexts(array $ids): array
+	{
+		$ids = array_values(array_unique(array_filter(array_map('intval', $ids), static fn (int $id): bool => $id > 0)));
+		if ($ids === []) return [];
+		$query = $this->getDatabase()->getQuery(true)->select(['project_id', 'stage_id'])->from($this->getDatabase()->quoteName('#__joomleague_project_round'))->whereIn('id', $ids, ParameterType::INTEGER)->group(['project_id', 'stage_id']);
+		return array_map(static fn (object $row): array => [(int) $row->project_id, (int) $row->stage_id], $this->getDatabase()->setQuery($query)->loadObjectList());
+	}
+
+	/** @param list<array{0:int,1:int}> $contexts */
+	private function refreshStandings(array $contexts): void
+	{
+		$trigger = new StandingsCascadeTrigger($this->getDatabase());
+		foreach ($contexts as [$projectId, $stageId]) $trigger->trigger($projectId, $stageId, (int) $this->getCurrentUser()->id);
 	}
 }

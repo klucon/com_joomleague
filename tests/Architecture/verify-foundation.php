@@ -1048,10 +1048,27 @@ $standingsSynchronizer = (string) file_get_contents($admin . '/src/Service/Stand
 $standingsRepository = $standingsReader . "\n" . $standingsRecalculator;
 $standingsController = (string) file_get_contents($admin . '/src/Controller/StandingsController.php');
 $standingsTemplate = (string) file_get_contents($admin . '/tmpl/standings/default.php');
+$matchModelSource = (string) file_get_contents($admin . '/src/Model/MatchModel.php');
+$roundModelSource = (string) file_get_contents($admin . '/src/Model/RoundModel.php');
 
 foreach (['#__joomleague_standing_adjustment', '#__joomleague_standing_snapshot', '#__joomleague_standing_snapshot_row', '#__joomleague_standing_current'] as $standingTable) {
 	if (!str_contains($standingsRepository, $standingTable)) {
 		throw new RuntimeException(sprintf('Standings repository is missing owned table %s.', $standingTable));
+	}
+}
+
+foreach (['match.published = 1', 'round.published = 1', 'stage.published = 1'] as $publicationGuard) {
+	if (!str_contains($standingsRecalculator, $publicationGuard) || !str_contains($standingsReader, $publicationGuard)) {
+		throw new RuntimeException('Standings and recent form must exclude unpublished competition structure: ' . $publicationGuard);
+	}
+}
+
+foreach (['Match' => $matchModelSource, 'Round' => $roundModelSource, 'Stage' => $stageModelSource] as $entity => $modelSource) {
+	if (!str_contains($modelSource, 'StandingsCascadeTrigger')
+		|| !str_contains($modelSource, 'public function publish(')
+		|| !str_contains($modelSource, 'public function delete(')
+		|| !str_contains($modelSource, 'refreshStandings(')) {
+		throw new RuntimeException($entity . ' publication and deletion must automatically refresh affected standings.');
 	}
 }
 

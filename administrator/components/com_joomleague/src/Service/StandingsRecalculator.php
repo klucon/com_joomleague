@@ -106,7 +106,12 @@ final class StandingsRecalculator
 	/** @param array<string,mixed> $profile @return list<array<string,mixed>> */
 	private function matches(int $projectId, ?int $stageId, array $profile): array
 	{
-		$query = $this->database->getQuery(true)->select(['match.id', 'result.status_code'])->from($this->database->quoteName('#__joomleague_project_match', 'match'))->innerJoin($this->database->quoteName('#__joomleague_match_result', 'result') . ' ON result.match_id = match.id')->where('match.project_id = :project')->bind(':project', $projectId, ParameterType::INTEGER)->order('match.id ASC');
+		$query = $this->database->getQuery(true)->select(['match.id', 'result.status_code'])->from($this->database->quoteName('#__joomleague_project_match', 'match'))
+			->innerJoin($this->database->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = match.round_id')
+			->innerJoin($this->database->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = match.stage_id')
+			->innerJoin($this->database->quoteName('#__joomleague_match_result', 'result') . ' ON result.match_id = match.id')
+			->where('match.project_id = :project')->where('match.published = 1')->where('round.published = 1')->where('stage.published = 1')
+			->bind(':project', $projectId, ParameterType::INTEGER)->order('match.id ASC');
 		if ($stageId !== null) $query->where('match.stage_id = :stage')->bind(':stage', $stageId, ParameterType::INTEGER);
 		$matches = []; foreach ($this->database->setQuery($query)->loadObjectList() as $match) $matches[(int) $match->id] = ['status' => (string) $match->status_code, 'participants' => [], 'segments' => [], 'statistics' => []];
 		if ($matches === []) return [];

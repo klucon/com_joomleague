@@ -15,16 +15,26 @@ foreach (['UuidFactory.php', 'CanonicalJson.php', 'StageTransitionValidator.php'
 }
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/StagetransitionTable.php';
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/StandingadjustmentTable.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/MatchTable.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/RoundTable.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/StageTable.php';
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/StandingsCascadeTrigger.php';
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Extension/JoomleagueComponent.php';
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Model/StageentriesModel.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Model/MatchModel.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Model/RoundModel.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Model/StageModel.php';
 
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\User\User;
 use Joomleague\Component\Joomleague\Administrator\Service\MatchResultRepository;
 use Joomleague\Component\Joomleague\Administrator\Service\StageProgressionService;
 use Joomleague\Component\Joomleague\Administrator\Service\StandingsCascadeTrigger;
 use Joomleague\Component\Joomleague\Administrator\Model\StageentriesModel;
+use Joomleague\Component\Joomleague\Administrator\Model\MatchModel;
+use Joomleague\Component\Joomleague\Administrator\Model\RoundModel;
+use Joomleague\Component\Joomleague\Administrator\Model\StageModel;
 use Joomleague\Component\Joomleague\Administrator\Table\StandingadjustmentTable;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsRecalculator;
@@ -90,18 +100,18 @@ $projectId = $insert('#__joomleague_project', ['uuid' => UuidFactory::v4(), 'com
 try {
 	$entries = [];
 	foreach (['Alpha', 'Beta'] as $entryName) $entries[] = $insert('#__joomleague_project_entry', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'entry_kind' => 'group', 'display_name' => $entryName]);
-	$stageId = $insert('#__joomleague_project_stage', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'name' => 'League', 'code' => 'league', 'stage_type' => 'league']);
-	$targetStageId = $insert('#__joomleague_project_stage', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'name' => 'Final', 'code' => 'final', 'stage_type' => 'knockout']);
+	$stageId = $insert('#__joomleague_project_stage', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'name' => 'League', 'code' => 'league', 'stage_type' => 'league', 'published' => 1]);
+	$targetStageId = $insert('#__joomleague_project_stage', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'name' => 'Final', 'code' => 'final', 'stage_type' => 'knockout', 'published' => 1]);
 	$transition = new StagetransitionTable($database); $transition->bind(['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'source_stage_id' => $stageId, 'target_stage_id' => $targetStageId, 'code' => 'league_to_final', 'name' => 'League to final', 'selector_type' => 'standing_rank_range', 'selector_config_json' => '{"from":1,"to":2,"scope":"total"}', 'carry_over_mode' => 'none']);
 	if (!$transition->check() || !$transition->store()) throw new RuntimeException('Valid stage progression could not be stored: ' . $transition->getError());
 	$cycle = new StagetransitionTable($database); $cycle->bind(['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'source_stage_id' => $targetStageId, 'target_stage_id' => $stageId, 'code' => 'invalid_cycle', 'name' => 'Invalid cycle', 'selector_type' => 'manual', 'carry_over_mode' => 'none']);
 	if ($cycle->check() || $cycle->getError() === '') throw new RuntimeException('Cyclic stage progression was accepted.');
-	$roundId = $insert('#__joomleague_project_round', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'stage_id' => $stageId, 'name' => 'Round 1', 'code' => 'round_1', 'round_type' => 'regular', 'sequence_number' => 1]);
+	$roundId = $insert('#__joomleague_project_round', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'stage_id' => $stageId, 'name' => 'Round 1', 'code' => 'round_1', 'round_type' => 'regular', 'sequence_number' => 1, 'published' => 1]);
 	$resultRepository = new MatchResultRepository($database);
 	$matches = [];
 
 	foreach ([[[1, 0], [1, 0]], [[1, 0], [0, 1]]] as $periodScores) {
-		$matchId = $insert('#__joomleague_project_match', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'stage_id' => $stageId, 'round_id' => $roundId, 'contest_type' => 'head_to_head']);
+		$matchId = $insert('#__joomleague_project_match', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'stage_id' => $stageId, 'round_id' => $roundId, 'contest_type' => 'head_to_head', 'published' => 1]);
 		$participants = [];
 		foreach ($entries as $slot => $entryId) $participants[] = $insert('#__joomleague_match_participant', ['uuid' => UuidFactory::v4(), 'match_id' => $matchId, 'project_id' => $projectId, 'project_entry_id' => $entryId, 'slot_number' => $slot + 1]);
 		$resultRepository->replace($matchId, $resultPayload($participants, $periodScores), 0);
@@ -251,10 +261,62 @@ try {
 	if (count($reader->current($projectId, $targetStageId, 'total')['rows']) !== 2) throw new RuntimeException('Restoring explicit stage assignments did not refresh target-stage standings.');
 	$stageEntriesModel->saveAssignments($targetStageId, 'inherit_project', []);
 	if (count($reader->current($projectId, $targetStageId, 'total')['rows']) !== 2) throw new RuntimeException('Switching a stage to inherited entries did not refresh target-stage standings.');
+
+	$adminId = (int) $database->setQuery($database->getQuery(true)->select('user_id')->from($database->quoteName('#__user_usergroup_map'))->where('group_id = 8')->order('user_id ASC'), 0, 1)->loadResult();
+	if ($adminId < 1) throw new RuntimeException('A Super Users account is required for model lifecycle integration tests.');
+	$currentUser = new User($adminId);
+	$modelConfig = ['dbo' => $database, 'events_map' => ['delete' => 'joomleague_test_none', 'save' => 'joomleague_test_none', 'change_state' => 'joomleague_test_none', 'validate' => 'joomleague_test_none', 'batch' => 'joomleague_test_none']];
+	$matchModel = new MatchModel($modelConfig); $matchModel->setCurrentUser($currentUser);
+	$roundModel = new RoundModel($modelConfig); $roundModel->setCurrentUser($currentUser);
+	$stageModel = new StageModel($modelConfig); $stageModel->setCurrentUser($currentUser);
+	$publicationIds = [$matches[1][0]];
+	if (!$matchModel->publish($publicationIds, 0)) throw new RuntimeException('Match could not be unpublished.');
+	if ($entryPoints('total', $entries[0]) !== '3' || $entryPoints('total', $entries[1]) !== '0') throw new RuntimeException('Unpublishing a match did not refresh standings.');
+	if (!$matchModel->publish($publicationIds, 1)) throw new RuntimeException('Match could not be republished.');
+	if ($entryPoints('total', $entries[0]) !== '3' || $entryPoints('total', $entries[1]) !== '3') throw new RuntimeException('Republishing a match did not restore standings.');
+	$publicationIds = [$roundId];
+	if (!$roundModel->publish($publicationIds, 0)) throw new RuntimeException('Round could not be unpublished.');
+	if ($entryPoints('total', $entries[0]) !== '0' || $entryPoints('total', $entries[1]) !== '0') throw new RuntimeException('Unpublishing a round did not refresh standings.');
+	if (!$roundModel->publish($publicationIds, 1)) throw new RuntimeException('Round could not be republished.');
+	if ($entryPoints('total', $entries[0]) !== '3' || $entryPoints('total', $entries[1]) !== '3') throw new RuntimeException('Republishing a round did not restore standings.');
+	$publicationIds = [$stageId];
+	if (!$stageModel->publish($publicationIds, 0)) throw new RuntimeException('Stage could not be unpublished.');
+	if ($entryPoints('total', $entries[0]) !== '0' || $entryPoints('total', $entries[1]) !== '0') throw new RuntimeException('Unpublishing a stage did not refresh standings.');
+	if (!$stageModel->publish($publicationIds, 1)) throw new RuntimeException('Stage could not be republished.');
+	if ($entryPoints('total', $entries[0]) !== '3' || $entryPoints('total', $entries[1]) !== '3') throw new RuntimeException('Republishing a stage did not restore standings.');
+
+	$createFinalMatch = static function (int $fixtureStageId, int $fixtureRoundId) use ($insert, $database, $projectId, $entries, $resultPayload, $resultRepository): int {
+		$matchId = $insert('#__joomleague_project_match', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'stage_id' => $fixtureStageId, 'round_id' => $fixtureRoundId, 'contest_type' => 'head_to_head', 'published' => 1]);
+		$participants = [];
+		foreach ($entries as $slot => $entryId) $participants[] = $insert('#__joomleague_match_participant', ['uuid' => UuidFactory::v4(), 'match_id' => $matchId, 'project_id' => $projectId, 'project_entry_id' => $entryId, 'slot_number' => $slot + 1]);
+		$resultRepository->replace($matchId, $resultPayload($participants, [[1, 0], [1, 0]]), 0);
+		(new StandingsCascadeTrigger($database))->trigger($projectId, $fixtureStageId, 0);
+		return $matchId;
+	};
+	$temporaryMatchId = $createFinalMatch($stageId, $roundId);
+	if ($entryPoints('total', $entries[0]) !== '6') throw new RuntimeException('Temporary match was not included before deletion.');
+	$deleteIds = [$temporaryMatchId];
+	if (!$matchModel->delete($deleteIds)) throw new RuntimeException('Match could not be deleted.');
+	if ($entryPoints('total', $entries[0]) !== '3') throw new RuntimeException('Deleting a match did not refresh standings.');
+
+	$temporaryRoundId = $insert('#__joomleague_project_round', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'stage_id' => $stageId, 'name' => 'Temporary round', 'code' => 'temporary_round', 'round_type' => 'regular', 'sequence_number' => 2, 'published' => 1]);
+	$createFinalMatch($stageId, $temporaryRoundId);
+	if ($entryPoints('total', $entries[0]) !== '6') throw new RuntimeException('Temporary round was not included before deletion.');
+	$deleteIds = [$temporaryRoundId];
+	if (!$roundModel->delete($deleteIds)) throw new RuntimeException('Round could not be deleted.');
+	if ($entryPoints('total', $entries[0]) !== '3') throw new RuntimeException('Deleting a round did not refresh standings.');
+
+	$temporaryStageId = $insert('#__joomleague_project_stage', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'name' => 'Temporary stage', 'code' => 'temporary_stage', 'stage_type' => 'league', 'published' => 1]);
+	$temporaryStageRoundId = $insert('#__joomleague_project_round', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'stage_id' => $temporaryStageId, 'name' => 'Temporary stage round', 'code' => 'temporary_stage_round', 'round_type' => 'regular', 'sequence_number' => 1, 'published' => 1]);
+	$createFinalMatch($temporaryStageId, $temporaryStageRoundId);
+	if ($entryPoints('total', $entries[0]) !== '6') throw new RuntimeException('Temporary stage was not included before deletion.');
+	$deleteIds = [$temporaryStageId];
+	if (!$stageModel->delete($deleteIds)) throw new RuntimeException('Stage could not be deleted.');
+	if ($entryPoints('total', $entries[0]) !== '3') throw new RuntimeException('Deleting a stage did not refresh project standings.');
 	$snapshotCount = (int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult();
 	if ($snapshotCount < 25) throw new RuntimeException('Immutable standings history was not retained across adjustment lifecycle changes.');
 
-	printf("Standings repository OK on %s: result, adjustment, project-entry and stage-entry lifecycles verified\n", $database->getName());
+	printf("Standings repository OK on %s: result, adjustment, participant and competition-structure lifecycles verified\n", $database->getName());
 } finally {
 	$database->setQuery($database->getQuery(true)->delete($database->quoteName('#__joomleague_project'))->where('id = ' . $projectId))->execute();
 	foreach ([['#__joomleague_sport_type', $sportTypeId], ['#__joomleague_competition', $competitionId], ['#__joomleague_season', $seasonId]] as [$table, $id]) $database->setQuery($database->getQuery(true)->delete($database->quoteName($table))->where('id = ' . $id))->execute();

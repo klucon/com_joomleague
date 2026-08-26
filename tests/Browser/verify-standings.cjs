@@ -26,14 +26,18 @@ const { chromium } = require('playwright');
 			}
 			if (/COM_JOOMLEAGUE_[A-Z0-9_]+/.test(await page.locator('body').innerText())) throw new Error('Standings contains an untranslated language key.');
 			if (viewport.name === 'desktop') {
-				await page.locator('#toolbar-refresh button').click();
-				await page.waitForLoadState('networkidle');
-				const messages = page.locator('#system-message-container joomla-alert');
-				try { await messages.first().waitFor(); }
-				catch (error) { throw new Error(`Standings recalculation produced no Joomla message at ${page.url()}: ${(await page.locator('body').innerText()).slice(0, 1600)}`, { cause: error }); }
-				if ((await messages.first().getAttribute('class') ?? '').includes('alert-danger')) throw new Error(`Standings recalculation failed: ${await messages.first().innerText()}`);
+				if (await page.locator('#toolbar-refresh').count() !== 0) throw new Error('Standings still exposes a manual recalculation action.');
+				const scopeTabs = page.locator('#standingsScopes [role="tab"]');
+				if (await scopeTabs.count() < 1) throw new Error('Standings has no profile-defined scope tabs.');
+				for (let index = 0; index < await scopeTabs.count(); index++) {
+					const scope = await scopeTabs.nth(index).getAttribute('aria-controls');
+					if (!scope || await page.locator(`#${scope} table`).count() !== 1) throw new Error(`Scope ${scope ?? 'unknown'} was not published automatically.`);
+				}
 			}
-			if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error(`Standings overflows horizontally at ${viewport.name}.`);
+			if (await page.evaluate(() => {
+				const main = document.querySelector('main');
+				return main !== null && main.scrollWidth > main.clientWidth;
+			})) throw new Error(`Standings content overflows horizontally at ${viewport.name}.`);
 			try {
 				const close = page.locator('a#toolbar-cancel');
 				const href = await close.getAttribute('href');
