@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 define('_JEXEC', 1);
 define('JPATH_BASE', '/var/www/html');
+$_SERVER['HTTP_HOST'] ??= 'localhost';
+$_SERVER['REQUEST_URI'] ??= '/';
+$_SERVER['SCRIPT_NAME'] = '/index.php';
 require_once JPATH_BASE . '/includes/defines.php';
 require_once JPATH_BASE . '/includes/framework.php';
 
@@ -11,11 +14,15 @@ foreach (['UuidFactory.php', 'CanonicalJson.php', 'StageTransitionValidator.php'
 	require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/' . $service;
 }
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/StagetransitionTable.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/StandingadjustmentTable.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/StandingsCascadeTrigger.php';
 
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomleague\Component\Joomleague\Administrator\Service\MatchResultRepository;
 use Joomleague\Component\Joomleague\Administrator\Service\StageProgressionService;
+use Joomleague\Component\Joomleague\Administrator\Service\StandingsCascadeTrigger;
+use Joomleague\Component\Joomleague\Administrator\Table\StandingadjustmentTable;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsRecalculator;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsSnapshotSynchronizer;
@@ -137,14 +144,28 @@ try {
 	$current = $reader->current($projectId, null, 'total');
 	if ($secondSnapshot === $firstSnapshot || (int) $current['snapshot']->id !== $secondSnapshot) throw new RuntimeException('Changed standings input did not publish a new snapshot.');
 	if ($current['rows'][0]->entry_name_snapshot !== 'Beta' || $current['rows'][0]->metrics['points'] !== '3' || $current['rows'][1]->metrics['points'] !== '3') throw new RuntimeException('Tie-break ordering after result replacement is incorrect.');
-	$insert('#__joomleague_standing_adjustment', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'stage_key' => 0, 'project_entry_id' => $entries[0], 'scope_code' => 'total', 'metric_code' => 'points', 'adjustment_value' => '-1', 'reason' => 'Integration test']);
-	$adjustedSnapshot = $recalculator->recalculate($projectId, null, 'total', 0); $adjusted = $reader->current($projectId, null, 'total');
-	$adjustedByEntry = []; foreach ($adjusted['rows'] as $row) $adjustedByEntry[(int) $row->entry_id_snapshot] = $row;
-	if ($adjustedSnapshot === $secondSnapshot || $adjustedByEntry[$entries[0]]->metrics['points'] !== '2') throw new RuntimeException('Published standings adjustment was not included in the snapshot.');
+	foreach ($context['available_scopes'] as $scope) $recalculator->recalculate($projectId, null, (string) $scope, 0);
+	$points = static function (string $scope) use ($reader, $projectId, $entries): string {
+		foreach ($reader->current($projectId, null, $scope)['rows'] as $row) if ((int) $row->entry_id_snapshot === $entries[0]) return (string) $row->metrics['points'];
+		throw new RuntimeException('Adjusted entry is missing from the ' . $scope . ' scope.');
+	};
+	$baseline = []; foreach ($context['available_scopes'] as $scope) $baseline[$scope] = $points((string) $scope);
+	$adjustmentData = ['project_id' => $projectId, 'stage_id' => null, 'project_entry_id' => $entries[0], 'scope_code' => 'all', 'metric_code' => 'points', 'adjustment_value' => '-1', 'reason' => 'Integration lifecycle test', 'published' => 1];
+	$adjustment = new StandingadjustmentTable($database); $adjustment->bind($adjustmentData); $adjustment->uuid = UuidFactory::v4();
+	if (!$adjustment->check() || !$adjustment->store()) throw new RuntimeException('Standing adjustment could not be created: ' . $adjustment->getError());
+	$adjustmentId = (int) $adjustment->id; (new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope] - 1.0) throw new RuntimeException('Created adjustment did not refresh the ' . $scope . ' scope.');
+	$adjustment->adjustment_value = '-2';
+	if (!$adjustment->check() || !$adjustment->store()) throw new RuntimeException('Standing adjustment could not be edited: ' . $adjustment->getError());
+	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope] - 2.0) throw new RuntimeException('Edited adjustment did not refresh the ' . $scope . ' scope.');
+	if (!$adjustment->delete($adjustmentId)) throw new RuntimeException('Standing adjustment could not be deleted: ' . $adjustment->getError());
+	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	foreach ($context['available_scopes'] as $scope) if ((float) $points((string) $scope) !== (float) $baseline[$scope]) throw new RuntimeException('Deleted adjustment did not restore the ' . $scope . ' scope.');
 	$snapshotCount = (int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult();
-	if ($snapshotCount !== 7) throw new RuntimeException('Immutable project and stage standings history was not retained.');
+	if ($snapshotCount < 14) throw new RuntimeException('Immutable standings history was not retained across adjustment lifecycle changes.');
 
-	printf("Standings repository OK on %s: calculation, idempotency, publication and history verified\n", $database->getName());
+	printf("Standings repository OK on %s: calculation, automatic scopes and adjustment lifecycle verified\n", $database->getName());
 } finally {
 	$database->setQuery($database->getQuery(true)->delete($database->quoteName('#__joomleague_project'))->where('id = ' . $projectId))->execute();
 	foreach ([['#__joomleague_sport_type', $sportTypeId], ['#__joomleague_competition', $competitionId], ['#__joomleague_season', $seasonId]] as [$table, $id]) $database->setQuery($database->getQuery(true)->delete($database->quoteName($table))->where('id = ' . $id))->execute();
