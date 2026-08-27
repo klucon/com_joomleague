@@ -1,43 +1,130 @@
 # JoomLeague 6.2
 
-Clean development line for JoomLeague 6.2.0.
+JoomLeague 6.2 is a new, sport-independent competition management system for
+Joomla 6.2. The current `6.2-dev` branch is a development preview intended for
+testing, schema validation and migration testing. It is not a production
+release.
 
-## Important compatibility warning
+## Compatibility warning
 
-The `6.2-dev` development line is **not compatible with JoomLeague 6.1.x**. Do not install it as a direct update over a 6.1.x installation and do not import a 6.1.x database or SQL export directly into the new schema.
+**JoomLeague 6.2 is not compatible with JoomLeague 6.1.x.**
 
-All migration testing for `6.2-dev` must use the new migration service:
+The 6.2 line uses a new database schema, versioned sport profiles and different
+runtime contracts. Therefore:
 
-**https://migrate.klucon.cz/new**
+- do not install a 6.2 package over JoomLeague 6.1.x;
+- do not copy 6.1.x files into a 6.2 installation;
+- do not import a 6.1.x database or SQL export directly into 6.2;
+- do not use a 6.1.x update package as a route to 6.2.
 
-The migration service converts supported legacy JoomLeague data into the new universal, sport-profile-driven JoomLeague 6.2 schema. Always test the generated migration package on a separate development installation before using it with important data.
+JoomLeague 6.2 must be installed as a **clean installation**.
 
-## Non-negotiable goals
+### Data conversion is not an upgrade
 
-1. Sport-independent behavior driven by versioned sport profiles.
-2. Auditable, resumable and lossless migration from JoomLeague 0.93, 1.5, 2.5, 3 and supported V6 alpha releases.
-3. Equivalent MariaDB/MySQL and PostgreSQL schemas and behavior.
-4. Joomla core MVC, ACL, forms and visual conventions.
+Existing data can only be transferred through the dedicated conversion service
+at **[migrate.joomleague.eu](https://migrate.joomleague.eu/)**. The service reads
+a supported legacy SQL dump and creates a new migration package for the 6.2
+schema. This is an external extract-transform-load process, not compatibility
+between 6.1 and 6.2 and not an in-place update.
 
-Historical source trees are references and migration inputs. They are not copied into this tree wholesale.
+Always import the generated package into a separate clean 6.2 test installation
+and review its migration report before using the converted data anywhere that
+matters. A successful conversion does not make 6.1 extensions, templates or
+database tables compatible with 6.2.
 
-## Current foundation
+## Current development package
 
-- Forty-eight canonical tables are implemented for MariaDB/MySQL and PostgreSQL, including project aggregates, sport-type runtime catalogs, universal match data and standings.
-- Fifteen bundled sport profiles are persisted losslessly and idempotently.
-- Six versioned template definitions resolve defaults through profile, project and presentation layers.
-- Joomla component configuration is reserved for installation-wide operational settings.
-- `en-GB` is the canonical source language; the development package also includes the current `cs-CZ` translation.
-- Bundled sport profiles are immutable templates. Positions, event types and statistics become working records only when selected during creation of a local sport type.
-- Architecture checks reject database-driver drift, invalid profiles and missing English language constants.
+- Version: `6.2.0-dev2`
+- Joomla: 6.2 development line
+- PHP: 8.3 or newer
+- Databases: MySQL 8.0+, MariaDB 10.6+ or PostgreSQL 14+
+- Source language: `en-GB`
+- Included translation: current `cs-CZ` development translation
 
-Run the foundation verification with:
+The installable package contains:
+
+- `com_joomleague` - administrator and frontend component;
+- `mod_joomleague_standings` - frontend standings module;
+- `plg_quickicon_joomleague` - administrator quick icon;
+- `plg_console_joomleague` - Joomla console integration;
+- `plg_task_joomleague` - Joomla Scheduler integration.
+
+No other historical JoomLeague modules or plugins are part of the current 6.2
+package unless they are explicitly listed above.
+
+## Architecture
+
+The 6.2 foundation is built around these rules:
+
+1. Sport behavior is defined by versioned JSON sport profiles, not hardcoded
+   football rules.
+2. MariaDB/MySQL and PostgreSQL must provide equivalent schema and behavior.
+3. Joomla core MVC, forms, ACL, Scheduler, update sites and administrator styles
+   are used wherever Joomla already provides the required functionality.
+4. Imported legacy values retain auditable provenance, but legacy tables are not
+   the runtime model.
+5. `en-GB` is the canonical language source.
+
+The current bundle provides 15 sport profiles, universal competition stages,
+entries, schedules, participants, results and standings, and versioned template
+definitions.
+
+## Clean installation
+
+1. Download `pkg_joomleague-*.zip` from
+   [downloads.joomleague.eu](https://downloads.joomleague.eu/).
+2. Install it through **System -> Install -> Extensions** in a clean Joomla 6.2
+   installation.
+3. Open **Components -> JoomLeague** and create a sport type from a bundled
+   profile or define your own catalogs.
+
+Do not perform these steps on a Joomla site containing JoomLeague 6.1.x.
+
+## Development updates
+
+The package registers the official Joomla update feed:
+
+`https://downloads.joomleague.eu/update.xml`
+
+Development releases are correctly tagged as `dev`. Test installations must set
+**System -> Update -> Extensions -> Options -> Minimum Extension Stability** to
+**Development**. Stable sites should retain Joomla's default **Stable** value.
+
+Each published package is checked with SHA-256, SHA-384 and SHA-512 hashes. The
+feed and changelog remain publicly accessible so Joomla can update without an
+interactive login.
+
+## Building and verification
+
+Build the complete package with:
+
+```bash
+./build/build-package.sh
+```
+
+The build validates the release contract before creating ZIP files. The main
+checks can also be run separately:
 
 ```bash
 php tests/Architecture/verify-foundation.php
-php tests/Unit/verify-template-resolver.php
-php tests/Unit/verify-project-rule-validator.php
+./tests/Architecture/verify-release.sh
 
-# Run inside each installed Joomla test container
-php /tmp/verify-project-rule-repository.php
+for test in tests/Unit/*.php; do
+    php "$test"
+done
 ```
+
+Integration and browser tests run against both JoomLeague test installations,
+one backed by MariaDB and one by PostgreSQL.
+
+## Services
+
+- Project hub: [joomleague.eu](https://joomleague.eu/)
+- Downloads and updates: [downloads.joomleague.eu](https://downloads.joomleague.eu/)
+- Documentation: [docs.joomleague.eu](https://docs.joomleague.eu/)
+- Data conversion: [migrate.joomleague.eu](https://migrate.joomleague.eu/)
+- Support: [support.joomleague.eu](https://support.joomleague.eu/)
+
+## License
+
+JoomLeague is released under the GNU General Public License version 2 or later.

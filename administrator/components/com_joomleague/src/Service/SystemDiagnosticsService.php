@@ -31,7 +31,7 @@ final class SystemDiagnosticsService
 			'driver' => $this->database->getName(),
 			'database_version' => $this->database->getVersion(),
 			'table_count' => count(ComponentTableCatalog::installed($this->database)),
-			'component_version' => '6.2.0-dev',
+			'component_version' => '6.2.0-dev2',
 			'php_version' => PHP_VERSION,
 			'upload_max_filesize' => (string) ini_get('upload_max_filesize'),
 			'post_max_size' => (string) ini_get('post_max_size'),

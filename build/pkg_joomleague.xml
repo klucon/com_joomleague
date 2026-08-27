@@ -2,7 +2,7 @@
 <extension type="package" method="upgrade">
 	<name>PKG_JOOMLEAGUE</name>
 	<packagename>joomleague</packagename>
-	<version>6.2.0-dev</version>
+	<version>6.2.0-dev2</version>
 	<creationDate>August 2026</creationDate>
 	<author>KLUCON</author>
 	<authorEmail>info@klucon.cz</authorEmail>
@@ -11,6 +11,10 @@
 	<license>GNU General Public License version 2 or later</license>
 	<description>PKG_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<scriptfile>pkg_script.php</scriptfile>
+	<changelogurl>https://downloads.joomleague.eu/changelog.xml</changelogurl>
+	<updateservers>
+		<server type="extension" priority="1" name="JoomLeague Updates">https://downloads.joomleague.eu/update.xml</server>
+	</updateservers>
 	<languages folder="language">
 		<language tag="en-GB">en-GB/pkg_joomleague.ini</language>
 		<language tag="en-GB">en-GB/pkg_joomleague.sys.ini</language>
@@ -18,10 +22,10 @@
 		<language tag="cs-CZ">cs-CZ/pkg_joomleague.sys.ini</language>
 	</languages>
 	<files>
-		<file type="component" id="com_joomleague">com_joomleague-6.2.0-dev.zip</file>
-		<file type="plugin" id="joomleague" group="quickicon">plg_quickicon_joomleague-6.2.0-dev.zip</file>
-		<file type="plugin" id="joomleague" group="console">plg_console_joomleague-6.2.0-dev.zip</file>
-		<file type="plugin" id="joomleague" group="task">plg_task_joomleague-6.2.0-dev.zip</file>
-		<file type="module" id="mod_joomleague_standings" client="site">mod_joomleague_standings-6.2.0-dev.zip</file>
+		<file type="component" id="com_joomleague">com_joomleague-6.2.0-dev2.zip</file>
+		<file type="plugin" id="joomleague" group="quickicon">plg_quickicon_joomleague-6.2.0-dev2.zip</file>
+		<file type="plugin" id="joomleague" group="console">plg_console_joomleague-6.2.0-dev2.zip</file>
+		<file type="plugin" id="joomleague" group="task">plg_task_joomleague-6.2.0-dev2.zip</file>
+		<file type="module" id="mod_joomleague_standings" client="site">mod_joomleague_standings-6.2.0-dev2.zip</file>
 	</files>
 </extension>

@@ -5,12 +5,14 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${ROOT}/build/package"
 DIST_DIR="${ROOT}/dist"
-PACKAGE="${DIST_DIR}/com_joomleague-6.2.0-dev.zip"
-PLUGIN_PACKAGE="${DIST_DIR}/plg_quickicon_joomleague-6.2.0-dev.zip"
-CONSOLE_PLUGIN_PACKAGE="${DIST_DIR}/plg_console_joomleague-6.2.0-dev.zip"
-TASK_PLUGIN_PACKAGE="${DIST_DIR}/plg_task_joomleague-6.2.0-dev.zip"
-STANDINGS_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_standings-6.2.0-dev.zip"
-SUITE_PACKAGE="${DIST_DIR}/pkg_joomleague-6.2.0-dev.zip"
+"${ROOT}/tests/Architecture/verify-release.sh"
+VERSION="$(sed -n 's:.*<version>\([^<]*\)</version>.*:\1:p' "${ROOT}/build/pkg_joomleague.xml" | head -n 1)"
+PACKAGE="${DIST_DIR}/com_joomleague-${VERSION}.zip"
+PLUGIN_PACKAGE="${DIST_DIR}/plg_quickicon_joomleague-${VERSION}.zip"
+CONSOLE_PLUGIN_PACKAGE="${DIST_DIR}/plg_console_joomleague-${VERSION}.zip"
+TASK_PLUGIN_PACKAGE="${DIST_DIR}/plg_task_joomleague-${VERSION}.zip"
+STANDINGS_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_standings-${VERSION}.zip"
+SUITE_PACKAGE="${DIST_DIR}/pkg_joomleague-${VERSION}.zip"
 
 if [[ -d "${BUILD_DIR}" ]]; then
 	find "${BUILD_DIR}" -mindepth 1 -delete
