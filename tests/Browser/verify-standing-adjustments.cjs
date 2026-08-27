@@ -15,8 +15,9 @@ const { chromium } = require('playwright');
 		if (/\b(?:Notice|Warning):/.test(body)) throw new Error(`Stages emits a PHP diagnostic: ${body.slice(0, 1200)}`);
 		const stageRows = page.locator('#stageList tbody tr').filter({ has: page.locator('a[href*="view=standings"][href*="stage_id="]') });
 		if (await stageRows.count()) {
-			await stageRows.first().locator('a[href*="view=standings"][href*="stage_id="]').click();
-			await page.waitForLoadState('networkidle');
+			const standingsHref = await stageRows.first().locator('a[href*="view=standings"][href*="stage_id="]').getAttribute('href');
+			if (!standingsHref) throw new Error('Stage standings link has no destination.');
+			await page.goto(new URL(standingsHref, page.url()).toString(), { waitUntil: 'networkidle' });
 			body = await page.locator('body').innerText();
 			if (!new URL(page.url()).searchParams.get('stage_id') || /COM_JOOMLEAGUE_[A-Z0-9_]+|\b(?:Notice|Warning):/.test(body)) throw new Error(`Stage standings context is invalid at ${page.url()}: ${body.slice(0, 1200)}`);
 			const closeHref = await page.locator('a#toolbar-cancel').getAttribute('href');

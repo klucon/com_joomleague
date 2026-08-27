@@ -12,7 +12,7 @@ const { chromium } = require('playwright');
 			if (await yes.waitFor({ state: 'visible', timeout: 2500 }).then(() => true).catch(() => false)) await yes.click(); else await native;
 			await page.waitForLoadState('networkidle');
 		};
-		await page.goto(`${baseUrl}/administrator/`, { waitUntil: 'networkidle' }); await page.getByLabel('Username').fill(username); await page.getByLabel('Password').fill(password); await page.getByRole('button', { name: 'Log in' }).click(); await page.waitForLoadState('networkidle');
+		await page.goto(`${baseUrl}/administrator/`, { waitUntil: 'networkidle' }); await page.locator('#mod-login-username').fill(username); await page.locator('#mod-login-password').fill(password); await page.locator('form#form-login button[type="submit"]').click(); await page.waitForLoadState('networkidle');
 		await page.goto(`${baseUrl}/administrator/index.php?option=com_joomleague&view=stages&project_id=${projectId}`, { waitUntil: 'networkidle' }); await page.getByRole('button', { name: 'New' }).click(); await page.waitForLoadState('networkidle');
 		await page.getByLabel('Name').fill('Round fixture stage'); await page.locator('#jform_code').fill('round_fixture_stage'); await page.locator('#jform_stage_type').fill('league_phase'); await page.getByRole('button', { name: 'Save & Close' }).click(); await page.waitForLoadState('networkidle');
 		const stageRow = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Round fixture stage', exact: true }) }); await stageRow.getByRole('link', { name: 'Manage stage rounds' }).click(); await page.waitForLoadState('networkidle');

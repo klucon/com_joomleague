@@ -39,13 +39,13 @@ final class HtmlView extends BaseHtmlView
 		$user = Factory::getApplication()->getIdentity();
 		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_PROJECTS_TITLE'), 'folder-open');
 		if ($user->authorise('core.create', 'com_joomleague')) ToolbarHelper::addNew('project.add');
-		if ($user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('project.edit');
-		if ($user->authorise('core.create', 'com_joomleague')) ToolbarHelper::custom('projects.duplicate', 'copy', 'copy', 'COM_JOOMLEAGUE_PROJECTS_DUPLICATE', true);
-		if ($user->authorise('core.edit.state', 'com_joomleague')) {
+		if ($this->items !== [] && $user->authorise('core.edit', 'com_joomleague')) ToolbarHelper::editList('project.edit');
+		if ($this->items !== [] && $user->authorise('core.create', 'com_joomleague')) ToolbarHelper::custom('projects.duplicate', 'copy', 'copy', 'COM_JOOMLEAGUE_PROJECTS_DUPLICATE', true);
+		if ($this->items !== [] && $user->authorise('core.edit.state', 'com_joomleague')) {
 			ToolbarHelper::publish('projects.publish', 'JTOOLBAR_PUBLISH', true);
 			ToolbarHelper::unpublish('projects.unpublish', 'JTOOLBAR_UNPUBLISH', true);
 			ToolbarHelper::checkin('projects.checkin');
 		}
-		if ($user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'projects.delete');
+		if ($this->items !== [] && $user->authorise('core.delete', 'com_joomleague')) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'projects.delete');
 	}
 }

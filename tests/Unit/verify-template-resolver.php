@@ -8,8 +8,8 @@ $root = dirname(__DIR__, 2);
 require_once $root . '/administrator/components/com_joomleague/src/Service/TemplateDefinitionRegistry.php';
 require_once $root . '/administrator/components/com_joomleague/src/Service/TemplateConfigResolver.php';
 
-use Joomleague\Component\Joomleague\Administrator\Service\TemplateConfigResolver;
-use Joomleague\Component\Joomleague\Administrator\Service\TemplateDefinitionRegistry;
+use Joomleague\Component\Joomleague\Domain\Service\TemplateConfigResolver;
+use Joomleague\Component\Joomleague\Domain\Service\TemplateDefinitionRegistry;
 
 $registry = new TemplateDefinitionRegistry($root . '/administrator/components/com_joomleague/resources/template-definitions/templates.json');
 $resolver = new TemplateConfigResolver($registry);

@@ -18,6 +18,7 @@ use Joomleague\Component\Joomleague\Domain\Service\UuidFactory;
 use Joomleague\Component\Joomleague\Administrator\Service\ProjectContextRepository;
 use Joomleague\Component\Joomleague\Administrator\Service\MatchParticipantSummaryProvider;
 use Joomleague\Component\Joomleague\Administrator\Service\MatchScheduleEditor;
+use Joomleague\Component\Joomleague\Administrator\Service\StandingsCascadeTrigger;
 
 final class MatchModel extends AdminModel implements CurrentUserInterface
 {
@@ -60,6 +61,7 @@ final class MatchModel extends AdminModel implements CurrentUserInterface
 			'attendance' => $data['attendance'] ?? '',
 		];
 		$id = (int) ($data['id'] ?? 0); $owner = $id > 0 ? $this->storedOwner($id) : $this->getRound((int) ($data['round_id'] ?? 0));
+		$oldPublished = $id > 0 ? (int) $owner->published : null;
 		$data['round_id'] = (int) ($owner->round_id ?? $owner->id); $data['stage_id'] = (int) $owner->stage_id; $data['project_id'] = (int) $owner->project_id;
 		$data['contest_type'] = $this->projectContestType((int) $owner->project_id);
 		if (($schedule['scheduled_date'] === '') !== ($schedule['scheduled_time'] === '')) throw new \UnexpectedValueException(Text::_('COM_JOOMLEAGUE_ERROR_MATCH_VALUES_INVALID'));
@@ -67,7 +69,24 @@ final class MatchModel extends AdminModel implements CurrentUserInterface
 		if (!parent::save($data)) return false;
 		$savedId = $id > 0 ? $id : (int) $this->getState($this->getName() . '.id');
 		(new MatchScheduleEditor($this->getDatabase()))->save($savedId, (int) $data['round_id'], $schedule, (int) $this->getCurrentUser()->id);
+		if ($oldPublished !== null && array_key_exists('published', $data) && (int) $data['published'] !== $oldPublished) {
+			$this->refreshStandings([[(int) $data['project_id'], (int) $data['stage_id']]]);
+		}
 		return true;
+	}
+	public function publish(&$pks, $value = 1): bool
+	{
+		$contexts = $this->standingsContexts((array) $pks);
+		$result = parent::publish($pks, $value);
+		if ($result) $this->refreshStandings($contexts);
+		return $result;
+	}
+	public function delete(&$pks): bool
+	{
+		$contexts = $this->standingsContexts((array) $pks);
+		$result = parent::delete($pks);
+		if ($result) $this->refreshStandings($contexts);
+		return $result;
 	}
 	protected function prepareTable($table): void
 	{
@@ -77,7 +96,7 @@ final class MatchModel extends AdminModel implements CurrentUserInterface
 	}
 	private function storedOwner(int $id): object
 	{
-		$db = $this->getDatabase(); $query = $db->getQuery(true)->select(['match.round_id', 'match.stage_id', 'match.project_id', 'project.timezone AS project_timezone'])->from($db->quoteName('#__joomleague_project_match', 'match'))->innerJoin($db->quoteName('#__joomleague_project', 'project') . ' ON project.id = match.project_id')->where($db->quoteName('match.id') . ' = :id')->bind(':id', $id, ParameterType::INTEGER);
+		$db = $this->getDatabase(); $query = $db->getQuery(true)->select(['match.round_id', 'match.stage_id', 'match.project_id', 'match.published', 'project.timezone AS project_timezone'])->from($db->quoteName('#__joomleague_project_match', 'match'))->innerJoin($db->quoteName('#__joomleague_project', 'project') . ' ON project.id = match.project_id')->where($db->quoteName('match.id') . ' = :id')->bind(':id', $id, ParameterType::INTEGER);
 		$owner = $db->setQuery($query)->loadObject(); if (!$owner) throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_MATCH_INVALID')); return $owner;
 	}
 	private function effectiveTimezone(string $matchTimezone, object $context): string { return $matchTimezone !== '' ? $matchTimezone : ((string) ($context->project_timezone ?? '') !== '' ? (string) $context->project_timezone : (string) Factory::getApplication()->get('offset', 'UTC')); }
@@ -91,5 +110,19 @@ final class MatchModel extends AdminModel implements CurrentUserInterface
 		}
 
 		return $contestType;
+	}
+	/** @param list<int|string> $ids @return list<array{0:int,1:int}> */
+	private function standingsContexts(array $ids): array
+	{
+		$ids = array_values(array_unique(array_filter(array_map('intval', $ids), static fn (int $id): bool => $id > 0)));
+		if ($ids === []) return [];
+		$query = $this->getDatabase()->getQuery(true)->select(['project_id', 'stage_id'])->from($this->getDatabase()->quoteName('#__joomleague_project_match'))->whereIn('id', $ids, ParameterType::INTEGER)->group(['project_id', 'stage_id']);
+		return array_map(static fn (object $row): array => [(int) $row->project_id, (int) $row->stage_id], $this->getDatabase()->setQuery($query)->loadObjectList());
+	}
+	/** @param list<array{0:int,1:int}> $contexts */
+	private function refreshStandings(array $contexts): void
+	{
+		$trigger = new StandingsCascadeTrigger($this->getDatabase());
+		foreach ($contexts as [$projectId, $stageId]) $trigger->trigger($projectId, $stageId, (int) $this->getCurrentUser()->id);
 	}
 }

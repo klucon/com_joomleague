@@ -36,9 +36,9 @@
         "favorite_highlight_mode": {"type": "string", "enum": ["none", "name", "row"], "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_FAVORITE_HIGHLIGHT", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_FAVORITE_HIGHLIGHT_DESC"}
       }
     },
-    "matchreport": {
-      "name_key": "COM_JOOMLEAGUE_TEMPLATE_MATCHREPORT",
-      "description_key": "COM_JOOMLEAGUE_TEMPLATE_MATCHREPORT_DESC",
+    "eventreport": {
+      "name_key": "COM_JOOMLEAGUE_TEMPLATE_EVENTREPORT",
+      "description_key": "COM_JOOMLEAGUE_TEMPLATE_EVENTREPORT_DESC",
       "defaults": {"show_lineups": true, "show_staff": true, "show_officials": true, "show_timeline": true, "show_schema_org": true},
       "fields": {
         "show_lineups": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_LINEUPS", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_LINEUPS_DESC"},

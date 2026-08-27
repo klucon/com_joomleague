@@ -21,15 +21,161 @@ use Joomleague\Component\Joomleague\Administrator\Service\SportProfileSchemaVali
 
 $manifest = (string) file_get_contents($root . '/administrator/components/com_joomleague/joomleague.xml');
 $admin = $root . '/administrator/components/com_joomleague';
+$site = $root . '/components/com_joomleague';
 $quickIcon = $root . '/plugins/quickicon/joomleague';
 $consolePlugin = $root . '/plugins/console/joomleague';
 $taskPlugin = $root . '/plugins/task/joomleague';
+$packageManifest = (string) file_get_contents($root . '/build/pkg_joomleague.xml');
+$packageInstaller = (string) file_get_contents($root . '/build/pkg_script.php');
+
+if ($packageInstaller === '') {
+	throw new RuntimeException('Package installer script cannot be read.');
+}
+
+if (preg_match('/<style\b|\sstyle\s*=/i', $packageInstaller) === 1) {
+	throw new RuntimeException('Package installer UI must use Joomla and Bootstrap classes without custom CSS.');
+}
+
+foreach ([
+	'PKG_JOOMLEAGUE_INSTALL_PLATFORM_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_CONTENT_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_INTEGRATIONS_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_STEP_PROFILE_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_STEP_PROJECT_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_STEP_PUBLISH_TITLE',
+	'PKG_JOOMLEAGUE_INSTALL_START_GUIDE',
+	'PKG_JOOMLEAGUE_INSTALL_CREATE_COMPETITION_GUIDE',
+] as $installerLanguageKey) {
+	if (!str_contains($packageInstaller, $installerLanguageKey)) {
+		throw new RuntimeException(sprintf('Package installer report is missing section key %s.', $installerLanguageKey));
+	}
+}
+
+foreach (['en-GB', 'cs-CZ'] as $packageLanguage) {
+	foreach (['pkg_joomleague.ini', 'pkg_joomleague.sys.ini'] as $packageLanguageFile) {
+		$languagePath = $root . '/build/language/' . $packageLanguage . '/' . $packageLanguageFile;
+
+		if (!is_file($languagePath) || !str_contains((string) file_get_contents($languagePath), 'PKG_JOOMLEAGUE="JoomLeague"')) {
+			throw new RuntimeException(sprintf('Package language %s/%s is missing or incomplete.', $packageLanguage, $packageLanguageFile));
+		}
+	}
+
+	$packageIni = (string) file_get_contents($root . '/build/language/' . $packageLanguage . '/pkg_joomleague.ini');
+
+	foreach ([
+		'PKG_JOOMLEAGUE_INSTALL_PLATFORM_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_CONTENT_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_INTEGRATIONS_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_STEP_PROFILE_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_STEP_PROJECT_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_STEP_PUBLISH_TITLE',
+		'PKG_JOOMLEAGUE_INSTALL_START_GUIDE',
+		'PKG_JOOMLEAGUE_INSTALL_CREATE_COMPETITION_GUIDE',
+	] as $installerLanguageKey) {
+		if (!str_contains($packageIni, $installerLanguageKey . '=')) {
+			throw new RuntimeException(sprintf('Package language %s is missing installer key %s.', $packageLanguage, $installerLanguageKey));
+		}
+	}
+}
+
+if (preg_match('/<uninstall>\s*<sql>/i', $manifest) === 1) {
+	throw new RuntimeException('The component manifest must not run destructive SQL during uninstallation.');
+}
+
+foreach (['<folder>fields</folder>', '<folder>src</folder>', '<folder>tmpl</folder>'] as $siteManifestFolder) {
+	if (!str_contains($manifest, $siteManifestFolder)) {
+		throw new RuntimeException(sprintf('Component manifest is missing site folder declaration %s.', $siteManifestFolder));
+	}
+}
+
+foreach (['projects', 'project', 'participants', 'participant', 'person', 'clubs', 'club', 'team', 'venues', 'venue', 'eventreport'] as $siteView) {
+	foreach ([
+		'/src/Model/' . ucfirst($siteView) . 'Model.php',
+		'/src/View/' . ucfirst($siteView) . '/HtmlView.php',
+		'/tmpl/' . $siteView . '/default.php',
+		'/tmpl/' . $siteView . '/default.xml',
+	] as $relativeFile) {
+		if (!is_file($site . $relativeFile)) {
+			throw new RuntimeException(sprintf('Public %s view is missing %s.', $siteView, $relativeFile));
+		}
+	}
+}
+
+foreach (['en-GB', 'cs-CZ'] as $siteLanguageTag) {
+	$siteLanguage = (string) file_get_contents($site . '/language/' . $siteLanguageTag . '/com_joomleague.ini');
+	$adminSystemLanguage = (string) file_get_contents($admin . '/language/' . $siteLanguageTag . '/com_joomleague.sys.ini');
+
+	foreach (['COM_JOOMLEAGUE_PROJECTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PROJECT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PERSON_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_CLUBS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_CLUB_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_TEAM_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_VENUES_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_VENUE_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_EVENTREPORT_VIEW_DEFAULT_TITLE'] as $menuViewKey) {
+		if (!str_contains($siteLanguage, $menuViewKey . '=') || !str_contains($adminSystemLanguage, $menuViewKey . '=')) {
+			throw new RuntimeException(sprintf('Public menu view key %s is incomplete for %s.', $menuViewKey, $siteLanguageTag));
+		}
+	}
+}
+
+$stageModelSource = (string) file_get_contents($admin . '/src/Model/StageModel.php');
+if (!str_contains($stageModelSource, "str_replace('-', '_', ApplicationHelper::stringURLSafe(\$name))")) {
+	throw new RuntimeException('Automatic stage codes must use the underscore format accepted by StageTable.');
+}
+$matchFormSource = (string) file_get_contents($admin . '/forms/match.xml');
+$matchScheduleSource = (string) file_get_contents($admin . '/src/Service/MatchScheduleEditor.php');
+if (preg_match('/name="participant_slot_[12]"[^>]*validate="options"/', $matchFormSource)
+	|| !str_contains($matchScheduleSource, 'StageEntryOptionsProvider($this->database))->contains')) {
+	throw new RuntimeException('Dynamic match participants must use the context-aware server-side allowlist.');
+}
+$eventReportModelSource = (string) file_get_contents($site . '/src/Model/EventreportModel.php');
+if (!str_contains($eventReportModelSource, "if (\$item->result_status === 'final')")) {
+	throw new RuntimeException('The public event report must not expose non-final score payloads.');
+}
+if (!str_contains($eventReportModelSource, "entry.entry_kind = 'team' AND team.id IS NOT NULL")) {
+	throw new RuntimeException('The public event report must not expose entries linked to unpublished entities.');
+}
+if (is_dir($site . '/tmpl/programitem') || is_file($site . '/src/Model/ProgramitemModel.php')) {
+	throw new RuntimeException('The obsolete programitem view must not coexist with canonical eventreport.');
+}
+
+foreach (glob($admin . '/resources/sport-profiles/*.json') ?: [] as $profileFile) {
+	$profileSource = (string) file_get_contents($profileFile);
+	if (str_contains($profileSource, '"matchreport"')) {
+		throw new RuntimeException(sprintf('Profile %s still contains the obsolete matchreport template key.', basename($profileFile)));
+	}
+}
+
+foreach (['mysql', 'postgresql'] as $driver) {
+	$uninstallSql = (string) file_get_contents($admin . '/sql/uninstall.' . ($driver === 'mysql' ? 'mysql.utf8' : 'postgresql') . '.sql');
+
+	if (preg_match('/\bDROP\s+TABLE\b/i', $uninstallSql) === 1) {
+		throw new RuntimeException(sprintf('%s uninstall SQL must preserve JoomLeague data tables.', $driver));
+	}
+}
 
 $installerScript = (string) file_get_contents($admin . '/script.php');
+
+if (!str_contains($installerScript, 'private const DEVELOPMENT_PROFILE_SYNC = true;')) {
+	throw new RuntimeException('The unreleased development package must update bundled profiles in place.');
+}
+foreach (['src/Model/ProgramitemModel.php', 'src/View/Programitem/HtmlView.php', 'tmpl/programitem/default.php', 'tmpl/programitem/default.xml'] as $obsoleteProgramItemFile) {
+	if (!str_contains($installerScript, "'" . $obsoleteProgramItemFile . "'")) {
+		throw new RuntimeException(sprintf('Installer does not remove obsolete site file %s.', $obsoleteProgramItemFile));
+	}
+}
 
 foreach (['ProjectRuleValidator.php', 'EntryModelValidator.php', 'StandingsContractValidator.php', 'SportProfileSchemaValidator.php'] as $installerDependency) {
 	if (!str_contains($installerScript, $installerDependency)) {
 		throw new RuntimeException(sprintf('Installer profile synchronisation is missing the explicit %s bootstrap.', $installerDependency));
+	}
+}
+
+foreach (['com_joomleague.getting-started', 'com_joomleague.create-competition', '#__guidedtours', '#__guidedtour_steps', 'synchroniseGuidedTours'] as $guidedTourRequirement) {
+	if (!str_contains($installerScript, $guidedTourRequirement)) {
+		throw new RuntimeException(sprintf('Installer guided tour integration is missing %s.', $guidedTourRequirement));
+	}
+}
+
+foreach (['en-GB', 'cs-CZ'] as $languageTag) {
+	foreach (['com_joomleague.getting_started.ini', 'com_joomleague.getting_started_steps.ini', 'com_joomleague.create_competition.ini', 'com_joomleague.create_competition_steps.ini'] as $tourLanguageFile) {
+		if (!is_file($admin . '/language/' . $languageTag . '/' . $tourLanguageFile)) {
+			throw new RuntimeException(sprintf('Guided tour language file %s/%s is missing.', $languageTag, $tourLanguageFile));
+		}
 	}
 }
 
@@ -130,6 +276,19 @@ foreach (['joomleague.xml', 'services/provider.php', 'src/Extension/Joomleague.p
 foreach (['joomleague.xml', 'services/provider.php', 'src/Extension/Joomleague.php', 'language/en-GB/plg_task_joomleague.ini', 'language/en-GB/plg_task_joomleague.sys.ini'] as $pluginFile) {
 	if (!is_file($taskPlugin . '/' . $pluginFile)) {
 		throw new RuntimeException(sprintf('Task plugin is missing %s.', $pluginFile));
+	}
+}
+
+foreach (glob($root . '/modules/mod_*', GLOB_ONLYDIR) ?: [] as $moduleDirectory) {
+	$module = basename($moduleDirectory);
+	$moduleManifest = $moduleDirectory . '/' . $module . '.xml';
+
+	if (!is_file($moduleManifest)) {
+		throw new RuntimeException(sprintf('Module %s is missing its manifest.', $module));
+	}
+
+	if (!str_contains($packageManifest, 'id="' . $module . '"')) {
+		throw new RuntimeException(sprintf('Module %s is not included in the JoomLeague package.', $module));
 	}
 }
 
@@ -356,13 +515,41 @@ foreach (['mysql' => $mysqlTables, 'postgresql' => $postgresTables] as $driver =
 	sort($updateFiles, SORT_STRING);
 	$latestUpdate = basename((string) end($updateFiles));
 
-	if ($latestUpdate !== '6.2.0-2026081601.sql') {
+	if ($latestUpdate !== '6.2.0-2026082501.sql') {
 		throw new RuntimeException(sprintf('%s update ordering must end at the schema anchor.', $driver));
 	}
 
 	if (preg_match('/ADD\s+COLUMN\s+IF\s+NOT\s+EXISTS/i', $updateSql) === 1) {
 		throw new RuntimeException(sprintf('%s updates use ADD COLUMN IF NOT EXISTS, which Joomla Database Checker parses incorrectly.', $driver));
 	}
+
+	if (preg_match('/CREATE\s+(?:UNIQUE\s+)?INDEX\s+IF\s+NOT\s+EXISTS/i', $updateSql) === 1) {
+		throw new RuntimeException(sprintf('%s updates use CREATE INDEX IF NOT EXISTS, which Joomla Database Checker parses incorrectly.', $driver));
+	}
+}
+
+foreach (['competition', 'season', 'project', 'club', 'team', 'person', 'venue'] as $publicEntity) {
+	foreach (['mysql' => $mysqlInstall, 'postgresql' => $postgresInstall] as $driver => $schema) {
+		$quote = $driver === 'mysql' ? '`' : '"';
+		$start = strpos($schema, 'CREATE TABLE IF NOT EXISTS ' . $quote . '#__joomleague_' . $publicEntity . $quote);
+		$endMarker = $driver === 'mysql' ? ') ENGINE=' : ');';
+		$end = $start === false ? false : strpos($schema, $endMarker, $start);
+		$definition = ($start === false || $end === false) ? '' : substr($schema, $start, $end - $start);
+		if (!str_contains($definition, $quote . 'access' . $quote)) {
+			throw new RuntimeException(sprintf('%s public entity %s is missing its access level.', $driver, $publicEntity));
+		}
+	}
+}
+
+$routerSource = (string) file_get_contents($root . '/components/com_joomleague/src/Service/Router.php');
+$providerSource = (string) file_get_contents($admin . '/services/provider.php');
+if (!str_contains($routerSource, 'extends RouterView') || !str_contains($providerSource, 'new RouterFactory')) {
+	throw new RuntimeException('The site component must register its native Joomla router.');
+}
+
+$participantModelSource = (string) file_get_contents($admin . '/src/Model/MatchparticipantsModel.php');
+if (!str_contains($participantModelSource, 'assertVariableParticipants') || !str_contains($participantModelSource, "contestType === 'head_to_head'")) {
+	throw new RuntimeException('Variable match participant management must reject fixed head-to-head contests.');
 }
 
 $stageForm = file_get_contents($root . '/administrator/components/com_joomleague/forms/stage.xml');
@@ -390,10 +577,7 @@ foreach (['mysql' => '`lifecycle_state`', 'postgresql' => '"lifecycle_state"'] a
 	}
 }
 
-$languageFiles = [
-	$admin . '/language/en-GB/com_joomleague.ini',
-	$admin . '/language/en-GB/com_joomleague.sys.ini',
-];
+$languageFiles = glob($admin . '/language/en-GB/*.ini') ?: [];
 $definedLanguageKeys = [];
 $languageDirectories = array_map('basename', glob($admin . '/language/*', GLOB_ONLYDIR) ?: []);
 
@@ -403,7 +587,10 @@ if ($languageDirectories !== ['cs-CZ', 'en-GB']) {
 	throw new RuntimeException('The component package must contain exactly the canonical en-GB source and bundled cs-CZ translation.');
 }
 
-foreach (['com_joomleague.ini', 'com_joomleague.sys.ini'] as $languageFilename) {
+$languageFilenames = array_map('basename', $languageFiles);
+sort($languageFilenames);
+
+foreach ($languageFilenames as $languageFilename) {
 	$keySets = [];
 
 	foreach (['en-GB', 'cs-CZ'] as $languageTag) {
@@ -700,6 +887,25 @@ if (!str_contains($projectEntryModel, 'loadStoredProjectId($entryId)')) {
 	throw new RuntimeException('Project participant edits must retain their stored project boundary.');
 }
 
+if (!str_contains($projectEntryModel, 'StandingsCascadeTrigger')
+	|| !str_contains($projectEntryModel, 'triggerProject(')
+	|| !str_contains($projectEntryModel, 'public function publish(')
+	|| !str_contains($projectEntryModel, 'public function delete(')) {
+	throw new RuntimeException('Project participant save, publication and deletion must automatically refresh project and stage standings.');
+}
+
+$stageEntriesModel = (string) file_get_contents($admin . '/src/Model/StageentriesModel.php');
+$stageProgressionService = (string) file_get_contents($admin . '/src/Service/StageProgressionService.php');
+$standingsCascadeTrigger = (string) file_get_contents($admin . '/src/Service/StandingsCascadeTrigger.php');
+
+if (!str_contains($standingsCascadeTrigger, 'public function triggerStage(')
+	|| !str_contains($stageEntriesModel, 'StandingsCascadeTrigger')
+	|| !str_contains($stageEntriesModel, 'triggerStage(')
+	|| !str_contains($stageProgressionService, 'refreshTargetStandings(')
+	|| !str_contains($stageProgressionService, 'triggerStage(')) {
+	throw new RuntimeException('Manual and automatic stage participant changes must automatically refresh target-stage standings.');
+}
+
 $entryMemberController = (string) file_get_contents($admin . '/src/Controller/EntrymemberController.php');
 $entryMembersTemplate = (string) file_get_contents($admin . '/tmpl/entrymembers/default.php');
 $entryMemberModel = (string) file_get_contents($admin . '/src/Model/EntrymemberModel.php');
@@ -739,8 +945,10 @@ $matchResultController = (string) file_get_contents($admin . '/src/Controller/Ma
 
 if (!str_contains($matchResultModel, 'MatchResultFormStateMutator')
 	|| substr_count($matchResultModel, 'clearTransient($matchId)') < 1
-	|| !str_contains($matchResultModel, 'MatchResultPayloadValidator')) {
-	throw new RuntimeException('Match result mutations must be profile-validated and transient state must be cleared after persistence.');
+	|| !str_contains($matchResultModel, 'MatchResultPayloadValidator')
+	|| !str_contains($matchResultModel, 'StandingsCascadeTrigger')
+	|| !str_contains($matchResultModel, 'cascadeStandings($matchId, $actorId)')) {
+	throw new RuntimeException('Match result mutations must be profile-validated, clear transient state and automatically refresh standings.');
 }
 
 if (!str_contains($matchResultPayloadValidator, 'MatchResultAggregationValidator')
@@ -851,15 +1059,16 @@ if (!str_contains($matchLineupRepository, 'available_member_count')
 	throw new RuntimeException('Match lineup administration must automatically select and summarize an available participant roster.');
 }
 
-// Standings read/write logic is split across two Domain\Service classes:
-// StandingsReader (read-only, safe for admin/site/modules) and
-// StandingsRecalculator (write-only, admin-exclusive). Together they must
-// still own every standings table.
+// StandingsReader remains read-only. The recalculator owns publication and
+// the synchronizer repairs missing profile scopes after external imports.
 $standingsReader = (string) file_get_contents($admin . '/src/Service/StandingsReader.php');
 $standingsRecalculator = (string) file_get_contents($admin . '/src/Service/StandingsRecalculator.php');
+$standingsSynchronizer = (string) file_get_contents($admin . '/src/Service/StandingsSnapshotSynchronizer.php');
 $standingsRepository = $standingsReader . "\n" . $standingsRecalculator;
 $standingsController = (string) file_get_contents($admin . '/src/Controller/StandingsController.php');
 $standingsTemplate = (string) file_get_contents($admin . '/tmpl/standings/default.php');
+$matchModelSource = (string) file_get_contents($admin . '/src/Model/MatchModel.php');
+$roundModelSource = (string) file_get_contents($admin . '/src/Model/RoundModel.php');
 
 foreach (['#__joomleague_standing_adjustment', '#__joomleague_standing_snapshot', '#__joomleague_standing_snapshot_row', '#__joomleague_standing_current'] as $standingTable) {
 	if (!str_contains($standingsRepository, $standingTable)) {
@@ -867,8 +1076,45 @@ foreach (['#__joomleague_standing_adjustment', '#__joomleague_standing_snapshot'
 	}
 }
 
+foreach (['match.published = 1', 'round.published = 1', 'stage.published = 1'] as $publicationGuard) {
+	if (!str_contains($standingsRecalculator, $publicationGuard) || !str_contains($standingsReader, $publicationGuard)) {
+		throw new RuntimeException('Standings and recent form must exclude unpublished competition structure: ' . $publicationGuard);
+	}
+}
+
+foreach (['Match' => $matchModelSource, 'Round' => $roundModelSource, 'Stage' => $stageModelSource] as $entity => $modelSource) {
+	if (!str_contains($modelSource, 'StandingsCascadeTrigger')
+		|| !str_contains($modelSource, 'public function publish(')
+		|| !str_contains($modelSource, 'public function delete(')
+		|| !str_contains($modelSource, 'refreshStandings(')) {
+		throw new RuntimeException($entity . ' publication and deletion must automatically refresh affected standings.');
+	}
+}
+
 if (str_contains($standingsReader, 'recalculate') || str_contains($standingsReader, 'transactionStart')) {
 	throw new RuntimeException('StandingsReader must stay read-only — no write/recalculation logic belongs there.');
+}
+
+$siteStandingsModel = (string) file_get_contents($root . '/components/com_joomleague/src/Model/StandingsModel.php');
+$siteStandingsTemplate = (string) file_get_contents($root . '/components/com_joomleague/tmpl/standings/default.php');
+
+if (!str_contains($siteStandingsModel, 'StandingsSnapshotSynchronizer')
+	|| !str_contains($standingsSynchronizer, "['available_scopes']")
+	|| !str_contains($standingsSynchronizer, "['snapshot'] === null")) {
+	throw new RuntimeException('Public standings must automatically publish every missing profile-defined scope.');
+}
+
+foreach (['project.published = 1', 'competition.published = 1', 'season.published = 1', 'sport_type.published = 1', 'stage.published = 1'] as $publishedGuard) {
+	if (!str_contains($siteStandingsModel, $publishedGuard)) {
+		throw new RuntimeException('Public standings are missing the publication guard: ' . $publishedGuard);
+	}
+}
+
+if (!str_contains($siteStandingsModel, "['status_order']")
+	|| !str_contains($siteStandingsTemplate, 'STANDINGS_TYPE_')
+	|| !str_contains($siteStandingsTemplate, 'STANDINGS_SCOPE_')
+	|| !str_contains($siteStandingsTemplate, "\$code === 'elapsed'")) {
+	throw new RuntimeException('Public standings are no longer profile-aware across table, competitor and race classifications.');
 }
 
 $modelIterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($admin . '/src/Model', FilesystemIterator::SKIP_DOTS));
@@ -907,9 +1153,41 @@ if (!str_contains($adminDomainCatalog, "'standings' => self::item('STANDINGS', '
 if (!str_contains($standingsController, 'Session::checkToken()')
 	|| !str_contains($standingsController, "authorise('core.edit', \$asset)")
 	|| !str_contains($standingsController, 'Log::add(')
-	|| !str_contains($standingsTemplate, "HTMLHelper::_('form.token')")
+	|| !str_contains($standingsTemplate, "HTMLHelper::_('uitab.startTabSet'")
+	|| str_contains($standingsTemplate, 'standings.recalculate')
 	|| preg_match('/<style\b|style\s*=|<script\b/i', $standingsTemplate) === 1) {
-	throw new RuntimeException('Standings administration must retain Joomla CSRF, ACL, logging and native styling.');
+	throw new RuntimeException('Standings administration must retain protected writes, automatic scope tabs and native Joomla styling.');
+}
+
+$siteResultsModel = (string) file_get_contents($root . '/components/com_joomleague/src/Model/ResultsModel.php');
+$siteResultsTemplate = (string) file_get_contents($root . '/components/com_joomleague/tmpl/results/default.php');
+if (!str_contains($siteResultsModel, "result.status_code = 'final'")
+	|| !str_contains($siteResultsModel, 'participant.slot_number ASC')
+	|| !str_contains($siteResultsModel, 'value.text_value')
+	|| !str_contains($siteResultsModel, 'value.result_rank')
+	|| !str_contains($siteResultsModel, "entry.entry_kind = 'person' AND person.id IS NOT NULL")) {
+	throw new RuntimeException('Public programme must support ordered participants and expose finalized universal result values only.');
+}
+foreach (['home_score', 'away_score', 'show_scorers', "'goal'", "'own_goal'"] as $footballOnlyToken) {
+	if (str_contains($siteResultsModel . $siteResultsTemplate, $footballOnlyToken)) {
+		throw new RuntimeException(sprintf('Public programme contains sport-specific token %s.', $footballOnlyToken));
+	}
+}
+if (preg_match('/<style\b|style\s*=|<script\b/i', $siteResultsTemplate) === 1) {
+	throw new RuntimeException('Public programme must use native Joomla styling without embedded CSS or scripts.');
+}
+
+$siteBracketModel = (string) file_get_contents($root . '/components/com_joomleague/src/Model/BracketModel.php');
+$siteBracketTemplate = (string) file_get_contents($root . '/components/com_joomleague/tmpl/bracket/default.php');
+foreach (['project_entry_id', "result.status_code = 'final'", 'value.text_value', 'value.result_rank', 'PARTICIPANT_HEIGHT'] as $bracketRequirement) {
+	if (!str_contains($siteBracketModel, $bracketRequirement)) {
+		throw new RuntimeException(sprintf('Public progression bracket is missing universal requirement %s.', $bracketRequirement));
+	}
+}
+foreach (['home_score', 'away_score', 'home_shootout', 'away_shootout', "['home']", "['away']"] as $headToHeadToken) {
+	if (str_contains($siteBracketModel . $siteBracketTemplate, $headToHeadToken)) {
+		throw new RuntimeException(sprintf('Public progression bracket contains head-to-head token %s.', $headToHeadToken));
+	}
 }
 
 printf(

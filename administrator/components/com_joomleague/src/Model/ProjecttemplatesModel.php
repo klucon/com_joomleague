@@ -14,8 +14,8 @@ use Joomla\Database\ParameterType;
 use Joomleague\Component\Joomleague\Domain\Service\CanonicalJson;
 use Joomleague\Component\Joomleague\Administrator\Service\ProjectTemplateConfigRepository;
 use Joomleague\Component\Joomleague\Administrator\Service\ProjectContextRepository;
-use Joomleague\Component\Joomleague\Administrator\Service\TemplateConfigResolver;
-use Joomleague\Component\Joomleague\Administrator\Service\TemplateDefinitionRegistry;
+use Joomleague\Component\Joomleague\Domain\Service\TemplateConfigResolver;
+use Joomleague\Component\Joomleague\Domain\Service\TemplateDefinitionRegistry;
 use SimpleXMLElement;
 
 final class ProjecttemplatesModel extends FormModel

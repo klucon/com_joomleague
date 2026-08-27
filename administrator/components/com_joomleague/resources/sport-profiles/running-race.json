@@ -434,6 +434,13 @@
             "show_personal_data": true,
             "show_results": true
         },
+        "eventreport": {
+            "show_lineups": true,
+            "show_staff": true,
+            "show_officials": true,
+            "show_timeline": true,
+            "show_schema_org": true
+        },
         "project": {
             "show_hero": true,
             "show_sport": true,

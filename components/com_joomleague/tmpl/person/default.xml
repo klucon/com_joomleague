@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_PERSON_VIEW_DEFAULT_TITLE">
+		<message><![CDATA[COM_JOOMLEAGUE_PERSON_VIEW_DEFAULT_DESC]]></message>
+	</layout>
+	<fields name="request">
+		<fieldset name="request">
+			<field name="person_id" type="sql" required="true" label="COM_JOOMLEAGUE_PERSON_REQUEST_PERSON_LABEL" description="COM_JOOMLEAGUE_PERSON_REQUEST_PERSON_DESC" query="SELECT id AS value, TRIM(CONCAT(first_name, ' ', last_name)) AS text FROM #__joomleague_person WHERE published = 1 ORDER BY last_name, first_name, id" key_field="value" value_field="text" />
+		</fieldset>
+	</fields>
+</metadata>

@@ -54,9 +54,11 @@ class JFormFieldEntry extends ListField
 					. ")), ''), CONCAT('ID ', " . $db->quoteName('entry.id') . ')) AS ' . $db->quoteName('text'),
 			])
 			->from($db->quoteName('#__joomleague_project_entry', 'entry'))
-			->leftJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id')
-			->leftJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id')
+			->leftJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.published = 1')
+			->leftJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id AND person.published = 1')
 			->where($db->quoteName('entry.project_id') . ' = :project')
+			->where($db->quoteName('entry.published') . ' = 1')
+			->where("(entry.entry_kind = 'group' OR (entry.entry_kind = 'team' AND team.id IS NOT NULL) OR (entry.entry_kind = 'person' AND person.id IS NOT NULL))")
 			->bind(':project', $projectId, ParameterType::INTEGER)
 			->order($db->quoteName('text') . ' ASC');
 

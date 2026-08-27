@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_organization_name_history` (
   CONSTRAINT `chk_jl_org_name_history_owner` CHECK ((`club_id` IS NOT NULL AND `team_id` IS NULL) OR (`club_id` IS NULL AND `team_id` IS NOT NULL)),
   CONSTRAINT `chk_jl_org_name_history_dates` CHECK (`valid_to` IS NULL OR `valid_from` IS NULL OR `valid_to` >= `valid_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS `#__joomleague_organization_media_history` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `uuid` CHAR(36) NOT NULL,

@@ -10,6 +10,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\ParameterType;
+use Joomleague\Component\Joomleague\Administrator\Service\StandingsCascadeTrigger;
 
 final class StageentriesModel extends BaseDatabaseModel
 {
@@ -76,7 +77,7 @@ final class StageentriesModel extends BaseDatabaseModel
 			} else {
 				$query = $db->getQuery(true)->delete($db->quoteName('#__joomleague_stage_entry'))->where($db->quoteName('stage_id') . ' = :stageId')->where($db->quoteName('manual_assignment') . ' = 1')->bind(':stageId', $stageId, ParameterType::INTEGER);
 				$db->setQuery($query)->execute();
-				$userId = (int) Factory::getApplication()->getIdentity()->id;
+				$userId = (int) (Factory::getApplication()->getIdentity()?->id ?? 0);
 				foreach ($entryIds as $ordering => $entryId) {
 					$query = $db->getQuery(true)->select('COUNT(*)')->from($db->quoteName('#__joomleague_stage_entry'))->where('stage_id = :stage')->where('entry_id = :entry')->bind(':stage',$stageId,ParameterType::INTEGER)->bind(':entry',$entryId,ParameterType::INTEGER);
 					if ((int) $db->setQuery($query)->loadResult() > 0) {
@@ -92,5 +93,11 @@ final class StageentriesModel extends BaseDatabaseModel
 			$db->transactionRollback();
 			throw $error;
 		}
+
+		(new StandingsCascadeTrigger($db))->triggerStage(
+			(int) $stage->project_id,
+			(int) $stageId,
+			(int) (Factory::getApplication()->getIdentity()?->id ?? 0)
+		);
 	}
 }

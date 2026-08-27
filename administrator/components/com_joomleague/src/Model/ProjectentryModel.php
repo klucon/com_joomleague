@@ -9,12 +9,14 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Log\Log;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\User\CurrentUserInterface;
 use Joomla\CMS\User\CurrentUserTrait;
 use Joomla\Database\ParameterType;
 use Joomleague\Component\Joomleague\Administrator\Service\ProjectContextRepository;
+use Joomleague\Component\Joomleague\Administrator\Service\StandingsCascadeTrigger;
 use Joomleague\Component\Joomleague\Domain\Service\UuidFactory;
 
 final class ProjectentryModel extends AdminModel implements CurrentUserInterface
@@ -94,7 +96,25 @@ final class ProjectentryModel extends AdminModel implements CurrentUserInterface
 			return false;
 		}
 
-		return parent::save($data);
+		$result = parent::save($data);
+		if ($result) $this->cascadeStandings([$projectId]);
+		return $result;
+	}
+
+	public function publish(&$pks, $value = 1): bool
+	{
+		$projectIds = $this->projectIdsForEntries((array) $pks);
+		$result = parent::publish($pks, $value);
+		if ($result) $this->cascadeStandings($projectIds);
+		return $result;
+	}
+
+	public function delete(&$pks): bool
+	{
+		$projectIds = $this->projectIdsForEntries((array) $pks);
+		$result = parent::delete($pks);
+		if ($result) $this->cascadeStandings($projectIds);
+		return $result;
 	}
 
 	protected function prepareTable($table): void
@@ -142,5 +162,24 @@ final class ProjectentryModel extends AdminModel implements CurrentUserInterface
 		}
 
 		return $projectId;
+	}
+
+	/** @param list<mixed> $entryIds @return list<int> */
+	private function projectIdsForEntries(array $entryIds): array
+	{
+		$entryIds = array_values(array_unique(array_filter(array_map('intval', $entryIds), static fn (int $id): bool => $id > 0)));
+		if ($entryIds === []) return [];
+		$query = $this->getDatabase()->getQuery(true)->select($this->getDatabase()->quoteName('project_id'))->from($this->getDatabase()->quoteName('#__joomleague_project_entry'))->whereIn($this->getDatabase()->quoteName('id'), $entryIds, ParameterType::INTEGER)->group($this->getDatabase()->quoteName('project_id'));
+		return array_map('intval', $this->getDatabase()->setQuery($query)->loadColumn());
+	}
+
+	/** @param list<int> $projectIds */
+	private function cascadeStandings(array $projectIds): void
+	{
+		$trigger = new StandingsCascadeTrigger($this->getDatabase());
+		foreach (array_unique($projectIds) as $projectId) {
+			try { $trigger->triggerProject((int) $projectId, (int) $this->getCurrentUser()->id); }
+			catch (\Throwable $exception) { Log::add($exception->getMessage(), Log::ERROR, 'com_joomleague.standings'); }
+		}
 	}
 }

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_VENUE_VIEW_DEFAULT_TITLE"><message><![CDATA[COM_JOOMLEAGUE_VENUE_VIEW_DEFAULT_DESC]]></message></layout>
+	<fields name="request"><fieldset name="request"><field name="venue_id" type="sql" required="true" label="COM_JOOMLEAGUE_VENUE_REQUEST_VENUE_LABEL" description="COM_JOOMLEAGUE_VENUE_REQUEST_VENUE_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_venue WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text" /></fieldset></fields>
+</metadata>

@@ -50,10 +50,10 @@ final class HtmlView extends BaseHtmlView
 		if ($user->authorise('core.create', $asset)) {
 			ToolbarHelper::addNew('projectentry.add');
 		}
-		if ($this->canEdit) {
+		if ($this->entries !== [] && $this->canEdit) {
 			ToolbarHelper::editList('projectentry.edit');
 		}
-		if ($user->authorise('core.delete', $asset)) {
+		if ($this->entries !== [] && $user->authorise('core.delete', $asset)) {
 			ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'projectentries.delete');
 		}
 		ToolbarHelper::link('index.php?option=com_joomleague&view=projectpanel&project_id=' . $projectId, 'JTOOLBAR_CLOSE', 'cancel');

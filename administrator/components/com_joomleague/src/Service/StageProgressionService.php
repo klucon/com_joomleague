@@ -60,6 +60,7 @@ final class StageProgressionService
 			$this->database->transactionStart();
 			try { $this->synchronise($transition, $preview['entries'], $existing, $actorId); $this->database->transactionCommit(); }
 			catch (\Throwable $error) { $this->database->transactionRollback(); throw $error; }
+			$this->refreshTargetStandings($transition, $actorId);
 			return ['run_id' => $existing, 'reused' => true, 'resolved_count' => count($preview['entries'])];
 		}
 
@@ -82,11 +83,23 @@ final class StageProgressionService
 			$runId = (int) $this->database->insertid();
 			$this->synchronise($transition, $preview['entries'], $runId, $actorId);
 			$this->database->transactionCommit();
-			return ['run_id' => $runId, 'reused' => false, 'resolved_count' => count($preview['entries'])];
 		} catch (\Throwable $error) {
 			$this->database->transactionRollback();
 			throw $error;
 		}
+
+		$this->refreshTargetStandings($transition, $actorId);
+
+		return ['run_id' => $runId, 'reused' => false, 'resolved_count' => count($preview['entries'])];
+	}
+
+	private function refreshTargetStandings(object $transition, int $actorId): void
+	{
+		(new StandingsCascadeTrigger($this->database))->triggerStage(
+			(int) $transition->project_id,
+			(int) $transition->target_stage_id,
+			$actorId
+		);
 	}
 
 	private function transition(int $id): object

@@ -45,9 +45,9 @@ const { chromium } = require('playwright');
 		};
 
 		await page.goto(`${baseUrl}/administrator/`, { waitUntil: 'networkidle' });
-		await page.getByLabel('Username').fill(username);
-		await page.getByLabel('Password').fill(password);
-		await page.getByRole('button', { name: 'Log in' }).click();
+		await page.locator('#mod-login-username').fill(username);
+		await page.locator('#mod-login-password').fill(password);
+		await page.locator('form#form-login button[type="submit"]').click();
 		await page.waitForLoadState('networkidle');
 		await page.goto(listUrl, { waitUntil: 'networkidle' });
 		await saveStage('Fixture group stage', 'fixture_group', 'group_stage');

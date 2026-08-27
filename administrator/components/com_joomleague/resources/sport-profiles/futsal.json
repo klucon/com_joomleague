@@ -387,7 +387,7 @@
         "ranking": {
             "favorite_highlight_mode": "row"
         },
-        "matchreport": {
+        "eventreport": {
             "show_lineups": true,
             "show_officials": true,
             "show_timeline": true

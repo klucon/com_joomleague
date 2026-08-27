@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 
 defined('_JEXEC') or die;
 
@@ -104,7 +105,7 @@ $teamsMarkup = static function (array $match) use ($entryName): string {
 		<?php else : ?>
 
 			<?php if ($nextMatch !== null) : ?>
-				<div class="card text-bg-primary bg-gradient shadow-sm mb-4">
+				<a class="card text-bg-primary bg-gradient shadow-sm mb-4 text-decoration-none" href="<?php echo Route::_('index.php?option=com_joomleague&amp;view=eventreport&amp;event_id=' . (int) $nextMatch['match_id']); ?>">
 					<div class="card-body">
 						<div class="d-flex justify-content-between align-items-center mb-2">
 							<span class="badge text-bg-light"><i class="fa-solid fa-star me-1"></i><?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAN_NEXT_MATCH_BADGE'); ?></span>
@@ -124,7 +125,7 @@ $teamsMarkup = static function (array $match) use ($entryName): string {
 							<span class="badge text-bg-light"><?php echo Text::_($nextMatch['is_home'] ? 'COM_JOOMLEAGUE_TEAMPLAN_HOME_LABEL' : 'COM_JOOMLEAGUE_TEAMPLAN_AWAY_LABEL'); ?></span>
 						</div>
 					</div>
-				</div>
+				</a>
 			<?php endif; ?>
 
 			<?php
@@ -139,7 +140,7 @@ $teamsMarkup = static function (array $match) use ($entryName): string {
 						$borderColor = $match['played'] ? $outcome($match) : 'secondary-subtle';
 						?>
 						<div class="col">
-							<div class="card h-100 shadow-sm border-start border-4 border-<?php echo $borderColor; ?>">
+							<a class="card h-100 shadow-sm border-start border-4 border-<?php echo $borderColor; ?> text-decoration-none text-body" href="<?php echo Route::_('index.php?option=com_joomleague&amp;view=eventreport&amp;event_id=' . (int) $match['match_id']); ?>">
 								<div class="card-body">
 									<div class="d-flex justify-content-between align-items-start mb-2">
 										<?php if ($plan['show_round']) : ?>
@@ -166,7 +167,7 @@ $teamsMarkup = static function (array $match) use ($entryName): string {
 										<?php endif; ?>
 									</div>
 								</div>
-							</div>
+							</a>
 						</div>
 					<?php endforeach; ?>
 				</div>

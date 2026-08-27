@@ -27,9 +27,9 @@ final class HtmlView extends BaseHtmlView
 		$this->items = $this->get('Items'); $this->pagination = $this->get('Pagination'); $this->state = $this->get('State'); $this->filterForm = $this->get('FilterForm'); $this->activeFilters = $this->get('ActiveFilters'); $this->project = $this->getModel()->getProject(); if ($errors = $this->get('Errors')) throw new GenericDataException(implode("\n", $errors), 500);
 		$user = Factory::getApplication()->getIdentity(); ToolbarHelper::title(Text::sprintf('COM_JOOMLEAGUE_STANDING_ADJUSTMENTS_TITLE_PROJECT', $this->project->name), 'plus-circle');
 		$asset = 'com_joomleague.project.' . (int) $this->project->id;
-		if ($user->authorise('core.create', $asset)) ToolbarHelper::addNew('standingadjustment.add'); if ($user->authorise('core.edit', $asset)) ToolbarHelper::editList('standingadjustment.edit');
-		if ($user->authorise('core.edit.state', $asset)) { ToolbarHelper::publish('standingadjustments.publish', 'JTOOLBAR_PUBLISH', true); ToolbarHelper::unpublish('standingadjustments.unpublish', 'JTOOLBAR_UNPUBLISH', true); }
-		if ($user->authorise('core.delete', $asset)) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'standingadjustments.delete');
+		if ($user->authorise('core.create', $asset)) ToolbarHelper::addNew('standingadjustment.add'); if ($this->items !== [] && $user->authorise('core.edit', $asset)) ToolbarHelper::editList('standingadjustment.edit');
+		if ($this->items !== [] && $user->authorise('core.edit.state', $asset)) { ToolbarHelper::publish('standingadjustments.publish', 'JTOOLBAR_PUBLISH', true); ToolbarHelper::unpublish('standingadjustments.unpublish', 'JTOOLBAR_UNPUBLISH', true); }
+		if ($this->items !== [] && $user->authorise('core.delete', $asset)) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'standingadjustments.delete');
 		$stageId = (int) $this->state->get('stage_id'); $url = 'index.php?option=com_joomleague&view=standings&project_id=' . (int) $this->project->id; if ($stageId > 0) $url .= '&stage_id=' . $stageId; ToolbarHelper::link($url, 'JTOOLBAR_CLOSE', 'cancel'); parent::display($tpl);
 	}
 }

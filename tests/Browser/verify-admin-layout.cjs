@@ -15,9 +15,9 @@ const { chromium } = require('playwright');
 		for (const viewport of [{ name: 'desktop', width: 1440, height: 1000 }, { name: 'mobile', width: 390, height: 844 }]) {
 			const page = await browser.newPage({ viewport });
 			await page.goto(`${baseUrl}/administrator/`, { waitUntil: 'networkidle' });
-			await page.getByLabel('Username').fill(username);
-			await page.getByLabel('Password').fill(password);
-			await page.getByRole('button', { name: 'Log in' }).click();
+			await page.locator('#mod-login-username').fill(username);
+			await page.locator('#mod-login-password').fill(password);
+			await page.locator('form#form-login button[type="submit"]').click();
 			await page.waitForLoadState('networkidle');
 			const hideTour = page.getByRole('button', { name: 'Hide Forever' });
 
@@ -27,7 +27,7 @@ const { chromium } = require('playwright');
 
 			for (const [name, route, heading, tabCount] of [
 				['dashboard', 'index.php?option=com_joomleague&view=dashboard', 'JoomLeague 6.2', 0],
-				['project', 'index.php?option=com_joomleague&view=project&layout=edit', 'New Project', 5],
+				['project', 'index.php?option=com_joomleague&view=project&layout=edit', 'New Project', 6],
 				['competition', 'index.php?option=com_joomleague&view=competition&layout=edit', 'New competition', 3],
 				['season', 'index.php?option=com_joomleague&view=season&layout=edit', 'New season', 3],
 				['sporttype', 'index.php?option=com_joomleague&view=sporttype&layout=edit', 'New Sport Type', 3],
@@ -71,13 +71,13 @@ const { chromium } = require('playwright');
 				}
 
 				if (tabCount > 0) {
-					const tabs = page.locator('.main-card joomla-tab-element');
+					const tabs = page.locator('.main-card > joomla-tab > joomla-tab-element');
 					const actualTabCount = await tabs.count();
 					if (actualTabCount !== tabCount) {
 						const bodyText = (await page.locator('body').innerText()).slice(0, 1500);
 						throw new Error(`${name} has ${actualTabCount} tabs instead of ${tabCount} at ${page.url()}. Body: ${bodyText}`);
 					}
-					if ((await page.locator('.main-card joomla-tab-element[active]').count()) !== 1) throw new Error(`${name} must have exactly one active tab.`);
+					if ((await page.locator('.main-card > joomla-tab > joomla-tab-element[active]').count()) !== 1) throw new Error(`${name} must have exactly one active tab.`);
 				}
 
 				await page.screenshot({ path: `/tmp/joomleague-${name}-${viewport.name}.png`, fullPage: true });

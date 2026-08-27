@@ -15,9 +15,9 @@ const { chromium } = require('playwright');
 	try {
 		const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 		await page.goto(`${baseUrl}/administrator/`, { waitUntil: 'networkidle' });
-		await page.getByLabel('Username').fill(username);
-		await page.getByLabel('Password').fill(password);
-		await page.getByRole('button', { name: 'Log in' }).click();
+		await page.locator('#mod-login-username').fill(username);
+		await page.locator('#mod-login-password').fill(password);
+		await page.locator('form#form-login button[type="submit"]').click();
 		await page.waitForLoadState('networkidle');
 
 		const hideTour = page.getByRole('button', { name: 'Hide Forever' });
@@ -33,6 +33,8 @@ const { chromium } = require('playwright');
 		const row = page.getByRole('row').filter({ hasText: clubName });
 		await row.getByRole('checkbox').check();
 		await page.getByRole('button', { name: 'Delete' }).click();
+		await page.getByRole('dialog').waitFor({ state: 'visible' });
+		await page.waitForTimeout(250);
 		await page.getByRole('dialog').getByRole('button', { name: 'Yes', exact: true }).click();
 		await page.waitForLoadState('networkidle');
 

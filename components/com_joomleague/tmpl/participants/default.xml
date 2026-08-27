@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_PARTICIPANTS_VIEW_DEFAULT_TITLE">
+		<message><![CDATA[COM_JOOMLEAGUE_PARTICIPANTS_VIEW_DEFAULT_DESC]]></message>
+	</layout>
+	<fields name="request">
+		<fieldset name="request">
+			<field
+				name="project_id"
+				type="sql"
+				required="true"
+				label="COM_JOOMLEAGUE_PARTICIPANTS_REQUEST_PROJECT_LABEL"
+				description="COM_JOOMLEAGUE_PARTICIPANTS_REQUEST_PROJECT_DESC"
+				query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project WHERE published = 1 ORDER BY name, id"
+				key_field="value"
+				value_field="text"
+			/>
+		</fieldset>
+	</fields>
+</metadata>

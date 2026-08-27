@@ -8,6 +8,7 @@ defined('_JEXEC') or die;
 
 use Joomla\Database\DatabaseInterface;
 use Joomleague\Component\Joomleague\Domain\Service\CanonicalJson;
+use Joomleague\Component\Joomleague\Domain\Service\TemplateDefinitionRegistry;
 
 final class ProjectTemplateConfigRepository
 {

@@ -15,7 +15,7 @@
 				required="true"
 				label="COM_JOOMLEAGUE_BRACKET_REQUEST_PROJECT_LABEL"
 				description="COM_JOOMLEAGUE_BRACKET_REQUEST_PROJECT_DESC"
-				query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id"
+				query="SELECT p.id AS value, COALESCE(NULLIF(p.name, ''), CONCAT('ID ', p.id)) AS text FROM #__joomleague_project AS p INNER JOIN #__joomleague_competition AS c ON c.id = p.competition_id AND c.published = 1 INNER JOIN #__joomleague_season AS s ON s.id = p.season_id AND s.published = 1 INNER JOIN #__joomleague_sport_type AS st ON st.id = p.sport_type_id AND st.published = 1 WHERE p.published = 1 ORDER BY p.name, p.id"
 				key_field="value"
 				value_field="text"
 			/>
@@ -25,7 +25,7 @@
 				required="true"
 				label="COM_JOOMLEAGUE_BRACKET_REQUEST_STAGE_LABEL"
 				description="COM_JOOMLEAGUE_BRACKET_REQUEST_STAGE_DESC"
-				query="SELECT id AS value, CONCAT(name, ' (', project_id, ')') AS text FROM #__joomleague_project_stage ORDER BY project_id, sequence_number, name"
+				query="SELECT s.id AS value, CONCAT(p.name, ' - ', s.name) AS text FROM #__joomleague_project_stage AS s INNER JOIN #__joomleague_project AS p ON p.id = s.project_id AND p.published = 1 WHERE s.published = 1 ORDER BY p.name, s.sequence_number, s.id"
 				key_field="value"
 				value_field="text"
 			/>

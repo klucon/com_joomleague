@@ -5,8 +5,8 @@
 		<field name="match_number" type="text" label="COM_JOOMLEAGUE_FIELD_MATCH_NUMBER_LABEL" description="COM_JOOMLEAGUE_FIELD_MATCH_NUMBER_DESC" maxlength="100" />
 		<field name="code" type="text" label="COM_JOOMLEAGUE_FIELD_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_MATCH_CODE_DESC" maxlength="100" filter="cmd" />
 		<field name="contest_type" type="contesttype" label="COM_JOOMLEAGUE_FIELD_CONTEST_TYPE_LABEL" description="COM_JOOMLEAGUE_FIELD_CONTEST_TYPE_DESC" required="true" default="head_to_head" filter="cmd" validate="options" />
-		<field name="participant_slot_1" type="matchparticipant" label="COM_JOOMLEAGUE_MATCH_COLUMN_HOME" description="COM_JOOMLEAGUE_FIELD_MATCH_HOME_DESC" required="true" filter="uint" validate="options" showon="contest_type:head_to_head" />
-		<field name="participant_slot_2" type="matchparticipant" label="COM_JOOMLEAGUE_MATCH_COLUMN_AWAY" description="COM_JOOMLEAGUE_FIELD_MATCH_AWAY_DESC" required="true" filter="uint" validate="options" showon="contest_type:head_to_head" />
+		<field name="participant_slot_1" type="matchparticipant" label="COM_JOOMLEAGUE_MATCH_COLUMN_HOME" description="COM_JOOMLEAGUE_FIELD_MATCH_HOME_DESC" required="true" filter="uint" showon="contest_type:head_to_head" />
+		<field name="participant_slot_2" type="matchparticipant" label="COM_JOOMLEAGUE_MATCH_COLUMN_AWAY" description="COM_JOOMLEAGUE_FIELD_MATCH_AWAY_DESC" required="true" filter="uint" showon="contest_type:head_to_head" />
 		<field name="participants_note" type="note" label="COM_JOOMLEAGUE_MATCHPARTICIPANTS_TITLE" description="COM_JOOMLEAGUE_FIELD_PARTICIPANTS_NOTE_DESC" showon="contest_type!:head_to_head" />
 		<field name="scheduled_date" type="calendar" label="COM_JOOMLEAGUE_MATCH_COLUMN_DATE" description="COM_JOOMLEAGUE_FIELD_MATCH_DATE_DESC" format="%Y-%m-%d" filter="string" todaybutton="true" />
 		<field name="scheduled_time" type="time" label="COM_JOOMLEAGUE_MATCH_COLUMN_TIME" description="COM_JOOMLEAGUE_FIELD_MATCH_TIME_DESC" filter="string" />

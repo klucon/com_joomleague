@@ -15,17 +15,23 @@
 				required="true"
 				label="COM_JOOMLEAGUE_RESULTS_REQUEST_PROJECT_LABEL"
 				description="COM_JOOMLEAGUE_RESULTS_REQUEST_PROJECT_DESC"
-				query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project ORDER BY name, id"
+				query="SELECT p.id AS value, COALESCE(NULLIF(p.name, ''), CONCAT('ID ', p.id)) AS text FROM #__joomleague_project AS p INNER JOIN #__joomleague_competition AS c ON c.id = p.competition_id AND c.published = 1 INNER JOIN #__joomleague_season AS s ON s.id = p.season_id AND s.published = 1 INNER JOIN #__joomleague_sport_type AS st ON st.id = p.sport_type_id AND st.published = 1 WHERE p.published = 1 ORDER BY p.name, p.id"
 				key_field="value"
 				value_field="text"
 			/>
 			<field
 				name="stage_id"
-				type="number"
+				type="sql"
 				default="0"
 				label="COM_JOOMLEAGUE_RESULTS_REQUEST_STAGE_LABEL"
 				description="COM_JOOMLEAGUE_RESULTS_REQUEST_STAGE_DESC"
-			/>
+				query="SELECT s.id AS value, CONCAT(p.name, ' - ', s.name) AS text FROM #__joomleague_project_stage AS s INNER JOIN #__joomleague_project AS p ON p.id = s.project_id WHERE s.published = 1 AND p.published = 1 ORDER BY p.name, s.sequence_number, s.id"
+				key_field="value"
+				value_field="text"
+				showon="project_id!:0"
+			>
+				<option value="0">JALL</option>
+			</field>
 		</fieldset>
 	</fields>
 
@@ -33,11 +39,11 @@
 	<fields name="params">
 		<fieldset name="params" label="COM_JOOMLEAGUE_RESULTS_PARAMS_FIELDSET_LABEL">
 			<field
-				name="show_scorers"
+				name="show_events"
 				type="radio"
 				default="1"
-				label="COM_JOOMLEAGUE_RESULTS_PARAMS_SHOW_SCORERS_LABEL"
-				description="COM_JOOMLEAGUE_RESULTS_PARAMS_SHOW_SCORERS_DESC"
+				label="COM_JOOMLEAGUE_RESULTS_PARAMS_SHOW_EVENTS_LABEL"
+				description="COM_JOOMLEAGUE_RESULTS_PARAMS_SHOW_EVENTS_DESC"
 				layout="joomla.form.field.radio.switcher"
 			>
 				<option value="0">JNO</option>

@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 2 or later</license>
 	<authorEmail>info@klucon.cz</authorEmail>
 	<authorUrl>https://klucon.cz</authorUrl>
-	<version>6.2.0-dev</version>
+	<version>6.2.0-dev1</version>
 	<description>COM_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Component\Joomleague</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -17,12 +17,6 @@
 			<file driver="postgresql" charset="utf8">sql/install.postgresql.sql</file>
 		</sql>
 	</install>
-	<uninstall>
-		<sql>
-			<file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
-			<file driver="postgresql" charset="utf8">sql/uninstall.postgresql.sql</file>
-		</sql>
-	</uninstall>
 	<update>
 		<schemas>
 			<schemapath type="mysql">sql/updates/mysql</schemapath>
@@ -30,7 +24,9 @@
 		</schemas>
 	</update>
 	<files folder="site">
+		<folder>fields</folder>
 		<folder>src</folder>
+		<folder>tmpl</folder>
 	</files>
 	<languages folder="site">
 		<language tag="en-GB">language/en-GB/com_joomleague.ini</language>

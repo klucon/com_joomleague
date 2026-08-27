@@ -54,8 +54,11 @@ final class TeamplanModel extends BaseDatabaseModel
 
         Factory::getApplication()->bootComponent('com_joomleague');
 
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
-        $reader = new MatchesReader($database);
+		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		if (!\Joomleague\Component\Joomleague\Site\Service\PublicAccess::projectAllowed($database, $projectId)) {
+			return ['error' => 'COM_JOOMLEAGUE_TEAMPLAN_UNAVAILABLE'];
+		}
+		$reader = new MatchesReader($database);
 
         $plan = $reader->forEntry($projectId, $entryId);
 
