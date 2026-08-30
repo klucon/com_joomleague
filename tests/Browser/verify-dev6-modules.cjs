@@ -35,7 +35,8 @@ const { chromium } = require('playwright');
 
 			const aside = page.locator('aside.jl-aside');
 			await aside.waitFor();
-			const text = await aside.innerText();
+			const moduleArea = page.locator('.jl-main-top, aside.jl-aside, .jl-main-bottom, .jl-module-band');
+			const text = await moduleArea.allInnerTexts().then((parts) => parts.join('\n'));
 			const expected = [
 				'No future programme event is available.',
 				'Stonebridge Foxes',
@@ -49,6 +50,20 @@ const { chromium } = require('playwright');
 				throw new Error(`Competition navigation module is missing at ${viewport.name}.`);
 			}
 
+			const placements = [
+				['.jl-main-top', 'No future programme event is available.'],
+				['.jl-main-bottom', 'Stonebridge Foxes Arena'],
+				['.jl-module-grid', 'Active members: 15'],
+				['.jl-module-grid', 'Officials'],
+				['.jl-module-band--wide', 'Running Race Demo League 2025/2026'],
+			];
+
+			for (const [selector, value] of placements) {
+				if (!(await page.locator(selector).innerText()).includes(value)) {
+					throw new Error(`Module is not in ${selector} at ${viewport.name}: ${value}`);
+				}
+			}
+
 			for (const value of expected) {
 				if (!text.includes(value)) {
 					throw new Error(`Expected module content is missing at ${viewport.name}: ${value}`);
@@ -59,30 +74,29 @@ const { chromium } = require('playwright');
 				throw new Error(`An untranslated language key is visible at ${viewport.name}.`);
 			}
 
-			const overflow = await aside.evaluate(
-				(element) => element.scrollWidth - element.clientWidth,
+			const overflow = await page.evaluate(
+				() => document.documentElement.scrollWidth - document.documentElement.clientWidth,
 			);
 
 			if (overflow > 1) {
-				const offenders = await aside.evaluate((container) => [...container.querySelectorAll('*')]
+				const offenders = await page.evaluate(() => [...document.querySelectorAll('body *')]
 					.map((element) => {
 						const rect = element.getBoundingClientRect();
-						const containerRect = container.getBoundingClientRect();
 
 						return {
 							tag: element.tagName,
 							className: typeof element.className === 'string' ? element.className : '',
 							text: (element.textContent || '').trim().slice(0, 80),
-							right: Math.round(rect.right - containerRect.right),
+							right: Math.round(rect.right),
 							width: Math.round(rect.width),
 						};
 					})
-					.filter((item) => item.right > 1)
+					.filter((item) => item.right > document.documentElement.clientWidth + 1)
 					.slice(0, 10));
-				throw new Error(`Module area overflows by ${overflow}px at ${viewport.name}: ${JSON.stringify(offenders)}`);
+				throw new Error(`Module page overflows by ${overflow}px at ${viewport.name}: ${JSON.stringify(offenders)}`);
 			}
 
-			const links = await aside.locator('a[href*="com_joomleague"]').evaluateAll((items) => [
+			const links = await moduleArea.locator('a[href*="com_joomleague"]').evaluateAll((items) => [
 				...new Set(items.map((item) => item.href)),
 			]);
 
