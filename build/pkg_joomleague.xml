@@ -2,7 +2,7 @@
 <extension type="package" method="upgrade">
 	<name>PKG_JOOMLEAGUE</name>
 	<packagename>joomleague</packagename>
-	<version>6.2.0-dev5</version>
+	<version>6.2.0-dev6</version>
 	<creationDate>August 2026</creationDate>
 	<author>KLUCON</author>
 	<authorEmail>info@klucon.cz</authorEmail>
@@ -22,15 +22,22 @@
 		<language tag="cs-CZ">cs-CZ/pkg_joomleague.sys.ini</language>
 	</languages>
 	<files>
-		<file type="component" id="com_joomleague">com_joomleague-6.2.0-dev5.zip</file>
-		<file type="plugin" id="joomleague" group="quickicon">plg_quickicon_joomleague-6.2.0-dev5.zip</file>
-		<file type="plugin" id="joomleague" group="console">plg_console_joomleague-6.2.0-dev5.zip</file>
-		<file type="plugin" id="joomleague" group="task">plg_task_joomleague-6.2.0-dev5.zip</file>
-		<file type="plugin" id="joomleague" group="finder">plg_finder_joomleague-6.2.0-dev5.zip</file>
-		<file type="plugin" id="joomleague" group="content">plg_content_joomleague-6.2.0-dev5.zip</file>
-		<file type="module" id="mod_joomleague_standings" client="site">mod_joomleague_standings-6.2.0-dev5.zip</file>
-		<file type="module" id="mod_joomleague_program" client="site">mod_joomleague_program-6.2.0-dev5.zip</file>
-		<file type="module" id="mod_joomleague_statranking" client="site">mod_joomleague_statranking-6.2.0-dev5.zip</file>
-		<file type="module" id="mod_joomleague_eventranking" client="site">mod_joomleague_eventranking-6.2.0-dev5.zip</file>
+		<file type="component" id="com_joomleague">com_joomleague-6.2.0-dev6.zip</file>
+		<file type="plugin" id="joomleague" group="quickicon">plg_quickicon_joomleague-6.2.0-dev6.zip</file>
+		<file type="plugin" id="joomleague" group="console">plg_console_joomleague-6.2.0-dev6.zip</file>
+		<file type="plugin" id="joomleague" group="task">plg_task_joomleague-6.2.0-dev6.zip</file>
+		<file type="plugin" id="joomleague" group="finder">plg_finder_joomleague-6.2.0-dev6.zip</file>
+		<file type="plugin" id="joomleague" group="content">plg_content_joomleague-6.2.0-dev6.zip</file>
+		<file type="module" id="mod_joomleague_standings" client="site">mod_joomleague_standings-6.2.0-dev6.zip</file>
+		<file type="module" id="mod_joomleague_program" client="site">mod_joomleague_program-6.2.0-dev6.zip</file>
+		<file type="module" id="mod_joomleague_next_event" client="site">mod_joomleague_next_event-6.2.0-dev6.zip</file>
+		<file type="module" id="mod_joomleague_navigation" client="site">mod_joomleague_navigation-6.2.0-dev6.zip</file>
+		<file type="module" id="mod_joomleague_participant" client="site">mod_joomleague_participant-6.2.0-dev6.zip</file>
+		<file type="module" id="mod_joomleague_club" client="site">mod_joomleague_club-6.2.0-dev6.zip</file>
+		<file type="module" id="mod_joomleague_personnel" client="site">mod_joomleague_personnel-6.2.0-dev6.zip</file>
+		<file type="module" id="mod_joomleague_venue_program" client="site">mod_joomleague_venue_program-6.2.0-dev6.zip</file>
+		<file type="module" id="mod_joomleague_competitions" client="site">mod_joomleague_competitions-6.2.0-dev6.zip</file>
+		<file type="module" id="mod_joomleague_statranking" client="site">mod_joomleague_statranking-6.2.0-dev6.zip</file>
+		<file type="module" id="mod_joomleague_eventranking" client="site">mod_joomleague_eventranking-6.2.0-dev6.zip</file>
 	</files>
 </extension>

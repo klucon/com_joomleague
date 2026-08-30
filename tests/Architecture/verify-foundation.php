@@ -26,6 +26,13 @@ $quickIcon = $root . '/plugins/quickicon/joomleague';
 $consolePlugin = $root . '/plugins/console/joomleague';
 $taskPlugin = $root . '/plugins/task/joomleague';
 $programModule = $root . '/modules/mod_joomleague_program';
+$nextEventModule = $root . '/modules/mod_joomleague_next_event';
+$navigationModule = $root . '/modules/mod_joomleague_navigation';
+$participantModule = $root . '/modules/mod_joomleague_participant';
+$clubModule = $root . '/modules/mod_joomleague_club';
+$personnelModule = $root . '/modules/mod_joomleague_personnel';
+$venueProgramModule = $root . '/modules/mod_joomleague_venue_program';
+$competitionsModule = $root . '/modules/mod_joomleague_competitions';
 $packageManifest = (string) file_get_contents($root . '/build/pkg_joomleague.xml');
 $packageInstaller = (string) file_get_contents($root . '/build/pkg_script.php');
 
@@ -90,6 +97,96 @@ foreach ([
 
 if (!str_contains($packageManifest, 'id="mod_joomleague_program"')) {
 	throw new RuntimeException('Package manifest does not install the programme module.');
+}
+
+foreach ([
+	'/mod_joomleague_next_event.xml',
+	'/services/provider.php',
+	'/src/Dispatcher/Dispatcher.php',
+	'/src/Helper/NextEventHelper.php',
+	'/tmpl/default.php',
+] as $nextEventModuleFile) {
+	if (!is_file($nextEventModule . $nextEventModuleFile)) {
+		throw new RuntimeException(sprintf('Next programme event module is missing %s.', $nextEventModuleFile));
+	}
+}
+
+if (!str_contains($packageManifest, 'id="mod_joomleague_next_event"')) {
+	throw new RuntimeException('Package manifest does not install the next programme event module.');
+}
+
+foreach ([
+	'/mod_joomleague_navigation.xml',
+	'/services/provider.php',
+	'/src/Dispatcher/Dispatcher.php',
+	'/src/Helper/NavigationHelper.php',
+	'/tmpl/default.php',
+] as $navigationModuleFile) {
+	if (!is_file($navigationModule . $navigationModuleFile)) {
+		throw new RuntimeException(sprintf('Navigation module is missing %s.', $navigationModuleFile));
+	}
+}
+
+if (!str_contains($packageManifest, 'id="mod_joomleague_navigation"')) {
+	throw new RuntimeException('Package manifest does not install the navigation module.');
+}
+
+$navigationHelper = (string) file_get_contents($navigationModule . '/src/Helper/NavigationHelper.php');
+foreach (['ProjectNavigationReader', "['participants']", "['program']", "['standings']", "['bracket_stage_id']"] as $navigationContract) {
+	if (!str_contains($navigationHelper, $navigationContract)) {
+		throw new RuntimeException(sprintf('Navigation module is missing contract %s.', $navigationContract));
+	}
+}
+
+$projectModel = (string) file_get_contents($site . '/src/Model/ProjectModel.php');
+if (!str_contains($projectModel, 'ProjectNavigationReader')) {
+	throw new RuntimeException('Project detail must share ProjectNavigationReader with the navigation module.');
+}
+
+foreach (['/mod_joomleague_participant.xml', '/services/provider.php', '/src/Dispatcher/Dispatcher.php', '/src/Helper/ParticipantHelper.php', '/tmpl/default.php'] as $participantModuleFile) {
+	if (!is_file($participantModule . $participantModuleFile)) {
+		throw new RuntimeException(sprintf('Participant module is missing %s.', $participantModuleFile));
+	}
+}
+if (!str_contains($packageManifest, 'id="mod_joomleague_participant"')) {
+	throw new RuntimeException('Package manifest does not install the participant module.');
+}
+$participantHelper = (string) file_get_contents($participantModule . '/src/Helper/ParticipantHelper.php');
+$participantModel = (string) file_get_contents($site . '/src/Model/ParticipantModel.php');
+if (!str_contains($participantHelper, 'ParticipantSummaryReader') || !str_contains($participantModel, 'ParticipantSummaryReader')) {
+	throw new RuntimeException('Participant module and detail must share ParticipantSummaryReader.');
+}
+
+foreach (['/mod_joomleague_club.xml', '/services/provider.php', '/src/Dispatcher/Dispatcher.php', '/src/Helper/ClubHelper.php', '/tmpl/default.php'] as $clubModuleFile) {
+	if (!is_file($clubModule . $clubModuleFile)) throw new RuntimeException(sprintf('Club module is missing %s.', $clubModuleFile));
+}
+if (!str_contains($packageManifest, 'id="mod_joomleague_club"')) throw new RuntimeException('Package manifest does not install the club module.');
+$clubHelper = (string) file_get_contents($clubModule . '/src/Helper/ClubHelper.php');
+$clubModel = (string) file_get_contents($site . '/src/Model/ClubModel.php');
+foreach (['ClubSummaryReader', 'ProgrammeScopeResolver', 'ProgrammeReader'] as $clubContract) if (!str_contains($clubHelper, $clubContract)) throw new RuntimeException(sprintf('Club module is missing contract %s.', $clubContract));
+if (!str_contains($clubModel, 'ClubSummaryReader')) throw new RuntimeException('Club detail must share ClubSummaryReader with the club module.');
+
+foreach (['/mod_joomleague_personnel.xml','/services/provider.php','/src/Dispatcher/Dispatcher.php','/src/Helper/PersonnelHelper.php','/tmpl/default.php'] as $personnelModuleFile) if (!is_file($personnelModule.$personnelModuleFile)) throw new RuntimeException(sprintf('Personnel module is missing %s.',$personnelModuleFile));
+if (!str_contains($packageManifest,'id="mod_joomleague_personnel"')) throw new RuntimeException('Package manifest does not install the personnel module.');
+$personnelHelper=(string)file_get_contents($personnelModule.'/src/Helper/PersonnelHelper.php');$personnelModel=(string)file_get_contents($site.'/src/Model/PersonnelModel.php');
+if (!str_contains($personnelHelper,'PersonnelReader')||!str_contains($personnelModel,'PersonnelReader')) throw new RuntimeException('Personnel module and detail must share PersonnelReader.');
+
+foreach (['/mod_joomleague_venue_program.xml','/services/provider.php','/src/Dispatcher/Dispatcher.php','/src/Helper/VenueProgramHelper.php','/tmpl/default.php'] as $venueProgramFile) if (!is_file($venueProgramModule.$venueProgramFile)) throw new RuntimeException(sprintf('Venue programme module is missing %s.',$venueProgramFile));
+if (!str_contains($packageManifest,'id="mod_joomleague_venue_program"')) throw new RuntimeException('Package manifest does not install the venue programme module.');
+$venueProgramHelper=(string)file_get_contents($venueProgramModule.'/src/Helper/VenueProgramHelper.php');$venueModel=(string)file_get_contents($site.'/src/Model/VenueModel.php');
+foreach (['ProgrammeReader','VenueSummaryReader','forVenue'] as $venueContract) if (!str_contains($venueProgramHelper,$venueContract)) throw new RuntimeException(sprintf('Venue programme module is missing contract %s.',$venueContract));
+if (!str_contains($venueModel,'VenueSummaryReader')) throw new RuntimeException('Venue detail must share VenueSummaryReader with the venue programme module.');
+
+foreach (['/mod_joomleague_competitions.xml','/services/provider.php','/src/Dispatcher/Dispatcher.php','/src/Helper/CompetitionsHelper.php','/tmpl/default.php'] as $competitionsFile) if (!is_file($competitionsModule.$competitionsFile)) throw new RuntimeException(sprintf('Competitions module is missing %s.',$competitionsFile));
+if (!str_contains($packageManifest,'id="mod_joomleague_competitions"')) throw new RuntimeException('Package manifest does not install the competitions module.');
+$competitionsHelper=(string)file_get_contents($competitionsModule.'/src/Helper/CompetitionsHelper.php');$projectsModel=(string)file_get_contents($site.'/src/Model/ProjectsModel.php');
+if (!str_contains($competitionsHelper,'ProjectCatalogueReader')||!str_contains($projectsModel,'ProjectCatalogueReader')) throw new RuntimeException('Competitions module and catalogue must share ProjectCatalogueReader.');
+
+$nextEventHelper = (string) file_get_contents($nextEventModule . '/src/Helper/NextEventHelper.php');
+foreach (['ProgrammeReader', 'ProgrammeScopeResolver', "!\$item['played']", "'entry'", "'club'"] as $nextEventContract) {
+	if (!str_contains($nextEventHelper, $nextEventContract)) {
+		throw new RuntimeException(sprintf('Next programme event module is missing contract %s.', $nextEventContract));
+	}
 }
 
 $programmeReader = (string) file_get_contents($admin . '/src/Service/ProgrammeReader.php');

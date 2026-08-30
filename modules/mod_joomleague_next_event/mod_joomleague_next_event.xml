@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="module" client="site" method="upgrade">
+	<name>mod_joomleague_next_event</name>
+	<author>Ondřej Klučka (https://joomleague.eu)</author>
+	<creationDate>2026-08</creationDate>
+	<copyright>(C) 2026 Ondřej Klučka.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>6.2.0-dev6</version>
+	<description>MOD_JOOMLEAGUE_NEXT_EVENT_XML_DESCRIPTION</description>
+	<namespace path="src">Joomleague\Module\NextEvent</namespace>
+	<files>
+		<folder module="mod_joomleague_next_event">services</folder>
+		<folder>src</folder>
+		<folder>tmpl</folder>
+	</files>
+	<languages>
+		<language tag="en-GB">language/en-GB/mod_joomleague_next_event.ini</language>
+		<language tag="en-GB">language/en-GB/mod_joomleague_next_event.sys.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_next_event.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_next_event.sys.ini</language>
+	</languages>
+	<config>
+		<fields name="params">
+			<fieldset name="basic">
+				<field name="project_id" type="sql" required="true" label="MOD_JOOMLEAGUE_NEXT_EVENT_PROJECT_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_PROJECT_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text" />
+				<field name="scope" type="list" default="project" label="MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_DESC">
+					<option value="project">MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_PROJECT</option>
+					<option value="entry">MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_ENTRY</option>
+					<option value="club">MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_CLUB</option>
+				</field>
+				<field name="entry_id" type="sql" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_ENTRY_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_ENTRY_DESC" showon="scope:entry" query="SELECT entry.id AS value, CONCAT(project.name, ' — ', COALESCE(NULLIF(entry.display_name, ''), team.name, CONCAT(person.first_name, ' ', person.last_name), CONCAT('ID ', entry.id))) AS text FROM #__joomleague_project_entry AS entry INNER JOIN #__joomleague_project AS project ON project.id = entry.project_id LEFT JOIN #__joomleague_team AS team ON team.id = entry.team_id LEFT JOIN #__joomleague_person AS person ON person.id = entry.person_id WHERE entry.published = 1 ORDER BY project.name, text" key_field="value" value_field="text"><option value="0">MOD_JOOMLEAGUE_NEXT_EVENT_SELECT_ENTRY</option></field>
+				<field name="club_id" type="sql" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_CLUB_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_CLUB_DESC" showon="scope:club" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text"><option value="0">MOD_JOOMLEAGUE_NEXT_EVENT_SELECT_CLUB</option></field>
+				<field name="show_project_name" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_PROJECT_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_PROJECT_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="show_round" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_ROUND_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_ROUND_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="show_venue" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_VENUE_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_VENUE_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="show_calendar" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_CALENDAR_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_CALENDAR_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			</fieldset>
+			<fieldset name="advanced">
+				<field name="layout" type="modulelayout" label="JFIELD_ALT_LAYOUT_LABEL" class="form-select" validate="moduleLayout" />
+				<field name="moduleclass_sfx" type="textarea" label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL" rows="3" validate="CssIdentifier" />
+				<field name="cache" type="list" default="1" label="COM_MODULES_FIELD_CACHING_LABEL"><option value="1">JGLOBAL_USE_GLOBAL</option><option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option></field>
+				<field name="cache_time" type="number" default="900" label="COM_MODULES_FIELD_CACHE_TIME_LABEL" />
+				<field name="cachemode" type="hidden" default="id" />
+			</fieldset>
+		</fields>
+	</config>
+</extension>

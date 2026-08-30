@@ -15,6 +15,13 @@ FINDER_PLUGIN_PACKAGE="${DIST_DIR}/plg_finder_joomleague-${VERSION}.zip"
 CONTENT_PLUGIN_PACKAGE="${DIST_DIR}/plg_content_joomleague-${VERSION}.zip"
 STANDINGS_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_standings-${VERSION}.zip"
 PROGRAM_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_program-${VERSION}.zip"
+NEXT_EVENT_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_next_event-${VERSION}.zip"
+NAVIGATION_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_navigation-${VERSION}.zip"
+PARTICIPANT_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_participant-${VERSION}.zip"
+CLUB_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_club-${VERSION}.zip"
+PERSONNEL_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_personnel-${VERSION}.zip"
+VENUE_PROGRAM_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_venue_program-${VERSION}.zip"
+COMPETITIONS_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_competitions-${VERSION}.zip"
 STATRANKING_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_statranking-${VERSION}.zip"
 EVENTRANKING_MODULE_PACKAGE="${DIST_DIR}/mod_joomleague_eventranking-${VERSION}.zip"
 SUITE_PACKAGE="${DIST_DIR}/pkg_joomleague-${VERSION}.zip"
@@ -38,7 +45,7 @@ find "${DIST_DIR}" -maxdepth 1 -type f -name "$(basename "${PACKAGE}")" -delete
 
 printf '%s\n' "${PACKAGE}"
 
-	find "${DIST_DIR}" -maxdepth 1 -type f \( -name "$(basename "${PLUGIN_PACKAGE}")" -o -name "$(basename "${CONSOLE_PLUGIN_PACKAGE}")" -o -name "$(basename "${TASK_PLUGIN_PACKAGE}")" -o -name "$(basename "${FINDER_PLUGIN_PACKAGE}")" -o -name "$(basename "${CONTENT_PLUGIN_PACKAGE}")" -o -name "$(basename "${STANDINGS_MODULE_PACKAGE}")" -o -name "$(basename "${PROGRAM_MODULE_PACKAGE}")" -o -name "$(basename "${STATRANKING_MODULE_PACKAGE}")" -o -name "$(basename "${EVENTRANKING_MODULE_PACKAGE}")" -o -name "$(basename "${SUITE_PACKAGE}")" \) -delete
+	find "${DIST_DIR}" -maxdepth 1 -type f \( -name "$(basename "${PLUGIN_PACKAGE}")" -o -name "$(basename "${CONSOLE_PLUGIN_PACKAGE}")" -o -name "$(basename "${TASK_PLUGIN_PACKAGE}")" -o -name "$(basename "${FINDER_PLUGIN_PACKAGE}")" -o -name "$(basename "${CONTENT_PLUGIN_PACKAGE}")" -o -name "$(basename "${STANDINGS_MODULE_PACKAGE}")" -o -name "$(basename "${PROGRAM_MODULE_PACKAGE}")" -o -name "$(basename "${NEXT_EVENT_MODULE_PACKAGE}")" -o -name "$(basename "${NAVIGATION_MODULE_PACKAGE}")" -o -name "$(basename "${PARTICIPANT_MODULE_PACKAGE}")" -o -name "$(basename "${CLUB_MODULE_PACKAGE}")" -o -name "$(basename "${PERSONNEL_MODULE_PACKAGE}")" -o -name "$(basename "${VENUE_PROGRAM_MODULE_PACKAGE}")" -o -name "$(basename "${COMPETITIONS_MODULE_PACKAGE}")" -o -name "$(basename "${STATRANKING_MODULE_PACKAGE}")" -o -name "$(basename "${EVENTRANKING_MODULE_PACKAGE}")" -o -name "$(basename "${SUITE_PACKAGE}")" \) -delete
 (
 	cd "${ROOT}/plugins/quickicon/joomleague"
 	zip -qr "${PLUGIN_PACKAGE}" .
@@ -75,6 +82,41 @@ printf '%s\n' "${PACKAGE}"
 )
 
 (
+	cd "${ROOT}/modules/mod_joomleague_next_event"
+	zip -qr "${NEXT_EVENT_MODULE_PACKAGE}" .
+)
+
+(
+	cd "${ROOT}/modules/mod_joomleague_navigation"
+	zip -qr "${NAVIGATION_MODULE_PACKAGE}" .
+)
+
+(
+	cd "${ROOT}/modules/mod_joomleague_participant"
+	zip -qr "${PARTICIPANT_MODULE_PACKAGE}" .
+)
+
+(
+	cd "${ROOT}/modules/mod_joomleague_club"
+	zip -qr "${CLUB_MODULE_PACKAGE}" .
+)
+
+(
+	cd "${ROOT}/modules/mod_joomleague_personnel"
+	zip -qr "${PERSONNEL_MODULE_PACKAGE}" .
+)
+
+(
+	cd "${ROOT}/modules/mod_joomleague_venue_program"
+	zip -qr "${VENUE_PROGRAM_MODULE_PACKAGE}" .
+)
+
+(
+	cd "${ROOT}/modules/mod_joomleague_competitions"
+	zip -qr "${COMPETITIONS_MODULE_PACKAGE}" .
+)
+
+(
 	cd "${ROOT}/modules/mod_joomleague_statranking"
 	zip -qr "${STATRANKING_MODULE_PACKAGE}" .
 )
@@ -88,10 +130,10 @@ trap 'find "${PACKAGE_STAGE}" -mindepth 1 -delete; rmdir "${PACKAGE_STAGE}"' EXI
 cp "${ROOT}/build/pkg_joomleague.xml" "${PACKAGE_STAGE}/pkg_joomleague.xml"
 cp "${ROOT}/build/pkg_script.php" "${PACKAGE_STAGE}/pkg_script.php"
 cp -R "${ROOT}/build/language" "${PACKAGE_STAGE}/language"
-cp "${PACKAGE}" "${PLUGIN_PACKAGE}" "${CONSOLE_PLUGIN_PACKAGE}" "${TASK_PLUGIN_PACKAGE}" "${FINDER_PLUGIN_PACKAGE}" "${CONTENT_PLUGIN_PACKAGE}" "${STANDINGS_MODULE_PACKAGE}" "${PROGRAM_MODULE_PACKAGE}" "${STATRANKING_MODULE_PACKAGE}" "${EVENTRANKING_MODULE_PACKAGE}" "${PACKAGE_STAGE}/"
+cp "${PACKAGE}" "${PLUGIN_PACKAGE}" "${CONSOLE_PLUGIN_PACKAGE}" "${TASK_PLUGIN_PACKAGE}" "${FINDER_PLUGIN_PACKAGE}" "${CONTENT_PLUGIN_PACKAGE}" "${STANDINGS_MODULE_PACKAGE}" "${PROGRAM_MODULE_PACKAGE}" "${NEXT_EVENT_MODULE_PACKAGE}" "${NAVIGATION_MODULE_PACKAGE}" "${PARTICIPANT_MODULE_PACKAGE}" "${CLUB_MODULE_PACKAGE}" "${PERSONNEL_MODULE_PACKAGE}" "${VENUE_PROGRAM_MODULE_PACKAGE}" "${COMPETITIONS_MODULE_PACKAGE}" "${STATRANKING_MODULE_PACKAGE}" "${EVENTRANKING_MODULE_PACKAGE}" "${PACKAGE_STAGE}/"
 (
 	cd "${PACKAGE_STAGE}"
 	zip -qr "${SUITE_PACKAGE}" .
 )
 
-printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' "${PLUGIN_PACKAGE}" "${CONSOLE_PLUGIN_PACKAGE}" "${TASK_PLUGIN_PACKAGE}" "${FINDER_PLUGIN_PACKAGE}" "${CONTENT_PLUGIN_PACKAGE}" "${STANDINGS_MODULE_PACKAGE}" "${PROGRAM_MODULE_PACKAGE}" "${STATRANKING_MODULE_PACKAGE}" "${EVENTRANKING_MODULE_PACKAGE}" "${SUITE_PACKAGE}"
+printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' "${PLUGIN_PACKAGE}" "${CONSOLE_PLUGIN_PACKAGE}" "${TASK_PLUGIN_PACKAGE}" "${FINDER_PLUGIN_PACKAGE}" "${CONTENT_PLUGIN_PACKAGE}" "${STANDINGS_MODULE_PACKAGE}" "${PROGRAM_MODULE_PACKAGE}" "${NEXT_EVENT_MODULE_PACKAGE}" "${NAVIGATION_MODULE_PACKAGE}" "${PARTICIPANT_MODULE_PACKAGE}" "${CLUB_MODULE_PACKAGE}" "${PERSONNEL_MODULE_PACKAGE}" "${VENUE_PROGRAM_MODULE_PACKAGE}" "${COMPETITIONS_MODULE_PACKAGE}" "${STATRANKING_MODULE_PACKAGE}" "${EVENTRANKING_MODULE_PACKAGE}" "${SUITE_PACKAGE}"

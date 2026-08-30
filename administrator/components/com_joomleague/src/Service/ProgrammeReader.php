@@ -19,7 +19,7 @@ final class ProgrammeReader
 	 * @param list<int> $viewLevels Joomla access levels authorised for the current visitor.
 	 * @return list<array<string,mixed>>
 	 */
-	public function forProject(int $projectId, ?array $entryIds, array $viewLevels): array
+	public function forProject(int $projectId, ?array $entryIds, array $viewLevels, ?int $venueId = null): array
 	{
 		if ($projectId < 1) {
 			throw new \InvalidArgumentException('Programme project is invalid.');
@@ -38,7 +38,7 @@ final class ProgrammeReader
 		$query = $db->getQuery(true)
 			->select([
 				'match.id', 'match.project_id', 'match.scheduled_start', 'match.timezone', 'match.duration_minutes', 'match.status_code',
-				'match.contest_type', 'project.name AS project_name', 'round.name AS round_name', 'venue.name AS venue_name',
+				'match.contest_type', 'project.name AS project_name', 'round.name AS round_name', 'venue.id AS venue_id', 'venue.name AS venue_name',
 				'result.status_code AS result_status',
 			])
 			->from($db->quoteName('#__joomleague_project_match', 'match'))
@@ -51,10 +51,14 @@ final class ProgrammeReader
 			->bind(':projectId', $projectId, ParameterType::INTEGER)
 			->order('match.scheduled_start ASC, match.id ASC');
 
+		if ($venueId !== null) {
+			$query->where('match.venue_id = :venueId')->bind(':venueId', $venueId, ParameterType::INTEGER);
+		}
+
 		if ($entryIds !== null) {
 			$query->innerJoin($db->quoteName('#__joomleague_match_participant', 'scope_participant') . ' ON scope_participant.match_id = match.id AND scope_participant.published = 1')
 				->whereIn('scope_participant.project_entry_id', $entryIds, ParameterType::INTEGER)
-				->group('match.id, match.project_id, match.scheduled_start, match.timezone, match.duration_minutes, match.status_code, match.contest_type, project.name, round.name, venue.name, result.status_code');
+				->group('match.id, match.project_id, match.scheduled_start, match.timezone, match.duration_minutes, match.status_code, match.contest_type, project.name, round.name, venue.id, venue.name, result.status_code');
 		}
 
 		$items = $db->setQuery($query)->loadObjectList();
@@ -117,8 +121,26 @@ final class ProgrammeReader
 			'project_name' => (string) $item->project_name,
 			'round_name' => (string) $item->round_name,
 			'venue_name' => $item->venue_name,
+			'venue_id' => $item->venue_id === null ? null : (int) $item->venue_id,
 			'played' => $item->result_status === 'final',
 			'participants' => $participantsByEvent[(int) $item->id] ?? [],
 		], $items);
+	}
+
+	/** @param list<int> $viewLevels @return list<array<string,mixed>> */
+	public function forVenue(int $venueId, array $viewLevels): array
+	{
+		if ($venueId < 1) return [];
+		$levels = array_values(array_unique(array_filter(array_map('intval', $viewLevels), static fn (int $id): bool => $id > 0)));
+		$levels = $levels === [] ? [1] : $levels;
+		$query = $this->database->getQuery(true)->select('DISTINCT match.project_id')->from($this->database->quoteName('#__joomleague_project_match', 'match'))
+			->innerJoin($this->database->quoteName('#__joomleague_project', 'project') . ' ON project.id = match.project_id AND project.published = 1 AND project.access IN (' . implode(',', $levels) . ')')
+			->where('match.venue_id = :venueId')->where('match.published = 1')->bind(':venueId', $venueId, ParameterType::INTEGER)->order('match.project_id ASC');
+		$items = [];
+		foreach (array_map('intval', $this->database->setQuery($query)->loadColumn()) as $projectId) {
+			array_push($items, ...$this->forProject($projectId, null, $levels, $venueId));
+		}
+		usort($items, static fn (array $a, array $b): int => strcmp((string) $a['scheduled_start'], (string) $b['scheduled_start']) ?: $a['id'] <=> $b['id']);
+		return $items;
 	}
 }
