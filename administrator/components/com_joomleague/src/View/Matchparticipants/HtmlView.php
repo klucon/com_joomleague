@@ -48,7 +48,7 @@ final class HtmlView extends BaseHtmlView
 		$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectId($matchId);
 		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
 		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_MATCHPARTICIPANTS_TITLE'), 'users');
-		if (!$this->locked && Factory::getApplication()->getIdentity()->authorise('core.edit', $asset)) {
+		if (!$this->locked && Factory::getApplication()->getIdentity()->authorise('joomleague.project.edit.schedule', $asset)) {
 			ToolbarHelper::custom('matchparticipants.add', 'plus', 'plus', 'COM_JOOMLEAGUE_MATCHPARTICIPANTS_ADD', false);
 			ToolbarHelper::custom('matchparticipants.remove', 'minus', 'minus', 'COM_JOOMLEAGUE_MATCHPARTICIPANTS_REMOVE', false);
 		}

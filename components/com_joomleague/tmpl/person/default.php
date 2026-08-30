@@ -23,6 +23,26 @@ $personTypeLabels = [
 	'official' => 'COM_JOOMLEAGUE_PARTICIPANT_MEMBER_OFFICIAL',
 	'participant' => 'COM_JOOMLEAGUE_PARTICIPANT_MEMBER_PARTICIPANT',
 ];
+$formatMembership = static function (object $membership) use ($personTypeLabels): string {
+	$role = trim((string) ($membership->role_name_key ?? '')) !== ''
+		? Text::_((string) $membership->role_name_key)
+		: (trim((string) ($membership->role_name ?? '')) !== '' ? (string) $membership->role_name : (string) ($membership->role_code ?? ''));
+	$parts = [Text::_($personTypeLabels[(string) $membership->member_person_type] ?? 'COM_JOOMLEAGUE_PARTICIPANT_MEMBER_PARTICIPANT')];
+
+	if ($role !== '') {
+		$parts[] = $role;
+	}
+
+	if ($membership->valid_from || $membership->valid_until) {
+		$parts[] = Text::sprintf(
+			'COM_JOOMLEAGUE_PERSON_MEMBERSHIP_PERIOD',
+			$membership->valid_from ?: Text::_('COM_JOOMLEAGUE_PERSON_PERIOD_OPEN'),
+			$membership->valid_until ?: Text::_('COM_JOOMLEAGUE_PERSON_PERIOD_OPEN')
+		);
+	}
+
+	return implode(' · ', array_map(static fn (string $part): string => htmlspecialchars($part, ENT_QUOTES, 'UTF-8'), $parts));
+};
 ?>
 <div class="com-joomleague-person">
 	<?php if (isset($data['error'])) : ?>
@@ -51,8 +71,21 @@ $personTypeLabels = [
 			<div class="list-group">
 				<?php foreach ($data['memberships'] as $membership) : ?>
 					<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center gap-3" href="<?php echo Route::_('index.php?option=com_joomleague&view=participant&project_id=' . (int) $membership->project_id . '&entry_id=' . (int) $membership->entry_id); ?>">
-						<span><strong><?php echo htmlspecialchars((string) $membership->entry_name, ENT_QUOTES, 'UTF-8'); ?></strong><br><small class="text-body-secondary"><?php echo htmlspecialchars((string) $membership->project_name, ENT_QUOTES, 'UTF-8'); ?> <span aria-hidden="true">&middot;</span> <?php echo htmlspecialchars((string) $membership->sport_type_name, ENT_QUOTES, 'UTF-8'); ?> <span aria-hidden="true">&middot;</span> <?php echo Text::_($personTypeLabels[(string) $membership->member_person_type] ?? 'COM_JOOMLEAGUE_PARTICIPANT_MEMBER_PARTICIPANT'); ?></small></span>
+						<span><strong><?php echo htmlspecialchars((string) $membership->entry_name, ENT_QUOTES, 'UTF-8'); ?></strong><br><small class="text-body-secondary"><?php echo htmlspecialchars((string) $membership->project_name, ENT_QUOTES, 'UTF-8'); ?> <span aria-hidden="true">&middot;</span> <?php echo htmlspecialchars((string) $membership->sport_type_name, ENT_QUOTES, 'UTF-8'); ?><br><?php echo $formatMembership($membership); ?></small></span>
 						<span class="d-flex gap-2 align-items-center"><?php if ($membership->shirt_number) : ?><span class="badge text-bg-light border"><?php echo Text::sprintf('COM_JOOMLEAGUE_PARTICIPANT_MEMBER_NUMBER', htmlspecialchars((string) $membership->shirt_number, ENT_QUOTES, 'UTF-8')); ?></span><?php endif; ?><?php if ((int) $membership->is_captain === 1) : ?><span class="badge text-bg-primary"><?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANT_MEMBER_CAPTAIN'); ?></span><?php endif; ?><span class="icon-chevron-right" aria-hidden="true"></span></span>
+					</a>
+				<?php endforeach; ?>
+			</div>
+		<?php endif; ?>
+
+		<?php if ($data['membership_history'] !== []) : ?>
+			<h2 class="h4 mt-4"><?php echo Text::_('COM_JOOMLEAGUE_PERSON_MEMBERSHIP_HISTORY'); ?></h2>
+			<div class="list-group">
+				<?php foreach ($data['membership_history'] as $membership) : ?>
+					<a class="list-group-item list-group-item-action" href="<?php echo Route::_('index.php?option=com_joomleague&view=participant&project_id=' . (int) $membership->project_id . '&entry_id=' . (int) $membership->entry_id); ?>">
+						<strong><?php echo htmlspecialchars((string) $membership->entry_name, ENT_QUOTES, 'UTF-8'); ?></strong>
+						<span class="badge text-bg-secondary ms-2"><?php echo Text::_('COM_JOOMLEAGUE_LIFECYCLE_' . strtoupper((string) $membership->lifecycle_state)); ?></span><br>
+						<small class="text-body-secondary"><?php echo htmlspecialchars((string) $membership->project_name, ENT_QUOTES, 'UTF-8'); ?> <span aria-hidden="true">&middot;</span> <?php echo $formatMembership($membership); ?></small>
 					</a>
 				<?php endforeach; ?>
 			</div>

@@ -28,7 +28,7 @@ final class HtmlView extends BaseHtmlView
 		$this->stageId = $input->getInt('stage_id') ?: null;
 		try { $context = $this->getModel()->getContext($projectId, $this->stageId); $this->project = $context['project']; $this->stage = $context['stage']; $this->availableScopes = $context['available_scopes']; $this->scope = (string) $context['default_scope']; $this->metrics = $context['contract']['metrics']; $this->standingsByScope = $this->getModel()->getAllCurrent($projectId, $this->stageId, $context); }
 		catch (\Throwable $error) { throw new GenericDataException($error->getMessage(), 500); }
-		$this->canEdit = Factory::getApplication()->getIdentity()->authorise('core.edit', 'com_joomleague.project.' . $projectId);
+		$this->canEdit = Factory::getApplication()->getIdentity()->authorise('joomleague.project.edit.results', 'com_joomleague.project.' . $projectId);
 		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_STANDINGS_TITLE'), 'ranking-star');
 		if ($this->canEdit) { $url = 'index.php?option=com_joomleague&view=standingadjustments&project_id=' . $projectId; if ($this->stageId !== null) $url .= '&stage_id=' . $this->stageId; ToolbarHelper::link($url, 'COM_JOOMLEAGUE_STANDING_ADJUSTMENTS_MANAGE', 'plus-circle'); }
 		$closeUrl = $this->stageId === null ? 'index.php?option=com_joomleague&view=projectpanel&project_id=' . $projectId : 'index.php?option=com_joomleague&view=stages&project_id=' . $projectId;

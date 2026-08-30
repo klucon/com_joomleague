@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_PROGRAMITEM_VIEW_DEFAULT_TITLE"><message><![CDATA[COM_JOOMLEAGUE_PROGRAMITEM_VIEW_DEFAULT_DESC]]></message></layout>
+	<fields name="request"><fieldset name="request"><field name="match_id" type="sql" required="true" label="COM_JOOMLEAGUE_PROGRAMITEM_REQUEST_ITEM_LABEL" description="COM_JOOMLEAGUE_PROGRAMITEM_REQUEST_ITEM_DESC" query="SELECT m.id AS value, CONCAT(p.name, ' - ', r.name, ' #', m.id) AS text FROM #__joomleague_project_match AS m INNER JOIN #__joomleague_project AS p ON p.id = m.project_id INNER JOIN #__joomleague_project_round AS r ON r.id = m.round_id WHERE m.published = 1 AND p.published = 1 ORDER BY m.scheduled_start DESC, m.id DESC" key_field="value" value_field="text" /></fieldset></fields>
+</metadata>

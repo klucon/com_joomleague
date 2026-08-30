@@ -169,7 +169,7 @@ $translateCode = static function (string $prefix, string $code): string {
 					?>
 						<tr>
 							<td<?php echo $cellStyle !== '' ? ' style="' . $cellStyle . '"' : ''; ?>><?php echo (int) $row->rank_number; ?></td>
-							<th scope="row" style="<?php echo $entryStyle; ?>"><?php echo htmlspecialchars((string) $row->entry_name_snapshot, ENT_QUOTES, 'UTF-8'); ?></th>
+							<th scope="row" style="<?php echo $entryStyle; ?>"><a class="link-body-emphasis" href="<?php echo Route::_('index.php?option=com_joomleague&view=participant&project_id=' . (int) $standings['project']->id . '&entry_id=' . (int) $row->project_entry_id); ?>"><?php echo htmlspecialchars((string) $row->entry_name_snapshot, ENT_QUOTES, 'UTF-8'); ?></a></th>
 							<?php foreach ($columns as $i => $column) :
 								if ($column['type'] === 'combined') {
 									$forValue = $row->metrics[$column['for']] ?? null;

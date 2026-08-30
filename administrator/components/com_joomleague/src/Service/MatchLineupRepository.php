@@ -215,11 +215,20 @@ final class MatchLineupRepository
 		$clockUnit = $this->codeOrNull($clockUnit, 50);
 		$notes = $this->textOrNull($notes);
 		$changes = $this->getSubstitutions($matchId, $participantId);
-		$maximum = (int) ($context['profile']['lineup']['substitutions']['default_allowed'] ?? $context['profile']['lineup']['default_substitutes_allowed'] ?? 0);
-		if ($maximum > 0 && count($changes) >= $maximum) throw new \InvalidArgumentException('The profile substitution limit has been reached.');
+		$substitutionContract = $context['profile']['lineup']['substitutions'] ?? [];
+		$maximum = (int) ($substitutionContract['maximum_per_scope'] ?? $context['profile']['lineup']['default_substitutes_allowed'] ?? 0);
+		$limitScope = (string) ($substitutionContract['limit_scope'] ?? 'match');
+		if ($maximum > 0) {
+			$scopeCount = count($changes);
+			if ($limitScope === 'segment') {
+				if ($phaseCode === null || $phaseSequence === null) throw new \InvalidArgumentException('A substitution segment is required by the match profile.');
+				$scopeCount = count(array_filter($changes, static fn (object $change): bool => (string) $change->phase_code === $phaseCode && (int) $change->phase_sequence === $phaseSequence));
+			}
+			if ($scopeCount >= $maximum) throw new \InvalidArgumentException('The profile substitution limit has been reached.');
+		}
 		$sequence = count($changes) + 1;
 		$candidate = (object) ['outgoing_lineup_member_id' => $outgoingId, 'incoming_lineup_member_id' => $incomingId, 'sequence_number' => $sequence];
-		$this->validateSubstitutionSequence($members, [...$changes, $candidate]);
+		$this->validateSubstitutionSequence($members, [...$changes, $candidate], ($substitutionContract['reentry_supported'] ?? false) === true);
 		$record = (object) [
 			'uuid' => UuidFactory::v4(), 'match_id' => $matchId, 'match_participant_id' => $participantId,
 			'outgoing_lineup_member_id' => $outgoingId, 'incoming_lineup_member_id' => $incomingId,
@@ -238,7 +247,8 @@ final class MatchLineupRepository
 		$remaining = array_values(array_filter($changes, static fn (object $change): bool => (int) $change->id !== $changeId));
 		if (count($remaining) === count($changes)) throw new \InvalidArgumentException('The substitution does not belong to this match participant.');
 		foreach ($remaining as $index => $change) $change->sequence_number = $index + 1;
-		$this->validateSubstitutionSequence($members, $remaining);
+		[$context] = $this->participantContext($matchId, $participantId);
+		$this->validateSubstitutionSequence($members, $remaining, ($context['profile']['lineup']['substitutions']['reentry_supported'] ?? false) === true);
 		$boundId = $changeId; $boundMatchId = $matchId; $boundParticipantId = $participantId;
 		$query = $this->database->getQuery(true)->delete($this->database->quoteName('#__joomleague_match_lineup_change'))
 			->where('id = :id')->where('match_id = :matchId')->where('match_participant_id = :participantId')
@@ -298,9 +308,10 @@ final class MatchLineupRepository
 	}
 
 	/** @param array<int,object> $members @param list<object> $changes */
-	private function validateSubstitutionSequence(array $members, array $changes): void
+	private function validateSubstitutionSequence(array $members, array $changes, bool $reentrySupported = false): void
 	{
 		$active = [];
+		$removed = [];
 		foreach ($members as $id => $member) if ($member->lineup_status === 'starter') $active[$id] = true;
 		usort($changes, static fn (object $left, object $right): int => (int) $left->sequence_number <=> (int) $right->sequence_number);
 		foreach ($changes as $change) {
@@ -308,7 +319,9 @@ final class MatchLineupRepository
 			if (!isset($members[$outgoing], $members[$incoming]) || !isset($active[$outgoing]) || isset($active[$incoming])) {
 				throw new \InvalidArgumentException('The substitution sequence is inconsistent with the active lineup.');
 			}
+			if (!$reentrySupported && isset($removed[$incoming])) throw new \InvalidArgumentException('The match profile does not allow a player to re-enter.');
 			unset($active[$outgoing]); $active[$incoming] = true;
+			$removed[$outgoing] = true;
 		}
 	}
 

@@ -96,6 +96,27 @@ final class EntrymemberModel extends AdminModel implements CurrentUserInterface
 		return parent::save($data);
 	}
 
+	protected function canDelete($record): bool
+	{
+		return $this->canEditEntry((int) ($record->entry_id ?? 0), 'core.delete');
+	}
+
+	protected function canEditState($record): bool
+	{
+		return $this->canEditEntry((int) ($record->entry_id ?? 0), 'core.edit.state');
+	}
+
+	private function canEditEntry(int $entryId, string $action): bool
+	{
+		try {
+			$entry = (new ProjectEntryContextRepository($this->getDatabase()))->get($entryId);
+		} catch (\Throwable) {
+			return false;
+		}
+
+		return $this->getCurrentUser()->authorise($action, 'com_joomleague.project.' . (int) $entry->project_id);
+	}
+
 	protected function prepareTable($table): void
 	{
 		$now = Factory::getDate()->toSql();
@@ -122,7 +143,7 @@ final class EntrymemberModel extends AdminModel implements CurrentUserInterface
 		$entryId = (int) $this->getDatabase()->setQuery($query)->loadResult();
 
 		if ($entryId < 1) {
-			throw new \RuntimeException('The project participant member does not exist.');
+			throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_ENTRYMEMBER_INVALID'));
 		}
 
 		return $entryId;

@@ -57,7 +57,17 @@ $data = $this->club;
 						<?php if ($team->projects !== []) : ?>
 							<h4 class="h6 mt-3"><?php echo Text::_('COM_JOOMLEAGUE_CLUB_TEAM_PROJECTS'); ?></h4>
 							<div class="list-group list-group-flush">
-								<?php foreach ($team->projects as $project) : ?><a class="list-group-item list-group-item-action px-0" href="<?php echo Route::_('index.php?option=com_joomleague&view=participant&project_id=' . (int) $project->project_id . '&entry_id=' . (int) $project->id); ?>"><?php echo htmlspecialchars((string) $project->project_name, ENT_QUOTES, 'UTF-8'); ?><small class="d-block text-body-secondary"><?php echo htmlspecialchars((string) $project->sport_type_name, ENT_QUOTES, 'UTF-8'); ?></small></a><?php endforeach; ?>
+								<?php foreach ($team->projects as $project) : ?>
+									<div class="list-group-item px-0">
+										<strong><?php echo htmlspecialchars((string) $project->project_name, ENT_QUOTES, 'UTF-8'); ?></strong>
+										<small class="d-block text-body-secondary mb-2"><?php echo htmlspecialchars((string) $project->competition_name, ENT_QUOTES, 'UTF-8'); ?> <span aria-hidden="true">&middot;</span> <?php echo htmlspecialchars((string) $project->season_name, ENT_QUOTES, 'UTF-8'); ?> <span aria-hidden="true">&middot;</span> <?php echo htmlspecialchars((string) $project->sport_type_name, ENT_QUOTES, 'UTF-8'); ?></small>
+										<div class="d-flex flex-wrap gap-2">
+											<a class="btn btn-sm btn-outline-secondary" href="<?php echo Route::_('index.php?option=com_joomleague&view=participant&project_id=' . (int) $project->project_id . '&entry_id=' . (int) $project->id); ?>"><span class="icon-user" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_CLUB_PARTICIPANT_DETAIL'); ?></a>
+											<a class="btn btn-sm btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=teamplan&project_id=' . (int) $project->project_id . '&entry_id=' . (int) $project->id); ?>"><span class="icon-calendar" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_CLUB_TEAM_PROGRAMME'); ?></a>
+											<a class="btn btn-sm btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=clubplan&project_id=' . (int) $project->project_id . '&club_id=' . (int) $club->id); ?>"><span class="icon-calendar-2" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_CLUB_COMBINED_PROGRAMME'); ?></a>
+										</div>
+									</div>
+								<?php endforeach; ?>
 							</div>
 						<?php endif; ?>
 					</div></article></div>

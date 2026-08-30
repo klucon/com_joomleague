@@ -275,7 +275,7 @@
             "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_WINS",
             "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_WINS_ABBR",
             "statistic_type": "basic",
-            "scope": "player",
+            "scope": "participant",
             "source": "manual_or_import"
         },
         {
@@ -283,7 +283,7 @@
             "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_KO_TKO_WINS",
             "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_KO_TKO_WINS_ABBR",
             "statistic_type": "basic",
-            "scope": "player",
+            "scope": "participant",
             "source": "event",
             "event_codes": [
                 "ko_tko"
@@ -294,7 +294,7 @@
             "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_SUBMISSION_WINS",
             "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_SUBMISSION_WINS_ABBR",
             "statistic_type": "basic",
-            "scope": "player",
+            "scope": "participant",
             "source": "event",
             "event_codes": [
                 "submission"
@@ -305,7 +305,7 @@
             "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_DECISION_WINS",
             "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_DECISION_WINS_ABBR",
             "statistic_type": "basic",
-            "scope": "player",
+            "scope": "participant",
             "source": "event",
             "event_codes": [
                 "decision"
@@ -316,7 +316,7 @@
             "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_KNOCKDOWNS",
             "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_KNOCKDOWNS_ABBR",
             "statistic_type": "basic",
-            "scope": "player",
+            "scope": "participant",
             "source": "event",
             "event_codes": [
                 "knockdown"
@@ -327,7 +327,7 @@
             "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_POINT_DEDUCTIONS",
             "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_STAT_POINT_DEDUCTIONS_ABBR",
             "statistic_type": "basic",
-            "scope": "player",
+            "scope": "participant",
             "source": "event",
             "event_codes": [
                 "point_deduction"

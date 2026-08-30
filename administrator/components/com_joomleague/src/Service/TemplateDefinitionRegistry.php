@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Joomleague\Component\Joomleague\Domain\Service;
+namespace Joomleague\Component\Joomleague\Administrator\Service;
 
 defined('_JEXEC') or die;
 

@@ -75,6 +75,8 @@ final class ClubModel extends BaseDatabaseModel
 					->select([
 						'entry.id', 'entry.team_id', $db->quoteName('project.id', 'project_id'),
 						$db->quoteName('project.name', 'project_name'),
+						$db->quoteName('competition.name', 'competition_name'),
+						$db->quoteName('season.name', 'season_name'),
 						$db->quoteName('sport_type.name', 'sport_type_name'),
 					])
 					->from($db->quoteName('#__joomleague_project_entry', 'entry'))
@@ -88,7 +90,7 @@ final class ClubModel extends BaseDatabaseModel
 					->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'project'))
 					->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'competition'))
 					->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'season'))
-					->order('project.name ASC, entry.id ASC')
+					->order('season.name DESC, project.name ASC, entry.id ASC')
 			)->loadObjectList();
 
 			foreach ($entries as $entry) {

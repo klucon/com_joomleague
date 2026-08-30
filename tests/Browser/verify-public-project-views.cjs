@@ -12,7 +12,7 @@ const { chromium } = require('playwright');
 	const clubPath = process.env.JOOMLA_CLUB_MENU_PATH;
 	const teamPath = process.env.JOOMLA_TEAM_MENU_PATH;
 	const venuePath = process.env.JOOMLA_VENUE_MENU_PATH;
-	const eventReportPath = process.env.JOOMLA_EVENTREPORT_MENU_PATH;
+	const programItemPath = process.env.JOOMLA_PROGRAMITEM_MENU_PATH;
 	const resultsPath = process.env.JOOMLA_RESULTS_MENU_PATH;
 	const bracketPath = process.env.JOOMLA_BRACKET_MENU_PATH;
 	const expectedProject = process.env.JOOMLA_EXPECTED_PROJECT;
@@ -22,7 +22,7 @@ const { chromium } = require('playwright');
 	const expectedSecondTeam = process.env.JOOMLA_EXPECTED_SECOND_TEAM;
 	const expectedVenue = process.env.JOOMLA_EXPECTED_VENUE;
 
-	if (!baseUrl || !projectsPath || !clubsPath || !venuesPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !teamPath || !venuePath || !eventReportPath || !resultsPath || !bracketPath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam || !expectedVenue) {
+	if (!baseUrl || !projectsPath || !clubsPath || !venuesPath || !projectPath || !participantsPath || !participantPath || !personPath || !clubPath || !teamPath || !venuePath || !programItemPath || !resultsPath || !bracketPath || !expectedProject || !expectedParticipant || !expectedMember || !expectedClub || !expectedSecondTeam || !expectedVenue) {
 		throw new Error('Public project view browser test environment is incomplete.');
 	}
 
@@ -228,20 +228,21 @@ const { chromium } = require('playwright');
 				throw new Error(`Public venue profile failed at ${viewport.width}px: overflow=${venueOverflow}, errors=${errors.join('; ')}`);
 			}
 
-			await page.goto(new URL(eventReportPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
+			await page.goto(new URL(programItemPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });
 			await page.locator('main').waitFor();
-			const eventReportText = await page.locator('main').innerText();
-			const eventReportOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+			const programItemText = await page.locator('main').innerText();
+			const programItemOverflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
 
-			if (!eventReportText.includes(expectedProject)
-				|| !eventReportText.includes(expectedParticipant)
-				|| !eventReportText.includes(expectedSecondTeam)
-				|| !eventReportText.includes(expectedVenue)
-				|| !eventReportText.includes('DEMO-001')
-				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(eventReportText)
-				|| eventReportOverflow > 1
+			if (!programItemText.includes(expectedProject)
+				|| !programItemText.includes(expectedParticipant)
+				|| !programItemText.includes(expectedSecondTeam)
+				|| !programItemText.includes(expectedVenue)
+				|| !programItemText.includes('DEMO-001')
+				|| !/Položka programu|Programme item/.test(programItemText)
+				|| /COM_JOOMLEAGUE_[A-Z0-9_]+/.test(programItemText)
+				|| programItemOverflow > 1
 				|| errors.length > 0) {
-				throw new Error(`Public event report failed at ${viewport.width}px: overflow=${eventReportOverflow}, errors=${errors.join('; ')}`);
+				throw new Error(`Public programme item failed at ${viewport.width}px: overflow=${programItemOverflow}, errors=${errors.join('; ')}`);
 			}
 
 			await page.goto(new URL(resultsPath, baseUrl).toString(), { waitUntil: 'domcontentloaded' });

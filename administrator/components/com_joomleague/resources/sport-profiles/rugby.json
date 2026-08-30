@@ -66,8 +66,14 @@
         "default_start_time": "15:00",
         "default_match_duration_minutes": 100
     },
-    "lineup": {
-        "preferred_order": [
+	"lineup": {
+		"substitutions": {
+			"supported": true,
+			"reentry_supported": false,
+			"limit_scope": "match",
+			"maximum_per_scope": 8
+		},
+		"preferred_order": [
             "prop",
             "hooker",
             "lock",

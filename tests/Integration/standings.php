@@ -10,7 +10,7 @@ $_SERVER['SCRIPT_NAME'] = '/index.php';
 require_once JPATH_BASE . '/includes/defines.php';
 require_once JPATH_BASE . '/includes/framework.php';
 
-foreach (['UuidFactory.php', 'CanonicalJson.php', 'StageTransitionValidator.php', 'StageProgressionService.php', 'MatchResultValidationException.php', 'MatchResultDecimal.php', 'MatchResultAggregationValidator.php', 'MatchResultPayloadValidator.php', 'MatchResultRepository.php', 'StandingsContractValidator.php', 'StandingsDecimal.php', 'StandingsCalculator.php', 'StandingsReader.php', 'StandingsRecalculator.php', 'StandingsSnapshotSynchronizer.php'] as $service) {
+foreach (['UuidFactory.php', 'CanonicalJson.php', 'StageTransitionValidator.php', 'StageProgressionService.php', 'MatchResultValidationException.php', 'MatchResultDecimal.php', 'MatchResultAggregationValidator.php', 'MatchResultPayloadValidator.php', 'MatchResultRepository.php', 'StandingsContractValidator.php', 'StandingsDecimal.php', 'StandingsCalculator.php', 'StandingsReader.php', 'StandingsRecalculator.php', 'StandingsSnapshotSynchronizer.php', 'StandingProgressionReader.php'] as $service) {
 	require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/' . $service;
 }
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/StagetransitionTable.php';
@@ -39,6 +39,7 @@ use Joomleague\Component\Joomleague\Administrator\Table\StandingadjustmentTable;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsRecalculator;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsSnapshotSynchronizer;
+use Joomleague\Component\Joomleague\Domain\Service\StandingProgressionReader;
 use Joomleague\Component\Joomleague\Domain\Service\UuidFactory;
 use Joomleague\Component\Joomleague\Administrator\Table\StagetransitionTable;
 
@@ -302,6 +303,8 @@ try {
 	$temporaryRoundId = $insert('#__joomleague_project_round', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'stage_id' => $stageId, 'name' => 'Temporary round', 'code' => 'temporary_round', 'round_type' => 'regular', 'sequence_number' => 2, 'published' => 1]);
 	$createFinalMatch($stageId, $temporaryRoundId);
 	if ($entryPoints('total', $entries[0]) !== '6') throw new RuntimeException('Temporary round was not included before deletion.');
+	$roundProgression = (new StandingProgressionReader($database))->forProject($projectId, $stageId, 'total');
+	if (count($roundProgression['points']) !== 2 || $roundProgression['points'][0]['round_sequence'] !== 1 || $roundProgression['points'][1]['round_sequence'] !== 2 || !isset($roundProgression['points'][1]['ranks'][$entries[0]])) throw new RuntimeException('Round-by-round standings progression is invalid.');
 	$deleteIds = [$temporaryRoundId];
 	if (!$roundModel->delete($deleteIds)) throw new RuntimeException('Round could not be deleted.');
 	if ($entryPoints('total', $entries[0]) !== '3') throw new RuntimeException('Deleting a round did not refresh standings.');

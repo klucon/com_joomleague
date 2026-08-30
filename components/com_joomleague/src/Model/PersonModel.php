@@ -58,9 +58,11 @@ final class PersonModel extends BaseDatabaseModel
 		$memberships = $db->setQuery(
 			$db->getQuery(true)
 				->select([
-					'member.member_person_type', 'member.shirt_number', 'member.is_captain',
+					'member.member_person_type', 'member.role_code', 'member.shirt_number', 'member.is_captain',
+					'member.valid_from', 'member.valid_until', 'member.lifecycle_state',
 					$db->quoteName('entry.id', 'entry_id'), $db->quoteName('project.id', 'project_id'),
 					$db->quoteName('project.name', 'project_name'), $db->quoteName('sport_type.name', 'sport_type_name'),
+					$db->quoteName('position.name', 'role_name'), $db->quoteName('position.name_key', 'role_name_key'),
 					'COALESCE(NULLIF(' . $db->quoteName('entry.display_name') . ", ''), "
 						. $db->quoteName('team.name') . ', NULLIF(TRIM(CONCAT('
 						. $db->quoteName('entry_person.first_name') . ", ' ', " . $db->quoteName('entry_person.last_name')
@@ -72,6 +74,7 @@ final class PersonModel extends BaseDatabaseModel
 				->innerJoin($db->quoteName('#__joomleague_competition', 'competition') . ' ON competition.id = project.competition_id AND competition.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_season', 'season') . ' ON season.id = project.season_id AND season.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_sport_type', 'sport_type') . ' ON sport_type.id = project.sport_type_id AND sport_type.published = 1')
+				->leftJoin($db->quoteName('#__joomleague_sport_position', 'position') . ' ON position.sport_type_id = project.sport_type_id AND position.code = member.role_code AND position.published = 1')
 				->leftJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.published = 1')
 				->leftJoin($db->quoteName('#__joomleague_person', 'entry_person') . ' ON entry_person.id = entry.person_id AND entry_person.published = 1')
 				->where('member.person_id = :personId')
@@ -79,15 +82,26 @@ final class PersonModel extends BaseDatabaseModel
 				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'project'))
 				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'competition'))
 				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'season'))
-				->where('(member.valid_from IS NULL OR member.valid_from <= :todayFrom)')
-				->where('(member.valid_until IS NULL OR member.valid_until >= :todayUntil)')
 				->where("(entry.entry_kind = 'group' OR (entry.entry_kind = 'team' AND team.id IS NOT NULL) OR (entry.entry_kind = 'person' AND entry_person.id IS NOT NULL))")
 				->bind(':personId', $personId, ParameterType::INTEGER)
-				->bind(':todayFrom', $today)
-				->bind(':todayUntil', $today)
-				->order('project.name ASC, entry.ordering ASC, entry.id ASC')
+				->order('member.valid_from DESC, project.name ASC, entry.ordering ASC, entry.id ASC')
 		)->loadObjectList();
 
-		return ['person' => $person, 'memberships' => $memberships];
+		$currentMemberships = [];
+		$membershipHistory = [];
+
+		foreach ($memberships as $membership) {
+			$isCurrent = ($membership->valid_from === null || $membership->valid_from <= $today)
+				&& ($membership->valid_until === null || $membership->valid_until >= $today)
+				&& (string) $membership->lifecycle_state !== 'departed';
+
+			if ($isCurrent) {
+				$currentMemberships[] = $membership;
+			} else {
+				$membershipHistory[] = $membership;
+			}
+		}
+
+		return ['person' => $person, 'memberships' => $currentMemberships, 'membership_history' => $membershipHistory];
 	}
 }

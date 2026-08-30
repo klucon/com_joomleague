@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata><layout title="COM_JOOMLEAGUE_COMPARISON_MENU_TITLE"><message><![CDATA[COM_JOOMLEAGUE_COMPARISON_MENU_DESC]]></message></layout><fields name="request"><fieldset name="request"><field name="project_id" type="sql" required="true" label="COM_JOOMLEAGUE_FIELD_PROJECT_LABEL" query="SELECT id AS value,name AS text FROM #__joomleague_project WHERE published=1 ORDER BY name" key_field="value" value_field="text"/></fieldset></fields></metadata>

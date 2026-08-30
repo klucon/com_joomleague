@@ -25,8 +25,171 @@ $site = $root . '/components/com_joomleague';
 $quickIcon = $root . '/plugins/quickicon/joomleague';
 $consolePlugin = $root . '/plugins/console/joomleague';
 $taskPlugin = $root . '/plugins/task/joomleague';
+$programModule = $root . '/modules/mod_joomleague_program';
 $packageManifest = (string) file_get_contents($root . '/build/pkg_joomleague.xml');
 $packageInstaller = (string) file_get_contents($root . '/build/pkg_script.php');
+
+$localizedExtensionRoots = array_merge(
+	[$admin, $site, $root . '/build'],
+	glob($root . '/modules/*', GLOB_ONLYDIR) ?: [],
+	glob($root . '/plugins/*/*', GLOB_ONLYDIR) ?: [],
+);
+
+foreach ($localizedExtensionRoots as $extensionRoot) {
+	$languageRoot = $extensionRoot . '/language';
+	$sourceRoot = $languageRoot . '/en-GB';
+	$translationRoot = $languageRoot . '/cs-CZ';
+
+	if (!is_dir($sourceRoot)) {
+		continue;
+	}
+
+	if (!is_dir($translationRoot)) {
+		throw new RuntimeException(sprintf('Bundled extension %s is missing its cs-CZ language directory.', basename($extensionRoot)));
+	}
+
+	$sourceFiles = array_map('basename', glob($sourceRoot . '/*.ini') ?: []);
+	$translationFiles = array_map('basename', glob($translationRoot . '/*.ini') ?: []);
+	sort($sourceFiles);
+	sort($translationFiles);
+
+	if ($sourceFiles !== $translationFiles) {
+		throw new RuntimeException(sprintf('Bundled extension %s has different en-GB and cs-CZ language files.', basename($extensionRoot)));
+	}
+
+	foreach ($sourceFiles as $languageFilename) {
+		$keySets = [];
+
+		foreach (['en-GB' => $sourceRoot, 'cs-CZ' => $translationRoot] as $languageTag => $directory) {
+			$contents = (string) file_get_contents($directory . '/' . $languageFilename);
+			preg_match_all('/^([A-Z][A-Z0-9_]+)=/m', $contents, $matches);
+			$keySets[$languageTag] = $matches[1] ?? [];
+
+			if (count($keySets[$languageTag]) !== count(array_unique($keySets[$languageTag]))) {
+				throw new RuntimeException(sprintf('Language file %s/%s contains duplicate keys.', $languageTag, $languageFilename));
+			}
+		}
+
+		if ($keySets['en-GB'] !== $keySets['cs-CZ']) {
+			throw new RuntimeException(sprintf('The cs-CZ key order must match en-GB in %s/%s.', basename($extensionRoot), $languageFilename));
+		}
+	}
+}
+
+foreach ([
+	'/mod_joomleague_program.xml',
+	'/services/provider.php',
+	'/src/Dispatcher/Dispatcher.php',
+	'/src/Helper/ProgramHelper.php',
+	'/tmpl/default.php',
+] as $programModuleFile) {
+	if (!is_file($programModule . $programModuleFile)) {
+		throw new RuntimeException(sprintf('Programme module is missing %s.', $programModuleFile));
+	}
+}
+
+if (!str_contains($packageManifest, 'id="mod_joomleague_program"')) {
+	throw new RuntimeException('Package manifest does not install the programme module.');
+}
+
+$programmeReader = (string) file_get_contents($admin . '/src/Service/ProgrammeReader.php');
+foreach (["project.published = 1", "match.published = 1", "participant.published = 1", "result.status_code = 'final'"] as $programmeGuard) {
+	if (!str_contains($programmeReader, $programmeGuard)) {
+		throw new RuntimeException(sprintf('Programme reader is missing public-data guard %s.', $programmeGuard));
+	}
+}
+
+foreach (['/src/Controller/IcalController.php', '/src/Model/IcalModel.php'] as $icalFile) {
+	if (!is_file($site . $icalFile)) {
+		throw new RuntimeException(sprintf('Public iCalendar endpoint is missing %s.', $icalFile));
+	}
+}
+
+$icalController = (string) file_get_contents($site . '/src/Controller/IcalController.php');
+foreach (['text/calendar; charset=utf-8', 'Content-Disposition', 'X-Content-Type-Options'] as $icalHeader) {
+	if (!str_contains($icalController, $icalHeader)) {
+		throw new RuntimeException(sprintf('iCalendar endpoint is missing response header %s.', $icalHeader));
+	}
+}
+
+$siteDisplayController = (string) file_get_contents($site . '/src/Controller/DisplayController.php');
+foreach ([
+	"getType() === 'html'",
+	'Powered by JoomLeague',
+	'href="https://joomleague.eu"',
+	'target="_blank"',
+	'rel="noopener noreferrer"',
+] as $attributionRequirement) {
+	if (!str_contains($siteDisplayController, $attributionRequirement)) {
+		throw new RuntimeException(sprintf('Public attribution is missing %s.', $attributionRequirement));
+	}
+}
+
+$schedulePlanner = (string) file_get_contents($admin . '/src/Service/SchedulePlannerService.php');
+foreach (["->getLanguage()->load(", "JPATH_ADMINISTRATOR . '/components/com_joomleague'", '$this->roundName($sequence)'] as $roundNameGuard) {
+	if (!str_contains($schedulePlanner, $roundNameGuard)) {
+		throw new RuntimeException(sprintf('Schedule planner is missing translated round-name guard %s.', $roundNameGuard));
+	}
+}
+
+$projectAclContracts = [
+	'joomleague.project.edit.schedule' => [
+		'/src/Controller/StageController.php', '/src/Controller/RoundController.php',
+		'/src/Controller/MatchController.php', '/src/Controller/ProjectscheduleController.php',
+		'/src/Controller/MatchparticipantsController.php',
+		'/src/Model/StageModel.php', '/src/Model/RoundModel.php', '/src/Model/MatchModel.php',
+		'/src/View/Stage/HtmlView.php', '/src/View/Stages/HtmlView.php',
+		'/src/View/Round/HtmlView.php', '/src/View/Rounds/HtmlView.php',
+		'/src/View/Match/HtmlView.php', '/src/View/Matches/HtmlView.php',
+		'/src/View/Projectschedule/HtmlView.php', '/src/View/Matchparticipants/HtmlView.php',
+	],
+	'joomleague.project.edit.rules' => [
+		'/src/Controller/ProjectrulesController.php', '/src/Controller/ProjecttemplatesController.php',
+		'/src/View/Projectrules/HtmlView.php', '/src/View/Projecttemplates/HtmlView.php',
+	],
+	'joomleague.project.edit.results' => [
+		'/src/Controller/MatchresultController.php', '/src/Controller/StandingadjustmentController.php',
+		'/src/Controller/StandingsController.php',
+		'/src/Model/StandingadjustmentModel.php', '/src/View/Matchresult/HtmlView.php',
+		'/src/View/Standingadjustment/HtmlView.php', '/src/View/Standingadjustments/HtmlView.php',
+		'/src/View/Standings/HtmlView.php',
+	],
+	'joomleague.project.run.transitions' => [
+		'/src/Controller/StagetransitionController.php', '/src/Controller/StageprogressionController.php',
+		'/src/Model/StagetransitionModel.php', '/src/View/Stagetransition/HtmlView.php',
+		'/src/View/Stagetransitions/HtmlView.php',
+	],
+];
+
+foreach ($projectAclContracts as $action => $contractFiles) {
+	foreach ($contractFiles as $contractFile) {
+		$contents = (string) file_get_contents($admin . $contractFile);
+
+		if (!str_contains($contents, $action)) {
+			throw new RuntimeException(sprintf('Project ACL action %s is missing from %s.', $action, $contractFile));
+		}
+	}
+}
+
+foreach (['Stage', 'Round', 'Match'] as $scheduleEntity) {
+	$modelSource = (string) file_get_contents($admin . '/src/Model/' . $scheduleEntity . 'Model.php');
+
+	foreach (['protected function canDelete(', 'protected function canEditState('] as $modelGuard) {
+		if (!str_contains($modelSource, $modelGuard)) {
+			throw new RuntimeException(sprintf('%s model is missing project-scoped ACL guard %s.', $scheduleEntity, $modelGuard));
+		}
+	}
+}
+
+foreach (['Projectentry', 'Entrymember'] as $projectOwnedEntity) {
+	$modelSource = (string) file_get_contents($admin . '/src/Model/' . $projectOwnedEntity . 'Model.php');
+
+	foreach (['protected function canDelete(', 'protected function canEditState('] as $modelGuard) {
+		if (!str_contains($modelSource, $modelGuard)) {
+			throw new RuntimeException(sprintf('%s model is missing project-owned ACL guard %s.', $projectOwnedEntity, $modelGuard));
+		}
+	}
+}
 
 if ($packageInstaller === '') {
 	throw new RuntimeException('Package installer script cannot be read.');
@@ -88,7 +251,7 @@ foreach (['<folder>fields</folder>', '<folder>src</folder>', '<folder>tmpl</fold
 	}
 }
 
-foreach (['projects', 'project', 'participants', 'participant', 'person', 'clubs', 'club', 'team', 'venues', 'venue', 'eventreport'] as $siteView) {
+foreach (['projects', 'project', 'participants', 'participant', 'person', 'clubs', 'club', 'team', 'venues', 'venue', 'eventreport', 'clubplan', 'nextmatch'] as $siteView) {
 	foreach ([
 		'/src/Model/' . ucfirst($siteView) . 'Model.php',
 		'/src/View/' . ucfirst($siteView) . '/HtmlView.php',
@@ -105,7 +268,7 @@ foreach (['en-GB', 'cs-CZ'] as $siteLanguageTag) {
 	$siteLanguage = (string) file_get_contents($site . '/language/' . $siteLanguageTag . '/com_joomleague.ini');
 	$adminSystemLanguage = (string) file_get_contents($admin . '/language/' . $siteLanguageTag . '/com_joomleague.sys.ini');
 
-	foreach (['COM_JOOMLEAGUE_PROJECTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PROJECT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PERSON_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_CLUBS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_CLUB_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_TEAM_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_VENUES_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_VENUE_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_EVENTREPORT_VIEW_DEFAULT_TITLE'] as $menuViewKey) {
+	foreach (['COM_JOOMLEAGUE_PROJECTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PROJECT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANTS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PARTICIPANT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PERSON_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_CLUBS_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_CLUB_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_TEAM_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_VENUES_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_VENUE_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_PROGRAMITEM_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_EVENTREPORT_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_CLUBPLAN_VIEW_DEFAULT_TITLE', 'COM_JOOMLEAGUE_NEXTMATCH_VIEW_DEFAULT_TITLE'] as $menuViewKey) {
 		if (!str_contains($siteLanguage, $menuViewKey . '=') || !str_contains($adminSystemLanguage, $menuViewKey . '=')) {
 			throw new RuntimeException(sprintf('Public menu view key %s is incomplete for %s.', $menuViewKey, $siteLanguageTag));
 		}
@@ -129,15 +292,9 @@ if (!str_contains($eventReportModelSource, "if (\$item->result_status === 'final
 if (!str_contains($eventReportModelSource, "entry.entry_kind = 'team' AND team.id IS NOT NULL")) {
 	throw new RuntimeException('The public event report must not expose entries linked to unpublished entities.');
 }
-if (is_dir($site . '/tmpl/programitem') || is_file($site . '/src/Model/ProgramitemModel.php')) {
-	throw new RuntimeException('The obsolete programitem view must not coexist with canonical eventreport.');
-}
-
-foreach (glob($admin . '/resources/sport-profiles/*.json') ?: [] as $profileFile) {
-	$profileSource = (string) file_get_contents($profileFile);
-	if (str_contains($profileSource, '"matchreport"')) {
-		throw new RuntimeException(sprintf('Profile %s still contains the obsolete matchreport template key.', basename($profileFile)));
-	}
+$legacyProgramItemModel = (string) file_get_contents($site . '/src/Model/ProgramitemModel.php');
+if (!str_contains($legacyProgramItemModel, 'extends EventreportModel')) {
+	throw new RuntimeException('The legacy programme-item route must remain a thin event-report compatibility wrapper.');
 }
 
 foreach (['mysql', 'postgresql'] as $driver) {
@@ -149,15 +306,6 @@ foreach (['mysql', 'postgresql'] as $driver) {
 }
 
 $installerScript = (string) file_get_contents($admin . '/script.php');
-
-if (!str_contains($installerScript, 'private const DEVELOPMENT_PROFILE_SYNC = true;')) {
-	throw new RuntimeException('The unreleased development package must update bundled profiles in place.');
-}
-foreach (['src/Model/ProgramitemModel.php', 'src/View/Programitem/HtmlView.php', 'tmpl/programitem/default.php', 'tmpl/programitem/default.xml'] as $obsoleteProgramItemFile) {
-	if (!str_contains($installerScript, "'" . $obsoleteProgramItemFile . "'")) {
-		throw new RuntimeException(sprintf('Installer does not remove obsolete site file %s.', $obsoleteProgramItemFile));
-	}
-}
 
 foreach (['ProjectRuleValidator.php', 'EntryModelValidator.php', 'StandingsContractValidator.php', 'SportProfileSchemaValidator.php'] as $installerDependency) {
 	if (!str_contains($installerScript, $installerDependency)) {
@@ -437,6 +585,96 @@ if ($mysqlTables !== $postgresTables || $mysqlTables !== $expectedTables) {
 	throw new RuntimeException('MariaDB/MySQL and PostgreSQL must define the same canonical foundation tables.');
 }
 
+$extractSchemaColumns = static function (string $schema, string $driver): array {
+	$quote = $driver === 'mysql' ? '`' : '"';
+	$end = $driver === 'mysql' ? '\\) ENGINE=' : '\\);';
+	$types = 'BIGSERIAL|BIGINT|INTEGER|SMALLINT|NUMERIC|DECIMAL|VARCHAR|CHAR|TEXT|DATE|TIME|TIMESTAMP|JSON|BOOLEAN|TINYINT|INT|DATETIME|LONGTEXT';
+	$tables = [];
+	preg_match_all('/CREATE TABLE IF NOT EXISTS ' . preg_quote($quote, '/') . '#__([a-z0-9_]+)' . preg_quote($quote, '/') . '\\s*\\((.*?)' . $end . '/si', $schema, $matches, PREG_SET_ORDER);
+
+	foreach ($matches as $match) {
+		preg_match_all('/(?:^|,)\\s*' . preg_quote($quote, '/') . '([a-z][a-z0-9_]*)' . preg_quote($quote, '/') . '\\s+(?:' . $types . ')\\b/i', $match[2], $columns);
+		$tables[$match[1]] = $columns[1] ?? [];
+	}
+
+	return $tables;
+};
+$mysqlColumns = $extractSchemaColumns($mysqlInstall, 'mysql');
+$postgresColumns = $extractSchemaColumns($postgresInstall, 'postgresql');
+
+foreach ($expectedTables as $table) {
+	$mysqlTableColumns = $mysqlColumns[$table] ?? [];
+	$postgresTableColumns = $postgresColumns[$table] ?? [];
+	// MariaDB needs a generated marker to emulate PostgreSQL's partial unique root index.
+	if ($table === 'joomleague_match_score_segment') {
+		$mysqlTableColumns = array_values(array_diff($mysqlTableColumns, ['root_marker']));
+	}
+
+	if ($mysqlTableColumns !== $postgresTableColumns) {
+		throw new RuntimeException(sprintf('Database column parity failed for %s.', $table));
+	}
+}
+
+$extractSchemaIndexes = static function (string $schema, string $driver): array {
+	$indexes = [];
+	if ($driver === 'mysql') {
+		preg_match_all('/(?:UNIQUE\\s+KEY|KEY)\\s+`([^`]+)`\\s*\\(([^)]+)\\)/i', $schema, $matches, PREG_SET_ORDER);
+	} else {
+		preg_match_all('/CREATE\\s+(?:UNIQUE\\s+)?INDEX(?:\\s+IF\\s+NOT\\s+EXISTS)?\\s+"([^"]+)"\\s+ON\\s+"#__[^\"]+"\\s*\\(([^)]+)\\)/i', $schema, $matches, PREG_SET_ORDER);
+		preg_match_all('/CONSTRAINT\\s+"(uq_jl_[^"]+)"\\s+UNIQUE\\s*\\(([^)]+)\\)/i', $schema, $uniqueMatches, PREG_SET_ORDER);
+		$matches = array_merge($matches, $uniqueMatches);
+	}
+
+	foreach ($matches as $match) {
+		$indexes[$match[1]] = preg_replace('/[`"\\s]/', '', $match[2]);
+	}
+
+	ksort($indexes);
+	return $indexes;
+};
+$mysqlIndexes = $extractSchemaIndexes($mysqlInstall, 'mysql');
+$postgresIndexes = $extractSchemaIndexes($postgresInstall, 'postgresql');
+
+if (array_keys($mysqlIndexes) !== array_keys($postgresIndexes)) {
+	throw new RuntimeException('MariaDB/MySQL and PostgreSQL must define the same named index contracts.');
+}
+
+foreach ($mysqlIndexes as $indexName => $columns) {
+	$postgresIndexColumns = $postgresIndexes[$indexName];
+	if ($indexName === 'uq_jl_match_score_segment_root') {
+		$columns = str_replace(',root_marker', '', $columns);
+	}
+	if ($columns !== $postgresIndexColumns) {
+		throw new RuntimeException(sprintf('Database index parity failed for %s.', $indexName));
+	}
+}
+
+$extractForeignKeys = static function (string $schema): array {
+	$foreignKeys = [];
+	preg_match_all('/CONSTRAINT\\s+[`"](fk_jl_[^`"]+)[`"]\\s+FOREIGN KEY\\s*\\(([^)]+)\\)\\s+REFERENCES\\s+[`"]#__([^`"]+)[`"]\\s*\\(([^)]+)\\)\\s+ON DELETE\\s+(CASCADE|RESTRICT|SET NULL|NO ACTION)/i', $schema, $matches, PREG_SET_ORDER);
+
+	foreach ($matches as $match) {
+		$foreignKeys[$match[1]] = preg_replace('/[`"\\s]/', '', $match[2]) . '->' . $match[3] . '(' . preg_replace('/[`"\\s]/', '', $match[4]) . ')/' . strtoupper($match[5]);
+	}
+
+	ksort($foreignKeys);
+	return $foreignKeys;
+};
+
+if ($extractForeignKeys($mysqlInstall) !== $extractForeignKeys($postgresInstall)) {
+	throw new RuntimeException('MariaDB/MySQL and PostgreSQL foreign-key contracts differ.');
+}
+
+preg_match_all('/CONSTRAINT\\s+[`"](chk_jl_[^`"]+)[`"]\\s+CHECK/i', $mysqlInstall, $mysqlChecks);
+preg_match_all('/CONSTRAINT\\s+[`"](chk_jl_[^`"]+)[`"]\\s+CHECK/i', $postgresInstall, $postgresChecks);
+$mysqlChecks = $mysqlChecks[1] ?? [];
+$postgresChecks = array_values(array_diff($postgresChecks[1] ?? [], ['chk_jl_venue_capacity']));
+sort($mysqlChecks);
+sort($postgresChecks);
+if ($mysqlChecks !== $postgresChecks) {
+	throw new RuntimeException('MariaDB/MySQL and PostgreSQL named check contracts differ.');
+}
+
 $resetCommand = (string) file_get_contents($consolePlugin . '/src/Console/ResetDemoDataCommand.php');
 $resetTables = array_values(array_diff($expectedTables, ['joomleague_sport_profile', 'joomleague_sport_profile_version']));
 
@@ -526,6 +764,14 @@ foreach (['mysql' => $mysqlTables, 'postgresql' => $postgresTables] as $driver =
 	if (preg_match('/CREATE\s+(?:UNIQUE\s+)?INDEX\s+IF\s+NOT\s+EXISTS/i', $updateSql) === 1) {
 		throw new RuntimeException(sprintf('%s updates use CREATE INDEX IF NOT EXISTS, which Joomla Database Checker parses incorrectly.', $driver));
 	}
+}
+
+$mysqlUpdateNames = array_map('basename', glob($admin . '/sql/updates/mysql/*.sql') ?: []);
+$postgresUpdateNames = array_map('basename', glob($admin . '/sql/updates/postgresql/*.sql') ?: []);
+sort($mysqlUpdateNames, SORT_STRING);
+sort($postgresUpdateNames, SORT_STRING);
+if ($mysqlUpdateNames !== $postgresUpdateNames) {
+	throw new RuntimeException('MariaDB/MySQL and PostgreSQL update chains must contain identical version anchors.');
 }
 
 foreach (['competition', 'season', 'project', 'club', 'team', 'person', 'venue'] as $publicEntity) {
@@ -627,6 +873,7 @@ foreach ($languageFiles as $languageFile) {
 
 $profiles = glob($admin . '/resources/sport-profiles/*.json') ?: [];
 $profileCodes = [];
+$profilePublicLanguageKeys = [];
 $requiredLanguageKeys = [];
 $projectRuleFieldCount = 0;
 $ruleValidator = new ProjectRuleValidator();
@@ -710,7 +957,26 @@ foreach ($profiles as $profile) {
 	foreach ($iterator as $value) {
 		if (is_string($value) && str_starts_with($value, 'COM_JOOMLEAGUE_')) {
 			$requiredLanguageKeys[$value] = true;
+			$profilePublicLanguageKeys[$value] = true;
 		}
+	}
+}
+
+foreach (['en-GB', 'cs-CZ'] as $siteLanguageTag) {
+	$siteLanguage = (string) file_get_contents($site . '/language/' . $siteLanguageTag . '/com_joomleague.ini');
+	preg_match_all('/^([A-Z0-9_]+)=/m', $siteLanguage, $matches);
+	$definedSiteKeys = array_fill_keys($matches[1] ?? [], true);
+	$missingProfileKeys = array_diff_key($profilePublicLanguageKeys, $definedSiteKeys);
+	if ($missingProfileKeys !== []) {
+		ksort($missingProfileKeys);
+		throw new RuntimeException(sprintf('Public %s language is missing sport-profile keys: %s.', $siteLanguageTag, implode(', ', array_keys($missingProfileKeys))));
+	}
+}
+
+$siteViewSources = glob($site . '/src/View/*/HtmlView.php') ?: [];
+foreach ($siteViewSources as $siteViewSource) {
+	if (str_contains((string) file_get_contents($siteViewSource), 'JPATH_ADMINISTRATOR')) {
+		throw new RuntimeException(sprintf('Public view %s must not load administrator language files.', basename(dirname($siteViewSource))));
 	}
 }
 
@@ -1151,7 +1417,7 @@ if (!str_contains($adminDomainCatalog, "'standings' => self::item('STANDINGS', '
 }
 
 if (!str_contains($standingsController, 'Session::checkToken()')
-	|| !str_contains($standingsController, "authorise('core.edit', \$asset)")
+	|| !str_contains($standingsController, "authorise('joomleague.project.edit.results', \$asset)")
 	|| !str_contains($standingsController, 'Log::add(')
 	|| !str_contains($standingsTemplate, "HTMLHelper::_('uitab.startTabSet'")
 	|| str_contains($standingsTemplate, 'standings.recalculate')
@@ -1187,6 +1453,47 @@ foreach (['project_entry_id', "result.status_code = 'final'", 'value.text_value'
 foreach (['home_score', 'away_score', 'home_shootout', 'away_shootout', "['home']", "['away']"] as $headToHeadToken) {
 	if (str_contains($siteBracketModel . $siteBracketTemplate, $headToHeadToken)) {
 		throw new RuntimeException(sprintf('Public progression bracket contains head-to-head token %s.', $headToHeadToken));
+	}
+}
+
+foreach (['projectrules', 'projecttemplates'] as $toolbarFormView) {
+	$toolbarForm = (string) file_get_contents($admin . '/tmpl/' . $toolbarFormView . '/default.php');
+
+	if (!str_contains($toolbarForm, 'name="adminForm" id="adminForm"')) {
+		throw new RuntimeException(sprintf('%s toolbar form must use the Joomla adminForm identifier.', $toolbarFormView));
+	}
+}
+
+$accessibilityContracts = [
+	$admin . '/tmpl/matches/default.php' => [
+		'data-schedule-field="match_number" maxlength="100" aria-label=',
+	],
+	$admin . '/tmpl/matchlineup/default.php' => [
+		'name="lineup_status[<?php echo $memberId; ?>]" aria-label=',
+	],
+	$admin . '/tmpl/matchresult/default.php' => [
+		'[text_value]" value="<?php echo $this->escape((string) ($value[\'text_value\'] ?? \'\')); ?>" aria-label=',
+		'[result_rank]" value="<?php echo $this->escape((string) ($value[\'result_rank\'] ?? \'\')); ?>" aria-label=',
+		'[status_code]" aria-label=',
+	],
+	$admin . '/tmpl/databasetools/default.php' => [
+		"Text::sprintf('COM_JOOMLEAGUE_DATABASETOOLS_SELECT_TABLE'",
+	],
+	$admin . '/tmpl/position/edit.php' => [
+		'for="<?php echo $availableId; ?>"',
+		'id="<?php echo $availableId; ?>"',
+		'for="<?php echo $assignedId; ?>"',
+		'id="<?php echo $assignedId; ?>"',
+	],
+];
+
+foreach ($accessibilityContracts as $templatePath => $requiredMarkers) {
+	$templateSource = (string) file_get_contents($templatePath);
+
+	foreach ($requiredMarkers as $requiredMarker) {
+		if (!str_contains($templateSource, $requiredMarker)) {
+			throw new RuntimeException(sprintf('%s is missing accessibility marker %s.', basename(dirname($templatePath)) . '/' . basename($templatePath), $requiredMarker));
+		}
 	}
 }
 

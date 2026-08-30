@@ -16,6 +16,8 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Site\Service\ProjectSchemaBuilder;
 
 final class HtmlView extends BaseHtmlView
 {
@@ -29,6 +31,19 @@ final class HtmlView extends BaseHtmlView
 			? (string) $this->project['project']->name
 			: Text::_('COM_JOOMLEAGUE_PROJECT_VIEW_TITLE');
 		$this->getDocument()->setTitle($title);
+		if (isset($this->project['project'])) {
+			$description = trim(strip_tags((string) $this->project['project']->description));
+			if ($description !== '') {
+				$this->getDocument()->setDescription($description);
+			}
+			$schema = (new ProjectSchemaBuilder())->build(
+				$this->project,
+				Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $this->project['project']->id, true, Route::TLS_IGNORE, true)
+			);
+			if ($schema !== []) {
+				$this->getDocument()->addCustomTag('<script type="application/ld+json">' . json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . '</script>');
+			}
+		}
 		parent::display($tpl);
 	}
 }

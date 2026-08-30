@@ -28,7 +28,7 @@ final class StandingsRecalculator
 	public function recalculate(int $projectId, ?int $stageId, string $scope, int $actorId): int
 	{
 		if ($actorId < 0) throw new \InvalidArgumentException('Standings actor is invalid.');
-		$context = $this->reader->context($projectId, $stageId, $scope); $input = $this->input($context, $scope); $rows = $this->calculator->calculate($context['contract'], $input['entries'], $input['matches'], $scope, $input['adjustments']);
+		$context = $this->reader->context($projectId, $stageId, $scope); $input = $this->inputForCalculation($context, $scope); $rows = $this->calculator->calculate($context['contract'], $input['entries'], $input['matches'], $scope, $input['adjustments']);
 		$inputChecksum = CanonicalJson::checksum(['profile_checksum' => (string) $context['project']->payload_checksum, 'scope' => $scope, 'stage_id' => $context['stage_id'], 'contract' => $context['contract'], 'entries' => $input['entries'], 'matches' => $input['matches'], 'adjustments' => $input['adjustments']]);
 		$existing = $this->existingSnapshot($projectId, $context['stage_id'], $scope, $inputChecksum);
 		if ($existing > 0) { $this->database->transactionStart(); try { $this->publish($projectId, $context['stage_id'], $scope, $existing, $actorId); $this->database->transactionCommit(); return $existing; } catch (\Throwable $error) { $this->database->transactionRollback(); throw $error; } }
@@ -42,7 +42,7 @@ final class StandingsRecalculator
 	}
 
 	/** @param array<string,mixed> $context @return array{entries:list<array{id:int,name:string,included:bool}>,matches:list<array<string,mixed>>,adjustments:list<array{entry_id:int,metric:string,value:string}>} */
-	private function input(array $context, string $scope): array
+	public function inputForCalculation(array $context, string $scope): array
 	{
 		$projectId = (int) $context['project']->id; $stageId = $context['stage_id'];
 		$query = $this->database->getQuery(true)->select(['entry.id', 'entry.display_name', 'entry.entry_kind', 'team.name AS team_name', 'person.first_name', 'person.last_name'])
@@ -86,7 +86,7 @@ final class StandingsRecalculator
 		$stageKey = $stageId ?? 0;
 		$effectiveDate = gmdate('Y-m-d');
 		$query = $this->database->getQuery(true)
-			->select(['project_entry_id', 'metric_code', 'adjustment_value'])
+			->select(['project_entry_id', 'metric_code', 'adjustment_value', 'effective_date'])
 			->from($this->database->quoteName('#__joomleague_standing_adjustment'))
 			->where('project_id = :project')
 			->where('stage_key = :stage')
@@ -99,21 +99,21 @@ final class StandingsRecalculator
 			->bind(':effectiveDate', $effectiveDate)
 			->order(['ordering ASC', 'id ASC']);
 		$result = [];
-		foreach ($this->database->setQuery($query)->loadObjectList() as $row) $result[] = ['entry_id' => (int) $row->project_entry_id, 'metric' => (string) $row->metric_code, 'value' => (string) $row->adjustment_value];
+		foreach ($this->database->setQuery($query)->loadObjectList() as $row) $result[] = ['entry_id' => (int) $row->project_entry_id, 'metric' => (string) $row->metric_code, 'value' => (string) $row->adjustment_value, 'effective_date' => $row->effective_date === null ? null : (string) $row->effective_date];
 		return $result;
 	}
 
 	/** @param array<string,mixed> $profile @return list<array<string,mixed>> */
 	private function matches(int $projectId, ?int $stageId, array $profile): array
 	{
-		$query = $this->database->getQuery(true)->select(['match.id', 'result.status_code'])->from($this->database->quoteName('#__joomleague_project_match', 'match'))
+		$query = $this->database->getQuery(true)->select(['match.id', 'match.scheduled_start', 'round.id AS round_id', 'round.name AS round_name', 'round.sequence_number AS round_sequence', 'result.status_code'])->from($this->database->quoteName('#__joomleague_project_match', 'match'))
 			->innerJoin($this->database->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = match.round_id')
 			->innerJoin($this->database->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = match.stage_id')
 			->innerJoin($this->database->quoteName('#__joomleague_match_result', 'result') . ' ON result.match_id = match.id')
 			->where('match.project_id = :project')->where('match.published = 1')->where('round.published = 1')->where('stage.published = 1')
 			->bind(':project', $projectId, ParameterType::INTEGER)->order('match.id ASC');
 		if ($stageId !== null) $query->where('match.stage_id = :stage')->bind(':stage', $stageId, ParameterType::INTEGER);
-		$matches = []; foreach ($this->database->setQuery($query)->loadObjectList() as $match) $matches[(int) $match->id] = ['status' => (string) $match->status_code, 'participants' => [], 'segments' => [], 'statistics' => []];
+		$matches = []; foreach ($this->database->setQuery($query)->loadObjectList() as $match) $matches[(int) $match->id] = ['status' => (string) $match->status_code, 'scheduled_start' => $match->scheduled_start, 'round_id' => (int) $match->round_id, 'round_name' => (string) $match->round_name, 'round_sequence' => (int) $match->round_sequence, 'participants' => [], 'segments' => [], 'statistics' => []];
 		if ($matches === []) return [];
 		$query = $this->database->getQuery(true)->select(['participant.match_id', 'participant.id AS participant_id', 'participant.project_entry_id', 'participant.slot_number', 'value.numeric_value', 'value.status_code', 'value.result_rank'])
 			->from($this->database->quoteName('#__joomleague_match_participant', 'participant'))->innerJoin($this->database->quoteName('#__joomleague_project_match', 'match') . ' ON match.id = participant.match_id')->innerJoin($this->database->quoteName('#__joomleague_match_score_segment', 'segment') . ' ON segment.match_id = participant.match_id AND segment.parent_id IS NULL')->leftJoin($this->database->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id = segment.id AND value.participant_id = participant.id')->where('match.project_id = :project')->bind(':project', $projectId, ParameterType::INTEGER);

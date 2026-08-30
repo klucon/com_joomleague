@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="plugin" group="finder" method="upgrade">
+	<name>PLG_FINDER_JOOMLEAGUE</name><author>KLUCON</author><creationDate>August 2026</creationDate>
+	<copyright>Copyright (C) 2026 KLUCON. All rights reserved.</copyright><license>GNU General Public License version 2 or later</license>
+	<version>6.2.0-dev5</version><description>PLG_FINDER_JOOMLEAGUE_XML_DESCRIPTION</description>
+	<namespace path="src">Joomleague\Plugin\Finder\Joomleague</namespace>
+	<files><folder plugin="joomleague">services</folder><folder>src</folder></files>
+	<languages><language tag="en-GB">language/en-GB/plg_finder_joomleague.ini</language><language tag="en-GB">language/en-GB/plg_finder_joomleague.sys.ini</language><language tag="cs-CZ">language/cs-CZ/plg_finder_joomleague.ini</language><language tag="cs-CZ">language/cs-CZ/plg_finder_joomleague.sys.ini</language></languages>
+</extension>

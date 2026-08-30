@@ -161,7 +161,13 @@
         "players_on_field": 11,
         "minimum_players_to_start": 7,
         "default_substitutes_allowed": 5,
-        "default_substitution_windows": 3,
+		"default_substitution_windows": 3,
+		"substitutions": {
+			"supported": true,
+			"reentry_supported": true,
+			"limit_scope": "match",
+			"maximum_per_scope": 5
+		},
         "allow_unused_substitutes": true,
         "allow_external_opponent_persons": true,
         "captain_supported": true,

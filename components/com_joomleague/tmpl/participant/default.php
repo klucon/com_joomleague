@@ -58,6 +58,7 @@ $personTypeLabels = [
 
 		<div class="d-flex flex-wrap gap-2 mb-4">
 			<a class="btn btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=teamplan&project_id=' . (int) $participant->project_id . '&entry_id=' . (int) $participant->id); ?>"><span class="icon-calendar" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANT_OPEN_PROGRAM'); ?></a>
+			<?php if ((int) $data['statistic_count'] > 0) : ?><a class="btn btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=participantstats&project_id=' . (int) $participant->project_id . '&entry_id=' . (int) $participant->id); ?>"><span class="icon-chart" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANT_OPEN_STATISTICS'); ?></a><?php endif; ?>
 			<a class="btn btn-outline-secondary" href="<?php echo Route::_('index.php?option=com_joomleague&view=participants&project_id=' . (int) $participant->project_id); ?>"><span class="icon-users" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANT_BACK_TO_LIST'); ?></a>
 		</div>
 

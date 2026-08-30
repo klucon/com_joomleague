@@ -34,13 +34,13 @@ final class ProjecttemplatesController extends BaseController
 	private function persist(bool $stay): void
 	{
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
-
-		if (!$this->app->getIdentity()->authorise('core.edit', 'com_joomleague')) {
-			throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
-		}
-
 		$data = $this->input->post->get('jform', [], 'array');
 		$projectId = (int) ($data['project_id'] ?? 0);
+		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+
+		if (!$this->app->getIdentity()->authorise('joomleague.project.edit.rules', $asset)) {
+			throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
 
 		try {
 			$this->getModel('Projecttemplates')->saveSubmittedTemplates($projectId, (array) ($data['templates'] ?? []), (int) $this->app->getIdentity()->id);

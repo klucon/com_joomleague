@@ -26,11 +26,36 @@ final class SportProfileSchemaValidator
 		$this->code($profile['code'] ?? null, 'profile code');
 		$this->code($profile['contest']['type'] ?? null, 'contest type');
 		$this->entryModel($profile['entry_model'] ?? null);
+		$this->lineup($profile['lineup'] ?? null);
 		$this->match($profile['match'] ?? null);
 		$this->standings($profile['standings'] ?? null);
 		$this->catalog($profile['positions'] ?? null, 'position');
 		$this->catalog($profile['event_types'] ?? null, 'event');
 		$this->statistics($profile['statistics'] ?? null, $profile['event_types'] ?? []);
+	}
+
+	private function lineup(mixed $lineup): void
+	{
+		if ($lineup === null) return;
+		if (!is_array($lineup)) throw new \UnexpectedValueException('Lineup contract is invalid.');
+		$substitutions = $lineup['substitutions'] ?? null;
+		if ($substitutions === null) return;
+		if (!is_array($substitutions) || !is_bool($substitutions['supported'] ?? null)) {
+			throw new \UnexpectedValueException('Lineup substitution support must be boolean.');
+		}
+		if (($substitutions['supported'] ?? false) !== true) return;
+		if (!is_bool($substitutions['reentry_supported'] ?? null)) {
+			throw new \UnexpectedValueException('Lineup substitution re-entry support must be boolean.');
+		}
+		if (!in_array($substitutions['limit_scope'] ?? null, ['match', 'segment', 'unlimited'], true)) {
+			throw new \UnexpectedValueException('Lineup substitution limit scope is invalid.');
+		}
+		$maximum = $substitutions['maximum_per_scope'] ?? null;
+		if ($substitutions['limit_scope'] === 'unlimited') {
+			if ($maximum !== null) throw new \UnexpectedValueException('Unlimited substitutions cannot define a maximum.');
+		} elseif (!is_int($maximum) || $maximum < 1) {
+			throw new \UnexpectedValueException('Limited substitutions require a positive maximum.');
+		}
 	}
 
 	private function entryModel(mixed $model): void

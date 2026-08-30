@@ -1,7 +1,7 @@
 # JoomLeague 6.2
 
 JoomLeague 6.2 is a new, sport-independent competition management system for
-Joomla 6.2. The current `6.2-dev` branch is a development preview intended for
+Joomla 6.1 and 6.2. The current `6.2-dev` branch is a development preview intended for
 testing, schema validation and migration testing. It is not a production
 release.
 
@@ -34,8 +34,8 @@ database tables compatible with 6.2.
 
 ## Current development package
 
-- Version: `6.2.0-dev1`
-- Joomla: 6.2 development line
+- Version: `6.2.0-dev5`
+- Joomla: 6.1.x or 6.2.x
 - PHP: 8.3 or newer
 - Databases: MySQL 8.0+, MariaDB 10.6+ or PostgreSQL 14+
 - Source language: `en-GB`
@@ -73,7 +73,7 @@ definitions.
 
 1. Download `pkg_joomleague-*.zip` from
    [downloads.joomleague.eu](https://downloads.joomleague.eu/).
-2. Install it through **System -> Install -> Extensions** in a clean Joomla 6.2
+2. Install it through **System -> Install -> Extensions** in a clean Joomla 6.1 or 6.2
    installation.
 3. Open **Components -> JoomLeague** and create a sport type from a bundled
    profile or define your own catalogs.

@@ -152,8 +152,14 @@
         "technical_timeouts": false,
         "default_start_time": "18:00"
     },
-    "lineup": {
-        "players_on_court": 6,
+	"lineup": {
+		"substitutions": {
+			"supported": true,
+			"reentry_supported": true,
+			"limit_scope": "segment",
+			"maximum_per_scope": 6
+		},
+		"players_on_court": 6,
         "minimum_players_to_start": 6,
         "libero_supported": true,
         "captain_supported": true,

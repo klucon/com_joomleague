@@ -14,9 +14,14 @@ fi
 MANIFESTS=(
 	"${ROOT}/administrator/components/com_joomleague/joomleague.xml"
 	"${ROOT}/modules/mod_joomleague_standings/mod_joomleague_standings.xml"
+	"${ROOT}/modules/mod_joomleague_program/mod_joomleague_program.xml"
+	"${ROOT}/modules/mod_joomleague_statranking/mod_joomleague_statranking.xml"
+	"${ROOT}/modules/mod_joomleague_eventranking/mod_joomleague_eventranking.xml"
 	"${ROOT}/plugins/console/joomleague/joomleague.xml"
 	"${ROOT}/plugins/quickicon/joomleague/joomleague.xml"
 	"${ROOT}/plugins/task/joomleague/joomleague.xml"
+	"${ROOT}/plugins/finder/joomleague/joomleague.xml"
+	"${ROOT}/plugins/content/joomleague/joomleague.xml"
 )
 
 for manifest in "${MANIFESTS[@]}"; do

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_RESULTMATRIX_VIEW_DEFAULT_TITLE"><message><![CDATA[COM_JOOMLEAGUE_RESULTMATRIX_VIEW_DEFAULT_DESC]]></message></layout>
+	<fields name="request"><fieldset name="request">
+		<field name="project_id" type="sql" required="true" label="COM_JOOMLEAGUE_RESULTMATRIX_REQUEST_PROJECT_LABEL" description="COM_JOOMLEAGUE_RESULTMATRIX_REQUEST_PROJECT_DESC" query="SELECT p.id AS value, COALESCE(NULLIF(p.name,''),CONCAT('ID ',p.id)) AS text FROM #__joomleague_project AS p WHERE p.published=1 ORDER BY p.name,p.id" key_field="value" value_field="text"/>
+		<field name="stage_id" type="sql" label="COM_JOOMLEAGUE_RESULTMATRIX_REQUEST_STAGE_LABEL" description="COM_JOOMLEAGUE_RESULTMATRIX_REQUEST_STAGE_DESC" query="SELECT s.id AS value, CONCAT(p.name,' - ',s.name) AS text FROM #__joomleague_project_stage AS s INNER JOIN #__joomleague_project AS p ON p.id=s.project_id AND p.published=1 WHERE s.published=1 ORDER BY p.name,s.sequence_number,s.id" key_field="value" value_field="text"><option value="">JOPTION_ALL</option></field>
+	</fieldset></fields>
+</metadata>

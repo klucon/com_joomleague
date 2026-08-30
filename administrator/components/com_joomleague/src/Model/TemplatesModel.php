@@ -7,8 +7,8 @@ namespace Joomleague\Component\Joomleague\Administrator\Model;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
-use Joomleague\Component\Joomleague\Domain\Service\TemplateConfigResolver;
-use Joomleague\Component\Joomleague\Domain\Service\TemplateDefinitionRegistry;
+use Joomleague\Component\Joomleague\Administrator\Service\TemplateConfigResolver;
+use Joomleague\Component\Joomleague\Administrator\Service\TemplateDefinitionRegistry;
 
 final class TemplatesModel extends BaseDatabaseModel
 {

@@ -23,7 +23,7 @@ final class RoundController extends FormController
 			$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectIdFromStage($stageId);
 		}
 		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
-		return $this->app->getIdentity()->authorise('core.create', $asset);
+		return $this->app->getIdentity()->authorise('joomleague.project.edit.schedule', $asset);
 	}
 
 	protected function allowEdit($data = [], $key = 'id'): bool
@@ -34,7 +34,7 @@ final class RoundController extends FormController
 			$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectIdFromRound($id);
 		}
 		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
-		return $this->app->getIdentity()->authorise('core.edit', $asset);
+		return $this->app->getIdentity()->authorise('joomleague.project.edit.schedule', $asset);
 	}
 	protected function getRedirectToItemAppend($recordId = null, $urlVar = 'id'): string { return parent::getRedirectToItemAppend($recordId, $urlVar) . $this->stageAppend(); }
 	protected function getRedirectToListAppend(): string { return parent::getRedirectToListAppend() . $this->stageAppend(); }

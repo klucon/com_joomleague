@@ -57,7 +57,7 @@ $formatValue = static function (?object $value, ?int $fallbackRank = null) use (
 			<h3 class="h5 mt-3"><?php echo $escape($round['name']); ?></h3>
 			<div class="list-group mb-4">
 				<?php foreach ($round['items'] as $item) : ?>
-					<a class="list-group-item list-group-item-action" href="<?php echo Route::_('index.php?option=com_joomleague&amp;view=eventreport&amp;event_id=' . (int) $item->id); ?>">
+					<a class="list-group-item list-group-item-action" href="<?php echo Route::_('index.php?option=com_joomleague&view=eventreport&event_id=' . (int) $item->id); ?>">
 						<div class="d-flex flex-wrap justify-content-between gap-3">
 							<div class="flex-grow-1">
 								<?php if ($item->participants === []) : ?>

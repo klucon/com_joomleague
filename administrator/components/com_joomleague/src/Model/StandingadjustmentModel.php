@@ -68,6 +68,22 @@ final class StandingadjustmentModel extends AdminModel implements CurrentUserInt
 		return $result;
 	}
 
+	protected function canDelete($record): bool
+	{
+		return $this->canEditResults((int) ($record->project_id ?? 0));
+	}
+
+	protected function canEditState($record): bool
+	{
+		return $this->canEditResults((int) ($record->project_id ?? 0));
+	}
+
+	private function canEditResults(int $projectId): bool
+	{
+		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		return $this->getCurrentUser()->authorise('joomleague.project.edit.results', $asset);
+	}
+
 	/**
 	 * Republishes standings after a correction (create/edit/delete) — an
 	 * adjustment doesn't go through a match result save, so it needs its

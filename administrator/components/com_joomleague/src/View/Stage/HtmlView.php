@@ -27,7 +27,8 @@ final class HtmlView extends BaseHtmlView
 
 		$isNew = (int) $this->item->id === 0;
 		ToolbarHelper::title(Text::_($isNew ? 'COM_JOOMLEAGUE_STAGE_NEW_TITLE' : 'COM_JOOMLEAGUE_STAGE_EDIT_TITLE'), 'tree');
-		if (Factory::getApplication()->getIdentity()->authorise($isNew ? 'core.create' : 'core.edit', 'com_joomleague')) {
+		$asset = 'com_joomleague.project.' . (int) $this->project->id;
+		if (Factory::getApplication()->getIdentity()->authorise('joomleague.project.edit.schedule', $asset)) {
 			ToolbarHelper::apply('stage.apply'); ToolbarHelper::save('stage.save'); ToolbarHelper::save2new('stage.save2new');
 		}
 		ToolbarHelper::cancel('stage.cancel', $isNew ? 'JTOOLBAR_CANCEL' : 'JTOOLBAR_CLOSE');

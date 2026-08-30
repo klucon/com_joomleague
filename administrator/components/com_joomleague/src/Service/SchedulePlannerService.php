@@ -51,7 +51,7 @@ final class SchedulePlannerService
 		$maxSequence = $this->maxRoundSequence($stageId); $rounds = []; $sequenceOffset = 0; $matchNumber = $options['first_match_number'];
 		foreach ($roundSets as $set) foreach ($set as $sourceRound) {
 			$sequenceOffset++; $sequence = $maxSequence + $sequenceOffset; $localStart = $start->modify('+' . (($sequenceOffset - 1) * $options['round_interval_days']) . ' days');
-			$round = ['sequence' => $sequence, 'name' => Text::sprintf('COM_JOOMLEAGUE_SCHEDULE_ROUND_NAME_PATTERN', $sequence), 'code' => 'schedule_round_' . $sequence, 'date' => $localStart->format('Y-m-d'), 'bye' => null, 'matches' => []];
+			$round = ['sequence' => $sequence, 'name' => $this->roundName($sequence), 'code' => 'schedule_round_' . $sequence, 'date' => $localStart->format('Y-m-d'), 'bye' => null, 'matches' => []];
 			if (isset($sourceRound->bye->seed)) $round['bye'] = $context['entries'][(int) $sourceRound->bye->seed - 1] ?? null;
 			foreach ($sourceRound->matches ?? [] as $matchIndex => $sourceMatch) {
 				$participants = [];
@@ -140,6 +140,25 @@ final class SchedulePlannerService
 	}
 
 	private function date(string $value):bool{$date=\DateTimeImmutable::createFromFormat('!Y-m-d',$value);return$date!==false&&$date->format('Y-m-d')===$value;}
+
+	private function roundName(int $sequence): string
+	{
+		$key = 'COM_JOOMLEAGUE_SCHEDULE_ROUND_NAME_PATTERN';
+		Factory::getApplication()->getLanguage()->load(
+			'com_joomleague',
+			JPATH_ADMINISTRATOR . '/components/com_joomleague',
+			null,
+			true,
+		);
+		$name = Text::sprintf($key, $sequence);
+
+		if ($name === $key || str_contains($name, $key)) {
+			throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_SCHEDULE_ROUND_NAME_TRANSLATION_FAILED'));
+		}
+
+		return $name;
+	}
+
 	private function mirrorFor(string $templateId):?object{foreach($this->templates->all() as $candidate)if(($candidate->secondHalf->mirrorOf??null)===$templateId)return$candidate;return null;}
 	private function maxRoundSequence(int $stageId):int{$query=$this->database->getQuery(true)->select('COALESCE(MAX(sequence_number),0)')->from($this->database->quoteName('#__joomleague_project_round'))->where('stage_id=:stage')->bind(':stage',$stageId,ParameterType::INTEGER);return(int)$this->database->setQuery($query)->loadResult();}
 

@@ -46,7 +46,7 @@ final class HtmlView extends BaseHtmlView
 		$user = Factory::getApplication()->getIdentity();
 		ToolbarHelper::title(Text::sprintf('COM_JOOMLEAGUE_PROJECTTEMPLATES_TITLE', $this->project->name), 'palette');
 
-		if ($user->authorise('core.edit', 'com_joomleague')) {
+		if ($user->authorise('joomleague.project.edit.rules', 'com_joomleague.project.' . (int) $this->project->id)) {
 			ToolbarHelper::apply('projecttemplates.apply');
 			ToolbarHelper::save('projecttemplates.save');
 		}

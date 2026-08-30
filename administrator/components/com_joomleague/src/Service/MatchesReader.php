@@ -22,7 +22,7 @@ final class MatchesReader
     public function __construct(private readonly DatabaseInterface $database) {}
 
     /** @return array<string,mixed> */
-    public function forEntry(int $projectId, int $entryId): array
+	public function forEntry(int $projectId, int $entryId): array
     {
         if ($projectId < 1 || $entryId < 1) {
             throw new \InvalidArgumentException('Matches request is invalid.');
@@ -51,8 +51,49 @@ final class MatchesReader
             return ['entry' => null, 'matches' => []];
         }
 
-        return ['entry' => $entry, 'matches' => $this->matchesForEntryIds([$entryId])[$entryId] ?? []];
-    }
+		return ['entry' => $entry, 'matches' => $this->matchesForEntryIds([$entryId])[$entryId] ?? []];
+	}
+
+	/**
+	 * Reads several entries in one project without repeating the match query.
+	 *
+	 * @param list<int> $entryIds
+	 * @return array{entries:array<int,object>,matches:array<int,list<array<string,mixed>>>}
+	 */
+	public function forEntries(int $projectId, array $entryIds): array
+	{
+		$entryIds = array_values(array_unique(array_filter(array_map('intval', $entryIds), static fn (int $id): bool => $id > 0)));
+
+		if ($projectId < 1 || $entryIds === []) {
+			return ['entries' => [], 'matches' => []];
+		}
+
+		$db = $this->database;
+		$entries = $db->setQuery(
+			$db->getQuery(true)
+				->select([
+					$db->quoteName('entry.id'),
+					$db->quoteName('entry.project_id'),
+					'COALESCE(NULLIF(' . $db->quoteName('entry.display_name') . ", ''), "
+						. $db->quoteName('team.name') . ', NULLIF(TRIM(CONCAT('
+						. $db->quoteName('person.first_name') . ", ' ', " . $db->quoteName('person.last_name')
+						. ")), ''), CONCAT('ID ', " . $db->quoteName('entry.id') . ')) AS ' . $db->quoteName('display_name'),
+				])
+				->from($db->quoteName('#__joomleague_project_entry', 'entry'))
+				->leftJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id')
+				->leftJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id')
+				->where($db->quoteName('entry.project_id') . ' = :project')
+				->whereIn($db->quoteName('entry.id'), $entryIds, ParameterType::INTEGER)
+				->bind(':project', $projectId, ParameterType::INTEGER)
+		)->loadObjectList('id');
+
+		$validIds = array_map('intval', array_keys($entries));
+
+		return [
+			'entries' => $entries,
+			'matches' => $this->matchesForEntryIds($validIds),
+		];
+	}
 
     /**
      * Shared core query, keyed by entry id, so a future clubplan reader

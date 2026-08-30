@@ -30,13 +30,6 @@ final class Com_JoomleagueInstallerScript
 		'joomleague.joomla.asset.json',
 	];
 
-	private const OBSOLETE_SITE_FILES = [
-		'src/Model/ProgramitemModel.php',
-		'src/View/Programitem/HtmlView.php',
-		'tmpl/programitem/default.php',
-		'tmpl/programitem/default.xml',
-	];
-
 	public function preflight(string $type, ComponentAdapter $adapter): bool
 	{
 		if ($type !== 'update') {
@@ -288,7 +281,6 @@ final class Com_JoomleagueInstallerScript
 	{
 		$groups = [
 			JPATH_ADMINISTRATOR . '/components/com_joomleague/' => self::OBSOLETE_ADMIN_FILES,
-			JPATH_ROOT . '/components/com_joomleague/' => self::OBSOLETE_SITE_FILES,
 			JPATH_ROOT . '/media/com_joomleague/' => self::OBSOLETE_MEDIA_FILES,
 		];
 
@@ -444,7 +436,6 @@ final class Com_JoomleagueInstallerScript
 		$versionId = $database->setQuery($query)->loadResult();
 
 		if ($versionId === null) return false;
-
 		$data = $profile['data'];
 		$query = $database->getQuery(true)
 			->update($database->quoteName('#__joomleague_sport_profile_version'))

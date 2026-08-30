@@ -20,7 +20,8 @@ final class HtmlView extends BaseHtmlView
 		$this->form = $this->get('Form'); $this->item = $this->get('Item'); $this->round = $this->getModel()->getRound();
 		if ($errors = $this->get('Errors')) throw new GenericDataException(implode("\n", $errors), 500);
 		$isNew = (int) $this->item->id === 0; ToolbarHelper::title(Text::_($isNew ? 'COM_JOOMLEAGUE_MATCH_NEW_TITLE' : 'COM_JOOMLEAGUE_MATCH_EDIT_TITLE'), 'play');
-		if (Factory::getApplication()->getIdentity()->authorise($isNew ? 'core.create' : 'core.edit', 'com_joomleague')) { ToolbarHelper::apply('match.apply'); ToolbarHelper::save('match.save'); ToolbarHelper::save2new('match.save2new'); }
+		$asset = 'com_joomleague.project.' . (int) $this->round->project_id;
+		if (Factory::getApplication()->getIdentity()->authorise('joomleague.project.edit.schedule', $asset)) { ToolbarHelper::apply('match.apply'); ToolbarHelper::save('match.save'); ToolbarHelper::save2new('match.save2new'); }
 		ToolbarHelper::cancel('match.cancel', $isNew ? 'JTOOLBAR_CANCEL' : 'JTOOLBAR_CLOSE'); parent::display($tpl);
 	}
 }

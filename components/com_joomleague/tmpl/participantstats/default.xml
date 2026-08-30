@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_PARTICIPANTSTATS_MENU_TITLE"><message><![CDATA[COM_JOOMLEAGUE_PARTICIPANTSTATS_MENU_DESC]]></message></layout>
+	<fields name="request"><fieldset name="request">
+		<field name="project_id" type="sql" required="true" label="COM_JOOMLEAGUE_FIELD_PROJECT_LABEL" query="SELECT id AS value, name AS text FROM #__joomleague_project WHERE published = 1 ORDER BY name" key_field="value" value_field="text" />
+		<field name="entry_id" type="sql" required="true" label="COM_JOOMLEAGUE_PARTICIPANTSTATS_ENTRY_LABEL" description="COM_JOOMLEAGUE_PARTICIPANTSTATS_ENTRY_DESC" query="SELECT id AS value, COALESCE(NULLIF(display_name, ''), entry_code, CONCAT('ID ', id)) AS text FROM #__joomleague_project_entry WHERE published = 1 ORDER BY display_name, id" key_field="value" value_field="text" />
+	</fieldset></fields>
+</metadata>

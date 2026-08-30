@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+	<layout title="COM_JOOMLEAGUE_CLUBPLAN_VIEW_DEFAULT_TITLE"><message><![CDATA[COM_JOOMLEAGUE_CLUBPLAN_VIEW_DEFAULT_DESC]]></message></layout>
+	<fields name="request"><fieldset name="request">
+		<field name="project_id" type="sql" required="true" label="COM_JOOMLEAGUE_CLUBPLAN_REQUEST_PROJECT_LABEL" description="COM_JOOMLEAGUE_CLUBPLAN_REQUEST_PROJECT_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text" />
+		<field name="club_id" type="sql" required="true" label="COM_JOOMLEAGUE_CLUBPLAN_REQUEST_CLUB_LABEL" description="COM_JOOMLEAGUE_CLUBPLAN_REQUEST_CLUB_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text" />
+	</fieldset></fields>
+	<fields name="params"><fieldset name="params" label="COM_JOOMLEAGUE_CLUBPLAN_PARAMS_FIELDSET_LABEL">
+		<field name="scope" type="list" default="all" label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SCOPE_LABEL" description="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SCOPE_DESC"><option value="all">COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SCOPE_ALL</option><option value="upcoming">COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SCOPE_UPCOMING</option><option value="played">COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SCOPE_PLAYED</option></field>
+		<field name="limit" type="number" default="0" min="0" label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_LIMIT_LABEL" description="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_LIMIT_DESC" />
+		<field name="show_round" type="radio" default="1" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SHOW_ROUND_LABEL" description="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SHOW_ROUND_DESC"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="show_venue" type="radio" default="1" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SHOW_VENUE_LABEL" description="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SHOW_VENUE_DESC"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="show_calendar" type="radio" default="1" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SHOW_CALENDAR_LABEL" description="COM_JOOMLEAGUE_TEAMPLAN_PARAMS_SHOW_CALENDAR_DESC"><option value="0">JNO</option><option value="1">JYES</option></field>
+	</fieldset></fields>
+</metadata>

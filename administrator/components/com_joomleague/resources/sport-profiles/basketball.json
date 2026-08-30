@@ -78,8 +78,14 @@
             "period_length_minutes": 5
         }
     },
-    "lineup": {
-        "preferred_order": [
+	"lineup": {
+		"substitutions": {
+			"supported": true,
+			"reentry_supported": true,
+			"limit_scope": "unlimited",
+			"maximum_per_scope": null
+		},
+		"preferred_order": [
             "point_guard",
             "shooting_guard",
             "small_forward",

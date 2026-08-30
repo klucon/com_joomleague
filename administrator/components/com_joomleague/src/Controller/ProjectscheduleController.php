@@ -24,7 +24,7 @@ final class ProjectscheduleController extends BaseController
 			return;
 		}
 
-		if (!$this->app->getIdentity()->authorise('core.edit', 'com_joomleague.project.' . $projectId)) {
+		if (!$this->app->getIdentity()->authorise('joomleague.project.edit.schedule', 'com_joomleague.project.' . $projectId)) {
 			throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
 		}
 

@@ -54,7 +54,7 @@ final class HtmlView extends BaseHtmlView
 		}
 
 		ToolbarHelper::title(Text::sprintf('COM_JOOMLEAGUE_PROJECTSCHEDULE_TITLE', $this->project->name), 'calendar');
-		if ($app->getIdentity()->authorise('core.edit', 'com_joomleague.project.' . $projectId)) {
+		if ($app->getIdentity()->authorise('joomleague.project.edit.schedule', 'com_joomleague.project.' . $projectId)) {
 			ToolbarHelper::custom('projectschedule.exportCsv', 'download', 'download', 'COM_JOOMLEAGUE_PROJECTSCHEDULE_EXPORT_CSV', false);
 		}
 		ToolbarHelper::link('index.php?option=com_joomleague&view=projectpanel&project_id=' . $projectId, 'JTOOLBAR_CLOSE', 'cancel');

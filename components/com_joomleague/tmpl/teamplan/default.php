@@ -13,6 +13,7 @@ declare(strict_types=1);
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Uri\Uri;
 
 defined('_JEXEC') or die;
 
@@ -105,7 +106,7 @@ $teamsMarkup = static function (array $match) use ($entryName): string {
 		<?php else : ?>
 
 			<?php if ($nextMatch !== null) : ?>
-				<a class="card text-bg-primary bg-gradient shadow-sm mb-4 text-decoration-none" href="<?php echo Route::_('index.php?option=com_joomleague&amp;view=eventreport&amp;event_id=' . (int) $nextMatch['match_id']); ?>">
+					<a class="card text-bg-primary bg-gradient shadow-sm mb-4 text-decoration-none" href="<?php echo Route::_('index.php?option=com_joomleague&view=eventreport&event_id=' . (int) $nextMatch['match_id']); ?>">
 					<div class="card-body">
 						<div class="d-flex justify-content-between align-items-center mb-2">
 							<span class="badge text-bg-light"><i class="fa-solid fa-star me-1"></i><?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAN_NEXT_MATCH_BADGE'); ?></span>
@@ -140,7 +141,7 @@ $teamsMarkup = static function (array $match) use ($entryName): string {
 						$borderColor = $match['played'] ? $outcome($match) : 'secondary-subtle';
 						?>
 						<div class="col">
-							<a class="card h-100 shadow-sm border-start border-4 border-<?php echo $borderColor; ?> text-decoration-none text-body" href="<?php echo Route::_('index.php?option=com_joomleague&amp;view=eventreport&amp;event_id=' . (int) $match['match_id']); ?>">
+								<a class="card h-100 shadow-sm border-start border-4 border-<?php echo $borderColor; ?> text-decoration-none text-body" href="<?php echo Route::_('index.php?option=com_joomleague&view=eventreport&event_id=' . (int) $match['match_id']); ?>">
 								<div class="card-body">
 									<div class="d-flex justify-content-between align-items-start mb-2">
 										<?php if ($plan['show_round']) : ?>
@@ -177,6 +178,39 @@ $teamsMarkup = static function (array $match) use ($entryName): string {
 			$renderCards($upcoming, 'COM_JOOMLEAGUE_TEAMPLAN_SECTION_UPCOMING', 'fa-regular fa-calendar-check');
 			$renderCards($played, 'COM_JOOMLEAGUE_TEAMPLAN_SECTION_PLAYED', 'fa-solid fa-clock-rotate-left');
 			?>
+		<?php endif; ?>
+
+		<?php if (($plan['show_calendar'] ?? true) && isset($plan['entry'])) :
+			$calendarPath = 'index.php?option=com_joomleague&task=ical.download&project_id=' . (int) $plan['project_id'] . '&scope=entry&entry_id=' . (int) $plan['entry']->id;
+			$calendarHttpUrl = rtrim(Uri::root(), '/') . '/' . ltrim(Route::_($calendarPath, false), '/');
+			$calendarWebcalUrl = preg_replace('#^https?://#i', 'webcal://', $calendarHttpUrl);
+			$calendarName = $entryName . ' - ' . (string) ($plan['project_name'] ?? '');
+			$googleUrl = 'https://calendar.google.com/calendar/r?cid=' . rawurlencode($calendarWebcalUrl);
+			$outlookParams = 'name=' . rawurlencode($calendarName) . '&url=' . rawurlencode($calendarWebcalUrl);
+		?>
+			<section class="card mt-4">
+				<div class="card-body">
+					<h2 class="h5 card-title"><span class="icon-calendar" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAN_CALENDAR_TITLE'); ?></h2>
+					<p class="card-text text-body-secondary small"><?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAN_CALENDAR_DESC'); ?></p>
+					<div class="d-flex flex-wrap gap-2">
+						<a class="btn btn-outline-secondary" href="<?php echo htmlspecialchars($calendarHttpUrl, ENT_QUOTES, 'UTF-8'); ?>">
+							<span class="icon-download" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAN_CALENDAR_ICS'); ?>
+						</a>
+						<a class="btn btn-outline-primary" href="<?php echo htmlspecialchars($googleUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer">
+							<span class="icon-calendar" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAN_CALENDAR_GOOGLE'); ?>
+						</a>
+						<a class="btn btn-outline-primary" href="<?php echo htmlspecialchars($calendarWebcalUrl, ENT_QUOTES, 'UTF-8'); ?>">
+							<span class="icon-calendar" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAN_CALENDAR_APPLE'); ?>
+						</a>
+						<a class="btn btn-outline-primary" href="https://outlook.live.com/calendar/addcalendar?<?php echo htmlspecialchars($outlookParams, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer">
+							<span class="icon-calendar" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAN_CALENDAR_OUTLOOK'); ?>
+						</a>
+						<a class="btn btn-outline-primary" href="https://outlook.office.com/calendar/addcalendar?<?php echo htmlspecialchars($outlookParams, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer">
+							<span class="icon-calendar" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_TEAMPLAN_CALENDAR_OFFICE'); ?>
+						</a>
+					</div>
+				</div>
+			</section>
 		<?php endif; ?>
 	<?php endif; ?>
 </div>

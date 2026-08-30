@@ -21,6 +21,13 @@ $base = ['schema_version' => '1.4.0', 'code' => 'test_sport', 'contest' => ['typ
 $validator = new SportProfileSchemaValidator();
 $validator->validate($base);
 
+$substitutions = $base;
+$substitutions['lineup']['substitutions'] = ['supported' => true, 'reentry_supported' => true, 'limit_scope' => 'unlimited', 'maximum_per_scope' => null];
+$validator->validate($substitutions);
+$limitedSubstitutions = $base;
+$limitedSubstitutions['lineup']['substitutions'] = ['supported' => true, 'reentry_supported' => false, 'limit_scope' => 'segment', 'maximum_per_scope' => 6];
+$validator->validate($limitedSubstitutions);
+
 $nested = $base;
 $nested['match']['structure']['type'] = 'set_based';
 $nested['match']['score']['type'] = 'nested_score';
@@ -49,5 +56,11 @@ try { $validator->validate($cyclic); throw new RuntimeException('Cyclic segment 
 $invalidControl = $base;
 $invalidControl['match']['score']['editor_control'] = 'duration';
 try { $validator->validate($invalidControl); throw new RuntimeException('Incompatible score editor control was accepted.'); } catch (UnexpectedValueException) {}
+$invalidSubstitutions = $base;
+$invalidSubstitutions['lineup']['substitutions'] = ['supported' => true, 'reentry_supported' => false, 'limit_scope' => 'unlimited', 'maximum_per_scope' => 5];
+try { $validator->validate($invalidSubstitutions); throw new RuntimeException('An unlimited substitution contract with a maximum was accepted.'); } catch (UnexpectedValueException) {}
+$missingSubstitutionLimit = $base;
+$missingSubstitutionLimit['lineup']['substitutions'] = ['supported' => true, 'reentry_supported' => false, 'limit_scope' => 'match', 'maximum_per_scope' => null];
+try { $validator->validate($missingSubstitutionLimit); throw new RuntimeException('A limited substitution contract without a maximum was accepted.'); } catch (UnexpectedValueException) {}
 
 echo "Sport profile schema 1.4 validator OK\n";

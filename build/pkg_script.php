@@ -48,7 +48,7 @@ final class Pkg_JoomleagueInstallerScript
 			->update($db->quoteName('#__extensions'))
 			->set($db->quoteName('enabled') . ' = 1')
 			->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
-			->where($db->quoteName('folder') . ' IN (' . implode(', ', [$db->quote('quickicon'), $db->quote('console'), $db->quote('task')]) . ')')
+			->where($db->quoteName('folder') . ' IN (' . implode(', ', [$db->quote('quickicon'), $db->quote('console'), $db->quote('task'), $db->quote('finder'), $db->quote('content')]) . ')')
 			->where($db->quoteName('element') . ' = ' . $db->quote('joomleague'));
 
 		$db->setQuery($query)->execute();

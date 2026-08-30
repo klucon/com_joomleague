@@ -94,8 +94,14 @@
             "initial_attempts_per_team": 3
         }
     },
-    "lineup": {
-        "preferred_order": [
+	"lineup": {
+		"substitutions": {
+			"supported": true,
+			"reentry_supported": true,
+			"limit_scope": "unlimited",
+			"maximum_per_scope": null
+		},
+		"preferred_order": [
             "goalkeeper",
             "defender",
             "center",

@@ -12,29 +12,39 @@ const { chromium } = require('playwright');
 		await page.locator('form#form-login button[type="submit"]').click();
 		await page.waitForLoadState('networkidle');
 
-		await page.goto(`${baseUrl}/administrator/index.php?option=com_menus&view=items&menutype=mainmenu`, { waitUntil: 'networkidle' });
-		const existing = page.getByRole('link', { name: 'Demo report události', exact: true });
-		if (await existing.count() === 0) {
+		const create = async (title, view, fields) => {
+			await page.goto(`${baseUrl}/administrator/index.php?option=com_menus&view=items&menutype=mainmenu`, { waitUntil: 'networkidle' });
+			if (await page.getByRole('link', { name: title, exact: true }).count()) return;
 			await page.goto(`${baseUrl}/administrator/index.php?option=com_menus&view=item&layout=edit&menutype=mainmenu`, { waitUntil: 'networkidle' });
-			await page.locator('#jform_title').fill('Demo report události');
+			await page.locator('#jform_title').fill(title);
 			await page.locator('.js-modal-content-select-field button[data-button-action="select"]').click();
 			await page.waitForTimeout(800);
 			const picker = page.frames().find((frame) => frame.url().includes('view=menutypes'));
 			if (!picker) throw new Error('Joomla menu type picker did not open.');
 			await picker.locator('button.accordion-button').filter({ hasText: 'JoomLeague' }).click();
-			await picker.locator('a.choose_type[data-request*="eventreport"]').click();
-			await page.locator('#jform_request_event_id').waitFor();
-			await page.locator('#jform_request_event_id').selectOption('1');
+			await picker.locator(`a.choose_type[data-request*="${view}"]`).click();
+			for (const [name, value] of Object.entries(fields)) {
+				const field = page.locator(`#jform_request_${name}`);
+				await field.waitFor();
+				await field.selectOption(String(value));
+			}
 			await page.locator('#save-group-children-save button').click();
 			await page.waitForLoadState('networkidle');
-		}
+			if (await page.locator('.alert-danger, .joomla-alert--danger').count()) throw new Error(`Saving ${view} menu item failed.`);
+		};
 
-		await page.goto(`${baseUrl}/administrator/index.php?option=com_menus&view=items&menutype=mainmenu`, { waitUntil: 'networkidle' });
-		const menuLink = page.getByRole('link', { name: 'Demo report události', exact: true });
-		await menuLink.waitFor();
-		const editUrl = new URL(await menuLink.getAttribute('href'), baseUrl);
-		console.log(`EVENTREPORT_MENU_ID=${editUrl.searchParams.get('id')}`);
+		await create('Program demo klubu', 'clubplan', { project_id: 3, club_id: 1 });
+		await create('Nejbližší položka programu', 'nextmatch', { project_id: 3 });
+
+		for (const title of ['Program demo klubu', 'Nejbližší položka programu']) {
+			await page.goto(`${baseUrl}/administrator/index.php?option=com_menus&view=items&menutype=mainmenu`, { waitUntil: 'networkidle' });
+			await page.getByRole('link', { name: title, exact: true }).waitFor();
+		}
+		console.log('PUBLIC_PROGRAM_MENU_VIEWS_OK');
 	} finally {
 		await browser.close();
 	}
-})();
+})().catch((error) => {
+	console.error(error);
+	process.exit(1);
+});

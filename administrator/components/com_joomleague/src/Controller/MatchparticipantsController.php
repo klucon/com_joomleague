@@ -62,7 +62,7 @@ final class MatchparticipantsController extends BaseController
 		if (!Session::checkToken()) throw new \RuntimeException(Text::_('JINVALID_TOKEN'), 403);
 		$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectId($matchId);
 		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
-		if (!$this->app->getIdentity()->authorise('core.edit', $asset)) throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		if (!$this->app->getIdentity()->authorise('joomleague.project.edit.schedule', $asset)) throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
 	}
 
 	private function redirectBack(int $matchId): void

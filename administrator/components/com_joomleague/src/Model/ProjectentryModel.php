@@ -117,6 +117,22 @@ final class ProjectentryModel extends AdminModel implements CurrentUserInterface
 		return $result;
 	}
 
+	protected function canDelete($record): bool
+	{
+		return $this->canEditProject((int) ($record->project_id ?? 0), 'core.delete');
+	}
+
+	protected function canEditState($record): bool
+	{
+		return $this->canEditProject((int) ($record->project_id ?? 0), 'core.edit.state');
+	}
+
+	private function canEditProject(int $projectId, string $action): bool
+	{
+		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		return $this->getCurrentUser()->authorise($action, $asset);
+	}
+
 	protected function prepareTable($table): void
 	{
 		$now = Factory::getDate()->toSql();

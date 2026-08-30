@@ -7,11 +7,13 @@ HTMLHelper::_('behavior.formvalidator');
 $this->getDocument()->getWebAssetManager()->useScript('com_joomleague.duallist');
 $renderDualList = function (string $name, array $data): void {
 	$label = static fn ($item): string => $item->name !== '' ? $item->name : Text::_((string) $item->name_key);
+	$availableId = 'position-' . $name . '-available';
+	$assignedId = 'position-' . $name . '-assigned';
 	?>
 	<div class="row g-3 align-items-center" data-jl-duallist>
-		<div class="col-md-5"><label class="form-label"><?php echo Text::_('COM_JOOMLEAGUE_AVAILABLE'); ?></label><select class="form-select" multiple size="14" data-available><?php foreach ($data['available'] as $item) : ?><option value="<?php echo (int)$item->id; ?>"><?php echo htmlspecialchars($label($item), ENT_QUOTES, 'UTF-8'); ?></option><?php endforeach; ?></select></div>
+		<div class="col-md-5"><label class="form-label" for="<?php echo $availableId; ?>"><?php echo Text::_('COM_JOOMLEAGUE_AVAILABLE'); ?></label><select class="form-select" id="<?php echo $availableId; ?>" multiple size="14" data-available><?php foreach ($data['available'] as $item) : ?><option value="<?php echo (int)$item->id; ?>"><?php echo htmlspecialchars($label($item), ENT_QUOTES, 'UTF-8'); ?></option><?php endforeach; ?></select></div>
 		<div class="col-md-2 d-grid gap-2"><button type="button" class="btn btn-secondary" data-add><span class="icon-chevron-right" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_ASSIGN_SELECTED'); ?></button><button type="button" class="btn btn-secondary" data-remove><span class="icon-chevron-left" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_UNASSIGN_SELECTED'); ?></button></div>
-		<div class="col-md-5"><label class="form-label"><?php echo Text::_('COM_JOOMLEAGUE_ASSIGNED'); ?></label><input type="hidden" name="jform[<?php echo $name; ?>][]" value=""><select class="form-select" name="jform[<?php echo $name; ?>][]" multiple size="14" data-assigned><?php foreach ($data['assigned'] as $item) : ?><option value="<?php echo (int)$item->id; ?>"><?php echo htmlspecialchars($label($item), ENT_QUOTES, 'UTF-8'); ?></option><?php endforeach; ?></select></div>
+		<div class="col-md-5"><label class="form-label" for="<?php echo $assignedId; ?>"><?php echo Text::_('COM_JOOMLEAGUE_ASSIGNED'); ?></label><input type="hidden" name="jform[<?php echo $name; ?>][]" value=""><select class="form-select" id="<?php echo $assignedId; ?>" name="jform[<?php echo $name; ?>][]" multiple size="14" data-assigned><?php foreach ($data['assigned'] as $item) : ?><option value="<?php echo (int)$item->id; ?>"><?php echo htmlspecialchars($label($item), ENT_QUOTES, 'UTF-8'); ?></option><?php endforeach; ?></select></div>
 	</div>
 	<?php
 };

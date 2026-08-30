@@ -19,7 +19,7 @@ final class MatchController extends FormController
 	{
 		$projectId = (int) ($data['project_id'] ?? $this->input->getInt('project_id', 0));
 		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
-		return $this->app->getIdentity()->authorise('core.create', $asset);
+		return $this->app->getIdentity()->authorise('joomleague.project.edit.schedule', $asset);
 	}
 
 	protected function allowEdit($data = [], $key = 'id'): bool

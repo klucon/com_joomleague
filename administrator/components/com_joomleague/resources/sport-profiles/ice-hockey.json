@@ -175,8 +175,14 @@
         "default_start_time": "18:00",
         "default_match_duration_minutes": 140
     },
-    "lineup": {
-        "players_on_ice": 6,
+	"lineup": {
+		"substitutions": {
+			"supported": true,
+			"reentry_supported": true,
+			"limit_scope": "unlimited",
+			"maximum_per_scope": null
+		},
+		"players_on_ice": 6,
         "skaters_on_ice": 5,
         "goalkeepers_on_ice": 1,
         "minimum_players_to_start": 6,

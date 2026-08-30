@@ -93,6 +93,15 @@ final class ParticipantModel extends BaseDatabaseModel
 			->bind(':todayUntil', $today)
 			->order('member.ordering ASC, person.last_name ASC, person.first_name ASC, member.id ASC');
 
-		return ['participant' => $participant, 'members' => $db->setQuery($memberQuery)->loadObjectList()];
+		$statPersonId = (int) ($participant->person_id ?? 0);
+		$statisticCount = $db->getQuery(true)->select('COUNT(*)')->from($db->quoteName('#__joomleague_match_statistic_value', 'value'))
+			->innerJoin($db->quoteName('#__joomleague_match_participant', 'match_participant') . ' ON match_participant.id = value.match_participant_id AND match_participant.published = 1')
+			->innerJoin($db->quoteName('#__joomleague_project_match', 'item') . ' ON item.id = value.match_id AND item.published = 1')
+			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = item.id AND result.status_code = 'final'")
+			->where('match_participant.project_entry_id = :statEntryId')->where('value.published = 1')->where('value.numeric_value IS NOT NULL')->where('value.segment_key = 0')
+			->where("(value.target_kind = 'participant' OR (value.target_kind = 'person' AND :statEntryKind = 'person' AND value.person_id = :statPersonId))")
+			->bind(':statEntryId', $entryId, ParameterType::INTEGER)->bind(':statEntryKind', $participant->entry_kind)->bind(':statPersonId', $statPersonId, ParameterType::INTEGER);
+
+		return ['participant' => $participant, 'members' => $db->setQuery($memberQuery)->loadObjectList(), 'statistic_count' => (int) $db->setQuery($statisticCount)->loadResult()];
 	}
 }

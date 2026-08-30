@@ -17,7 +17,9 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
-use Joomleague\Component\Joomleague\Domain\Service\MatchesReader;
+use Joomla\Database\ParameterType;
+use Joomleague\Component\Joomleague\Domain\Service\ProgrammeReader;
+use Joomleague\Component\Joomleague\Domain\Service\ProgrammeScopeResolver;
 
 /**
  * Reads one project entry's own fixture list (past + future matches) for
@@ -58,13 +60,54 @@ final class TeamplanModel extends BaseDatabaseModel
 		if (!\Joomleague\Component\Joomleague\Site\Service\PublicAccess::projectAllowed($database, $projectId)) {
 			return ['error' => 'COM_JOOMLEAGUE_TEAMPLAN_UNAVAILABLE'];
 		}
-		$reader = new MatchesReader($database);
-
-        $plan = $reader->forEntry($projectId, $entryId);
-
-        if ($plan['entry'] === null) {
+		$viewLevels = Factory::getApplication()->getIdentity()->getAuthorisedViewLevels();
+		$entryIds = (new ProgrammeScopeResolver($database))->resolve($projectId, 'entry', $entryId, $viewLevels);
+		if ($entryIds === []) {
             return ['error' => 'COM_JOOMLEAGUE_TEAMPLAN_UNAVAILABLE'];
         }
+
+		$entry = $database->setQuery(
+			$database->getQuery(true)
+				->select([
+					'entry.id',
+					'COALESCE(NULLIF(entry.display_name, \'\'), team.name, NULLIF(TRIM(CONCAT(person.first_name, \' \', person.last_name)), \'\'), CONCAT(\'ID \', entry.id)) AS display_name',
+				])
+				->from($database->quoteName('#__joomleague_project_entry', 'entry'))
+				->leftJoin($database->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id')
+				->leftJoin($database->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id')
+				->where('entry.id = :entryId')
+				->bind(':entryId', $entryId, ParameterType::INTEGER)
+		)->loadObject();
+		$events = (new ProgrammeReader($database))->forProject($projectId, $entryIds, $viewLevels);
+		$matches = [];
+		foreach ($events as $event) {
+			$own = null;
+			$opponents = [];
+			foreach ($event['participants'] as $participant) {
+				if ((int) $participant['entry_id'] === $entryId) {
+					$own = $participant;
+				} else {
+					$opponents[] = $participant;
+				}
+			}
+			if ($own === null) {
+				continue;
+			}
+			$opponentScore = count($opponents) === 1 ? $opponents[0]['score'] : null;
+			$matches[] = [
+				'match_id' => (int) $event['id'],
+				'round_name' => (string) $event['round_name'],
+				'scheduled_start' => $event['scheduled_start'],
+				'venue' => $event['venue_name'],
+				'attendance' => null,
+				'is_home' => (int) $own['slot'] === 1,
+				'opponent' => implode(', ', array_column($opponents, 'name')),
+				'own_score' => $own['score'],
+				'opponent_score' => $opponentScore,
+				'played' => (bool) $event['played'],
+			];
+		}
+		$projectName = $events === [] ? '' : (string) $events[0]['project_name'];
 
         $params = Factory::getApplication()->getParams();
         $scope = (string) $params->get('scope', 'all');
@@ -88,14 +131,13 @@ final class TeamplanModel extends BaseDatabaseModel
         // next match" is an absolute fact about the schedule, not something
         // that should shift depending on how the page happens to be filtered.
         $nextMatchId = null;
-        foreach ($plan['matches'] as $match) {
+        foreach ($matches as $match) {
             if ($isFuture($match)) {
                 $nextMatchId = $match['match_id'];
                 break;
             }
         }
 
-        $matches = $plan['matches'];
         if ($scope === 'upcoming') {
             $matches = array_values(array_filter($matches, $isFuture));
         } elseif ($scope === 'played') {
@@ -111,11 +153,14 @@ final class TeamplanModel extends BaseDatabaseModel
         }
 
         return [
-            'entry' => $plan['entry'],
+			'project_id' => $projectId,
+			'project_name' => $projectName,
+            'entry' => $entry,
             'matches' => $matches,
             'show_venue' => (int) $params->get('show_venue', 1) === 1,
             'show_round' => (int) $params->get('show_round', 1) === 1,
             'highlight_next' => $highlightNext,
+			'show_calendar' => (int) $params->get('show_calendar', 1) === 1,
             'next_match_id' => $nextMatchId,
         ];
     }

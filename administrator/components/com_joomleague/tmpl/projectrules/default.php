@@ -12,7 +12,7 @@ $formatDefault = static function (mixed $value): string {
 	return (string) $value;
 };
 ?>
-<form action="<?php echo Route::_('index.php?option=com_joomleague&view=projectrules&project_id=' . (int) $this->project->id); ?>" method="post" name="adminForm" id="projectrules-form">
+<form action="<?php echo Route::_('index.php?option=com_joomleague&view=projectrules&project_id=' . (int) $this->project->id); ?>" method="post" name="adminForm" id="adminForm">
 	<div class="alert alert-info" role="alert">
 		<strong><?php echo $this->escape($this->project->sport_type_name); ?></strong>
 		<?php echo Text::_($this->project->profile_name_key); ?> <?php echo $this->escape($this->project->profile_version); ?>.

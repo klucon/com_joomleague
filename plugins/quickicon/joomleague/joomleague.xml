@@ -5,7 +5,7 @@
 	<creationDate>August 2026</creationDate>
 	<copyright>Copyright (C) 2026 KLUCON. All rights reserved.</copyright>
 	<license>GNU General Public License version 2 or later</license>
-	<version>6.2.0-dev1</version>
+	<version>6.2.0-dev5</version>
 	<description>PLG_QUICKICON_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Plugin\Quickicon\Joomleague</namespace>
 	<files>
@@ -15,6 +15,8 @@
 	<languages>
 		<language tag="en-GB">language/en-GB/plg_quickicon_joomleague.ini</language>
 		<language tag="en-GB">language/en-GB/plg_quickicon_joomleague.sys.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/plg_quickicon_joomleague.ini</language>
+		<language tag="cs-CZ">language/cs-CZ/plg_quickicon_joomleague.sys.ini</language>
 	</languages>
 	<config>
 		<fields name="params">

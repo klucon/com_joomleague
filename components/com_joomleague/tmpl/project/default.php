@@ -53,18 +53,40 @@ $data = $this->project;
 
 		<h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAVIGATION_TITLE'); ?></h2>
 		<div class="list-group">
+			<?php if ($data['capabilities']['participants']) : ?>
 			<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="<?php echo Route::_('index.php?option=com_joomleague&view=participants&project_id=' . (int) $project->id); ?>">
 				<span><strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PARTICIPANTS'); ?></strong><br><small class="text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PARTICIPANTS_DESC'); ?></small></span>
 				<span class="icon-chevron-right" aria-hidden="true"></span>
 			</a>
+			<?php endif; ?>
+			<?php if ($data['capabilities']['personnel']) : ?>
+			<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="<?php echo Route::_('index.php?option=com_joomleague&view=personnel&project_id=' . (int) $project->id); ?>">
+				<span><strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PERSONNEL'); ?></strong><br><small class="text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PERSONNEL_DESC'); ?></small></span>
+				<span class="icon-chevron-right" aria-hidden="true"></span>
+			</a>
+			<?php endif; ?>
+			<?php if ($data['capabilities']['program']) : ?>
 			<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="<?php echo Route::_('index.php?option=com_joomleague&view=results&project_id=' . (int) $project->id); ?>">
 				<span><strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PROGRAM'); ?></strong><br><small class="text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PROGRAM_DESC'); ?></small></span>
 				<span class="icon-chevron-right" aria-hidden="true"></span>
 			</a>
+			<?php endif; ?>
+			<?php if ($data['capabilities']['standings'] && $data['capabilities']['program']) : ?>
 			<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="<?php echo Route::_('index.php?option=com_joomleague&view=standings&project_id=' . (int) $project->id); ?>">
 				<span><strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_STANDINGS'); ?></strong><br><small class="text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_STANDINGS_DESC'); ?></small></span>
 				<span class="icon-chevron-right" aria-hidden="true"></span>
 			</a>
+			<?php endif; ?>
+			<?php if ((int) $data['capabilities']['bracket_stage_id'] > 0) : ?>
+			<a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="<?php echo Route::_('index.php?option=com_joomleague&view=bracket&project_id=' . (int) $project->id . '&stage_id=' . (int) $data['capabilities']['bracket_stage_id']); ?>">
+				<span><strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_BRACKET'); ?></strong><br><small class="text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_BRACKET_DESC'); ?></small></span>
+				<span class="icon-chevron-right" aria-hidden="true"></span>
+			</a>
+			<?php endif; ?>
+			<?php if ($data['capabilities']['statistics_overview']) : ?><a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="<?php echo Route::_('index.php?option=com_joomleague&view=statisticsoverview&project_id=' . (int) $project->id); ?>"><span><strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_STATSOVERVIEW'); ?></strong><br><small class="text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_STATSOVERVIEW_DESC'); ?></small></span><span class="icon-chevron-right" aria-hidden="true"></span></a><?php endif; ?>
+			<?php if ($data['capabilities']['result_matrix']) : ?><a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="<?php echo Route::_('index.php?option=com_joomleague&view=resultmatrix&project_id=' . (int) $project->id); ?>"><span><strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_RESULTMATRIX'); ?></strong><br><small class="text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_RESULTMATRIX_DESC'); ?></small></span><span class="icon-chevron-right" aria-hidden="true"></span></a><?php endif; ?>
+			<?php if ($data['capabilities']['comparison']) : ?><a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="<?php echo Route::_('index.php?option=com_joomleague&view=comparison&project_id=' . (int) $project->id); ?>"><span><strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_COMPARISON'); ?></strong><br><small class="text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_COMPARISON_DESC'); ?></small></span><span class="icon-chevron-right" aria-hidden="true"></span></a><?php endif; ?>
+			<?php if ($data['capabilities']['progression']) : ?><a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="<?php echo Route::_('index.php?option=com_joomleague&view=standingprogression&project_id=' . (int) $project->id); ?>"><span><strong><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PROGRESSION'); ?></strong><br><small class="text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECT_NAV_PROGRESSION_DESC'); ?></small></span><span class="icon-chevron-right" aria-hidden="true"></span></a><?php endif; ?>
 		</div>
 	<?php endif; ?>
 </div>

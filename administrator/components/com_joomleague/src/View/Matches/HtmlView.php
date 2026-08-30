@@ -34,11 +34,9 @@ final class HtmlView extends BaseHtmlView
 		if ($errors = $this->get('Errors')) throw new GenericDataException(implode("\n", $errors), 500);
 		$user = Factory::getApplication()->getIdentity(); ToolbarHelper::title(Text::sprintf('COM_JOOMLEAGUE_MATCHES_TITLE_ROUND', $this->round->name), 'play');
 		$asset = 'com_joomleague.project.' . (int) ($this->round->project_id ?? 0);
-		if ($user->authorise('core.create', $asset)) ToolbarHelper::addNew('match.add');
-		if ($this->items !== [] && $user->authorise('joomleague.project.edit.schedule', $asset)) ToolbarHelper::editList('match.edit');
-		if ($this->items !== [] && $user->authorise('joomleague.project.edit.schedule', $asset)) ToolbarHelper::modal('matches-batch-modal', 'icon-copy', 'COM_JOOMLEAGUE_MATCHES_BATCH_BUTTON');
-		if ($this->items !== [] && $user->authorise('core.edit.state', $asset)) { ToolbarHelper::publish('matches.publish', 'JTOOLBAR_PUBLISH', true); ToolbarHelper::unpublish('matches.unpublish', 'JTOOLBAR_UNPUBLISH', true); ToolbarHelper::checkin('matches.checkin'); }
-		if ($this->items !== [] && $user->authorise('core.delete', $asset)) ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'matches.delete');
+		$canEditSchedule = $user->authorise('joomleague.project.edit.schedule', $asset);
+		if ($canEditSchedule) ToolbarHelper::addNew('match.add');
+		if ($this->items !== [] && $canEditSchedule) { ToolbarHelper::editList('match.edit'); ToolbarHelper::modal('matches-batch-modal', 'icon-copy', 'COM_JOOMLEAGUE_MATCHES_BATCH_BUTTON'); ToolbarHelper::publish('matches.publish', 'JTOOLBAR_PUBLISH', true); ToolbarHelper::unpublish('matches.unpublish', 'JTOOLBAR_UNPUBLISH', true); ToolbarHelper::checkin('matches.checkin'); ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'matches.delete'); }
 		ToolbarHelper::link('index.php?option=com_joomleague&view=rounds&stage_id=' . (int) $this->round->stage_id, 'JTOOLBAR_CLOSE', 'cancel'); parent::display($tpl);
 	}
 }

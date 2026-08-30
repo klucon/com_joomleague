@@ -97,6 +97,22 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 		return $result;
 	}
 
+	protected function canDelete($record): bool
+	{
+		return $this->canEditSchedule((int) ($record->project_id ?? 0));
+	}
+
+	protected function canEditState($record): bool
+	{
+		return $this->canEditSchedule((int) ($record->project_id ?? 0));
+	}
+
+	private function canEditSchedule(int $projectId): bool
+	{
+		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		return $this->getCurrentUser()->authorise('joomleague.project.edit.schedule', $asset);
+	}
+
 	protected function prepareTable($table): void
 	{
 		$now = Factory::getDate()->toSql();

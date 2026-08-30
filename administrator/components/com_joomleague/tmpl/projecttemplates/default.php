@@ -21,7 +21,7 @@ $formatValue = static function (mixed $value): string {
 	return $translated === $key ? (string) $value : $translated;
 };
 ?>
-<form action="<?php echo Route::_('index.php?option=com_joomleague&view=projecttemplates&project_id=' . (int) $this->project->id); ?>" method="post" name="adminForm" id="projecttemplates-form">
+<form action="<?php echo Route::_('index.php?option=com_joomleague&view=projecttemplates&project_id=' . (int) $this->project->id); ?>" method="post" name="adminForm" id="adminForm">
 	<div class="alert alert-info" role="alert">
 		<strong><?php echo $this->escape($this->project->sport_type_name); ?></strong>
 		<?php echo Text::_($this->project->profile_name_key); ?> <?php echo $this->escape($this->project->profile_version); ?>.

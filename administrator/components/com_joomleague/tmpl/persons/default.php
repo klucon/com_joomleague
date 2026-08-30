@@ -51,7 +51,16 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 			</tbody>
 		</table>
 	</div>
-	<?php echo $this->pagination->getListFooter(); ?>
+	<div class="d-none d-sm-block"><?php echo $this->pagination->getListFooter(); ?></div>
+	<?php $paginationData = $this->pagination->getData(); ?>
+	<div class="d-sm-none">
+		<div class="text-end mb-2"><?php echo $this->pagination->getResultsCounter(); ?></div>
+		<ul class="pagination justify-content-end mb-0">
+			<?php echo LayoutHelper::render('joomla.pagination.link', ['data' => $paginationData->previous, 'active' => $paginationData->previous->link !== null]); ?>
+			<li class="page-item disabled"><span class="page-link"><?php echo $this->pagination->getPagesCounter(); ?></span></li>
+			<?php echo LayoutHelper::render('joomla.pagination.link', ['data' => $paginationData->next, 'active' => $paginationData->next->link !== null]); ?>
+		</ul>
+	</div>
 	<input type="hidden" name="task" value="">
 	<input type="hidden" name="boxchecked" value="0">
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>">
