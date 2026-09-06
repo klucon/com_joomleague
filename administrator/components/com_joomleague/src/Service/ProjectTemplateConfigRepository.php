@@ -32,12 +32,12 @@ final class ProjectTemplateConfigRepository
 		foreach ($this->database->setQuery($query)->loadObjectList() as $row) {
 			$code = (string) $row->template_code;
 			if (!in_array($code, $supported, true) || !hash_equals(TemplateDefinitionRegistry::SCHEMA_VERSION, (string) $row->schema_version)) {
-				throw new \UnexpectedValueException(sprintf('Project %d contains an unsupported template configuration.', $projectId));
+					throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_PROJECT_CONFIG_UNSUPPORTED');
 			}
 			$params = $this->decodeObject((string) $row->params_json);
 			$this->registry->validateValues($code, $params);
 			if (!hash_equals(CanonicalJson::checksum($params), (string) $row->params_checksum)) {
-				throw new \UnexpectedValueException(sprintf('Project %d template "%s" checksum is invalid.', $projectId, $code));
+					throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_PROJECT_CHECKSUM');
 			}
 			$result[$code] = $params;
 		}
@@ -59,7 +59,7 @@ final class ProjectTemplateConfigRepository
 	public function saveAll(int $projectId, array $configs, int $actorId): void
 	{
 		if ($actorId < 0) {
-			throw new \InvalidArgumentException('Actor ID cannot be negative.');
+			throw new \InvalidArgumentException('COM_JOOMLEAGUE_TEMPLATE_ERROR_ACTOR_INVALID');
 		}
 
 		$this->database->transactionStart();
@@ -72,7 +72,7 @@ final class ProjectTemplateConfigRepository
 
 			foreach ($configs as $templateCode => $params) {
 				if (!is_string($templateCode) || !in_array($templateCode, $supported, true)) {
-					throw new \InvalidArgumentException(sprintf('Template "%s" is not supported by this project profile.', (string) $templateCode));
+						throw new \InvalidArgumentException('COM_JOOMLEAGUE_TEMPLATE_ERROR_PROJECT_TEMPLATE_UNSUPPORTED');
 				}
 
 				$this->registry->validateValues($templateCode, $params);
@@ -85,7 +85,7 @@ final class ProjectTemplateConfigRepository
 				$json = CanonicalJson::encodeObject($params);
 
 				if (strlen($json) > self::MAX_PAYLOAD_BYTES) {
-					throw new \LengthException('Project template configuration exceeds the storage limit.');
+						throw new \LengthException('COM_JOOMLEAGUE_TEMPLATE_ERROR_PROJECT_SIZE');
 				}
 
 				$records[$templateCode] = [
@@ -119,14 +119,14 @@ final class ProjectTemplateConfigRepository
 	/** @return array<string,mixed> */
 	private function loadProjectProfile(int $projectId): array
 	{
-		if ($projectId < 1) throw new \InvalidArgumentException('A positive project ID is required.');
+		if ($projectId < 1) throw new \InvalidArgumentException('COM_JOOMLEAGUE_CONTEXT_PROJECT_REQUIRED');
 		$query = $this->database->getQuery(true)
 			->select('version.payload_json')
 			->from($this->database->quoteName('#__joomleague_project', 'project'))
 			->innerJoin($this->database->quoteName('#__joomleague_sport_profile_version', 'version') . ' ON version.id = project.profile_version_id')
 			->where('project.id = :projectId')->bind(':projectId', $projectId);
 		$json = $this->database->setQuery($query)->loadResult();
-		if ($json === null) throw new \RuntimeException(sprintf('Project %d does not exist.', $projectId));
+		if ($json === null) throw new \RuntimeException('COM_JOOMLEAGUE_TEMPLATE_ERROR_PROJECT_NOT_FOUND');
 		return $this->decodeObject((string) $json);
 	}
 
@@ -134,10 +134,10 @@ final class ProjectTemplateConfigRepository
 	private function supportedTemplateCodes(array $profile): array
 	{
 		$defaults = $profile['template_defaults'] ?? null;
-		if (!is_array($defaults) || array_is_list($defaults)) throw new \UnexpectedValueException('Profile template defaults must be an object.');
+		if (!is_array($defaults) || array_is_list($defaults)) throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_PROFILE_DEFAULTS_INVALID');
 		$known = $this->registry->all();
 		foreach ($defaults as $code => $values) {
-			if (!isset($known[$code]) || !is_array($values) || array_is_list($values)) throw new \UnexpectedValueException(sprintf('Profile contains invalid template defaults for "%s".', $code));
+			if (!isset($known[$code]) || !is_array($values) || array_is_list($values)) throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_PROFILE_DEFAULTS_INVALID');
 			$this->registry->validateValues((string) $code, $values);
 		}
 		return array_keys($defaults);
@@ -191,7 +191,7 @@ final class ProjectTemplateConfigRepository
 	private function decodeObject(string $json): array
 	{
 		$value = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-		if (!is_array($value) || (array_is_list($value) && $value !== [])) throw new \UnexpectedValueException('Template configuration must be a JSON object.');
+		if (!is_array($value) || (array_is_list($value) && $value !== [])) throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_CONFIG_INVALID');
 		return $value;
 	}
 }

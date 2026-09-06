@@ -161,7 +161,7 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 				->where('project_id = :project')->where('code = :code')
 				->bind(':project', $projectId, ParameterType::INTEGER)->bind(':code', $code);
 			if ((int) $this->getDatabase()->setQuery($query)->loadResult() === 0) return $code;
-			$code = $base . '-' . $suffix++;
+			$code = $base . '_' . $suffix++;
 		}
 	}
 

@@ -5,7 +5,7 @@
 	<creationDate>2026-08</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.2.0-dev6</version>
+	<version>6.2.0-dev7</version>
 	<description>MOD_JOOMLEAGUE_STANDINGS_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Standings</namespace>
 	<files>
@@ -52,14 +52,19 @@
 				<field
 					name="highlight_style"
 					type="list"
-					default="row"
+					default=""
 					label="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_STYLE_LABEL"
 					description="MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_STYLE_DESC"
 				>
+					<option value="">MOD_JOOMLEAGUE_STANDINGS_INHERIT</option>
 					<option value="row">MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_STYLE_ROW</option>
 					<option value="text">MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_STYLE_TEXT</option>
 					<option value="none">MOD_JOOMLEAGUE_STANDINGS_HIGHLIGHT_STYLE_NONE</option>
 				</field>
+				<field name="template_show_score" type="list" default="" label="MOD_JOOMLEAGUE_STANDINGS_TEMPLATE_SHOW_SCORE_LABEL" description="MOD_JOOMLEAGUE_STANDINGS_TEMPLATE_SHOW_SCORE_DESC"><option value="">MOD_JOOMLEAGUE_STANDINGS_INHERIT</option><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="template_show_goal_difference" type="list" default="" label="MOD_JOOMLEAGUE_STANDINGS_TEMPLATE_SHOW_DIFFERENCE_LABEL" description="MOD_JOOMLEAGUE_STANDINGS_TEMPLATE_SHOW_DIFFERENCE_DESC"><option value="">MOD_JOOMLEAGUE_STANDINGS_INHERIT</option><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="template_show_sets" type="list" default="" label="MOD_JOOMLEAGUE_STANDINGS_TEMPLATE_SHOW_SETS_LABEL" description="MOD_JOOMLEAGUE_STANDINGS_TEMPLATE_SHOW_SETS_DESC"><option value="">MOD_JOOMLEAGUE_STANDINGS_INHERIT</option><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="template_show_points" type="list" default="" label="MOD_JOOMLEAGUE_STANDINGS_TEMPLATE_SHOW_POINTS_LABEL" description="MOD_JOOMLEAGUE_STANDINGS_TEMPLATE_SHOW_POINTS_DESC"><option value="">MOD_JOOMLEAGUE_STANDINGS_INHERIT</option><option value="0">JNO</option><option value="1">JYES</option></field>
 				<field
 					name="highlight_color_row"
 					type="color"

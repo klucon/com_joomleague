@@ -3,8 +3,9 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Router\Route;
 
-$formatValues = static function (array $values): string {
+$formatValues = static function (array $values, array $fields): string {
 	if ($values === []) {
 		return '<span class="text-body-secondary">' . Text::_('COM_JOOMLEAGUE_TEMPLATES_NO_OVERRIDES') . '</span>';
 	}
@@ -13,8 +14,11 @@ $formatValues = static function (array $values): string {
 
 	foreach ($values as $key => $value) {
 		$display = is_bool($value) ? Text::_($value ? 'JYES' : 'JNO') : (string) $value;
+		if (isset($fields[$key]['enum'])) {
+			$display = Text::_('COM_JOOMLEAGUE_TEMPLATE_OPTION_' . strtoupper((string) $value));
+		}
 		$output[] = '<span class="badge text-bg-light border me-1 mb-1">'
-			. htmlspecialchars((string) $key, ENT_QUOTES, 'UTF-8') . ': '
+			. htmlspecialchars(Text::_($fields[$key]['label_key']), ENT_QUOTES, 'UTF-8') . ': '
 			. htmlspecialchars($display, ENT_QUOTES, 'UTF-8') . '</span>';
 	}
 
@@ -55,6 +59,14 @@ $formatValues = static function (array $values): string {
 				</h2>
 				<div id="profile-<?php echo (int) $index; ?>" class="accordion-collapse collapse" aria-labelledby="profile-heading-<?php echo (int) $index; ?>" data-bs-parent="#templateProfiles">
 					<div class="accordion-body p-0">
+						<?php if ($this->canEditProfiles) : ?>
+							<div class="p-3 border-bottom text-end">
+								<a class="btn btn-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=profiletemplates&profile_version_id=' . (int) $profile->profile_version_id); ?>">
+									<span class="icon-edit" aria-hidden="true"></span>
+									<?php echo Text::_('COM_JOOMLEAGUE_PROFILETEMPLATES_EDIT'); ?>
+								</a>
+							</div>
+						<?php endif; ?>
 						<?php foreach ($profile->templates as $templateIndex => $template) : ?>
 							<section class="p-3<?php echo $templateIndex > 0 ? ' border-top' : ''; ?>">
 								<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
@@ -67,15 +79,15 @@ $formatValues = static function (array $values): string {
 								<div class="row row-cols-1 row-cols-lg-3 g-3">
 									<div class="col">
 										<h4 class="h6 text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_COLUMN_BUNDLED'); ?></h4>
-										<div><?php echo $formatValues($template->bundled); ?></div>
+									<div><?php echo $formatValues($template->bundled, $template->fields); ?></div>
 									</div>
 									<div class="col">
 										<h4 class="h6 text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_COLUMN_OVERRIDE'); ?></h4>
-										<div><?php echo $formatValues($template->overrides); ?></div>
+									<div><?php echo $formatValues($template->overrides, $template->fields); ?></div>
 									</div>
 									<div class="col">
 										<h4 class="h6 text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_COLUMN_EFFECTIVE'); ?></h4>
-										<div><?php echo $formatValues($template->effective); ?></div>
+									<div><?php echo $formatValues($template->effective, $template->fields); ?></div>
 									</div>
 								</div>
 							</section>

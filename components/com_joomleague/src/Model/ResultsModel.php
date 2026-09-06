@@ -61,7 +61,7 @@ final class ResultsModel extends BaseDatabaseModel
 			->select([
 				'item.id', 'item.round_id', 'item.match_number', 'item.scheduled_start', 'item.timezone',
 				'item.attendance', 'item.status_code', 'venue.name AS venue_name',
-				'round.name AS round_name', 'stage.id AS stage_id', 'stage.name AS stage_name',
+				'round.name AS round_name', 'stage.id AS stage_id', 'stage.name AS stage_name', 'stage.stage_type',
 				'result.status_code AS result_status', 'result.notes AS result_notes',
 			])
 			->from($db->quoteName('#__joomleague_project_match', 'item'))
@@ -87,7 +87,7 @@ final class ResultsModel extends BaseDatabaseModel
 		$participants = $db->setQuery(
 			$db->getQuery(true)
 				->select([
-					'participant.id', 'participant.match_id', 'participant.slot_number', 'participant.role_code',
+					'participant.id', 'participant.match_id', 'participant.project_entry_id', 'participant.slot_number', 'participant.role_code',
 					'participant.result_status', 'participant.result_rank', 'entry.id AS entry_id',
 					'entry.display_name', 'team.name AS team_name', 'person.first_name', 'person.last_name',
 				])
@@ -106,6 +106,8 @@ final class ResultsModel extends BaseDatabaseModel
 			$personName = trim((string) $participant->first_name . ' ' . (string) $participant->last_name);
 			$participant->name = (string) ($participant->display_name ?: $participant->team_name ?: $personName ?: ('ID ' . $participant->entry_id));
 			$participant->result_value = null;
+			$participant->winner = false;
+			$participant->resolved = true;
 			$participantsByItem[(int) $participant->match_id][] = $participant;
 			$participantById[(int) $participant->id] = $participant;
 		}
@@ -114,6 +116,7 @@ final class ResultsModel extends BaseDatabaseModel
 			static fn (object $item): int => (int) $item->id,
 			array_filter($items, static fn (object $item): bool => $item->result_status === 'final')
 		));
+		$scoreSegmentsByItem = [];
 		if ($finalItemIds !== []) {
 			$values = $db->setQuery(
 				$db->getQuery(true)
@@ -125,31 +128,77 @@ final class ResultsModel extends BaseDatabaseModel
 			foreach ($values as $value) {
 				if (isset($participantById[(int) $value->participant_id])) {
 					$participantById[(int) $value->participant_id]->result_value = $value;
+					$participantById[(int) $value->participant_id]->winner = $value->status_code === 'winner' || (int) $value->result_rank === 1;
+				}
+			}
+
+			$segmentValues = $db->setQuery(
+				$db->getQuery(true)
+					->select([
+						'segment.id AS segment_id', 'segment.match_id', 'segment.level_code',
+						'segment.sequence_number', 'value.participant_id', 'value.numeric_value',
+						'value.text_value', 'value.status_code', 'value.result_rank',
+					])
+					->from($db->quoteName('#__joomleague_match_score_segment', 'segment'))
+					->leftJoin($db->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id = segment.id')
+					->where('segment.parent_id IS NOT NULL')
+					->whereIn('segment.match_id', $finalItemIds, ParameterType::INTEGER)
+					->order('segment.match_id ASC, segment.sequence_number ASC, segment.id ASC, value.participant_id ASC')
+			)->loadObjectList();
+
+			foreach ($segmentValues as $value) {
+				$matchId = (int) $value->match_id;
+				$segmentId = (int) $value->segment_id;
+				$scoreSegmentsByItem[$matchId][$segmentId] ??= (object) [
+					'level_code' => (string) $value->level_code,
+					'sequence_number' => (int) $value->sequence_number,
+					'values' => [],
+				];
+				if ($value->participant_id !== null) {
+					$scoreSegmentsByItem[$matchId][$segmentId]->values[(int) $value->participant_id] = $value;
 				}
 			}
 		}
 
 		$params = Factory::getApplication()->getParams();
-		$showEvents = (int) $params->get('show_events', 1) === 1;
 		$showVenue = (int) $params->get('show_venue', 1) === 1;
-		$eventsByItem = [];
-		if ($showEvents) {
-			$events = $db->setQuery(
-				$db->getQuery(true)
-					->select(['event.match_id', 'event.event_name_key', 'event.primary_name_snapshot', 'event.clock_value', 'event.clock_unit'])
-					->from($db->quoteName('#__joomleague_match_event', 'event'))
-					->whereIn('event.match_id', $itemIds, ParameterType::INTEGER)->where('event.published = 1')
-					->order('event.match_id ASC, event.sequence_number ASC, event.id ASC')
-			)->loadObjectList();
-			foreach ($events as $event) {
-				$eventsByItem[(int) $event->match_id][] = $event;
+
+		$progressionStageId = null;
+		$progressionRoundId = null;
+		$progressionRoundIndex = -1;
+		$previousRoundEntries = [];
+		$currentRoundEntries = [];
+		foreach ($items as $item) {
+			if ((string) $item->stage_type !== 'knockout') {
+				continue;
+			}
+			if ($progressionStageId !== (int) $item->stage_id) {
+				$progressionStageId = (int) $item->stage_id;
+				$progressionRoundId = null;
+				$progressionRoundIndex = -1;
+				$previousRoundEntries = [];
+				$currentRoundEntries = [];
+			}
+			if ($progressionRoundId !== (int) $item->round_id) {
+				$previousRoundEntries = $currentRoundEntries;
+				$currentRoundEntries = [];
+				$progressionRoundId = (int) $item->round_id;
+				$progressionRoundIndex++;
+			}
+			foreach ($participantsByItem[(int) $item->id] ?? [] as $participant) {
+				$entryId = (int) $participant->project_entry_id;
+				$source = $previousRoundEntries[$entryId] ?? null;
+				$participant->resolved = $progressionRoundIndex === 0
+					|| $source === null
+					|| ($source['status'] === 'final' && $source['participant']->winner);
+				$currentRoundEntries[$entryId] = ['status' => $item->result_status, 'participant' => $participant];
 			}
 		}
 
 		$rounds = [];
 		foreach ($items as $item) {
 			$item->participants = $participantsByItem[(int) $item->id] ?? [];
-			$item->events = $eventsByItem[(int) $item->id] ?? [];
+			$item->score_segments = array_values($scoreSegmentsByItem[(int) $item->id] ?? []);
 			if (!$showVenue) {
 				$item->venue_name = null;
 				$item->attendance = null;
@@ -159,6 +208,6 @@ final class ResultsModel extends BaseDatabaseModel
 			$rounds[$key]['items'][] = $item;
 		}
 
-		return ['project' => $project, 'rounds' => array_values($rounds), 'show_events' => $showEvents, 'show_venue' => $showVenue];
+		return ['project' => $project, 'rounds' => array_values($rounds), 'show_venue' => $showVenue];
 	}
 }

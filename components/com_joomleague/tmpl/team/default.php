@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 
 defined('_JEXEC') or die;
@@ -37,6 +38,7 @@ $data = $this->team;
 			</div>
 			<?php if (trim((string) $team->description) !== '') : ?><p class="mt-3 mb-0"><?php echo nl2br(htmlspecialchars((string) $team->description, ENT_QUOTES, 'UTF-8')); ?></p><?php endif; ?>
 		</header>
+		<?php echo LayoutHelper::render('joomleague.fields', ['context' => 'com_joomleague.team', 'item' => $team], JPATH_ROOT . '/components/com_joomleague/layouts'); ?>
 
 		<h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_TEAM_PROJECTS_TITLE'); ?></h2>
 		<?php if ($data['projects'] === []) : ?>

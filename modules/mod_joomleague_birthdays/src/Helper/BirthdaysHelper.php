@@ -1,0 +1,4 @@
+<?php
+declare(strict_types=1);namespace Joomleague\Module\Birthdays\Site\Helper;defined('_JEXEC')or die;
+use DateTimeImmutable;use DateTimeZone;use Joomla\CMS\Factory;use Joomla\Database\DatabaseInterface;use Joomla\Registry\Registry;use Joomleague\Component\Joomleague\Domain\Service\BirthdayReader;
+final class BirthdaysHelper{/** @return array<string,mixed> */public function getBirthdays(Registry$p):array{try{$app=Factory::getApplication();$app->bootComponent('com_joomleague');$zone=new DateTimeZone((string)$app->get('offset','UTC'));$today=new DateTimeImmutable('today',$zone);$levels=$app->getIdentity()?->getAuthorisedViewLevels()??[1];$items=(new BirthdayReader(Factory::getContainer()->get(DatabaseInterface::class)))->upcoming($today,(int)$p->get('days',30),(int)$p->get('limit',10),$levels,(int)$p->get('club_id',0));return['items'=>$items];}catch(\Throwable){return['error'=>'MOD_JOOMLEAGUE_BIRTHDAYS_UNAVAILABLE'];}}}

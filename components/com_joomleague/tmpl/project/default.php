@@ -11,34 +11,37 @@ declare(strict_types=1);
  */
 
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 
 defined('_JEXEC') or die;
 
 /** @var Joomleague\Component\Joomleague\Site\View\Project\HtmlView $this */
 $data = $this->project;
+$config = $this->templateConfig;
 ?>
 <div class="com-joomleague-project">
 	<?php if (isset($data['error'])) : ?>
 		<div class="alert alert-warning"><?php echo Text::_($data['error']); ?></div>
 	<?php else : ?>
 		<?php $project = $data['project']; ?>
-		<header class="border-bottom pb-3 mb-4">
+		<?php if ($config['show_hero'] ?? true) : ?><header class="border-bottom pb-3 mb-4">
 			<div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
 				<div>
 					<h1 class="mb-1"><?php echo htmlspecialchars((string) $project->name, ENT_QUOTES, 'UTF-8'); ?></h1>
-					<div class="text-body-secondary">
-						<?php echo htmlspecialchars((string) $project->competition_name, ENT_QUOTES, 'UTF-8'); ?>
-						<span aria-hidden="true">&middot;</span>
-						<?php echo htmlspecialchars((string) $project->season_name, ENT_QUOTES, 'UTF-8'); ?>
-					</div>
+					<?php if (($config['show_competition_info'] ?? true) || ($config['show_season'] ?? true)) : ?><div class="text-body-secondary">
+						<?php if ($config['show_competition_info'] ?? true) : ?><?php echo htmlspecialchars((string) $project->competition_name, ENT_QUOTES, 'UTF-8'); ?><?php endif; ?>
+						<?php if (($config['show_competition_info'] ?? true) && ($config['show_season'] ?? true)) : ?><span aria-hidden="true">&middot;</span><?php endif; ?>
+						<?php if ($config['show_season'] ?? true) : ?><?php echo htmlspecialchars((string) $project->season_name, ENT_QUOTES, 'UTF-8'); ?><?php endif; ?>
+					</div><?php endif; ?>
 				</div>
-				<span class="badge text-bg-secondary"><?php echo htmlspecialchars((string) $project->sport_type_name, ENT_QUOTES, 'UTF-8'); ?></span>
+				<?php if ($config['show_sport'] ?? true) : ?><span class="badge text-bg-secondary"><?php echo htmlspecialchars((string) $project->sport_type_name, ENT_QUOTES, 'UTF-8'); ?></span><?php endif; ?>
 			</div>
 			<?php if (trim((string) $project->description) !== '') : ?>
 				<p class="mt-3 mb-0"><?php echo nl2br(htmlspecialchars((string) $project->description, ENT_QUOTES, 'UTF-8')); ?></p>
 			<?php endif; ?>
-		</header>
+		</header><?php else : ?><h1 class="mb-4"><?php echo htmlspecialchars((string) $project->name, ENT_QUOTES, 'UTF-8'); ?></h1><?php endif; ?>
+		<?php echo LayoutHelper::render('joomleague.fields', ['context' => 'com_joomleague.project', 'item' => $project], JPATH_ROOT . '/components/com_joomleague/layouts'); ?>
 
 		<div class="row row-cols-2 row-cols-lg-4 g-3 mb-4" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_PROJECT_SUMMARY_LABEL'); ?>">
 			<?php foreach (['entries', 'stages', 'rounds', 'program'] as $metric) : ?>

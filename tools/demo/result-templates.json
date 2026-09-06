@@ -1,0 +1,1999 @@
+{
+    "basketball": {
+        "result_type": "numeric_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "90.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "77.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 2,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 3,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 4,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "90.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "77.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "bowling": {
+        "result_type": "numeric_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "188.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "139.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": []
+            }
+        ]
+    },
+    "chess": {
+        "result_type": "numeric_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "0.500000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "0.500000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "board",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "0.500000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "0.500000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "darts": {
+        "result_type": "nested_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "2.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "3.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "set",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "2.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "3.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "esports": {
+        "result_type": "nested_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "4.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "1.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "map",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "4.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "floorball": {
+        "result_type": "numeric_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "5.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "3.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "2.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 2,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "2.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 3,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "football": {
+        "result_type": "numeric_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "2.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "4.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "2.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 2,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "2.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "futsal": {
+        "result_type": "numeric_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "2.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "2.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 2,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "ice_hockey": {
+        "result_type": "numeric_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "2.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "1.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 2,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "1.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 3,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "mma_boxing": {
+        "result_type": "decision_result",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "1.000000000",
+                        "text_value": null,
+                        "status_code": "winner",
+                        "result_rank": 1,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "0.000000000",
+                        "text_value": null,
+                        "status_code": "loser",
+                        "result_rank": 2,
+                        "metadata": []
+                    }
+                ],
+                "children": []
+            }
+        ]
+    },
+    "motorsport": {
+        "result_type": "time_result",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:23.000",
+                        "status_code": null,
+                        "result_rank": 1,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:49.000",
+                        "status_code": null,
+                        "result_rank": 2,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_3}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:06.000",
+                        "status_code": null,
+                        "result_rank": 3,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_4}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:39.000",
+                        "status_code": null,
+                        "result_rank": 4,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_5}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:58.000",
+                        "status_code": null,
+                        "result_rank": 5,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_6}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:13.000",
+                        "status_code": null,
+                        "result_rank": 6,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_7}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:07.000",
+                        "status_code": null,
+                        "result_rank": 7,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_8}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:48.000",
+                        "status_code": null,
+                        "result_rank": 8,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_9}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:48.000",
+                        "status_code": null,
+                        "result_rank": 9,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_10}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:50.000",
+                        "status_code": null,
+                        "result_rank": 10,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_11}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:20.000",
+                        "status_code": null,
+                        "result_rank": 11,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_12}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:44.000",
+                        "status_code": null,
+                        "result_rank": 12,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_13}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:17.000",
+                        "status_code": null,
+                        "result_rank": 13,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_14}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:23.000",
+                        "status_code": null,
+                        "result_rank": 14,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "session",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_3}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_4}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_5}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_6}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_7}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_8}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_9}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_10}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_11}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_12}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_13}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_14}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "session",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 2,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_3}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_4}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_5}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_6}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_7}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_8}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_9}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_10}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_11}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_12}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_13}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_14}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "session",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 3,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_3}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_4}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_5}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_6}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_7}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_8}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_9}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_10}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_11}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_12}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_13}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_14}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "rugby": {
+        "result_type": "numeric_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "20.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "32.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "period",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 2,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "20.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "32.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "running_race": {
+        "result_type": "time_result",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:53.000",
+                        "status_code": null,
+                        "result_rank": 1,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:46.000",
+                        "status_code": null,
+                        "result_rank": 2,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_3}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:46.000",
+                        "status_code": null,
+                        "result_rank": 3,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_4}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:02.000",
+                        "status_code": null,
+                        "result_rank": 4,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_5}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:39.000",
+                        "status_code": null,
+                        "result_rank": 5,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_6}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:26.000",
+                        "status_code": null,
+                        "result_rank": 6,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_7}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:19.000",
+                        "status_code": null,
+                        "result_rank": 7,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_8}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:21.000",
+                        "status_code": null,
+                        "result_rank": 8,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_9}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:51.000",
+                        "status_code": null,
+                        "result_rank": 9,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_10}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:49.000",
+                        "status_code": null,
+                        "result_rank": 10,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_11}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:49.000",
+                        "status_code": null,
+                        "result_rank": 11,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_12}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:07.000",
+                        "status_code": null,
+                        "result_rank": 12,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_13}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:03.000",
+                        "status_code": null,
+                        "result_rank": 13,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_14}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:54.000",
+                        "status_code": null,
+                        "result_rank": 14,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_15}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:26.000",
+                        "status_code": null,
+                        "result_rank": 15,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_16}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:23.000",
+                        "status_code": null,
+                        "result_rank": 16,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_17}}",
+                        "numeric_value": null,
+                        "text_value": "00:15:59.000",
+                        "status_code": null,
+                        "result_rank": 17,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_18}}",
+                        "numeric_value": null,
+                        "text_value": "00:16:21.000",
+                        "status_code": null,
+                        "result_rank": 18,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "gun_time",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_3}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_4}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_5}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_6}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_7}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_8}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_9}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_10}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_11}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_12}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_13}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_14}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_15}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_16}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_17}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_18}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    },
+                    {
+                        "level_code": "chip_time",
+                        "segment_type_ordinal": 20,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_3}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_4}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_5}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_6}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_7}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_8}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_9}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_10}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_11}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_12}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_13}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_14}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_15}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_16}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_17}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_18}}",
+                                "numeric_value": null,
+                                "text_value": "00:00:00.000",
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "tennis": {
+        "result_type": "nested_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "0.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "3.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "set",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "0.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "3.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    },
+    "volleyball": {
+        "result_type": "nested_score",
+        "status_code": "final",
+        "outcome_code": "completed",
+        "finalized_at": null,
+        "notes": null,
+        "metadata": [],
+        "segments": [
+            {
+                "level_code": "result",
+                "segment_type_ordinal": 0,
+                "sequence_number": 1,
+                "status_code": "completed",
+                "metadata": [],
+                "values": [
+                    {
+                        "participant_id": "{{participant_1}}",
+                        "numeric_value": "3.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    },
+                    {
+                        "participant_id": "{{participant_2}}",
+                        "numeric_value": "4.000000000",
+                        "text_value": null,
+                        "status_code": null,
+                        "result_rank": null,
+                        "metadata": []
+                    }
+                ],
+                "children": [
+                    {
+                        "level_code": "set",
+                        "segment_type_ordinal": 10,
+                        "sequence_number": 1,
+                        "status_code": "completed",
+                        "metadata": [],
+                        "values": [
+                            {
+                                "participant_id": "{{participant_1}}",
+                                "numeric_value": "3.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            },
+                            {
+                                "participant_id": "{{participant_2}}",
+                                "numeric_value": "4.000000000",
+                                "text_value": null,
+                                "status_code": null,
+                                "result_rank": null,
+                                "metadata": []
+                            }
+                        ],
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    }
+}

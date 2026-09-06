@@ -7,6 +7,7 @@ namespace Joomleague\Component\Joomleague\Administrator\Model;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Form\Form;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
@@ -50,7 +51,13 @@ final class RoundModel extends AdminModel implements CurrentUserInterface
 		$id = (int) ($data['id'] ?? 0);
 		$oldPublished = null;
 		if ($id > 0) { $stored = $this->storedOwner($id); $data['stage_id'] = $stored->stage_id; $data['project_id'] = $stored->project_id; $oldPublished = (int) $stored->published; }
-		else { $stage = $this->getStage((int) ($data['stage_id'] ?? 0)); $data['project_id'] = (int) $stage->project_id; }
+		else {
+			$stage = $this->getStage((int) ($data['stage_id'] ?? 0));
+			$data['project_id'] = (int) $stage->project_id;
+			if (trim((string) ($data['code'] ?? '')) === '') {
+				$data['code'] = $this->availableCode((int) $stage->id, (string) ($data['name'] ?? 'round'));
+			}
+		}
 		$result = parent::save($data);
 		if ($result && $oldPublished !== null && array_key_exists('published', $data) && (int) $data['published'] !== $oldPublished) $this->refreshStandings([[(int) $data['project_id'], (int) $data['stage_id']]]);
 		return $result;
@@ -99,6 +106,22 @@ final class RoundModel extends AdminModel implements CurrentUserInterface
 	{
 		$query = $this->getDatabase()->getQuery(true)->select(['stage_id', 'project_id', 'published'])->from($this->getDatabase()->quoteName('#__joomleague_project_round'))->where($this->getDatabase()->quoteName('id') . ' = :id')->bind(':id', $id, ParameterType::INTEGER);
 		$owner = $this->getDatabase()->setQuery($query)->loadObject(); if (!$owner) throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_ROUND_INVALID')); return $owner;
+	}
+
+	private function availableCode(int $stageId, string $name): string
+	{
+		$base = str_replace('-', '_', ApplicationHelper::stringURLSafe($name)) ?: 'round';
+		$code = $base;
+		$suffix = 2;
+
+		while (true) {
+			$query = $this->getDatabase()->getQuery(true)->select('COUNT(*)')
+				->from($this->getDatabase()->quoteName('#__joomleague_project_round'))
+				->where('stage_id = :stage')->where('code = :code')
+				->bind(':stage', $stageId, ParameterType::INTEGER)->bind(':code', $code);
+			if ((int) $this->getDatabase()->setQuery($query)->loadResult() === 0) return $code;
+			$code = $base . '_' . $suffix++;
+		}
 	}
 
 	/** @param list<int|string> $ids @return list<array{0:int,1:int}> */

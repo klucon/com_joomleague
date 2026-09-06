@@ -34,7 +34,7 @@ final class HtmlView extends BaseHtmlView
 			$this->form = $this->getModel()->getForm($projectId);
 			$this->templateGroups = $this->getModel()->getTemplateGroups();
 		} catch (\Throwable $exception) {
-			throw new GenericDataException($exception->getMessage(), 500);
+			throw new GenericDataException(Text::_($exception->getMessage()), 500);
 		}
 
 		$this->addToolbar();

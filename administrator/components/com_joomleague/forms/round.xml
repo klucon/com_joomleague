@@ -4,7 +4,7 @@
 		<field name="project_id" type="hidden" filter="uint" /><field name="stage_id" type="hidden" filter="uint" required="true" />
 		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_NAME_DESC" required="true" maxlength="255" />
 		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_ALIAS_DESC" maxlength="255" />
-		<field name="code" type="text" label="COM_JOOMLEAGUE_FIELD_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_CODE_DESC" required="true" maxlength="100" filter="cmd" />
+		<field name="code" type="hidden" filter="cmd" />
 		<field name="round_type" type="text" label="COM_JOOMLEAGUE_FIELD_ROUND_TYPE_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_TYPE_DESC" required="true" default="standard" maxlength="100" filter="cmd" />
 		<field name="sequence_number" type="number" label="COM_JOOMLEAGUE_FIELD_ROUND_NUMBER_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_NUMBER_DESC" required="true" min="1" filter="uint" />
 		<field name="start_date" type="calendar" label="COM_JOOMLEAGUE_FIELD_START_DATE_LABEL" description="COM_JOOMLEAGUE_FIELD_ROUND_START_DATE_DESC" format="%Y-%m-%d" filter="string" showtime="false" todaybutton="true" />

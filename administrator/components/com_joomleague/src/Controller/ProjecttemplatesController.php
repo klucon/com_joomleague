@@ -7,6 +7,7 @@ namespace Joomleague\Component\Joomleague\Administrator\Controller;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Log\Log;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Session\Session;
@@ -46,9 +47,14 @@ final class ProjecttemplatesController extends BaseController
 			$this->getModel('Projecttemplates')->saveSubmittedTemplates($projectId, (array) ($data['templates'] ?? []), (int) $this->app->getIdentity()->id);
 			$this->app->enqueueMessage(Text::_('COM_JOOMLEAGUE_PROJECTTEMPLATES_SAVE_SUCCESS'));
 			$url = $stay ? 'index.php?option=com_joomleague&view=projecttemplates&project_id=' . $projectId : 'index.php?option=com_joomleague&view=projectpanel&project_id=' . $projectId;
-		} catch (\Throwable $exception) {
+		} catch (\InvalidArgumentException|\UnexpectedValueException $exception) {
 			$this->app->setUserState('com_joomleague.edit.projecttemplates.data', $data);
-			$this->app->enqueueMessage($exception->getMessage(), 'error');
+			$this->app->enqueueMessage(Text::_($exception->getMessage()), 'error');
+			$url = 'index.php?option=com_joomleague&view=projecttemplates&project_id=' . $projectId;
+		} catch (\Throwable $exception) {
+			Log::add($exception->getMessage(), Log::ERROR, 'com_joomleague.templates');
+			$this->app->setUserState('com_joomleague.edit.projecttemplates.data', $data);
+			$this->app->enqueueMessage(Text::_('COM_JOOMLEAGUE_PROJECTTEMPLATES_SAVE_FAILED'), 'error');
 			$url = 'index.php?option=com_joomleague&view=projecttemplates&project_id=' . $projectId;
 		}
 

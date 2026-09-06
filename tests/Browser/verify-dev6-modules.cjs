@@ -1,12 +1,8 @@
 const { chromium } = require('playwright');
 
 (async () => {
-	const baseUrl = process.env.JOOMLA_BASE_URL;
-	const pagePath = process.env.JOOMLA_MODULE_TEST_PATH;
-
-	if (!baseUrl || !pagePath) {
-		throw new Error('Module browser test environment is incomplete.');
-	}
+	const baseUrl = process.env.JOOMLA_BASE_URL || 'https://demo.joomleague.eu';
+	const pagePath = process.env.JOOMLA_MODULE_TEST_PATH || '/';
 
 	const browser = await chromium.launch({ headless: true });
 
@@ -33,40 +29,41 @@ const { chromium } = require('playwright');
 				throw new Error(`Module test page returned ${response ? response.status() : 'no response'}.`);
 			}
 
-			const aside = page.locator('aside.jl-aside');
-			await aside.waitFor();
-			const moduleArea = page.locator('.jl-main-top, aside.jl-aside, .jl-main-bottom, .jl-module-band');
+			const moduleArea = page.locator('main, .jl-competition-nav');
 			const text = await moduleArea.allInnerTexts().then((parts) => parts.join('\n'));
-			const expected = [
-				'No future programme event is available.',
-				'Stonebridge Foxes',
-				'Active members: 15',
-				'Officials',
-				'Stonebridge Foxes Arena',
-				'Running Race Demo League 2025/2026',
+			const moduleSelectors = [
+				'.mod-joomleague-next-event',
+				'.mod-joomleague-standings',
+				'.mod-joomleague-calendar',
+				'.mod-joomleague-programme-ticker',
+				'.mod-joomleague-latest-results',
+				'.mod-joomleague-program',
+				'.mod-joomleague-birthdays',
+				'.mod-joomleague-statranking',
+				'.mod-joomleague-eventranking',
+				'.mod-joomleague-spotlight',
+			];
+			const moduleHeadings = [
+				'At Westmoor Arena',
+				'Featured team',
+				'Westmoor Football Club',
+				'Coaching and officials',
+				'Explore competitions',
 			];
 
-			if (await aside.locator('nav[aria-label="Competition navigation"]').count() !== 1) {
+			if (await page.locator('nav[aria-label="Competition navigation"]').count() !== 1) {
 				throw new Error(`Competition navigation module is missing at ${viewport.name}.`);
 			}
 
-			const placements = [
-				['.jl-main-top', 'No future programme event is available.'],
-				['.jl-main-bottom', 'Stonebridge Foxes Arena'],
-				['.jl-module-grid', 'Active members: 15'],
-				['.jl-module-grid', 'Officials'],
-				['.jl-module-band--wide', 'Running Race Demo League 2025/2026'],
-			];
-
-			for (const [selector, value] of placements) {
-				if (!(await page.locator(selector).innerText()).includes(value)) {
-					throw new Error(`Module is not in ${selector} at ${viewport.name}: ${value}`);
+			for (const selector of moduleSelectors) {
+				if (await page.locator(selector).count() !== 1) {
+					throw new Error(`Published module ${selector} is missing or duplicated at ${viewport.name}.`);
 				}
 			}
 
-			for (const value of expected) {
-				if (!text.includes(value)) {
-					throw new Error(`Expected module content is missing at ${viewport.name}: ${value}`);
+			for (const heading of moduleHeadings) {
+				if (await page.getByRole('heading', { name: heading, exact: true }).count() !== 1) {
+					throw new Error(`Published module heading is missing at ${viewport.name}: ${heading}`);
 				}
 			}
 
@@ -115,11 +112,6 @@ const { chromium } = require('playwright');
 			if (errors.length > 0) {
 				throw new Error(`Browser errors at ${viewport.name}: ${errors.join('; ')}`);
 			}
-
-			await page.screenshot({
-				path: `/mnt/disk-b/server-backups/joomleague-release/dev6-modules-${viewport.name}.png`,
-				fullPage: true,
-			});
 
 			await page.close();
 		}

@@ -17,6 +17,7 @@ defined('_JEXEC') or die;
 
 /** @var Joomleague\Component\Joomleague\Site\View\Participant\HtmlView $this */
 $data = $this->participant;
+$config = $this->templateConfig;
 $kindLabels = [
 	'team' => 'COM_JOOMLEAGUE_PARTICIPANTS_KIND_TEAM',
 	'person' => 'COM_JOOMLEAGUE_PARTICIPANTS_KIND_PERSON',
@@ -35,7 +36,7 @@ $personTypeLabels = [
 	<?php else : ?>
 		<?php
 		$participant = $data['participant'];
-		$media = $participant->team_logo ?: ($participant->person_picture ?: $participant->team_picture);
+		$media = ($config['show_personal_data'] ?? true) ? ($participant->team_logo ?: ($participant->person_picture ?: $participant->team_picture)) : null;
 		$description = $participant->entry_kind === 'team' ? $participant->team_description : $participant->person_description;
 		?>
 		<header class="border-bottom pb-3 mb-4">
@@ -53,12 +54,12 @@ $personTypeLabels = [
 					</div>
 				</div>
 			</div>
-			<?php if (trim((string) $description) !== '') : ?><p class="mt-3 mb-0"><?php echo nl2br(htmlspecialchars((string) $description, ENT_QUOTES, 'UTF-8')); ?></p><?php endif; ?>
+			<?php if (($config['show_personal_data'] ?? true) && trim((string) $description) !== '') : ?><p class="mt-3 mb-0"><?php echo nl2br(htmlspecialchars((string) $description, ENT_QUOTES, 'UTF-8')); ?></p><?php endif; ?>
 		</header>
 
 		<div class="d-flex flex-wrap gap-2 mb-4">
-			<a class="btn btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=teamplan&project_id=' . (int) $participant->project_id . '&entry_id=' . (int) $participant->id); ?>"><span class="icon-calendar" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANT_OPEN_PROGRAM'); ?></a>
-			<?php if ((int) $data['statistic_count'] > 0) : ?><a class="btn btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=participantstats&project_id=' . (int) $participant->project_id . '&entry_id=' . (int) $participant->id); ?>"><span class="icon-chart" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANT_OPEN_STATISTICS'); ?></a><?php endif; ?>
+			<?php if ($config['show_results'] ?? true) : ?><a class="btn btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=teamplan&project_id=' . (int) $participant->project_id . '&entry_id=' . (int) $participant->id); ?>"><span class="icon-calendar" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANT_OPEN_PROGRAM'); ?></a>
+			<?php if ((int) $data['statistic_count'] > 0) : ?><a class="btn btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=participantstats&project_id=' . (int) $participant->project_id . '&entry_id=' . (int) $participant->id); ?>"><span class="icon-chart" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANT_OPEN_STATISTICS'); ?></a><?php endif; ?><?php endif; ?>
 			<a class="btn btn-outline-secondary" href="<?php echo Route::_('index.php?option=com_joomleague&view=participants&project_id=' . (int) $participant->project_id); ?>"><span class="icon-users" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANT_BACK_TO_LIST'); ?></a>
 		</div>
 

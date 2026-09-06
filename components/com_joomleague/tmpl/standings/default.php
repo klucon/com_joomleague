@@ -35,7 +35,7 @@ $translateCode = static function (string $prefix, string $code): string {
 				<span aria-hidden="true"> · </span><?php echo htmlspecialchars((string) $standings['stage']->name, ENT_QUOTES, 'UTF-8'); ?>
 			<?php endif; ?>
 		</p>
-		<?php if (\count($standings['available_scopes']) > 1) : ?>
+		<?php if (($this->templateConfig['show_filters'] ?? true) && \count($standings['available_scopes']) > 1) : ?>
 			<nav class="nav nav-tabs mb-3" aria-label="<?php echo htmlspecialchars(Text::_('COM_JOOMLEAGUE_STANDINGS_SCOPE_NAV_LABEL'), ENT_QUOTES, 'UTF-8'); ?>">
 				<?php foreach ($standings['available_scopes'] as $availableScope) : ?>
 					<a class="nav-link<?php echo $availableScope === $standings['scope'] ? ' active' : ''; ?>"

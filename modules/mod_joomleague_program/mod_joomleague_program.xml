@@ -5,7 +5,7 @@
 	<creationDate>2026-08</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.2.0-dev6</version>
+	<version>6.2.0-dev7</version>
 	<description>MOD_JOOMLEAGUE_PROGRAM_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Program</namespace>
 	<files>
@@ -42,6 +42,7 @@
 				<field name="show_venue" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_VENUE_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_VENUE_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
 				<field name="show_result" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_RESULT_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_RESULT_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
 				<field name="show_calendar" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_CALENDAR_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_CALENDAR_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="template_show_match_detail_button" type="list" default="" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_DETAIL_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_DETAIL_DESC"><option value="">MOD_JOOMLEAGUE_PROGRAM_INHERIT</option><option value="0">JNO</option><option value="1">JYES</option></field>
 			</fieldset>
 			<fieldset name="advanced">
 				<field name="layout" type="modulelayout" label="JFIELD_ALT_LAYOUT_LABEL" class="form-select" validate="moduleLayout" />

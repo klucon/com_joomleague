@@ -20,7 +20,7 @@ $formatter = new IntlDateFormatter(str_replace('-', '_', Factory::getLanguage()-
 		<?php endif; ?>
 		<div class="list-group list-group-flush">
 			<?php foreach ($programme['items'] as $item) : ?>
-				<a class="list-group-item list-group-item-action px-0" href="<?php echo Route::_('index.php?option=com_joomleague&view=eventreport&event_id=' . (int) $item['id']); ?>">
+				<?php if ($programme['show_detail']) : ?><a class="list-group-item list-group-item-action px-0" href="<?php echo Route::_('index.php?option=com_joomleague&view=eventreport&event_id=' . (int) $item['id']); ?>"><?php else : ?><div class="list-group-item px-0"><?php endif; ?>
 					<?php if ((int) $params->get('show_round', 1) === 1 && $item['round_name'] !== '') : ?>
 						<div class="small text-body-secondary mb-1"><?php echo htmlspecialchars($item['round_name'], ENT_QUOTES, 'UTF-8'); ?></div>
 					<?php endif; ?>
@@ -40,7 +40,7 @@ $formatter = new IntlDateFormatter(str_replace('-', '_', Factory::getLanguage()-
 							<span><span class="icon-location" aria-hidden="true"></span> <?php echo htmlspecialchars((string) $item['venue_name'], ENT_QUOTES, 'UTF-8'); ?></span>
 						<?php endif; ?>
 					</div>
-				</a>
+				<?php echo $programme['show_detail'] ? '</a>' : '</div>'; ?>
 			<?php endforeach; ?>
 		</div>
 		<?php if ((int) $params->get('show_calendar', 1) === 1) :

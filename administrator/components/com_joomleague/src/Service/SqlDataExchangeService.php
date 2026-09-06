@@ -61,6 +61,8 @@ final class SqlDataExchangeService
 			throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_SIZE');
 		}
 
+		$isCanonicalMigration = str_contains($sql, '-- Canonical JoomLeague 6.2 migration package');
+		$profileCodes = $isCanonicalMigration ? $this->profileCodes($sql) : [];
 		$statements = $this->splitSql($sql);
 		$statements = array_values(array_filter(array_map('trim', $statements)));
 		foreach ($statements as $statement) {
@@ -84,6 +86,10 @@ final class SqlDataExchangeService
 				$this->database->setQuery($sql)->execute();
 				if ($this->database->getAffectedRows() === 0) $skipped++; else $executed++;
 			}
+			if ($isCanonicalMigration) {
+				$executed += $this->materializeImportedSportTypes($profileCodes);
+				$this->synchronizePostgreSqlIdentitySequences();
+			}
 			$this->database->transactionCommit();
 		} catch (Throwable $error) {
 			try {
@@ -95,6 +101,98 @@ final class SqlDataExchangeService
 		}
 
 		return compact('executed', 'skipped');
+	}
+
+	private function synchronizePostgreSqlIdentitySequences(): void
+	{
+		if ($this->database->getName() !== 'pgsql') {
+			return;
+		}
+
+		foreach (ComponentTableCatalog::installed($this->database) as $table) {
+			if (!array_key_exists('id', $this->database->getTableColumns($table, false))) {
+				continue;
+			}
+
+			$physicalTable = $this->database->replacePrefix($table);
+			$query = $this->database->getQuery(true)
+				->select('pg_get_serial_sequence(' . $this->database->quote($physicalTable) . ', ' . $this->database->quote('id') . ')');
+			$sequence = (string) $this->database->setQuery($query)->loadResult();
+
+			if ($sequence === '') {
+				continue;
+			}
+
+			$query = $this->database->getQuery(true)
+				->select('COALESCE(MAX(' . $this->database->quoteName('id') . '), 0)')
+				->from($this->database->quoteName($table));
+			$maximum = (int) $this->database->setQuery($query)->loadResult();
+			$called = $maximum > 0 ? 'TRUE' : 'FALSE';
+			$nextValue = max(1, $maximum);
+			$this->database->setQuery(
+				'SELECT setval(' . $this->database->quote($sequence) . ', ' . $nextValue . ', ' . $called . ')'
+			)->execute();
+		}
+	}
+
+	/** @return list<string> */
+	private function profileCodes(string $sql): array
+	{
+		preg_match_all('/\{\{profile_version:([a-z][a-z0-9_]*)\}\}/', $sql, $matches);
+
+		return array_values(array_unique($matches[1] ?? []));
+	}
+
+	/** @param list<string> $profileCodes */
+	private function materializeImportedSportTypes(array $profileCodes): int
+	{
+		$created = 0;
+
+		foreach ($profileCodes as $profileCode) {
+			$query = $this->database->getQuery(true)
+				->select([
+					$this->database->quoteName('sport_type.id'),
+					$this->database->quoteName('sport_type.profile_version_id'),
+				])
+				->from($this->database->quoteName('#__joomleague_sport_type', 'sport_type'))
+				->innerJoin($this->database->quoteName('#__joomleague_sport_profile_version', 'version') . ' ON version.id = sport_type.profile_version_id')
+				->innerJoin($this->database->quoteName('#__joomleague_sport_profile', 'profile') . ' ON profile.id = version.profile_id')
+				->where($this->database->quoteName('profile.code') . ' = :profileCode')
+				->bind(':profileCode', $profileCode);
+
+			foreach ($this->database->setQuery($query)->loadObjectList() as $sportType) {
+				$options = [
+					'positions' => !$this->sportCatalogExists('#__joomleague_sport_position', (int) $sportType->id),
+					'event_types' => !$this->sportCatalogExists('#__joomleague_event_type', (int) $sportType->id),
+					'statistics' => !$this->sportCatalogExists('#__joomleague_statistic', (int) $sportType->id),
+				];
+
+				if (!in_array(true, $options, true)) {
+					continue;
+				}
+
+				$counts = (new SportTypeProfileMaterializer($this->database))->materialize(
+					(int) $sportType->id,
+					(int) $sportType->profile_version_id,
+					$options,
+					0
+				);
+				$created += array_sum($counts);
+			}
+		}
+
+		return $created;
+	}
+
+	private function sportCatalogExists(string $table, int $sportTypeId): bool
+	{
+		$query = $this->database->getQuery(true)
+			->select('COUNT(*)')
+			->from($this->database->quoteName($table))
+			->where($this->database->quoteName('sport_type_id') . ' = :sportTypeId')
+			->bind(':sportTypeId', $sportTypeId, \Joomla\Database\ParameterType::INTEGER);
+
+		return (int) $this->database->setQuery($query)->loadResult() > 0;
 	}
 
 	/** @param list<string> $output */
@@ -157,7 +255,14 @@ final class SqlDataExchangeService
 			fn (array $match): string => (string) $this->activeProfileVersionId($match[1]),
 			$statement
 		);
-		return $this->database->replacePrefix($statement);
+		$statement = $this->database->replacePrefix($statement);
+
+		if ($this->database->getName() === 'pgsql') {
+			$statement = preg_replace('/`([A-Za-z0-9_]+)`/', '"$1"', $statement);
+			if ($statement === null) throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT');
+		}
+
+		return $statement;
 	}
 
 	private function activeProfileVersionId(string $code): int

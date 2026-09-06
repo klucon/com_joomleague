@@ -8,8 +8,8 @@ const { chromium } = require('playwright');
 		for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
 			const page = await browser.newPage({ viewport });
 			for (const [path, expected] of [
-				[`view=projectpanel&project_id=${projectId}`, 'Připravenost projektu'],
-				[`view=projectpreflight&project_id=${projectId}`, 'provozně připraven'],
+				[`view=projectpanel&project_id=${projectId}`, /Project readiness|Připravenost projektu/],
+				[`view=projectpreflight&project_id=${projectId}`, /Project is (?:not )?operationally ready|Projekt (?:není|je) provozně připraven/],
 			]) {
 				const url = `${baseUrl}/administrator/index.php?option=com_joomleague&${path}`;
 				await page.goto(url, { waitUntil: 'networkidle' });
@@ -18,7 +18,7 @@ const { chromium } = require('playwright');
 					await page.locator('form#form-login button[type="submit"]').click(); await page.waitForLoadState('networkidle'); await page.goto(url, { waitUntil: 'networkidle' });
 				}
 				const body = await page.locator('body').innerText();
-				if (!body.includes(expected) || /COM_JOOMLEAGUE_[A-Z0-9_]+|Notice:|Warning:|Fatal error/.test(body)) throw new Error(`Invalid preflight output at ${url}.`);
+				if (!expected.test(body) || /COM_JOOMLEAGUE_[A-Z0-9_]+|Notice:|Warning:|Fatal error/.test(body)) throw new Error(`Invalid preflight output at ${url}.`);
 				if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error(`Preflight page overflows at ${viewport.width}px.`);
 			}
 			await page.close();

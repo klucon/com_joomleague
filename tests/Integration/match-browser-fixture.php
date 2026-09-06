@@ -50,5 +50,7 @@ $competitionId = $insert('#__joomleague_competition', ['uuid' => $uuid(), 'name'
 $seasonId = $insert('#__joomleague_season', ['uuid' => $uuid(), 'name' => $projectName]);
 $sportTypeId = $insert('#__joomleague_sport_type', ['profile_version_id' => $profileVersionId, 'code' => 'match-browser-' . $suffix, 'name' => $projectName]);
 $projectId = $insert('#__joomleague_project', ['uuid' => $uuid(), 'competition_id' => $competitionId, 'season_id' => $seasonId, 'sport_type_id' => $sportTypeId, 'profile_version_id' => $profileVersionId, 'name' => $projectName, 'project_type' => 'league']);
+$insert('#__joomleague_project_entry', ['uuid' => $uuid(), 'project_id' => $projectId, 'entry_kind' => 'group', 'display_name' => $projectName . ' A', 'ordering' => 1]);
+$insert('#__joomleague_project_entry', ['uuid' => $uuid(), 'project_id' => $projectId, 'entry_kind' => 'group', 'display_name' => $projectName . ' B', 'ordering' => 2]);
 
 echo $projectId . "\n";

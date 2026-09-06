@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 
 defined('_JEXEC') or die;
@@ -63,6 +64,7 @@ $formatMembership = static function (object $membership) use ($personTypeLabels)
 			</div>
 			<?php if (trim((string) $person->description) !== '') : ?><p class="mt-3 mb-0"><?php echo nl2br(htmlspecialchars((string) $person->description, ENT_QUOTES, 'UTF-8')); ?></p><?php endif; ?>
 		</header>
+		<?php echo LayoutHelper::render('joomleague.fields', ['context' => 'com_joomleague.person', 'item' => $person], JPATH_ROOT . '/components/com_joomleague/layouts'); ?>
 
 		<h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_PERSON_CURRENT_MEMBERSHIPS'); ?></h2>
 		<?php if ($data['memberships'] === []) : ?>
@@ -83,8 +85,7 @@ $formatMembership = static function (object $membership) use ($personTypeLabels)
 			<div class="list-group">
 				<?php foreach ($data['membership_history'] as $membership) : ?>
 					<a class="list-group-item list-group-item-action" href="<?php echo Route::_('index.php?option=com_joomleague&view=participant&project_id=' . (int) $membership->project_id . '&entry_id=' . (int) $membership->entry_id); ?>">
-						<strong><?php echo htmlspecialchars((string) $membership->entry_name, ENT_QUOTES, 'UTF-8'); ?></strong>
-						<span class="badge text-bg-secondary ms-2"><?php echo Text::_('COM_JOOMLEAGUE_LIFECYCLE_' . strtoupper((string) $membership->lifecycle_state)); ?></span><br>
+						<strong><?php echo htmlspecialchars((string) $membership->entry_name, ENT_QUOTES, 'UTF-8'); ?></strong><br>
 						<small class="text-body-secondary"><?php echo htmlspecialchars((string) $membership->project_name, ENT_QUOTES, 'UTF-8'); ?> <span aria-hidden="true">&middot;</span> <?php echo $formatMembership($membership); ?></small>
 					</a>
 				<?php endforeach; ?>

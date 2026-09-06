@@ -39,6 +39,9 @@ final class ProjecttemplatesModel extends FormModel
 		$profileOverrides = $this->loadProfileOverrides((int) $project->profile_version_id, $registry);
 		$posted = Factory::getApplication()->getUserState('com_joomleague.edit.projecttemplates.data', []);
 		Factory::getApplication()->setUserState('com_joomleague.edit.projecttemplates.data', null);
+		if ((int) ($posted['project_id'] ?? 0) !== $projectId) {
+			$posted = [];
+		}
 		$form = $this->loadForm('com_joomleague.projecttemplates', 'projecttemplates', ['control' => 'jform', 'load_data' => false]);
 		if (!$form instanceof Form) throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_FORM_LOAD'));
 		$form->setValue('project_id', null, $projectId);
@@ -101,10 +104,10 @@ final class ProjecttemplatesModel extends FormModel
 		$query = $db->getQuery(true)->select(['template_code','schema_version','params_json','params_checksum'])->from($db->quoteName('#__joomleague_profile_template_config'))->where('profile_version_id = :versionId')->where('published = 1')->bind(':versionId', $profileVersionId, ParameterType::INTEGER);
 		$result = [];
 		foreach ($db->setQuery($query)->loadObjectList() as $row) {
-			if (!hash_equals(TemplateDefinitionRegistry::SCHEMA_VERSION, (string) $row->schema_version)) throw new \UnexpectedValueException('Profile template schema version is invalid.');
+			if (!hash_equals(TemplateDefinitionRegistry::SCHEMA_VERSION, (string) $row->schema_version)) throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_PROFILE_CONFIG_UNSUPPORTED');
 			$params = $this->decodeObject((string) $row->params_json);
 			$registry->validateValues((string) $row->template_code, $params);
-			if (!hash_equals(CanonicalJson::checksum($params), (string) $row->params_checksum)) throw new \UnexpectedValueException('Profile template checksum is invalid.');
+			if (!hash_equals(CanonicalJson::checksum($params), (string) $row->params_checksum)) throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_PROFILE_CHECKSUM');
 			$result[(string) $row->template_code] = $params;
 		}
 		return $result;
@@ -128,10 +131,15 @@ final class ProjecttemplatesModel extends FormModel
 
 	private function parseValue(mixed $value, array $metadata, string $labelKey): bool|int|string
 	{
+		if (!is_string($value) && !is_int($value)) {
+			throw new \InvalidArgumentException(Text::sprintf('COM_JOOMLEAGUE_PROJECTTEMPLATES_VALUE_INVALID', Text::_($labelKey)));
+		}
 		$value = is_string($value) ? trim($value) : $value;
 		return match ($metadata['type']) {
-			'boolean' => (string) $value === '1',
-			'integer' => is_string($value) && preg_match('/^-?\d+$/', $value) === 1 ? (int) $value : throw new \InvalidArgumentException(Text::sprintf('COM_JOOMLEAGUE_PROJECTTEMPLATES_VALUE_INVALID', Text::_($labelKey))),
+			'boolean' => in_array((string) $value, ['0', '1'], true)
+				? (string) $value === '1'
+				: throw new \InvalidArgumentException(Text::sprintf('COM_JOOMLEAGUE_PROJECTTEMPLATES_VALUE_INVALID', Text::_($labelKey))),
+			'integer' => filter_var($value, FILTER_VALIDATE_INT) !== false ? (int) $value : throw new \InvalidArgumentException(Text::sprintf('COM_JOOMLEAGUE_PROJECTTEMPLATES_VALUE_INVALID', Text::_($labelKey))),
 			'string' => is_string($value) ? $value : throw new \InvalidArgumentException(Text::sprintf('COM_JOOMLEAGUE_PROJECTTEMPLATES_VALUE_INVALID', Text::_($labelKey))),
 			default => throw new \InvalidArgumentException(Text::sprintf('COM_JOOMLEAGUE_PROJECTTEMPLATES_VALUE_INVALID', Text::_($labelKey))),
 		};
@@ -143,7 +151,7 @@ final class ProjecttemplatesModel extends FormModel
 	private function decodeObject(string $json): array
 	{
 		$value = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-		if (!is_array($value) || (array_is_list($value) && $value !== [])) throw new \UnexpectedValueException('Template value must be an object.');
+		if (!is_array($value) || (array_is_list($value) && $value !== [])) throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_CONFIG_INVALID');
 		return $value;
 	}
 }

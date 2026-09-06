@@ -11,6 +11,7 @@ use Joomla\Database\DatabaseInterface;
 use Joomla\Registry\Registry;
 use Joomleague\Component\Joomleague\Domain\Service\ProgrammeReader;
 use Joomleague\Component\Joomleague\Domain\Service\ProgrammeScopeResolver;
+use Joomleague\Component\Joomleague\Site\Service\ProjectTemplateProvider;
 
 final class ProgramHelper
 {
@@ -28,7 +29,19 @@ final class ProgramHelper
 			|| $language->load('com_joomleague', JPATH_SITE . '/components/com_joomleague');
 
 		$db = Factory::getContainer()->get(DatabaseInterface::class);
-		$viewLevels = Factory::getApplication()->getIdentity()->getAuthorisedViewLevels();
+		$detailOverride = (string) $params->get('template_show_match_detail_button', '');
+		$presentationOverrides = ($detailOverride === '0' || $detailOverride === '1')
+			? ['show_match_detail_button' => $detailOverride === '1']
+			: [];
+		try {
+			$provider = new ProjectTemplateProvider($db);
+			$templateConfig = $provider->supports($projectId, 'results')
+				? $provider->resolve($projectId, 'results', $presentationOverrides)
+				: [];
+		} catch (\Throwable) {
+			$templateConfig = [];
+		}
+		$viewLevels = Factory::getApplication()->getIdentity()?->getAuthorisedViewLevels() ?? [1];
 		$viewLevels = array_values(array_unique(array_filter(array_map('intval', $viewLevels), static fn (int $id): bool => $id > 0)));
 		$viewLevels = $viewLevels === [] ? [1] : $viewLevels;
 		$scope = (string) $params->get('scope', 'project');
@@ -71,6 +84,10 @@ final class ProgramHelper
 			return ['error' => 'MOD_JOOMLEAGUE_PROGRAM_EMPTY'];
 		}
 
-		return ['project_name' => (string) $items[0]['project_name'], 'items' => $items];
+		return [
+			'project_name' => (string) $items[0]['project_name'],
+			'items' => $items,
+			'show_detail' => (bool) ($templateConfig['show_match_detail_button'] ?? true),
+		];
 	}
 }

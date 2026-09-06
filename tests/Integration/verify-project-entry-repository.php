@@ -50,12 +50,11 @@ try {
 		->from($database->quoteName('#__joomleague_sport_profile_version', 'version'))
 		->innerJoin($database->quoteName('#__joomleague_sport_profile', 'profile') . ' ON profile.id = version.profile_id')
 		->where('profile.code = ' . $database->quote('football'))
-		->where('version.profile_version = ' . $database->quote('1.3.0'))
 		->order('version.id DESC');
 	$profileVersionId = (int) $database->setQuery($query, 0, 1)->loadResult();
 
 	if ($profileVersionId < 1) {
-		throw new RuntimeException('Football profile 1.3.0 is unavailable.');
+		throw new RuntimeException('No current football profile is available.');
 	}
 
 	$competitionId = $insert($database, '#__joomleague_competition', ['uuid' => UuidFactory::v4(), 'name' => 'Entry fixture ' . $suffix]);

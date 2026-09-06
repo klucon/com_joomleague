@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 
 defined('_JEXEC') or die;
@@ -20,6 +21,7 @@ $data = $this->venue;
 			<?php if ($location !== []) : ?><address class="mt-3 mb-0"><?php echo implode('<br>', array_map(static fn (string $value): string => htmlspecialchars($value, ENT_QUOTES, 'UTF-8'), $location)); ?></address><?php endif; ?>
 			<div class="d-flex flex-wrap gap-2 mt-3"><?php if ($venue->club_name) : ?><a class="btn btn-sm btn-outline-secondary" href="<?php echo Route::_('index.php?option=com_joomleague&view=club&club_id=' . (int) $venue->club_id); ?>"><span class="icon-shield" aria-hidden="true"></span> <?php echo htmlspecialchars((string) $venue->club_name, ENT_QUOTES, 'UTF-8'); ?></a><?php endif; ?><?php if ($venue->website) : ?><a class="btn btn-sm btn-outline-primary" href="<?php echo htmlspecialchars((string) $venue->website, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><span class="icon-out-2" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_VENUE_WEBSITE'); ?></a><?php endif; ?></div>
 		</header>
+		<?php echo LayoutHelper::render('joomleague.fields', ['context' => 'com_joomleague.venue', 'item' => $venue], JPATH_ROOT . '/components/com_joomleague/layouts'); ?>
 		<div class="row g-3 mb-4">
 			<?php if ($venue->capacity !== null) : ?><div class="col-12 col-md-4"><div class="border rounded p-3 h-100"><div class="text-body-secondary small"><?php echo Text::_('COM_JOOMLEAGUE_VENUE_CAPACITY_LABEL'); ?></div><strong><?php echo number_format((int) $venue->capacity, 0, '', ' '); ?></strong></div></div><?php endif; ?>
 			<?php if ($venue->timezone) : ?><div class="col-12 col-md-4"><div class="border rounded p-3 h-100"><div class="text-body-secondary small"><?php echo Text::_('COM_JOOMLEAGUE_VENUE_TIMEZONE'); ?></div><strong><?php echo htmlspecialchars((string) $venue->timezone, ENT_QUOTES, 'UTF-8'); ?></strong></div></div><?php endif; ?>

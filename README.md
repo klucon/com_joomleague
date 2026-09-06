@@ -34,7 +34,7 @@ database tables compatible with 6.2.
 
 ## Current development package
 
-- Version: `6.2.0-dev6`
+- Version: `6.2.0-dev7`
 - Joomla: 6.1.x or 6.2.x
 - PHP: 8.3 or newer
 - Databases: MySQL 8.0+, MariaDB 10.6+ or PostgreSQL 14+
@@ -44,10 +44,16 @@ database tables compatible with 6.2.
 The installable package contains:
 
 - `com_joomleague` - administrator and frontend component;
-- `mod_joomleague_standings` - frontend standings module;
+- `mod_joomleague_standings`, `mod_joomleague_program`, `mod_joomleague_next_event`,
+  `mod_joomleague_calendar`, `mod_joomleague_programme_ticker`, `mod_joomleague_latest_results`, `mod_joomleague_birthdays`, `mod_joomleague_spotlight`, `mod_joomleague_navigation`, `mod_joomleague_participant`,
+  `mod_joomleague_club`, `mod_joomleague_personnel`, `mod_joomleague_venue_program`,
+  `mod_joomleague_competitions`, `mod_joomleague_statranking` and
+  `mod_joomleague_eventranking` - sport-neutral frontend modules;
 - `plg_quickicon_joomleague` - administrator quick icon;
 - `plg_console_joomleague` - Joomla console integration;
 - `plg_task_joomleague` - Joomla Scheduler integration.
+- `plg_finder_joomleague` - Joomla Smart Search integration;
+- `plg_content_joomleague` - JoomLeague content integration.
 
 No other historical JoomLeague modules or plugins are part of the current 6.2
 package unless they are explicitly listed above.

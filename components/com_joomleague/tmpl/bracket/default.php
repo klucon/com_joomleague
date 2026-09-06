@@ -61,6 +61,7 @@ $formatValue = static function (?object $value): string {
 			.jl-bracket-match__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; border-radius: .2rem; }
 			.jl-bracket-match__name:hover { background: var(--bs-tertiary-bg, #f1f3f5); }
 			.jl-bracket-match__name--active { color: var(--bs-primary, #0d6efd); text-decoration: underline; }
+			.jl-bracket-match__decider { border-top: 1px solid var(--bs-border-color, #dee2e6); margin-top: .15rem; padding-top: .15rem; color: var(--bs-secondary-color, #6c757d); text-align: right; }
 		</style>
 
 		<div class="jl-bracket-nav">
@@ -100,11 +101,22 @@ $formatValue = static function (?object $value): string {
 							<div class="jl-bracket-match" data-id="<?php echo (int) $item->id; ?>" style="left:<?php echo $roundIndex * $columnWidth; ?>px;top:<?php echo $item->y; ?>px;width:<?php echo $cardWidth; ?>px;height:<?php echo $cardHeight; ?>px;">
 								<?php if ($item->participants === []) : ?><div class="text-body-secondary">—</div><?php endif; ?>
 								<?php foreach ($item->participants as $participant) : ?>
+									<?php $resolved = (bool) ($participant->resolved ?? true); ?>
 									<div class="jl-bracket-match__participant<?php echo $participant->winner ? ' jl-bracket-match__participant--winner' : ''; ?>">
-										<span class="jl-bracket-match__name" data-entry="<?php echo (int) $participant->project_entry_id; ?>"><?php echo htmlspecialchars($participant->name, ENT_QUOTES, 'UTF-8'); ?></span>
-										<span><?php echo htmlspecialchars($formatValue($participant->value), ENT_QUOTES, 'UTF-8'); ?></span>
+										<span class="jl-bracket-match__name<?php echo $resolved ? '' : ' text-body-secondary'; ?>"<?php echo $resolved ? ' data-entry="' . (int) $participant->project_entry_id . '"' : ''; ?>><?php echo $resolved ? htmlspecialchars($participant->name, ENT_QUOTES, 'UTF-8') : Text::_('COM_JOOMLEAGUE_BRACKET_PARTICIPANT_PENDING'); ?></span>
+										<span><?php echo $resolved ? htmlspecialchars($formatValue($participant->value), ENT_QUOTES, 'UTF-8') : ''; ?></span>
 									</div>
 								<?php endforeach; ?>
+								<?php if ($item->decider !== null) : ?>
+									<?php
+									$deciderScores = [];
+									foreach ($item->participants as $participant) {
+										$deciderScores[] = $formatValue($item->decider->values[(int) $participant->id] ?? null);
+									}
+									$segmentKey = 'COM_JOOMLEAGUE_SCORE_SEGMENT_' . strtoupper((string) $item->decider->level_code);
+									?>
+									<div class="jl-bracket-match__decider"><?php echo htmlspecialchars(Text::_($segmentKey) . ' ' . implode(':', $deciderScores), ENT_QUOTES, 'UTF-8'); ?></div>
+								<?php endif; ?>
 							</div>
 						<?php endforeach; ?>
 					<?php endforeach; ?>

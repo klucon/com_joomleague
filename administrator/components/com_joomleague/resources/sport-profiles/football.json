@@ -834,6 +834,7 @@
             "favorite_highlight_mode": "row"
         },
         "eventreport": {
+            "section_order": "standard",
             "show_lineups": true,
             "show_staff": true,
             "show_officials": true,
@@ -868,6 +869,22 @@
                 "striker",
                 "utocnik"
             ],
+            "head_coach": [
+                "head_coach",
+                "coach",
+                "trener",
+                "treneri"
+            ],
+            "team_manager": [
+                "team_manager",
+                "vedouci",
+                "vedouci_muzstva"
+            ],
+            "doctor": [
+                "doctor",
+                "lekar",
+                "lekar_zdravotnik"
+            ],
             "referee": [
                 "referee",
                 "main_referee",
@@ -894,7 +911,8 @@
             "goal": [
                 "goal",
                 "g",
-                "branka"
+                "branka",
+                "gol"
             ],
             "own_goal": [
                 "own_goal",
@@ -905,6 +923,12 @@
                 "yellow_card",
                 "yc",
                 "zluta_karta"
+            ],
+            "second_yellow_card": [
+                "second_yellow_card",
+                "yellow_red_card",
+                "yellow_red",
+                "zluta_cervena_karta"
             ],
             "red_card": [
                 "red_card",

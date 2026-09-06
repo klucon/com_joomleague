@@ -6,6 +6,12 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PACKAGE_MANIFEST="${ROOT}/build/pkg_joomleague.xml"
 VERSION="$(xmllint --xpath 'string(/extension/version)' "${PACKAGE_MANIFEST}")"
 
+php "${ROOT}/tests/Architecture/verify-frontend-contract.php"
+php "${ROOT}/tests/Architecture/verify-template-contract.php"
+php "${ROOT}/tests/Architecture/verify-custom-fields-contract.php"
+php "${ROOT}/tests/Architecture/verify-seo-contract.php"
+php "${ROOT}/tests/Architecture/verify-toolbar-contract.php"
+
 if [[ -z "${VERSION}" ]] || ! php -r 'exit(version_compare($argv[1], "6.2.0-dev", ">=") ? 0 : 1);' "${VERSION}"; then
 	printf '%s\n' 'Package version is missing or invalid.' >&2
 	exit 1
@@ -24,6 +30,11 @@ MANIFESTS=(
 	"${ROOT}/modules/mod_joomleague_competitions/mod_joomleague_competitions.xml"
 	"${ROOT}/modules/mod_joomleague_statranking/mod_joomleague_statranking.xml"
 	"${ROOT}/modules/mod_joomleague_eventranking/mod_joomleague_eventranking.xml"
+	"${ROOT}/modules/mod_joomleague_calendar/mod_joomleague_calendar.xml"
+	"${ROOT}/modules/mod_joomleague_programme_ticker/mod_joomleague_programme_ticker.xml"
+	"${ROOT}/modules/mod_joomleague_birthdays/mod_joomleague_birthdays.xml"
+	"${ROOT}/modules/mod_joomleague_spotlight/mod_joomleague_spotlight.xml"
+	"${ROOT}/modules/mod_joomleague_latest_results/mod_joomleague_latest_results.xml"
 	"${ROOT}/plugins/console/joomleague/joomleague.xml"
 	"${ROOT}/plugins/quickicon/joomleague/joomleague.xml"
 	"${ROOT}/plugins/task/joomleague/joomleague.xml"

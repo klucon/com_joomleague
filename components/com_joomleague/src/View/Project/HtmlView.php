@@ -17,32 +17,38 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Router\Route;
+use Joomla\Database\DatabaseInterface;
 use Joomleague\Component\Joomleague\Site\Service\ProjectSchemaBuilder;
+use Joomleague\Component\Joomleague\Site\Service\ProjectTemplateProvider;
+use Joomleague\Component\Joomleague\Site\Service\SeoMetadata;
 
 final class HtmlView extends BaseHtmlView
 {
 	/** @var array<string,mixed> */
 	public array $project = [];
+	/** @var array<string,mixed> */
+	public array $templateConfig = [];
 
 	public function display($tpl = null): void
 	{
 		$this->project = $this->getModel()->getProject();
+		if (isset($this->project['project'])) {
+			$this->templateConfig = (new ProjectTemplateProvider(\Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class)))->resolve((int) $this->project['project']->id, 'project');
+		}
 		$title = isset($this->project['project'])
 			? (string) $this->project['project']->name
 			: Text::_('COM_JOOMLEAGUE_PROJECT_VIEW_TITLE');
-		$this->getDocument()->setTitle($title);
 		if (isset($this->project['project'])) {
-			$description = trim(strip_tags((string) $this->project['project']->description));
-			if ($description !== '') {
-				$this->getDocument()->setDescription($description);
-			}
+			$url = Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $this->project['project']->id, true, Route::TLS_IGNORE, true);
+			$seo = new SeoMetadata();
+			$seo->apply($this->getDocument(), $title, $url, (string) $this->project['project']->description, (string) ($this->project['project']->picture ?? ''));
 			$schema = (new ProjectSchemaBuilder())->build(
 				$this->project,
-				Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $this->project['project']->id, true, Route::TLS_IGNORE, true)
+				$url
 			);
-			if ($schema !== []) {
-				$this->getDocument()->addCustomTag('<script type="application/ld+json">' . json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . '</script>');
-			}
+			$seo->addStructuredData($this->getDocument(), $schema);
+		} else {
+			$this->getDocument()->setTitle($title);
 		}
 		parent::display($tpl);
 	}

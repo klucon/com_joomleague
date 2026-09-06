@@ -314,6 +314,7 @@
         }
     ],
     "template_defaults": {
+        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
         "results": {
             "group_by_round": true
         },
@@ -321,6 +322,7 @@
             "favorite_highlight_mode": "row"
         },
         "eventreport": {
+            "section_order": "standard",
             "show_lineups": true,
             "show_officials": true,
             "show_timeline": true

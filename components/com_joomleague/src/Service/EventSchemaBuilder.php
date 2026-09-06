@@ -48,6 +48,7 @@ final class EventSchemaBuilder
 			'scheduled', 'in_progress' => 'https://schema.org/EventScheduled',
 			'postponed' => 'https://schema.org/EventPostponed',
 			'cancelled' => 'https://schema.org/EventCancelled',
+			'finished', 'completed' => 'https://schema.org/EventCompleted',
 			default => null,
 		};
 		if ($status !== null) {

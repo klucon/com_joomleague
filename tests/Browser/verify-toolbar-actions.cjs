@@ -16,7 +16,7 @@ const { chromium } = require('playwright');
 	const browser = await chromium.launch({ headless: true });
 	const page = await browser.newPage({ acceptDownloads: true });
 	const pageErrors = [];
-	page.on('pageerror', (error) => pageErrors.push(error.message));
+	page.on('pageerror', (error) => pageErrors.push(`${page.url()}: ${error.stack || error.message}`));
 
 	try {
 		await page.goto(`${baseUrl}/administrator/`, { waitUntil: 'networkidle' });

@@ -39,8 +39,9 @@
     "eventreport": {
       "name_key": "COM_JOOMLEAGUE_TEMPLATE_EVENTREPORT",
       "description_key": "COM_JOOMLEAGUE_TEMPLATE_EVENTREPORT_DESC",
-      "defaults": {"show_lineups": true, "show_staff": true, "show_officials": true, "show_timeline": true, "show_schema_org": true},
+      "defaults": {"section_order": "standard", "show_lineups": true, "show_staff": true, "show_officials": true, "show_timeline": true, "show_schema_org": true},
       "fields": {
+        "section_order": {"type": "string", "enum": ["standard", "activity_first", "statistics_first"], "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SECTION_ORDER", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SECTION_ORDER_DESC"},
         "show_lineups": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_LINEUPS", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_LINEUPS_DESC"},
         "show_staff": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_STAFF", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_STAFF_DESC"},
         "show_officials": {"type": "boolean", "label_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_OFFICIALS", "description_key": "COM_JOOMLEAGUE_TEMPLATE_FIELD_SHOW_OFFICIALS_DESC"},

@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 2 or later</license>
 	<authorEmail>info@klucon.cz</authorEmail>
 	<authorUrl>https://klucon.cz</authorUrl>
-	<version>6.2.0-dev6</version>
+	<version>6.2.0-dev7</version>
 	<description>COM_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Component\Joomleague</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -25,6 +25,7 @@
 	</update>
 	<files folder="site">
 		<folder>fields</folder>
+		<folder>layouts</folder>
 		<folder>src</folder>
 		<folder>tmpl</folder>
 	</files>
@@ -53,6 +54,7 @@
 			<menu link="option=com_joomleague&amp;view=events">COM_JOOMLEAGUE_MENU_EVENTS</menu>
 			<menu link="option=com_joomleague&amp;view=statistics">COM_JOOMLEAGUE_MENU_STATISTICS</menu>
 			<menu link="option=com_joomleague&amp;view=templates">COM_JOOMLEAGUE_MENU_TEMPLATES</menu>
+			<menu link="option=com_fields&amp;view=fields&amp;context=com_joomleague.project">COM_JOOMLEAGUE_MENU_CUSTOM_FIELDS</menu>
 			<menu link="option=com_joomleague&amp;view=rounds">COM_JOOMLEAGUE_MENU_ROUNDS</menu>
 			<menu link="option=com_joomleague&amp;view=matches">COM_JOOMLEAGUE_MENU_MATCHES</menu>
 			<menu link="option=com_joomleague&amp;view=standings">COM_JOOMLEAGUE_MENU_STANDINGS</menu>
@@ -67,6 +69,7 @@
 			<filename>joomleague.xml</filename>
 			<folder>forms</folder>
 			<folder>language</folder>
+			<folder>layouts</folder>
 			<folder>resources</folder>
 			<folder>services</folder>
 			<folder>sql</folder>

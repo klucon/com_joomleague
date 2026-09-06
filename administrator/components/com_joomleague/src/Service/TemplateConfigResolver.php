@@ -49,7 +49,7 @@ final class TemplateConfigResolver
 		$profileDefaults = $profilePayload['template_defaults'][$templateCode] ?? [];
 
 		if (!is_array($profileDefaults)) {
-			throw new \UnexpectedValueException(sprintf('Profile defaults for "%s" must be an object.', $templateCode));
+			throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_PROFILE_DEFAULTS_INVALID');
 		}
 
 		return $this->resolve(

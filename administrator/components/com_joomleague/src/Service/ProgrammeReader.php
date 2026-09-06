@@ -85,6 +85,7 @@ final class ProgrammeReader
 
 		$participantIds = array_map(static fn (object $participant): int => (int) $participant->participant_id, $participants);
 		$scores = [];
+		$deciders = [];
 		if ($participantIds !== []) {
 			$scoreRows = $db->setQuery(
 				$db->getQuery(true)
@@ -96,13 +97,34 @@ final class ProgrammeReader
 					->where('segment.level_code = ' . $db->quote('result'))
 			)->loadObjectList();
 			foreach ($scoreRows as $score) {
-				$scores[(int) $score->match_id][(int) $score->participant_id] = $score->numeric_value ?? $score->text_value;
+				$scores[(int) $score->match_id][(int) $score->participant_id] = $score->numeric_value !== null
+					? self::formatNumericScore((string) $score->numeric_value)
+					: $score->text_value;
+			}
+			$deciderRows = $db->setQuery(
+				$db->getQuery(true)
+					->select(['segment.match_id', 'segment.level_code', 'segment.metadata_json', 'value.participant_id', 'value.numeric_value', 'value.text_value'])
+					->from($db->quoteName('#__joomleague_match_score_segment', 'segment'))
+					->innerJoin($db->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id = segment.id AND value.match_id = segment.match_id')
+					->whereIn('segment.match_id', $eventIds, ParameterType::INTEGER)
+					->where('segment.parent_id IS NOT NULL')
+					->order('segment.match_id ASC, segment.segment_type_ordinal ASC, segment.sequence_number ASC, value.participant_id ASC')
+			)->loadObjectList();
+			foreach ($deciderRows as $row) {
+				$metadata = json_decode((string) ($row->metadata_json ?? ''), true);
+				if (!is_array($metadata) || ($metadata['decider'] ?? false) !== true) continue;
+				$matchId = (int) $row->match_id;
+				$deciders[$matchId] ??= ['level_code' => (string) $row->level_code, 'values' => []];
+				$deciders[$matchId]['values'][(int) $row->participant_id] = $row->numeric_value !== null
+					? self::formatNumericScore((string) $row->numeric_value)
+					: $row->text_value;
 			}
 		}
 
 		$participantsByEvent = [];
 		foreach ($participants as $participant) {
 			$participantsByEvent[(int) $participant->match_id][] = [
+				'participant_id' => (int) $participant->participant_id,
 				'entry_id' => (int) $participant->project_entry_id,
 				'slot' => (int) $participant->slot_number,
 				'name' => (string) $participant->display_name,
@@ -124,6 +146,7 @@ final class ProgrammeReader
 			'venue_id' => $item->venue_id === null ? null : (int) $item->venue_id,
 			'played' => $item->result_status === 'final',
 			'participants' => $participantsByEvent[(int) $item->id] ?? [],
+			'decider' => $deciders[(int) $item->id] ?? null,
 		], $items);
 	}
 
@@ -142,5 +165,12 @@ final class ProgrammeReader
 		}
 		usort($items, static fn (array $a, array $b): int => strcmp((string) $a['scheduled_start'], (string) $b['scheduled_start']) ?: $a['id'] <=> $b['id']);
 		return $items;
+	}
+
+	private static function formatNumericScore(string $value): string
+	{
+		$formatted = str_contains($value, '.') ? rtrim(rtrim($value, '0'), '.') : $value;
+
+		return $formatted === '-0' || $formatted === '' ? '0' : $formatted;
 	}
 }

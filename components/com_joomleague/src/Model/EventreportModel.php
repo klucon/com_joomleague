@@ -34,6 +34,7 @@ class EventreportModel extends BaseDatabaseModel
 					'match.id', 'match.match_number', 'match.contest_type', 'match.scheduled_start',
 					'match.timezone', 'match.duration_minutes', 'match.attendance', 'match.status_code',
 					'match.description', 'project.id AS project_id', 'project.name AS project_name',
+					'profile_version.payload_json AS profile_payload_json',
 					'stage.name AS stage_name', 'round.name AS round_name',
 					'venue.id AS venue_id', 'venue.name AS venue_name',
 					'sporttype.name AS sport_name', 'competition.name AS competition_name', 'season.name AS season_name',
@@ -42,6 +43,7 @@ class EventreportModel extends BaseDatabaseModel
 				])
 				->from($db->quoteName('#__joomleague_project_match', 'match'))
 				->innerJoin($db->quoteName('#__joomleague_project', 'project') . ' ON project.id = match.project_id AND project.published = 1')
+				->innerJoin($db->quoteName('#__joomleague_sport_profile_version', 'profile_version') . ' ON profile_version.id = project.profile_version_id')
 				->innerJoin($db->quoteName('#__joomleague_competition', 'competition') . ' ON competition.id = project.competition_id AND competition.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_season', 'season') . ' ON season.id = project.season_id AND season.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_sport_type', 'sporttype') . ' ON sporttype.id = project.sport_type_id AND sporttype.published = 1')
@@ -88,6 +90,13 @@ class EventreportModel extends BaseDatabaseModel
 		$segments = [];
 		$valuesBySegment = [];
 		if ($item->result_status === 'final') {
+			$profile = json_decode((string) $item->profile_payload_json, true);
+			$segmentLabels = [];
+			foreach (is_array($profile) ? ($profile['match']['score']['segment_types'] ?? []) : [] as $segmentType) {
+				if (is_array($segmentType) && is_string($segmentType['code'] ?? null) && is_string($segmentType['name_key'] ?? null)) {
+					$segmentLabels[$segmentType['code']] = $segmentType['name_key'];
+				}
+			}
 			$segments = $db->setQuery(
 			$db->getQuery(true)
 				->select(['segment.id', 'segment.parent_id', 'segment.level_code', 'segment.sequence_number', 'segment.status_code'])
@@ -96,6 +105,12 @@ class EventreportModel extends BaseDatabaseModel
 				->bind(':eventId', $matchId, ParameterType::INTEGER)
 				->order('segment.parent_id ASC, segment.sequence_number ASC, segment.id ASC')
 			)->loadObjectList();
+
+			foreach ($segments as $segment) {
+				$segment->name_key = $segment->level_code === 'result'
+					? 'COM_JOOMLEAGUE_EVENTREPORT_RESULT'
+					: ($segmentLabels[(string) $segment->level_code] ?? null);
+			}
 
 			$values = $db->setQuery(
 			$db->getQuery(true)
@@ -167,7 +182,12 @@ class EventreportModel extends BaseDatabaseModel
 
 		$statistics = $db->setQuery(
 			$db->getQuery(true)
-				->select(['statistic.statistic_name_key', 'statistic.abbreviation_key', 'statistic.scope_code', 'statistic.target_name_snapshot', 'statistic.numeric_value', 'statistic.text_value', 'statistic.notes'])
+				->select([
+					'statistic.statistic_code', 'statistic.statistic_name_key', 'statistic.abbreviation_key',
+					'statistic.scope_code', 'statistic.target_kind', 'statistic.match_participant_id',
+					'statistic.lineup_member_id', 'statistic.person_id', 'statistic.segment_key',
+					'statistic.target_name_snapshot', 'statistic.numeric_value', 'statistic.text_value', 'statistic.notes',
+				])
 				->from($db->quoteName('#__joomleague_match_statistic_value', 'statistic'))
 				->where('statistic.match_id = :eventId')->where('statistic.published = 1')
 				->bind(':eventId', $matchId, ParameterType::INTEGER)

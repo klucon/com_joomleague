@@ -4,9 +4,16 @@ declare(strict_types=1);
 
 define('_JEXEC', 1);
 define('JPATH_BASE', '/var/www/html');
+$configurationPath = getenv('JOOMLEAGUE_TEST_CONFIGURATION');
+if (is_string($configurationPath) && $configurationPath !== '') {
+	define('JPATH_CONFIGURATION', $configurationPath);
+}
 require_once JPATH_BASE . '/includes/defines.php';
 require_once JPATH_BASE . '/includes/framework.php';
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/ComponentTableCatalog.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/CanonicalJson.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/UuidFactory.php';
+require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/SportTypeProfileMaterializer.php';
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/SqlDataExchangeService.php';
 
 use Joomla\CMS\Factory;

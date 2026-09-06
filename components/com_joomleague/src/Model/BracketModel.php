@@ -125,6 +125,7 @@ final class BracketModel extends BaseDatabaseModel
 			static fn (object $item): int => (int) $item->id,
 			array_filter($items, static fn (object $item): bool => $item->result_status === 'final')
 		));
+		$decidersByItem = [];
 		if ($finalItemIds !== []) {
 			$values = $db->setQuery(
 				$db->getQuery(true)
@@ -141,15 +142,56 @@ final class BracketModel extends BaseDatabaseModel
 				$participant->value = $value;
 				$participant->winner = $value->status_code === 'winner' || (int) $value->result_rank === 1;
 			}
+
+			$deciderValues = $db->setQuery(
+				$db->getQuery(true)
+					->select(['segment.id AS segment_id', 'segment.match_id', 'segment.level_code', 'segment.metadata_json', 'value.participant_id', 'value.numeric_value', 'value.text_value', 'value.status_code', 'value.result_rank'])
+					->from($db->quoteName('#__joomleague_match_score_segment', 'segment'))
+					->innerJoin($db->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id = segment.id AND value.match_id = segment.match_id')
+					->whereIn('segment.match_id', $finalItemIds, ParameterType::INTEGER)
+					->where('segment.parent_id IS NOT NULL')
+					->order('segment.match_id ASC, segment.segment_type_ordinal ASC, segment.sequence_number ASC, value.participant_id ASC')
+			)->loadObjectList();
+			foreach ($deciderValues as $value) {
+				$metadata = json_decode((string) ($value->metadata_json ?? ''), true);
+				if (!is_array($metadata) || ($metadata['decider'] ?? false) !== true) {
+					continue;
+				}
+				$matchId = (int) $value->match_id;
+				$decidersByItem[$matchId] ??= (object) ['level_code' => (string) $value->level_code, 'values' => []];
+				$decidersByItem[$matchId]->values[(int) $value->participant_id] = $value;
+			}
 		}
 
 		$maxParticipants = max(1, ...array_map('count', $participantsByItem));
-		$cardHeight = max(52, $maxParticipants * self::PARTICIPANT_HEIGHT + self::CARD_PADDING);
+		$cardHeight = max(52, $maxParticipants * self::PARTICIPANT_HEIGHT + self::CARD_PADDING + ($decidersByItem === [] ? 0 : 18));
 		$rowHeight = $cardHeight + self::ROW_GAP;
 		$itemsByRound = [];
 		foreach ($items as $item) {
 			$item->participants = $participantsByItem[(int) $item->id] ?? [];
+			$item->decider = $decidersByItem[(int) $item->id] ?? null;
 			$itemsByRound[(int) $item->round_id][(int) $item->id] = $item;
+		}
+
+		// Imported or pre-generated brackets may carry provisional participants in
+		// later rounds. Keep those records for feeder geometry, but do not expose a
+		// participant as qualified until its immediately preceding item is final and
+		// the participant is its winner. Entries appearing for the first time remain
+		// valid direct seeds/byes.
+		$previousRoundEntries = [];
+		foreach ($rounds as $roundIndex => $round) {
+			$currentRoundEntries = [];
+			foreach ($itemsByRound[(int) $round->id] ?? [] as $item) {
+				foreach ($item->participants as $participant) {
+					$entryId = (int) $participant->project_entry_id;
+					$source = $previousRoundEntries[$entryId] ?? null;
+					$participant->resolved = $roundIndex === 0
+						|| $source === null
+						|| ($source['status'] === 'final' && $source['participant']->winner);
+					$currentRoundEntries[$entryId] = ['status' => $item->result_status, 'participant' => $participant];
+				}
+			}
+			$previousRoundEntries = $currentRoundEntries;
 		}
 
 		$y = [];

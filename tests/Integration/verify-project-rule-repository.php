@@ -45,11 +45,12 @@ try {
 		->from($database->quoteName('#__joomleague_sport_profile_version', 'version'))
 		->innerJoin($database->quoteName('#__joomleague_sport_profile', 'profile') . ' ON profile.id = version.profile_id')
 		->where($database->quoteName('profile.code') . ' = ' . $database->quote('football'))
-		->where($database->quoteName('version.profile_version') . ' = ' . $database->quote('1.3.0'));
-	$profileVersionId = (int) $database->setQuery($query)->loadResult();
+		->order($database->quoteName('version.id') . ' DESC');
+	$database->setQuery($query, 0, 1);
+	$profileVersionId = (int) $database->loadResult();
 
 	if ($profileVersionId < 1) {
-		throw new RuntimeException('Football profile 1.3.0 is not installed.');
+		throw new RuntimeException('No current football profile is installed.');
 	}
 
 	$query = $database->getQuery(true)

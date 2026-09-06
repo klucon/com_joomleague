@@ -15,14 +15,13 @@ const { chromium } = require('playwright');
 	try {
 		const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
 		const listUrl = `${baseUrl}/administrator/index.php?option=com_joomleague&view=stages&project_id=${projectId}`;
-		const saveStage = async (name, code, type, parent = '') => {
+		const saveStage = async (name, type, parent = '') => {
 			await page.getByRole('button', { name: 'New' }).click();
 			await page.waitForLoadState('networkidle');
 			if (!(await page.getByLabel('Name').count())) {
 				throw new Error(`Stage form did not open at ${page.url()}: ${(await page.locator('body').innerText()).slice(0, 1000)}`);
 			}
 			await page.getByLabel('Name').fill(name);
-			await page.locator('#jform_code').fill(code);
 			await page.locator('#jform_stage_type').fill(type);
 			if (parent) await page.getByLabel('Parent stage').selectOption({ label: parent });
 			await page.getByRole('button', { name: 'Save & Close' }).click();
@@ -50,8 +49,8 @@ const { chromium } = require('playwright');
 		await page.locator('form#form-login button[type="submit"]').click();
 		await page.waitForLoadState('networkidle');
 		await page.goto(listUrl, { waitUntil: 'networkidle' });
-		await saveStage('Fixture group stage', 'fixture_group', 'group_stage');
-		await saveStage('Fixture knockout stage', 'fixture_knockout', 'knockout', 'Fixture group stage');
+		await saveStage('Fixture group stage', 'group_stage');
+		await saveStage('Fixture knockout stage', 'knockout', 'Fixture group stage');
 
 		const childRow = page.getByRole('row').filter({ has: page.getByRole('link', { name: 'Fixture knockout stage', exact: true }) });
 		if (!(await childRow.innerText()).includes('Fixture group stage')) throw new Error('The child stage does not show its parent.');

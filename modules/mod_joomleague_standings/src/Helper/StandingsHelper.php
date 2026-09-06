@@ -14,6 +14,8 @@ use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Registry\Registry;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
+use Joomleague\Component\Joomleague\Site\Service\ProjectTemplateProvider;
+use Joomleague\Component\Joomleague\Site\Service\RankingColumnFilter;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -106,7 +108,26 @@ class StandingsHelper
             $form = array_map('array_reverse', $form);
         }
 
-        $highlightStyle = (string) $params->get('highlight_style', 'row');
+        $presentationOverrides = [];
+        foreach (['show_score', 'show_goal_difference', 'show_sets', 'show_points'] as $field) {
+            $value = (string) $params->get('template_' . $field, '');
+            if ($value === '0' || $value === '1') {
+                $presentationOverrides[$field] = $value === '1';
+            }
+        }
+        try {
+            $provider = new ProjectTemplateProvider($database);
+            $templateConfig = $provider->supports($projectId, 'ranking')
+                ? $provider->resolve($projectId, 'ranking', $presentationOverrides)
+                : [];
+        } catch (\Throwable) {
+            $templateConfig = [];
+        }
+
+        $highlightStyle = (string) $params->get('highlight_style', '');
+        if ($highlightStyle === '') {
+            $highlightStyle = (string) ($templateConfig['favorite_highlight_mode'] ?? 'row');
+        }
         if (!\in_array($highlightStyle, ['row', 'text', 'none'], true)) {
             $highlightStyle = 'row';
         }
@@ -120,9 +141,14 @@ class StandingsHelper
         // silently discarded and fall back to the "bold" default on save. A
         // radio pair always has exactly one option selected and therefore
         // always submits a value, whichever way the admin sets it.
+        $columns = $this->buildColumns($context['contract']['metrics'] ?? [], $params->get('metric_codes', []), (int) $params->get('combined_score_format', 0) === 1);
+        if ($templateConfig !== []) {
+            $columns = (new RankingColumnFilter())->apply($columns, $templateConfig);
+        }
+
         return [
             'project' => $context['project'],
-            'columns' => $this->buildColumns($context['contract']['metrics'] ?? [], $params->get('metric_codes', []), (int) $params->get('combined_score_format', 0) === 1),
+            'columns' => $columns,
             'short_labels' => (int) $params->get('short_labels', 0) === 1,
             'short_label_tooltips' => (int) $params->get('short_label_tooltips', 1) === 1,
             'snapshot' => $current['snapshot'],

@@ -29,13 +29,13 @@ final class TemplateDefinitionRegistry
 		$contents = file_get_contents($file);
 
 		if ($contents === false) {
-			throw new \RuntimeException('Template definition file cannot be read.');
+			throw new \RuntimeException('COM_JOOMLEAGUE_TEMPLATE_ERROR_DEFINITION_READ');
 		}
 
 		$data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
 
 		if (($data['schema_version'] ?? null) !== self::SCHEMA_VERSION || !is_array($data['definitions'] ?? null)) {
-			throw new \UnexpectedValueException('Unsupported template definition schema.');
+			throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_DEFINITION_SCHEMA');
 		}
 
 		foreach ($data['definitions'] as $code => $definition) {
@@ -49,7 +49,7 @@ final class TemplateDefinitionRegistry
 	public function get(string $code): array
 	{
 		return $this->all()[$code]
-			?? throw new \InvalidArgumentException(sprintf('Unknown template definition "%s".', $code));
+				?? throw new \InvalidArgumentException('COM_JOOMLEAGUE_TEMPLATE_ERROR_DEFINITION_UNKNOWN');
 	}
 
 	/** @param array<string, mixed> $values */
@@ -59,7 +59,7 @@ final class TemplateDefinitionRegistry
 
 		foreach ($values as $field => $value) {
 			if (!isset($definition['fields'][$field])) {
-				throw new \InvalidArgumentException(sprintf('Unknown field "%s" in template "%s".', $field, $code));
+				throw new \InvalidArgumentException('COM_JOOMLEAGUE_TEMPLATE_ERROR_FIELD_UNKNOWN');
 			}
 
 			$this->validateValue($code, (string) $field, $definition['fields'][$field], $value);
@@ -69,21 +69,21 @@ final class TemplateDefinitionRegistry
 	private function validateDefinition(string $code, mixed $definition): void
 	{
 		if (preg_match('/^[a-z][a-z0-9_]*$/', $code) !== 1 || !is_array($definition)) {
-			throw new \UnexpectedValueException('Invalid template definition code.');
+			throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_DEFINITION_INVALID');
 		}
 
 		foreach (['name_key', 'description_key'] as $key) {
 			if (!is_string($definition[$key] ?? null) || !str_starts_with($definition[$key], 'COM_JOOMLEAGUE_')) {
-				throw new \UnexpectedValueException(sprintf('Template "%s" has an invalid %s.', $code, $key));
+				throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_DEFINITION_INVALID');
 			}
 		}
 
 		if (!is_array($definition['defaults'] ?? null) || !is_array($definition['fields'] ?? null)) {
-			throw new \UnexpectedValueException(sprintf('Template "%s" must define defaults and fields.', $code));
+			throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_DEFINITION_INVALID');
 		}
 
 		if (array_diff_key($definition['defaults'], $definition['fields']) !== []) {
-			throw new \UnexpectedValueException(sprintf('Template "%s" contains defaults without field definitions.', $code));
+			throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_DEFINITION_INVALID');
 		}
 
 		$this->validateValuesFromDefinition($code, $definition);
@@ -94,28 +94,28 @@ final class TemplateDefinitionRegistry
 	{
 		foreach ($definition['fields'] as $field => $metadata) {
 			if (!is_array($metadata) || !in_array($metadata['type'] ?? null, ['boolean', 'integer', 'string'], true)) {
-				throw new \UnexpectedValueException(sprintf('Template "%s" field "%s" has an unsupported type.', $code, $field));
+				throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_FIELD_INVALID');
 			}
 
 			foreach (['label_key', 'description_key'] as $key) {
 				if (!is_string($metadata[$key] ?? null) || !str_starts_with($metadata[$key], 'COM_JOOMLEAGUE_')) {
-					throw new \UnexpectedValueException(sprintf('Template "%s" field "%s" has an invalid %s.', $code, $field, $key));
+					throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_FIELD_INVALID');
 				}
 			}
 
 			if (isset($metadata['enum'])) {
 				if ($metadata['type'] !== 'string' || !is_array($metadata['enum']) || $metadata['enum'] === [] || !array_is_list($metadata['enum'])) {
-					throw new \UnexpectedValueException(sprintf('Template "%s" field "%s" has an invalid enum.', $code, $field));
+					throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_FIELD_INVALID');
 				}
 
 				foreach ($metadata['enum'] as $option) {
 					if (!is_string($option) || $option === '') {
-						throw new \UnexpectedValueException(sprintf('Template "%s" field "%s" has an invalid enum option.', $code, $field));
+						throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_FIELD_INVALID');
 					}
 				}
 
 				if (count($metadata['enum']) !== count(array_unique($metadata['enum']))) {
-					throw new \UnexpectedValueException(sprintf('Template "%s" field "%s" has duplicate enum options.', $code, $field));
+					throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_FIELD_INVALID');
 				}
 			}
 
@@ -136,7 +136,7 @@ final class TemplateDefinitionRegistry
 		};
 
 		if (!$valid || (isset($metadata['enum']) && !in_array($value, $metadata['enum'], true))) {
-			throw new \InvalidArgumentException(sprintf('Invalid value for template "%s" field "%s".', $code, $field));
+			throw new \InvalidArgumentException('COM_JOOMLEAGUE_TEMPLATE_ERROR_VALUE_INVALID');
 		}
 	}
 }

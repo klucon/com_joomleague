@@ -33,6 +33,11 @@ $clubModule = $root . '/modules/mod_joomleague_club';
 $personnelModule = $root . '/modules/mod_joomleague_personnel';
 $venueProgramModule = $root . '/modules/mod_joomleague_venue_program';
 $competitionsModule = $root . '/modules/mod_joomleague_competitions';
+$calendarModule = $root . '/modules/mod_joomleague_calendar';
+$programmeTickerModule = $root . '/modules/mod_joomleague_programme_ticker';
+$birthdaysModule = $root . '/modules/mod_joomleague_birthdays';
+$spotlightModule = $root . '/modules/mod_joomleague_spotlight';
+$latestResultsModule = $root . '/modules/mod_joomleague_latest_results';
 $packageManifest = (string) file_get_contents($root . '/build/pkg_joomleague.xml');
 $packageInstaller = (string) file_get_contents($root . '/build/pkg_script.php');
 
@@ -182,6 +187,69 @@ if (!str_contains($packageManifest,'id="mod_joomleague_competitions"')) throw ne
 $competitionsHelper=(string)file_get_contents($competitionsModule.'/src/Helper/CompetitionsHelper.php');$projectsModel=(string)file_get_contents($site.'/src/Model/ProjectsModel.php');
 if (!str_contains($competitionsHelper,'ProjectCatalogueReader')||!str_contains($projectsModel,'ProjectCatalogueReader')) throw new RuntimeException('Competitions module and catalogue must share ProjectCatalogueReader.');
 
+foreach (['/mod_joomleague_calendar.xml', '/services/provider.php', '/src/Dispatcher/Dispatcher.php', '/src/Helper/CalendarHelper.php', '/tmpl/default.php'] as $calendarFile) {
+	if (!is_file($calendarModule . $calendarFile)) {
+		throw new RuntimeException(sprintf('Calendar module is missing %s.', $calendarFile));
+	}
+}
+if (!str_contains($packageManifest, 'id="mod_joomleague_calendar"')) {
+	throw new RuntimeException('Package manifest does not install the calendar module.');
+}
+$calendarHelper = (string) file_get_contents($calendarModule . '/src/Helper/CalendarHelper.php');
+foreach (['CrossProjectProgrammeReader', 'ProjectTemplateProvider', 'sport_type_id', 'club_id', 'show_match_detail_button'] as $calendarContract) {
+	if (!str_contains($calendarHelper, $calendarContract)) {
+		throw new RuntimeException(sprintf('Calendar module is missing universal contract %s.', $calendarContract));
+	}
+}
+
+foreach (['/mod_joomleague_programme_ticker.xml', '/services/provider.php', '/src/Dispatcher/Dispatcher.php', '/src/Helper/ProgrammeTickerHelper.php', '/tmpl/default.php'] as $tickerFile) {
+	if (!is_file($programmeTickerModule . $tickerFile)) {
+		throw new RuntimeException(sprintf('Programme ticker module is missing %s.', $tickerFile));
+	}
+}
+if (!str_contains($packageManifest, 'id="mod_joomleague_programme_ticker"')) {
+	throw new RuntimeException('Package manifest does not install the programme ticker module.');
+}
+$crossProjectProgrammeReader = (string) file_get_contents($admin . '/src/Service/CrossProjectProgrammeReader.php');
+$tickerHelper = (string) file_get_contents($programmeTickerModule . '/src/Helper/ProgrammeTickerHelper.php');
+foreach (['ProgrammeReader', 'ProgrammeScopeResolver', 'project.published = 1', 'project.access', 'catch (\\Throwable)'] as $aggregateContract) {
+	if (!str_contains($crossProjectProgrammeReader, $aggregateContract)) {
+		throw new RuntimeException(sprintf('Cross-project programme reader is missing contract %s.', $aggregateContract));
+	}
+}
+foreach (['CrossProjectProgrammeReader', 'ProjectTemplateProvider', "['played']", 'completed_limit', 'upcoming_limit'] as $tickerContract) {
+	if (!str_contains($tickerHelper, $tickerContract)) {
+		throw new RuntimeException(sprintf('Programme ticker module is missing contract %s.', $tickerContract));
+	}
+}
+
+foreach (['/mod_joomleague_birthdays.xml', '/services/provider.php', '/src/Dispatcher/Dispatcher.php', '/src/Helper/BirthdaysHelper.php', '/tmpl/default.php'] as $birthdayFile) {
+	if (!is_file($birthdaysModule . $birthdayFile)) throw new RuntimeException(sprintf('Birthdays module is missing %s.', $birthdayFile));
+}
+if (!str_contains($packageManifest, 'id="mod_joomleague_birthdays"')) throw new RuntimeException('Package manifest does not install the birthdays module.');
+$birthdayReader = (string) file_get_contents($admin . '/src/Service/BirthdayReader.php');
+foreach (['person.published = 1', 'person.access IN', 'person.death_date IS NULL', 'checkdate(2, 29', 'club_id = :clubId'] as $birthdayContract) {
+	if (!str_contains($birthdayReader, $birthdayContract)) throw new RuntimeException(sprintf('Birthday reader is missing privacy or date contract %s.', $birthdayContract));
+}
+
+foreach (['/mod_joomleague_spotlight.xml', '/services/provider.php', '/src/Dispatcher/Dispatcher.php', '/src/Helper/SpotlightHelper.php', '/tmpl/default.php'] as $spotlightFile) {
+	if (!is_file($spotlightModule . $spotlightFile)) throw new RuntimeException(sprintf('Spotlight module is missing %s.', $spotlightFile));
+}
+if (!str_contains($packageManifest, 'id="mod_joomleague_spotlight"')) throw new RuntimeException('Package manifest does not install the spotlight module.');
+$spotlightReader = (string) file_get_contents($admin . '/src/Service/SpotlightReader.php');
+foreach (['entity.published = 1', 'entity.access IN', "kind === 'person'", "kind === 'team'", 'crc32'] as $spotlightContract) {
+	if (!str_contains($spotlightReader, $spotlightContract)) throw new RuntimeException(sprintf('Spotlight reader is missing universal contract %s.', $spotlightContract));
+}
+
+foreach (['/mod_joomleague_latest_results.xml', '/services/provider.php', '/src/Dispatcher/Dispatcher.php', '/src/Helper/LatestResultsHelper.php', '/tmpl/default.php'] as $latestResultsFile) {
+	if (!is_file($latestResultsModule . $latestResultsFile)) throw new RuntimeException(sprintf('Latest results module is missing %s.', $latestResultsFile));
+}
+if (!str_contains($packageManifest, 'id="mod_joomleague_latest_results"')) throw new RuntimeException('Package manifest does not install the latest results module.');
+$latestResultsHelper = (string) file_get_contents($latestResultsModule . '/src/Helper/LatestResultsHelper.php');
+foreach (['CrossProjectProgrammeReader', "(bool)\$i['played']", 'sport_type_id', 'club_id', 'project_id', 'ProjectTemplateProvider'] as $latestResultsContract) {
+	if (!str_contains($latestResultsHelper, $latestResultsContract)) throw new RuntimeException(sprintf('Latest results module is missing contract %s.', $latestResultsContract));
+}
+
 $nextEventHelper = (string) file_get_contents($nextEventModule . '/src/Helper/NextEventHelper.php');
 foreach (['ProgrammeReader', 'ProgrammeScopeResolver', "!\$item['played']", "'entry'", "'club'"] as $nextEventContract) {
 	if (!str_contains($nextEventHelper, $nextEventContract)) {
@@ -190,7 +258,7 @@ foreach (['ProgrammeReader', 'ProgrammeScopeResolver', "!\$item['played']", "'en
 }
 
 $programmeReader = (string) file_get_contents($admin . '/src/Service/ProgrammeReader.php');
-foreach (["project.published = 1", "match.published = 1", "participant.published = 1", "result.status_code = 'final'"] as $programmeGuard) {
+foreach (["project.published = 1", "match.published = 1", "participant.published = 1", "result.status_code = 'final'", 'formatNumericScore'] as $programmeGuard) {
 	if (!str_contains($programmeReader, $programmeGuard)) {
 		throw new RuntimeException(sprintf('Programme reader is missing public-data guard %s.', $programmeGuard));
 	}
@@ -1540,12 +1608,95 @@ if (preg_match('/<style\b|style\s*=|<script\b/i', $siteResultsTemplate) === 1) {
 	throw new RuntimeException('Public programme must use native Joomla styling without embedded CSS or scripts.');
 }
 
+$templateRuntimeContracts = [
+	'Project' => ['view' => 'project', 'fields' => ['show_hero', 'show_sport', 'show_season', 'show_competition_info']],
+	'Results' => ['view' => 'results', 'fields' => ['group_by_round', 'show_match_detail_button', 'show_period_scores', 'show_set_scores']],
+	'Standings' => ['view' => 'standings', 'fields' => ['show_score', 'show_goal_difference', 'show_sets', 'show_points']],
+	'Participant' => ['view' => 'participant', 'fields' => ['show_personal_data', 'show_results']],
+	'Eventreport' => ['view' => 'eventreport', 'fields' => ['show_lineups', 'show_staff', 'show_officials', 'show_timeline', 'show_schema_org']],
+];
+foreach ($templateRuntimeContracts as $viewClass => $contract) {
+	$viewSource = (string) file_get_contents($site . '/src/View/' . $viewClass . '/HtmlView.php');
+	$templateSource = (string) file_get_contents($site . '/tmpl/' . $contract['view'] . '/default.php');
+	$runtimeSource = $viewSource . $templateSource;
+	if ($viewClass === 'Standings') {
+		$runtimeSource .= (string) file_get_contents($site . '/src/Service/RankingColumnFilter.php');
+	}
+	if (!str_contains($viewSource, 'ProjectTemplateProvider')) {
+		throw new RuntimeException(sprintf('%s frontend view must resolve the central project-template contract.', $viewClass));
+	}
+	foreach ($contract['fields'] as $field) {
+		if (!str_contains($runtimeSource, $field)) {
+			throw new RuntimeException(sprintf('%s frontend output does not apply template field %s.', $viewClass, $field));
+		}
+	}
+}
+foreach (['segment.parent_id IS NOT NULL', 'score_segments', 'show_period_scores', 'show_set_scores'] as $segmentContract) {
+	if (!str_contains($siteResultsModel . $siteResultsTemplate, $segmentContract)) {
+		throw new RuntimeException(sprintf('Public results are missing partial-score contract %s.', $segmentContract));
+	}
+}
+
+$standingsModuleHelper = (string) file_get_contents($root . '/modules/mod_joomleague_standings/src/Helper/StandingsHelper.php');
+$standingsModuleManifest = (string) file_get_contents($root . '/modules/mod_joomleague_standings/mod_joomleague_standings.xml');
+foreach (['ProjectTemplateProvider', 'RankingColumnFilter', 'presentationOverrides', 'favorite_highlight_mode'] as $moduleTemplateContract) {
+	if (!str_contains($standingsModuleHelper, $moduleTemplateContract)) {
+		throw new RuntimeException(sprintf('Standings module is missing ranking-template contract %s.', $moduleTemplateContract));
+	}
+}
+foreach (['template_show_score', 'template_show_goal_difference', 'template_show_sets', 'template_show_points'] as $moduleOverrideField) {
+	if (!str_contains($standingsModuleManifest, 'name="' . $moduleOverrideField . '"')) {
+		throw new RuntimeException(sprintf('Standings module is missing presentation override field %s.', $moduleOverrideField));
+	}
+}
+
+$programModuleHelper = (string) file_get_contents($root . '/modules/mod_joomleague_program/src/Helper/ProgramHelper.php');
+$programModuleTemplate = (string) file_get_contents($root . '/modules/mod_joomleague_program/tmpl/default.php');
+$programModuleManifest = (string) file_get_contents($root . '/modules/mod_joomleague_program/mod_joomleague_program.xml');
+foreach (['ProjectTemplateProvider', 'show_match_detail_button', 'presentationOverrides'] as $programTemplateContract) {
+	if (!str_contains($programModuleHelper, $programTemplateContract)) {
+		throw new RuntimeException(sprintf('Programme module is missing Results-template contract %s.', $programTemplateContract));
+	}
+}
+if (!str_contains($programModuleTemplate, "['show_detail']")
+	|| !str_contains($programModuleManifest, 'name="template_show_match_detail_button"')) {
+	throw new RuntimeException('Programme module does not apply its inherited event-detail link setting.');
+}
+
+$participantModuleHelper = (string) file_get_contents($root . '/modules/mod_joomleague_participant/src/Helper/ParticipantHelper.php');
+$participantModuleTemplate = (string) file_get_contents($root . '/modules/mod_joomleague_participant/tmpl/default.php');
+$participantModuleManifest = (string) file_get_contents($root . '/modules/mod_joomleague_participant/mod_joomleague_participant.xml');
+foreach (['ProjectTemplateProvider', 'show_personal_data', 'show_results'] as $participantTemplateContract) {
+	if (!str_contains($participantModuleHelper . $participantModuleTemplate, $participantTemplateContract)) {
+		throw new RuntimeException(sprintf('Participant module is missing Participant-template contract %s.', $participantTemplateContract));
+	}
+}
+foreach (['template_show_personal_data', 'template_show_results'] as $participantOverrideField) {
+	if (!str_contains($participantModuleManifest, 'name="' . $participantOverrideField . '"')) {
+		throw new RuntimeException(sprintf('Participant module is missing presentation override field %s.', $participantOverrideField));
+	}
+}
+
 $siteBracketModel = (string) file_get_contents($root . '/components/com_joomleague/src/Model/BracketModel.php');
 $siteBracketTemplate = (string) file_get_contents($root . '/components/com_joomleague/tmpl/bracket/default.php');
-foreach (['project_entry_id', "result.status_code = 'final'", 'value.text_value', 'value.result_rank', 'PARTICIPANT_HEIGHT'] as $bracketRequirement) {
-	if (!str_contains($siteBracketModel, $bracketRequirement)) {
+foreach (['project_entry_id', "result.status_code = 'final'", 'value.text_value', 'value.result_rank', 'PARTICIPANT_HEIGHT', "['decider']", 'segment.level_code', 'jl-bracket-match__decider'] as $bracketRequirement) {
+	if (!str_contains($siteBracketModel . $siteBracketTemplate, $bracketRequirement)) {
 		throw new RuntimeException(sprintf('Public progression bracket is missing universal requirement %s.', $bracketRequirement));
 	}
+}
+
+$demoPopulation = (string) file_get_contents($root . '/tools/demo/populate-demo.php');
+$demoEvents = (string) file_get_contents($root . '/tools/demo/enrich-demo-events.php');
+if (!str_contains($demoPopulation, "'status_code' => 'finished'") || !str_contains($demoPopulation, "modify('-10 years')")) {
+	throw new RuntimeException('Demo population does not mark programme items with final results as finished.');
+}
+foreach (['$clockValues', '($matchIndex + $position)', '$primaryIndex'] as $eventVariationContract) {
+	if (!str_contains($demoEvents, $eventVariationContract)) {
+		throw new RuntimeException(sprintf('Demo timeline enrichment is missing credibility contract %s.', $eventVariationContract));
+	}
+}
+if (str_contains($demoEvents, '$eligible[0]->id') || str_contains($demoEvents, '$eligible[1]->id')) {
+	throw new RuntimeException('Demo timeline enrichment assigns every event to fixed lineup positions.');
 }
 foreach (['home_score', 'away_score', 'home_shootout', 'away_shootout', "['home']", "['away']"] as $headToHeadToken) {
 	if (str_contains($siteBracketModel . $siteBracketTemplate, $headToHeadToken)) {

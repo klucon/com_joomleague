@@ -16,6 +16,9 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Site\Service\EntitySchemaBuilder;
+use Joomleague\Component\Joomleague\Site\Service\SeoMetadata;
 
 final class HtmlView extends BaseHtmlView
 {
@@ -28,7 +31,15 @@ final class HtmlView extends BaseHtmlView
 		$title = isset($this->club['club'])
 			? (string) $this->club['club']->name
 			: Text::_('COM_JOOMLEAGUE_CLUB_VIEW_TITLE');
-		$this->getDocument()->setTitle($title);
+		if (isset($this->club['club'])) {
+			$item = $this->club['club'];
+			$url = Route::_('index.php?option=com_joomleague&view=club&club_id=' . (int) $item->id, true, Route::TLS_IGNORE, true);
+			$seo = new SeoMetadata();
+			$seo->apply($this->getDocument(), $title, $url, (string) ($item->description ?? ''), (string) ($item->logo ?? ''));
+			$seo->addStructuredData($this->getDocument(), (new EntitySchemaBuilder())->build('club', $item, $url));
+		} else {
+			$this->getDocument()->setTitle($title);
+		}
 		parent::display($tpl);
 	}
 }

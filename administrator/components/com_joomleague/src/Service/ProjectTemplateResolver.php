@@ -26,7 +26,7 @@ final class ProjectTemplateResolver
 	public function resolve(int $projectId, string $templateCode, array $presentationOverrides = []): array
 	{
 		if ($projectId < 1) {
-			throw new \InvalidArgumentException('A positive project ID is required.');
+			throw new \InvalidArgumentException('COM_JOOMLEAGUE_CONTEXT_PROJECT_REQUIRED');
 		}
 
 		$profileTemplateCode = $templateCode;
@@ -55,7 +55,7 @@ final class ProjectTemplateResolver
 		$row = $this->database->setQuery($query)->loadObject();
 
 		if ($row === null) {
-			throw new \RuntimeException(sprintf('Project %d does not exist.', $projectId));
+			throw new \RuntimeException('COM_JOOMLEAGUE_TEMPLATE_ERROR_PROJECT_NOT_FOUND');
 		}
 
 		$profilePayload = $this->decodeObject((string) $row->payload_json, 'profile payload');
@@ -81,7 +81,7 @@ final class ProjectTemplateResolver
 		$value = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
 		if (!is_array($value) || array_is_list($value)) {
-			throw new \UnexpectedValueException(sprintf('The %s must be a JSON object.', $context));
+			throw new \UnexpectedValueException('COM_JOOMLEAGUE_TEMPLATE_ERROR_CONFIG_INVALID');
 		}
 
 		return $value;

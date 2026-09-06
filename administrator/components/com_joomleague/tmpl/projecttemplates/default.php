@@ -28,15 +28,17 @@ $formatValue = static function (mixed $value): string {
 		<?php echo Text::_('COM_JOOMLEAGUE_PROJECTTEMPLATES_INTRO'); ?>
 	</div>
 
+	<?php echo HTMLHelper::_('uitab.startTabSet', 'projectTemplateTabs', ['active' => $this->templateGroups[0]['code'] ?? '', 'recall' => true, 'breakpoint' => 768]); ?>
 	<?php foreach ($this->templateGroups as $group) : ?>
-		<div class="options-form">
-			<legend><?php echo Text::_($group['name_key']); ?></legend>
+		<?php echo HTMLHelper::_('uitab.addTab', 'projectTemplateTabs', $group['code'], Text::_($group['name_key'])); ?>
+		<fieldset class="options-form">
+			<legend class="visually-hidden"><?php echo Text::_($group['name_key']); ?></legend>
 			<p class="text-body-secondary"><?php echo Text::_($group['description_key']); ?></p>
 			<div class="table-responsive">
 				<table class="table table-striped align-middle">
 					<thead>
 						<tr>
-							<th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_PROJECTTEMPLATES_COLUMN_FIELD'); ?></th>
+							<th scope="col" class="w-50"><?php echo Text::_('COM_JOOMLEAGUE_PROJECTTEMPLATES_COLUMN_FIELD'); ?></th>
 							<th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_PROJECTTEMPLATES_COLUMN_INHERITED'); ?></th>
 							<th scope="col" class="text-center"><?php echo Text::_('COM_JOOMLEAGUE_PROJECTTEMPLATES_COLUMN_OVERRIDE'); ?></th>
 							<th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_PROJECTTEMPLATES_COLUMN_PROJECT_VALUE'); ?></th>
@@ -59,8 +61,10 @@ $formatValue = static function (mixed $value): string {
 					</tbody>
 				</table>
 			</div>
-		</div>
+		</fieldset>
+		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 	<?php endforeach; ?>
+	<?php echo HTMLHelper::_('uitab.endTabSet'); ?>
 
 	<?php echo $this->form->getInput('project_id'); ?>
 	<input type="hidden" name="task" value="">

@@ -37,7 +37,11 @@ final class ProjectSchemaBuilder
 			$schema['organizer'] = ['@type' => 'Organization', 'name' => (string) $project->competition_name];
 		}
 		if (!empty($project->picture)) {
-			$schema['image'] = (string) $project->picture;
+			$image = trim((string) $project->picture);
+			if (!preg_match('#^https?://#i', $image) && preg_match('#^(https?://[^/]+)#i', $url, $origin)) {
+				$image = $origin[1] . '/' . ltrim($image, '/');
+			}
+			$schema['image'] = $image;
 		}
 
 		return $schema;

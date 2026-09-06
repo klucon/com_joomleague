@@ -4,6 +4,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 
 HTMLHelper::_('behavior.formvalidator');
@@ -43,6 +44,7 @@ $description = $this->form->getField('description');
 		</div></div>
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
+		<?php echo LayoutHelper::render('joomleague.edit.customfields', ['form' => $this->form, 'tabSet' => 'teamTabs'], JPATH_ADMINISTRATOR . '/components/com_joomleague/layouts'); ?>
 		<?php echo HTMLHelper::_('uitab.endTabSet'); ?>
 	</div>
 	<input type="hidden" name="task" value="">
