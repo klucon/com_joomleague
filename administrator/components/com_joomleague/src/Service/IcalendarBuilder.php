@@ -20,11 +20,13 @@ final class IcalendarBuilder
 			'METHOD:PUBLISH',
 			'X-WR-CALNAME:' . $this->escape($calendarName),
 		];
-		$stamp = gmdate('Ymd\\THis\\Z');
-
 		foreach ($events as $event) {
 			if (empty($event['scheduled_start'])) {
 				continue;
+			}
+			$uuid = strtolower(trim((string) ($event['uuid'] ?? '')));
+			if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid) !== 1) {
+				throw new \InvalidArgumentException('Calendar event UUID is invalid.');
 			}
 
 			$start = new \DateTimeImmutable((string) $event['scheduled_start'], new \DateTimeZone('UTC'));
@@ -33,10 +35,14 @@ final class IcalendarBuilder
 			$participantNames = array_map(static fn (array $participant): string => (string) $participant['name'], $event['participants'] ?? []);
 			$summary = $participantNames === [] ? $calendarName : implode(' - ', $participantNames);
 			$description = implode(' | ', array_filter([(string) ($event['project_name'] ?? ''), (string) ($event['round_name'] ?? '')]));
+			$created = $this->utcDate((string) ($event['created'] ?? $event['modified'] ?? $event['scheduled_start']));
+			$modified = $this->utcDate((string) ($event['modified'] ?? $event['created'] ?? $event['scheduled_start']));
 
 			$lines[] = 'BEGIN:VEVENT';
-			$lines[] = 'UID:joomleague-event-' . (int) $event['id'] . '@joomleague.eu';
-			$lines[] = 'DTSTAMP:' . $stamp;
+			$lines[] = 'UID:joomleague-event-' . $uuid . '@joomleague.eu';
+			$lines[] = 'DTSTAMP:' . $created->format('Ymd\\THis\\Z');
+			$lines[] = 'LAST-MODIFIED:' . $modified->format('Ymd\\THis\\Z');
+			$lines[] = 'SEQUENCE:' . max(0, $modified->getTimestamp());
 			$lines[] = 'DTSTART:' . $start->format('Ymd\\THis\\Z');
 			$lines[] = 'DTEND:' . $end->format('Ymd\\THis\\Z');
 			$lines[] = 'SUMMARY:' . $this->escape($summary);
@@ -54,6 +60,15 @@ final class IcalendarBuilder
 		$lines[] = 'END:VCALENDAR';
 
 		return implode("\r\n", array_map($this->fold(...), $lines)) . "\r\n";
+	}
+
+	private function utcDate(string $value): \DateTimeImmutable
+	{
+		try {
+			return new \DateTimeImmutable($value, new \DateTimeZone('UTC'));
+		} catch (\Exception $exception) {
+			throw new \InvalidArgumentException('Calendar event timestamp is invalid.', 0, $exception);
+		}
 	}
 
 	private function escape(string $value): string

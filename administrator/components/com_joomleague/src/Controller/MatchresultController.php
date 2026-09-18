@@ -27,6 +27,7 @@ final class MatchresultController extends BaseController
 	{
 		if (!Session::checkToken()) throw new \RuntimeException(Text::_('JINVALID_TOKEN'), 403);
 		$matchId = $this->input->getInt('match_id');
+		$this->assertEditPermission($matchId);
 		$this->getModel('Matchresult')->clearTransient($matchId);
 		$roundId = $this->input->getInt('round_id');
 		$this->setRedirect(Route::_('index.php?option=com_joomleague&view=matches&round_id=' . $roundId, false));

@@ -8,8 +8,11 @@ defined('_JEXEC') or die;
 
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
+use Joomla\CMS\Language\Text;
 use Joomleague\Component\Joomleague\Domain\Service\CanonicalJson;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsDecimal;
+use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
+use Joomleague\Component\Joomleague\Domain\Service\StandingsRecalculator;
 use Joomleague\Component\Joomleague\Domain\Service\UuidFactory;
 
 final class StageProgressionService
@@ -21,6 +24,9 @@ final class StageProgressionService
 	{
 		$transition = $this->transition($transitionId);
 		$config = json_decode((string) ($transition->selector_config_json ?? '{}'), true, 32, JSON_THROW_ON_ERROR) ?: [];
+		if ((string) $transition->selector_type === 'standing_rank_range') {
+			$this->refreshSourceStandings($transition, $config);
+		}
 		$entries = match ((string) $transition->selector_type) {
 			'all_entries' => $this->sourceEntries($transition),
 			'standing_rank_range' => $this->standingEntries($transition, $config),
@@ -44,6 +50,34 @@ final class StageProgressionService
 		$lastRun = $this->database->setQuery($query, 0, 1)->loadObject();
 
 		return ['transition' => $transition, 'entries' => $entries, 'checksum' => $checksum, 'executable' => $transition->selector_type !== 'manual', 'last_run' => $lastRun ?: null];
+	}
+
+	/** @param array<string,mixed> $config */
+	private function refreshSourceStandings(object $transition, array $config): void
+	{
+		$scope = $config['scope'] ?? null;
+
+		if (!is_string($scope) || preg_match('/^[a-z][a-z0-9_]*$/', $scope) !== 1) {
+			throw new \DomainException(Text::_('COM_JOOMLEAGUE_ERROR_STAGE_PROGRESSION_STANDINGS_REFRESH'));
+		}
+
+		try {
+			$reader = new StandingsReader($this->database);
+			$recalculator = new StandingsRecalculator($this->database, $reader);
+			$snapshotId = $recalculator->recalculate(
+				(int) $transition->project_id,
+				(int) $transition->source_stage_id,
+				$scope,
+				0
+			);
+			$current = $reader->current((int) $transition->project_id, (int) $transition->source_stage_id, $scope);
+
+			if ($snapshotId < 1 || (int) ($current['snapshot']->id ?? 0) !== $snapshotId) {
+				throw new \RuntimeException('The recalculated standings snapshot was not published.');
+			}
+		} catch (\Throwable $error) {
+			throw new \DomainException(Text::_('COM_JOOMLEAGUE_ERROR_STAGE_PROGRESSION_STANDINGS_REFRESH'), 0, $error);
+		}
 	}
 
 	/** @return array{run_id:int,reused:bool,resolved_count:int} */
@@ -199,16 +233,31 @@ final class StageProgressionService
 	private function synchronise(object $transition, array $entries, int $runId, int $actorId): void
 	{
 		$ids = array_column($entries, 'id');
+		$seedStart = $transition->target_seed_start === null ? null : (int) $transition->target_seed_start;
+		$targetEntries = $this->targetStageEntries((int) $transition->target_stage_id);
+		$this->assertNoManualConflicts($entries, $targetEntries, $seedStart);
 		$query = $this->database->getQuery(true)->select('project_entry_id')->from($this->database->quoteName('#__joomleague_stage_transition_assignment'))->where('transition_id = :transition')->bind(':transition', $transition->id, ParameterType::INTEGER);
 		$old = array_map('intval', $this->database->setQuery($query)->loadColumn());
 		$query = $this->database->getQuery(true)->delete($this->database->quoteName('#__joomleague_stage_transition_assignment'))->where('transition_id = :transition')->bind(':transition', $transition->id, ParameterType::INTEGER);
 		$this->database->setQuery($query)->execute();
-		$seedStart = $transition->target_seed_start === null ? null : (int) $transition->target_seed_start;
 		foreach ($entries as $index => $entry) {
 			$id = (int) $entry['id']; $seed = $seedStart === null ? null : $seedStart + $index;
-			$query = $this->database->getQuery(true)->select('COUNT(*)')->from($this->database->quoteName('#__joomleague_stage_entry'))->where('stage_id = :stage')->where('entry_id = :entry')->bind(':stage',$transition->target_stage_id,ParameterType::INTEGER)->bind(':entry',$id,ParameterType::INTEGER);
-			if ((int) $this->database->setQuery($query)->loadResult() === 0) {
+			$targetEntry = $targetEntries[$id] ?? null;
+			if ($targetEntry === null) {
 				$query = $this->database->getQuery(true)->insert($this->database->quoteName('#__joomleague_stage_entry'))->columns($this->database->quoteName(['stage_id','entry_id','project_id','ordering','seed_number','manual_assignment','created_by']))->values(':stage,:entry,:project,:ordering,:seed,0,:actor')->bind(':stage',$transition->target_stage_id,ParameterType::INTEGER)->bind(':entry',$id,ParameterType::INTEGER)->bind(':project',$transition->project_id,ParameterType::INTEGER)->bind(':ordering',$index,ParameterType::INTEGER)->bind(':seed',$seed,ParameterType::INTEGER)->bind(':actor',$actorId,ParameterType::INTEGER);
+				$this->database->setQuery($query)->execute();
+			} elseif ((int) $targetEntry->manual_assignment === 0) {
+				$query = $this->database->getQuery(true)
+					->update($this->database->quoteName('#__joomleague_stage_entry'))
+					->set($this->database->quoteName('ordering') . ' = :ordering')
+					->set($this->database->quoteName('seed_number') . ' = :seed')
+					->where($this->database->quoteName('stage_id') . ' = :stage')
+					->where($this->database->quoteName('entry_id') . ' = :entry')
+					->where($this->database->quoteName('manual_assignment') . ' = 0')
+					->bind(':ordering', $index, ParameterType::INTEGER)
+					->bind(':seed', $seed, ParameterType::INTEGER)
+					->bind(':stage', $transition->target_stage_id, ParameterType::INTEGER)
+					->bind(':entry', $id, ParameterType::INTEGER);
 				$this->database->setQuery($query)->execute();
 			}
 			$query = $this->database->getQuery(true)->insert($this->database->quoteName('#__joomleague_stage_transition_assignment'))->columns($this->database->quoteName(['transition_id','target_stage_id','project_entry_id','project_id','run_id','target_seed','created_by']))->values(':transition,:stage,:entry,:project,:run,:seed,:actor')->bind(':transition',$transition->id,ParameterType::INTEGER)->bind(':stage',$transition->target_stage_id,ParameterType::INTEGER)->bind(':entry',$id,ParameterType::INTEGER)->bind(':project',$transition->project_id,ParameterType::INTEGER)->bind(':run',$runId,ParameterType::INTEGER)->bind(':seed',$seed,ParameterType::INTEGER)->bind(':actor',$actorId,ParameterType::INTEGER);
@@ -221,5 +270,54 @@ final class StageProgressionService
 		}
 		$query = $this->database->getQuery(true)->update($this->database->quoteName('#__joomleague_project_stage'))->set("entry_selection_mode = 'explicit'")->where('id = :stage')->bind(':stage',$transition->target_stage_id,ParameterType::INTEGER);
 		$this->database->setQuery($query)->execute();
+	}
+
+	/** @return array<int,object> */
+	private function targetStageEntries(int $stageId): array
+	{
+		$query = $this->database->getQuery(true)
+			->select($this->database->quoteName(['entry_id', 'ordering', 'seed_number', 'manual_assignment']))
+			->from($this->database->quoteName('#__joomleague_stage_entry'))
+			->where($this->database->quoteName('stage_id') . ' = :stage')
+			->bind(':stage', $stageId, ParameterType::INTEGER);
+		$result = [];
+
+		foreach ($this->database->setQuery($query)->loadObjectList() as $entry) {
+			$result[(int) $entry->entry_id] = $entry;
+		}
+
+		return $result;
+	}
+
+	/** @param list<array{id:int}> $entries @param array<int,object> $targetEntries */
+	private function assertNoManualConflicts(array $entries, array $targetEntries, ?int $seedStart): void
+	{
+		$manualEntries = array_filter(
+			$targetEntries,
+			static fn (object $entry): bool => (int) $entry->manual_assignment === 1
+		);
+
+		foreach ($entries as $index => $entry) {
+			$entryId = (int) $entry['id'];
+			$seed = $seedStart === null ? null : $seedStart + $index;
+			$current = $manualEntries[$entryId] ?? null;
+
+			if ($current !== null && ((int) $current->ordering !== $index || ($seed !== null && ($current->seed_number === null || (int) $current->seed_number !== $seed)))) {
+				throw new \DomainException(Text::_('COM_JOOMLEAGUE_ERROR_STAGE_PROGRESSION_MANUAL_CONFLICT'));
+			}
+
+			foreach ($manualEntries as $manualEntryId => $manualEntry) {
+				if ($manualEntryId === $entryId) {
+					continue;
+				}
+
+				$orderConflict = (int) $manualEntry->ordering === $index;
+				$seedConflict = $seed !== null && $manualEntry->seed_number !== null && (int) $manualEntry->seed_number === $seed;
+
+				if ($orderConflict || $seedConflict) {
+					throw new \DomainException(Text::_('COM_JOOMLEAGUE_ERROR_STAGE_PROGRESSION_MANUAL_CONFLICT'));
+				}
+			}
+		}
 	}
 }

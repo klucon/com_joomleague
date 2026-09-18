@@ -37,9 +37,10 @@ final class ProgrammeReader
 		$db = $this->database;
 		$query = $db->getQuery(true)
 			->select([
-				'match.id', 'match.project_id', 'match.scheduled_start', 'match.timezone', 'match.duration_minutes', 'match.status_code',
+				'match.id', 'match.uuid', 'match.project_id', 'match.scheduled_start', 'match.timezone', 'match.duration_minutes', 'match.status_code',
+				'match.created AS match_created', 'match.modified AS match_modified',
 				'match.contest_type', 'project.name AS project_name', 'round.name AS round_name', 'venue.id AS venue_id', 'venue.name AS venue_name',
-				'result.status_code AS result_status',
+				'result.status_code AS result_status', 'result.created AS result_created', 'result.modified AS result_modified', 'result.finalized_at',
 			])
 			->from($db->quoteName('#__joomleague_project_match', 'match'))
 			->innerJoin($db->quoteName('#__joomleague_project', 'project') . ' ON project.id = match.project_id AND project.published = 1 AND project.access IN (' . implode(',', $viewLevels) . ')')
@@ -58,7 +59,7 @@ final class ProgrammeReader
 		if ($entryIds !== null) {
 			$query->innerJoin($db->quoteName('#__joomleague_match_participant', 'scope_participant') . ' ON scope_participant.match_id = match.id AND scope_participant.published = 1')
 				->whereIn('scope_participant.project_entry_id', $entryIds, ParameterType::INTEGER)
-				->group('match.id, match.project_id, match.scheduled_start, match.timezone, match.duration_minutes, match.status_code, match.contest_type, project.name, round.name, venue.id, venue.name, result.status_code');
+				->group('match.id, match.uuid, match.project_id, match.scheduled_start, match.timezone, match.duration_minutes, match.status_code, match.created, match.modified, match.contest_type, project.name, round.name, venue.id, venue.name, result.status_code, result.created, result.modified, result.finalized_at');
 		}
 
 		$items = $db->setQuery($query)->loadObjectList();
@@ -134,6 +135,9 @@ final class ProgrammeReader
 
 		return array_map(static fn (object $item): array => [
 			'id' => (int) $item->id,
+			'uuid' => (string) $item->uuid,
+			'created' => $item->match_created,
+			'modified' => self::latestDateTime([$item->match_modified, $item->result_created, $item->result_modified, $item->finalized_at, $item->match_created]),
 			'project_id' => (int) $item->project_id,
 			'scheduled_start' => $item->scheduled_start,
 			'timezone' => $item->timezone,
@@ -148,6 +152,14 @@ final class ProgrammeReader
 			'participants' => $participantsByEvent[(int) $item->id] ?? [],
 			'decider' => $deciders[(int) $item->id] ?? null,
 		], $items);
+	}
+
+	/** @param list<mixed> $values */
+	private static function latestDateTime(array $values): ?string
+	{
+		$dates = array_values(array_filter(array_map(static fn (mixed $value): string => trim((string) ($value ?? '')), $values)));
+
+		return $dates === [] ? null : max($dates);
 	}
 
 	/** @param list<int> $viewLevels @return list<array<string,mixed>> */

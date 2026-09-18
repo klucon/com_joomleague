@@ -18,7 +18,7 @@ final class DataimportController extends BaseController
 	public function import(): void
 	{
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
-		if (!$this->app->getIdentity()->authorise('core.manage', 'com_joomleague')) throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		if (!$this->app->getIdentity()->authorise('joomleague.database.import', 'com_joomleague')) throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
 		$file = $this->input->files->get('sql_file', null, 'raw');
 		$maxUploadSize = (int) Utility::getMaxUploadSize();
 		try {

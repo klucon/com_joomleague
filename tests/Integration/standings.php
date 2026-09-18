@@ -10,7 +10,7 @@ $_SERVER['SCRIPT_NAME'] = '/index.php';
 require_once JPATH_BASE . '/includes/defines.php';
 require_once JPATH_BASE . '/includes/framework.php';
 
-foreach (['UuidFactory.php', 'CanonicalJson.php', 'StageTransitionValidator.php', 'StageProgressionService.php', 'MatchResultValidationException.php', 'MatchResultDecimal.php', 'MatchResultAggregationValidator.php', 'MatchResultPayloadValidator.php', 'MatchResultRepository.php', 'StandingsContractValidator.php', 'StandingsDecimal.php', 'StandingsCalculator.php', 'StandingsReader.php', 'StandingsRecalculator.php', 'StandingsSnapshotSynchronizer.php', 'StandingProgressionReader.php'] as $service) {
+foreach (['UuidFactory.php', 'CanonicalJson.php', 'StageTransitionValidator.php', 'ScheduleTemplateService.php', 'SchedulePlannerService.php', 'StageProgressionService.php', 'MatchResultValidationException.php', 'MatchResultDecimal.php', 'MatchResultAggregationValidator.php', 'MatchResultPayloadValidator.php', 'MatchResultRepository.php', 'StandingsContractValidator.php', 'StandingsDecimal.php', 'StandingsCalculator.php', 'StandingsReader.php', 'StandingsFreshnessState.php', 'CarryOverMatchPolicy.php', 'StandingsRecalculator.php', 'StandingsSnapshotSynchronizer.php', 'StandingProgressionReader.php'] as $service) {
 	require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/' . $service;
 }
 require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/StagetransitionTable.php';
@@ -29,6 +29,7 @@ use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\User\User;
 use Joomleague\Component\Joomleague\Administrator\Service\MatchResultRepository;
+use Joomleague\Component\Joomleague\Administrator\Service\SchedulePlannerService;
 use Joomleague\Component\Joomleague\Administrator\Service\StageProgressionService;
 use Joomleague\Component\Joomleague\Administrator\Service\StandingsCascadeTrigger;
 use Joomleague\Component\Joomleague\Administrator\Model\StageentriesModel;
@@ -39,6 +40,7 @@ use Joomleague\Component\Joomleague\Administrator\Table\StandingadjustmentTable;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsRecalculator;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsSnapshotSynchronizer;
+use Joomleague\Component\Joomleague\Domain\Service\StandingsFreshnessState;
 use Joomleague\Component\Joomleague\Domain\Service\StandingProgressionReader;
 use Joomleague\Component\Joomleague\Domain\Service\UuidFactory;
 use Joomleague\Component\Joomleague\Administrator\Table\StagetransitionTable;
@@ -48,6 +50,21 @@ $container->alias('session', 'session.cli')->alias('JSession', 'session.cli')->a
 Factory::$application = $container->get(Joomla\Console\Application::class);
 $database = $container->get(DatabaseInterface::class);
 $suffix = bin2hex(random_bytes(5));
+
+if (($argv[1] ?? '') === 'recalculate') {
+	$childProjectId = (int) ($argv[2] ?? 0);
+	$childStageId = (int) ($argv[3] ?? 0);
+	$childScope = (string) ($argv[4] ?? 'total');
+	$childReader = new StandingsReader($database);
+	(new StandingsRecalculator($database, $childReader))->recalculate(
+		$childProjectId,
+		$childStageId > 0 ? $childStageId : null,
+		$childScope,
+		0
+	);
+	echo "recalculated\n";
+	exit(0);
+}
 
 $insert = static function (string $table, array $values) use ($database): int {
 	$query = $database->getQuery(true)->insert($database->quoteName($table))->columns($database->quoteName(array_keys($values)));
@@ -103,7 +120,7 @@ try {
 	foreach (['Alpha', 'Beta'] as $entryName) $entries[] = $insert('#__joomleague_project_entry', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'entry_kind' => 'group', 'display_name' => $entryName]);
 	$stageId = $insert('#__joomleague_project_stage', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'name' => 'League', 'code' => 'league', 'stage_type' => 'league', 'published' => 1]);
 	$targetStageId = $insert('#__joomleague_project_stage', ['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'name' => 'Final', 'code' => 'final', 'stage_type' => 'knockout', 'published' => 1]);
-	$transition = new StagetransitionTable($database); $transition->bind(['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'source_stage_id' => $stageId, 'target_stage_id' => $targetStageId, 'code' => 'league_to_final', 'name' => 'League to final', 'selector_type' => 'standing_rank_range', 'selector_config_json' => '{"from":1,"to":2,"scope":"total"}', 'carry_over_mode' => 'none']);
+	$transition = new StagetransitionTable($database); $transition->bind(['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'source_stage_id' => $stageId, 'target_stage_id' => $targetStageId, 'code' => 'league_to_final', 'name' => 'League to final', 'selector_type' => 'standing_rank_range', 'selector_config_json' => '{"from":1,"to":2,"scope":"total"}', 'carry_over_mode' => 'none', 'target_seed_start' => 1]);
 	if (!$transition->check() || !$transition->store()) throw new RuntimeException('Valid stage progression could not be stored: ' . $transition->getError());
 	$cycle = new StagetransitionTable($database); $cycle->bind(['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'source_stage_id' => $targetStageId, 'target_stage_id' => $stageId, 'code' => 'invalid_cycle', 'name' => 'Invalid cycle', 'selector_type' => 'manual', 'carry_over_mode' => 'none']);
 	if ($cycle->check() || $cycle->getError() === '') throw new RuntimeException('Cyclic stage progression was accepted.');
@@ -128,11 +145,68 @@ try {
 	if ($firstSnapshot < 1 || count($current['rows']) !== 2) throw new RuntimeException('Initial standings snapshot was not published.');
 	if ($current['rows'][0]->entry_name_snapshot !== 'Alpha' || $current['rows'][0]->metrics['points'] !== '4' || $current['rows'][1]->metrics['points'] !== '1') throw new RuntimeException('Football points were calculated incorrectly.');
 	if ($recalculator->recalculate($projectId, null, 'total', 0) !== $firstSnapshot) throw new RuntimeException('Identical standings input created a duplicate snapshot.');
+
+	// Hold the project publication lock, add a still-uncommitted input, and
+	// start another recalculation. The child must wait and then calculate from
+	// the committed post-lock input instead of publishing an older snapshot.
+	$database->transactionStart();
+	$freshness = new StandingsFreshnessState($database);
+	$freshness->lockProject($projectId);
+	$concurrentAdjustmentId = $insert('#__joomleague_standing_adjustment', [
+		'uuid' => UuidFactory::v4(),
+		'project_id' => $projectId,
+		'stage_key' => 0,
+		'project_entry_id' => $entries[0],
+		'scope_code' => 'all',
+		'metric_code' => 'points',
+		'adjustment_value' => '-1',
+		'reason' => 'Concurrent standings publication test',
+		'published' => 1,
+	]);
+	$process = proc_open(
+		[PHP_BINARY, __FILE__, 'recalculate', (string) $projectId, '0', 'total'],
+		[1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
+		$pipes
+	);
+
+	if (!is_resource($process)) {
+		$database->transactionRollback();
+		throw new RuntimeException('Concurrent standings test process could not be started.');
+	}
+
+	usleep(300000);
+	if (!(proc_get_status($process)['running'] ?? false)) {
+		$database->transactionRollback();
+		throw new RuntimeException('Concurrent recalculation bypassed the project publication lock.');
+	}
+	$database->transactionCommit();
+	$childOutput = stream_get_contents($pipes[1]);
+	$childError = stream_get_contents($pipes[2]);
+	fclose($pipes[1]);
+	fclose($pipes[2]);
+	$childExit = proc_close($process);
+
+	if ($childExit !== 0 || !str_contains($childOutput, 'recalculated')) {
+		throw new RuntimeException('Concurrent recalculation failed: ' . trim($childError));
+	}
+
+	$concurrentRows = $reader->current($projectId, null, 'total')['rows'];
+	if ($concurrentRows[0]->entry_name_snapshot !== 'Alpha' || $concurrentRows[0]->metrics['points'] !== '3') {
+		throw new RuntimeException('Concurrent recalculation published input captured before its project lock.');
+	}
+	$database->setQuery($database->getQuery(true)->delete($database->quoteName('#__joomleague_standing_adjustment'))->where('id = ' . $concurrentAdjustmentId))->execute();
+	(new StandingsCascadeTrigger($database))->trigger($projectId, null, 0);
+	if ($reader->current($projectId, null, 'total')['rows'][0]->metrics['points'] !== '4') throw new RuntimeException('Concurrent publication fixture was not restored.');
+
 	(new StandingsSnapshotSynchronizer($database))->synchronize($projectId, null, 0, $context);
 	if (count($reader->current($projectId, null, 'home')['rows']) !== 2 || count($reader->current($projectId, null, 'away')['rows']) !== 2) throw new RuntimeException('Missing profile-defined scopes were not published automatically.');
 	$automaticSnapshotCount = (int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult();
 	(new StandingsSnapshotSynchronizer($database))->synchronize($projectId, null, 0, $context);
 	if ((int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_standing_snapshot'))->where('project_id = ' . $projectId))->loadResult() !== $automaticSnapshotCount) throw new RuntimeException('Complete standings scopes were recalculated during a read.');
+	$freshness->markDirty($projectId, null, 'home');
+	if ($freshness->isFresh($projectId, null, 'home')) throw new RuntimeException('Dirty standings scope was reported as fresh.');
+	(new StandingsSnapshotSynchronizer($database))->synchronize($projectId, null, 0, $context);
+	if (!$freshness->isFresh($projectId, null, 'home')) throw new RuntimeException('Dirty standings scope was not repaired automatically.');
 	$stageSnapshot = $recalculator->recalculate($projectId, $stageId, 'total', 0);
 	if ($stageSnapshot < 1 || count($reader->current($projectId, $stageId, 'total')['rows']) !== 2) throw new RuntimeException('A stage inheriting project participants did not publish a complete table.');
 	$outcomeTransition = new StagetransitionTable($database); $outcomeTransition->bind(['uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'source_stage_id' => $stageId, 'target_stage_id' => $targetStageId, 'code' => 'winners_to_final', 'name' => 'Winners to final', 'selector_type' => 'match_outcome', 'selector_config_json' => '{"outcome":"winner"}', 'carry_over_mode' => 'none']);
@@ -140,15 +214,14 @@ try {
 	$outcomePreview = (new StageProgressionService($database))->preview((int) $outcomeTransition->id);
 	if (count($outcomePreview['entries']) !== 1 || $outcomePreview['entries'][0]['id'] !== $entries[0]) throw new RuntimeException('Numeric match-outcome fallback did not resolve the winner.');
 	$database->setQuery($database->getQuery(true)->update($database->quoteName('#__joomleague_stage_transition'))->set("carry_over_mode = 'all_results'")->where('id = ' . (int) $transition->id))->execute();
-	$insert('#__joomleague_stage_entry', ['stage_id' => $targetStageId, 'entry_id' => $entries[1], 'project_id' => $projectId, 'manual_assignment' => 1]);
 	$progression = new StageProgressionService($database); $progressionPreview = $progression->preview((int) $transition->id);
 	if (count($progressionPreview['entries']) !== 2 || !$progressionPreview['executable']) throw new RuntimeException('Standing-rank progression preview is incorrect.');
 	$progressionRun = $progression->apply((int) $transition->id, 0); $repeatedRun = $progression->apply((int) $transition->id, 0);
 	if ($progressionRun['run_id'] !== $repeatedRun['run_id'] || !$repeatedRun['reused']) throw new RuntimeException('Stage progression execution is not idempotent.');
 	$runCount = (int) $database->setQuery($database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__joomleague_stage_transition_run'))->where('transition_id = ' . (int) $transition->id))->loadResult();
 	if ($runCount !== 1) throw new RuntimeException('Identical stage progression input created duplicate audit runs.');
-	$manualFlag = (int) $database->setQuery($database->getQuery(true)->select('manual_assignment')->from($database->quoteName('#__joomleague_stage_entry'))->where('stage_id = ' . $targetStageId)->where('entry_id = ' . $entries[1]))->loadResult();
-	if ($manualFlag !== 1) throw new RuntimeException('Automatic progression overwrote a manual target-stage assignment.');
+	$initialTargetOrder = $database->setQuery($database->getQuery(true)->select(['entry_id','ordering','seed_number'])->from($database->quoteName('#__joomleague_stage_entry'))->where('stage_id = ' . $targetStageId)->order('seed_number ASC'))->loadAssocList();
+	if (array_map('intval', array_column($initialTargetOrder, 'entry_id')) !== $entries || array_map('intval', array_column($initialTargetOrder, 'seed_number')) !== [1,2]) throw new RuntimeException('Initial stage progression seeds are incorrect.');
 	$targetSnapshot = (int) $reader->current($projectId, $targetStageId, 'total')['snapshot']->id; $targetRows = $reader->current($projectId, $targetStageId, 'total')['rows'];
 	if ($targetSnapshot < 1 || count($targetRows) !== 2 || $targetRows[0]->metrics['points'] !== '4') throw new RuntimeException('All-results carry-over was not applied to target standings.');
 	$entryPoints = static function (string $scope, int $entryId) use ($reader, $projectId): string {
@@ -158,11 +231,34 @@ try {
 
 	[$changedMatchId, $changedParticipants] = $matches[1];
 	$resultRepository->replace($changedMatchId, $resultPayload($changedParticipants, [[0, 1], [0, 2]]), 0);
+	$staleStageSnapshot = (int) $reader->current($projectId, $stageId, 'total')['snapshot']->id;
+	$freshProgressionPreview = $progression->preview((int) $transition->id);
+	$freshStageSnapshot = (int) $reader->current($projectId, $stageId, 'total')['snapshot']->id;
+	if ($freshStageSnapshot === $staleStageSnapshot) throw new RuntimeException('Stage progression preview consumed stale standings.');
+	if (array_column($freshProgressionPreview['entries'], 'id') !== [$entries[1],$entries[0]]) throw new RuntimeException('Stage progression preview did not select participants from refreshed standings.');
 	(new StandingsCascadeTrigger($database))->trigger($projectId, $stageId, 0);
 	$current = $reader->current($projectId, null, 'total');
 	$secondSnapshot = (int) $current['snapshot']->id;
 	if ($secondSnapshot === $firstSnapshot) throw new RuntimeException('Changed standings input did not publish a new snapshot.');
 	if ($current['rows'][0]->entry_name_snapshot !== 'Beta' || $current['rows'][0]->metrics['points'] !== '3' || $current['rows'][1]->metrics['points'] !== '3') throw new RuntimeException('Tie-break ordering after result replacement is incorrect.');
+	$changedProgressionRun = $progression->apply((int) $transition->id, 0);
+	if ($changedProgressionRun['run_id'] === $progressionRun['run_id'] || $changedProgressionRun['reused']) throw new RuntimeException('Changed progression input reused the old transition run.');
+	$changedTargetOrder = $database->setQuery($database->getQuery(true)->select(['entry_id','ordering','seed_number'])->from($database->quoteName('#__joomleague_stage_entry'))->where('stage_id = ' . $targetStageId)->order('seed_number ASC'))->loadAssocList();
+	if (array_map('intval', array_column($changedTargetOrder, 'entry_id')) !== [$entries[1],$entries[0]] || array_map('intval', array_column($changedTargetOrder, 'ordering')) !== [0,1] || array_map('intval', array_column($changedTargetOrder, 'seed_number')) !== [1,2]) throw new RuntimeException('Repeated stage progression kept stale target seeds or ordering.');
+	$changedAssignments = $database->setQuery($database->getQuery(true)->select(['project_entry_id','target_seed'])->from($database->quoteName('#__joomleague_stage_transition_assignment'))->where('transition_id = ' . (int) $transition->id)->order('target_seed ASC'))->loadAssocList();
+	if (array_map('intval', array_column($changedAssignments, 'project_entry_id')) !== [$entries[1],$entries[0]] || array_map('intval', array_column($changedAssignments, 'target_seed')) !== [1,2]) throw new RuntimeException('Transition assignments disagree with refreshed target-stage seeds.');
+	$plannerOptions = (new SchedulePlannerService($database))->defaults($targetStageId);
+	$plannerPreview = (new SchedulePlannerService($database))->preview($targetStageId, $plannerOptions);
+	if (array_column($plannerPreview['context']['entries'], 'id') !== [$entries[1],$entries[0]]) throw new RuntimeException('Schedule planner did not consume refreshed stage seeds.');
+	$database->setQuery($database->getQuery(true)->update($database->quoteName('#__joomleague_stage_entry'))->set('manual_assignment = 1')->where('stage_id = ' . $targetStageId)->where('entry_id = ' . $entries[1]))->execute();
+	$manualRun = $progression->apply((int) $transition->id, 0);
+	if (!$manualRun['reused']) throw new RuntimeException('Unchanged progression with a compatible manual assignment was not idempotent.');
+	$database->setQuery($database->getQuery(true)->update($database->quoteName('#__joomleague_stage_entry'))->set('seed_number = 9')->where('stage_id = ' . $targetStageId)->where('entry_id = ' . $entries[1]))->execute();
+	try { $progression->apply((int) $transition->id, 0); throw new RuntimeException('Conflicting manual target seed was silently overwritten.'); }
+	catch (DomainException $error) { if ($error->getMessage() !== Joomla\CMS\Language\Text::_('COM_JOOMLEAGUE_ERROR_STAGE_PROGRESSION_MANUAL_CONFLICT')) throw $error; }
+	$assignmentsAfterConflict = $database->setQuery($database->getQuery(true)->select(['project_entry_id','target_seed'])->from($database->quoteName('#__joomleague_stage_transition_assignment'))->where('transition_id = ' . (int) $transition->id)->order('target_seed ASC'))->loadAssocList();
+	if ($assignmentsAfterConflict !== $changedAssignments) throw new RuntimeException('A rejected manual conflict partially changed transition assignments.');
+	$database->setQuery($database->getQuery(true)->update($database->quoteName('#__joomleague_stage_entry'))->set('seed_number = 1')->where('stage_id = ' . $targetStageId)->where('entry_id = ' . $entries[1]))->execute();
 	if ($entryPoints('home', $entries[0]) !== '3' || $entryPoints('away', $entries[1]) !== '3') throw new RuntimeException('Changed final result did not refresh home and away scopes.');
 	$draftPayload = $resultPayload($changedParticipants, [[0, 1], [0, 2]]); $draftPayload['status_code'] = 'draft'; $draftPayload['finalized_at'] = null;
 	$resultRepository->replace($changedMatchId, $draftPayload, 0); (new StandingsCascadeTrigger($database))->trigger($projectId, $stageId, 0);

@@ -28,15 +28,29 @@ final class StandingsRecalculator
 	public function recalculate(int $projectId, ?int $stageId, string $scope, int $actorId): int
 	{
 		if ($actorId < 0) throw new \InvalidArgumentException('Standings actor is invalid.');
-		$context = $this->reader->context($projectId, $stageId, $scope); $input = $this->inputForCalculation($context, $scope); $rows = $this->calculator->calculate($context['contract'], $input['entries'], $input['matches'], $scope, $input['adjustments']);
-		$inputChecksum = CanonicalJson::checksum(['profile_checksum' => (string) $context['project']->payload_checksum, 'scope' => $scope, 'stage_id' => $context['stage_id'], 'contract' => $context['contract'], 'entries' => $input['entries'], 'matches' => $input['matches'], 'adjustments' => $input['adjustments']]);
-		$existing = $this->existingSnapshot($projectId, $context['stage_id'], $scope, $inputChecksum);
-		if ($existing > 0) { $this->database->transactionStart(); try { $this->publish($projectId, $context['stage_id'], $scope, $existing, $actorId); $this->database->transactionCommit(); return $existing; } catch (\Throwable $error) { $this->database->transactionRollback(); throw $error; } }
 		$this->database->transactionStart();
+
 		try {
+			$freshness = new StandingsFreshnessState($this->database);
+			$freshness->lockProject($projectId);
+			$context = $this->reader->context($projectId, $stageId, $scope);
+			$input = $this->inputForCalculation($context, $scope);
+			$rows = $this->calculator->calculate($context['contract'], $input['entries'], $input['matches'], $scope, $input['adjustments']);
+			$inputChecksum = CanonicalJson::checksum(['profile_checksum' => (string) $context['project']->payload_checksum, 'scope' => $scope, 'stage_id' => $context['stage_id'], 'contract' => $context['contract'], 'entries' => $input['entries'], 'matches' => $input['matches'], 'adjustments' => $input['adjustments']]);
+			$existing = $this->existingSnapshot($projectId, $context['stage_id'], $scope, $inputChecksum);
+
+			if ($existing > 0) {
+				$this->publish($projectId, $context['stage_id'], $scope, $existing, $actorId);
+				$freshness->markFresh($projectId, $context['stage_id'], $scope, $inputChecksum, $actorId);
+				$this->database->transactionCommit();
+
+				return $existing;
+			}
+
 			$snapshotId = $this->insertSnapshot($context, $scope, $inputChecksum, count($rows), $actorId);
 			foreach ($rows as $sequence => $row) $this->insertRow($snapshotId, $row, $sequence + 1);
 			$this->publish($projectId, $context['stage_id'], $scope, $snapshotId, $actorId);
+			$freshness->markFresh($projectId, $context['stage_id'], $scope, $inputChecksum, $actorId);
 			$this->database->transactionCommit(); return $snapshotId;
 		} catch (\Throwable $error) { $this->database->transactionRollback(); throw $error; }
 	}
@@ -71,9 +85,7 @@ final class StandingsRecalculator
 		foreach ($this->database->setQuery($query)->loadObjectList() as $transition) {
 			foreach ($this->matches((int) $projectId, (int) $transition->source_stage_id, $profile) as $match) {
 				$participantIds = array_map(static fn(array $participant): int => (int) ($participant['entry_id'] ?? 0), $match['participants'] ?? []);
-				$qualified = array_filter($participantIds, static fn(int $id): bool => isset($included[$id]));
-				$accept = $transition->carry_over_mode === 'all_results' ? $qualified !== [] : ($participantIds !== [] && count($qualified) === count($participantIds));
-				if (!$accept) continue;
+				if (!CarryOverMatchPolicy::includes((string) $transition->carry_over_mode, $participantIds, $included)) continue;
 				$key = CanonicalJson::checksum(['match' => $match]); if (!isset($seen[$key])) { $seen[$key] = count($matches); $matches[] = $match; }
 			}
 		}

@@ -520,7 +520,6 @@ CREATE TABLE IF NOT EXISTS "#__joomleague_match_score_segment" (
   CONSTRAINT "uq_jl_match_score_segment_uuid" UNIQUE ("uuid"), CONSTRAINT "uq_jl_match_score_segment_position" UNIQUE ("match_id", "parent_id", "level_code", "sequence_number"),
   CONSTRAINT "uq_jl_match_score_segment_scope" UNIQUE ("id", "match_id"),
   CONSTRAINT "fk_jl_match_score_segment_match" FOREIGN KEY ("match_id") REFERENCES "#__joomleague_project_match" ("id") ON DELETE CASCADE,
-  CONSTRAINT "fk_jl_match_score_segment_parent" FOREIGN KEY ("parent_id", "match_id") REFERENCES "#__joomleague_match_score_segment" ("id", "match_id") ON DELETE CASCADE,
   CONSTRAINT "chk_jl_match_score_segment_sequence" CHECK ("sequence_number" > 0)
 );
 CREATE INDEX IF NOT EXISTS "idx_jl_match_score_segment_parent" ON "#__joomleague_match_score_segment" ("parent_id", "match_id");
@@ -766,6 +765,15 @@ CREATE TABLE IF NOT EXISTS "#__joomleague_standing_current" (
   PRIMARY KEY ("project_id", "stage_key", "scope_code"), CONSTRAINT "uq_jl_standing_current_snapshot" UNIQUE ("snapshot_id"),
   CONSTRAINT "fk_jl_standing_current_project" FOREIGN KEY ("project_id") REFERENCES "#__joomleague_project" ("id") ON DELETE CASCADE,
   CONSTRAINT "fk_jl_standing_current_snapshot" FOREIGN KEY ("snapshot_id", "project_id") REFERENCES "#__joomleague_standing_snapshot" ("id", "project_id") ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "#__joomleague_standing_freshness" (
+  "project_id" BIGINT NOT NULL, "stage_key" BIGINT NOT NULL DEFAULT 0, "scope_code" VARCHAR(100) NOT NULL,
+  "is_dirty" SMALLINT NOT NULL DEFAULT 1, "input_checksum" CHAR(64) NULL,
+  "dirty_at" TIMESTAMP WITHOUT TIME ZONE NULL, "refreshed_at" TIMESTAMP WITHOUT TIME ZONE NULL, "refreshed_by" BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY ("project_id", "stage_key", "scope_code"),
+  CONSTRAINT "fk_jl_standing_freshness_project" FOREIGN KEY ("project_id") REFERENCES "#__joomleague_project" ("id") ON DELETE CASCADE,
+  CONSTRAINT "chk_jl_standing_freshness_dirty" CHECK ("is_dirty" IN (0, 1))
 );
 
 CREATE TABLE IF NOT EXISTS "#__joomleague_stage_transition" (

@@ -655,7 +655,6 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_match_score_segment` (
   UNIQUE KEY `uq_jl_match_score_segment_position` (`match_id`, `parent_id`, `level_code`, `sequence_number`),
   UNIQUE KEY `uq_jl_match_score_segment_scope` (`id`, `match_id`), KEY `idx_jl_match_score_segment_parent` (`parent_id`, `match_id`),
   CONSTRAINT `fk_jl_match_score_segment_match` FOREIGN KEY (`match_id`) REFERENCES `#__joomleague_project_match` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_jl_match_score_segment_parent` FOREIGN KEY (`parent_id`, `match_id`) REFERENCES `#__joomleague_match_score_segment` (`id`, `match_id`) ON DELETE CASCADE,
   CONSTRAINT `chk_jl_match_score_segment_sequence` CHECK (`sequence_number` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
@@ -915,6 +914,15 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_standing_current` (
   PRIMARY KEY (`project_id`, `stage_key`, `scope_code`), UNIQUE KEY `uq_jl_standing_current_snapshot` (`snapshot_id`),
   CONSTRAINT `fk_jl_standing_current_project` FOREIGN KEY (`project_id`) REFERENCES `#__joomleague_project` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_jl_standing_current_snapshot` FOREIGN KEY (`snapshot_id`, `project_id`) REFERENCES `#__joomleague_standing_snapshot` (`id`, `project_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `#__joomleague_standing_freshness` (
+  `project_id` BIGINT UNSIGNED NOT NULL, `stage_key` BIGINT UNSIGNED NOT NULL DEFAULT 0, `scope_code` VARCHAR(100) NOT NULL,
+  `is_dirty` TINYINT UNSIGNED NOT NULL DEFAULT 1, `input_checksum` CHAR(64) NULL DEFAULT NULL,
+  `dirty_at` DATETIME NULL DEFAULT NULL, `refreshed_at` DATETIME NULL DEFAULT NULL, `refreshed_by` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`project_id`, `stage_key`, `scope_code`),
+  CONSTRAINT `fk_jl_standing_freshness_project` FOREIGN KEY (`project_id`) REFERENCES `#__joomleague_project` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_jl_standing_freshness_dirty` CHECK (`is_dirty` IN (0, 1))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `#__joomleague_stage_transition` (

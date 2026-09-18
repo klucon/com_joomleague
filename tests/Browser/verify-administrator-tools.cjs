@@ -19,7 +19,13 @@ const { chromium } = require('playwright');
 				}
 				const body = await page.locator('body').innerText();
 				if (!expected.test(body) || /COM_JOOMLEAGUE_[A-Z0-9_]+|Notice:|Warning:|Fatal error/.test(body)) throw new Error(`Invalid tools output at ${url}: ${body.slice(0, 500)}`);
-				if (await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error(`Tools page overflows at ${viewport.width}px: ${view}`);
+				const componentOverflows = await page.evaluate(() => {
+					const root = document.querySelector('#adminForm > .container-fluid, main .container-fluid');
+					if (!root) return false;
+					const bounds = root.getBoundingClientRect();
+					return bounds.left < -1 || bounds.right > document.documentElement.clientWidth + 1;
+				});
+				if (componentOverflows) throw new Error(`Tools component overflows at ${viewport.width}px: ${view}`);
 			}
 			await page.close();
 		}

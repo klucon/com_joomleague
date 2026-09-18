@@ -22,7 +22,7 @@ $database = $container->get(DatabaseInterface::class);
 $service = new SqlDataExchangeService($database, JPATH_ADMINISTRATOR . '/components/com_joomleague');
 $tables = ComponentTableCatalog::installed($database);
 
-if (count($tables) !== 48 || !in_array('#__joomleague_sport_profile', $tables, true)) throw new RuntimeException('Installed table catalogue is incomplete.');
+if (count($tables) !== 49 || !in_array('#__joomleague_sport_profile', $tables, true)) throw new RuntimeException('Installed table catalogue is incomplete.');
 $sql = $service->export(['#__joomleague_sport_profile']);
 if (!str_contains($sql, 'CREATE TABLE IF NOT EXISTS') || !str_contains($sql, 'INSERT INTO') || !str_contains($sql, '#__joomleague_sport_profile')) throw new RuntimeException('SQL export does not contain structure and data.');
 $import = $service->import($sql);

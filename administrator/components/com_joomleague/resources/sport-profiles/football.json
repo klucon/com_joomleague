@@ -846,39 +846,61 @@
         "joomleague3_sport_keys": [
             "COM_JOOMLEAGUE_ST_SOCCER",
             "SOCCER",
-            "FOOTBALL"
+            "FOOTBALL",
+            "PIŁKA NOŻNA",
+            "PILKA NOZNA"
         ],
         "position_aliases": {
             "goalkeeper": [
                 "goalkeeper",
                 "keeper",
-                "brankar"
+                "brankar",
+                "bramkarz"
             ],
             "defender": [
                 "defender",
                 "back",
-                "obrance"
+                "obrance",
+                "obronca"
             ],
             "midfielder": [
                 "midfielder",
                 "zalpoloznik",
-                "zaloznik"
+                "zaloznik",
+                "pomocnik"
             ],
             "forward": [
                 "forward",
                 "striker",
-                "utocnik"
+                "utocnik",
+                "napastnik"
             ],
             "head_coach": [
                 "head_coach",
                 "coach",
                 "trener",
-                "treneri"
+                "treneri",
+                "pierwszy_trener"
+            ],
+            "assistant_coach": [
+                "assistant_coach",
+                "asystent_trenera"
+            ],
+            "goalkeeper_coach": [
+                "goalkeeper_coach",
+                "trener_bramkarzy"
             ],
             "team_manager": [
                 "team_manager",
                 "vedouci",
-                "vedouci_muzstva"
+                "vedouci_muzstva",
+                "kierownik_druzyny"
+            ],
+            "physiotherapist": [
+                "physiotherapist",
+                "fyzioterapeut",
+                "fizjoterapeuta",
+                "masazysta"
             ],
             "doctor": [
                 "doctor",
@@ -888,7 +910,8 @@
             "referee": [
                 "referee",
                 "main_referee",
-                "rozhodci"
+                "rozhodci",
+                "sedzia"
             ],
             "assistant_referee_1": [
                 "assistant_referee_1",
@@ -917,29 +940,39 @@
             "own_goal": [
                 "own_goal",
                 "og",
-                "vlastni_gol"
+                "vlastni_gol",
+                "bramka_samobojcza"
             ],
             "yellow_card": [
                 "yellow_card",
                 "yc",
-                "zluta_karta"
+                "zluta_karta",
+                "zolta_kartka"
             ],
             "second_yellow_card": [
                 "second_yellow_card",
                 "yellow_red_card",
                 "yellow_red",
-                "zluta_cervena_karta"
+                "zluta_cervena_karta",
+                "2_zolta_czerwona"
             ],
             "red_card": [
                 "red_card",
                 "rc",
-                "cervena_karta"
+                "cervena_karta",
+                "czerwona_kartka"
             ],
             "substitution": [
                 "substitution",
                 "sub",
                 "stridani"
             ]
+        },
+        "statistic_aliases": {
+            "goals": ["goals", "goal", "bramka", "bramki"],
+            "yellow_cards": ["yellow_cards", "yellow_card", "zolta_kartka"],
+            "second_yellow_cards": ["second_yellow_cards", "2_zolta_czerwona"],
+            "red_cards": ["red_cards", "red_card", "czerwona_karta", "czerwona_kartka"]
         }
     },
     "sport_type_name_key": "COM_JOOMLEAGUE_ADMIN_SPORTTYPE_FOOTBALL_NAME",
@@ -1052,6 +1085,6 @@
             "substitute",
             "finished",
             "disqualified"
-        ]
-    }
+    ]
+  }
 }

@@ -8,6 +8,8 @@
 		<action name="core.delete" title="JACTION_DELETE" />
 		<action name="core.edit" title="JACTION_EDIT" />
 		<action name="core.edit.state" title="JACTION_EDITSTATE" />
+		<action name="joomleague.database.import" title="COM_JOOMLEAGUE_ACTION_DATABASE_IMPORT" description="COM_JOOMLEAGUE_ACTION_DATABASE_IMPORT_DESC" />
+		<action name="joomleague.database.export" title="COM_JOOMLEAGUE_ACTION_DATABASE_EXPORT" description="COM_JOOMLEAGUE_ACTION_DATABASE_EXPORT_DESC" />
 	</section>
 	<section name="project">
 		<action name="core.delete" title="JACTION_DELETE" />

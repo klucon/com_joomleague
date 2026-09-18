@@ -6,6 +6,7 @@ define('_JEXEC', 1);
 
 $root = dirname(__DIR__, 2);
 require_once $root . '/administrator/components/com_joomleague/src/Service/CanonicalJson.php';
+require_once $root . '/administrator/components/com_joomleague/src/Service/ExactDecimal.php';
 require_once $root . '/administrator/components/com_joomleague/src/Service/ProjectRuleValidator.php';
 
 use Joomleague\Component\Joomleague\Domain\Service\CanonicalJson;
@@ -101,6 +102,26 @@ $tennis = json_decode(
 	JSON_THROW_ON_ERROR
 );
 $validator->validateOverrides($tennis, ['match_structure' => ['sets_to_win' => 3, 'maximum_sets' => 5]]);
+
+$decimalProfile = [
+	'ratio' => 0.1,
+	'total' => 0.3,
+	'project_rule_schema' => [
+		'schema_version' => '1.0.0',
+		'fields' => [
+			'/ratio' => ['type' => 'number'],
+			'/total' => ['type' => 'number'],
+		],
+		'constraints' => [[
+			'code' => 'exact_decimal_product',
+			'operator' => 'eq',
+			'left' => ['terms' => [['path' => '/ratio', 'factor' => 3]]],
+			'right' => ['terms' => [['path' => '/total']]],
+		]],
+	],
+];
+$validator->validateProfileSchema($decimalProfile);
+$validator->validateOverrides($decimalProfile, ['ratio' => 0.2, 'total' => 0.6]);
 
 printf(
 	"Project-rule validator OK: %d profiles, %d explicitly overridable fields, relational constraints and canonical checksum validated\n",

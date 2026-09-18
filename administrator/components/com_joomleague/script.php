@@ -8,6 +8,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
+use Joomleague\Component\Joomleague\Administrator\Service\ExactDecimal;
 use Joomleague\Component\Joomleague\Administrator\Service\ProjectRuleValidator;
 use Joomleague\Component\Joomleague\Administrator\Service\EntryModelValidator;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsContractValidator;
@@ -18,6 +19,19 @@ defined('_JEXEC') or die;
 final class Com_JoomleagueInstallerScript
 {
 	private const DEVELOPMENT_PROFILE_SYNC = true;
+
+	private const SCHEMA_TABLES = [
+		'sport_profile', 'sport_profile_version', 'sport_type', 'sport_position', 'event_type', 'statistic',
+		'position_event_type', 'position_statistic', 'profile_template_config', 'competition', 'season', 'project',
+		'project_stage', 'project_round', 'project_rule_config', 'project_template_config', 'club', 'venue', 'team',
+		'organization_name_history', 'organization_media_history', 'person', 'project_entry', 'stage_entry',
+		'project_match', 'match_participant', 'match_result', 'match_score_segment', 'match_score_value',
+		'project_entry_member', 'match_lineup_member', 'match_lineup_change', 'project_actor_role',
+		'match_actor_role', 'match_event', 'match_statistic_value', 'standing_adjustment', 'standing_snapshot',
+		'standing_snapshot_row', 'standing_current', 'standing_freshness', 'stage_transition', 'stage_transition_run',
+		'stage_transition_assignment', 'schedule_generation', 'schedule_generation_match', 'migration_batch',
+		'migration_record', 'migration_issue',
+	];
 
 	private const OBSOLETE_ADMIN_FILES = [
 		'sql/updates/mysql/6.2.0.sql',
@@ -32,6 +46,10 @@ final class Com_JoomleagueInstallerScript
 
 	public function preflight(string $type, ComponentAdapter $adapter): bool
 	{
+		if ($type === 'install' && !$this->prepareIncompleteInstallation()) {
+			return false;
+		}
+
 		if ($type !== 'update') {
 			return true;
 		}
@@ -62,6 +80,68 @@ final class Com_JoomleagueInstallerScript
 		}
 
 		$database->setQuery($sql)->execute();
+
+		return true;
+	}
+
+	private function prepareIncompleteInstallation(): bool
+	{
+		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$allTables = array_flip($database->getTableList());
+		$expected = array_map(
+			static fn (string $suffix): string => $database->replacePrefix('#__joomleague_' . $suffix),
+			self::SCHEMA_TABLES
+		);
+		$existing = array_values(array_filter($expected, static fn (string $table): bool => isset($allTables[$table])));
+
+		if ($existing === [] || count($existing) === count($expected)) {
+			return true;
+		}
+
+		$nonEmpty = [];
+
+		foreach ($existing as $table) {
+			$count = (int) $database->setQuery(
+				'SELECT COUNT(*) FROM ' . $database->quoteName($table)
+			)->loadResult();
+
+			if ($count > 0) {
+				$nonEmpty[] = $table . ' (' . $count . ')';
+			}
+		}
+
+		if ($nonEmpty !== []) {
+			Factory::getApplication()->enqueueMessage(
+				Text::sprintf(
+					'COM_JOOMLEAGUE_INSTALL_INCOMPLETE_SCHEMA_BLOCKED',
+					count($existing),
+					count($expected),
+					implode(', ', $nonEmpty)
+				),
+				'error'
+			);
+
+			return false;
+		}
+
+		$quoted = array_map([$database, 'quoteName'], $existing);
+
+		if ($database->getName() === 'pgsql') {
+			$database->setQuery('DROP TABLE IF EXISTS ' . implode(', ', $quoted) . ' CASCADE')->execute();
+		} else {
+			$database->setQuery('SET FOREIGN_KEY_CHECKS = 0')->execute();
+
+			try {
+				$database->setQuery('DROP TABLE IF EXISTS ' . implode(', ', $quoted))->execute();
+			} finally {
+				$database->setQuery('SET FOREIGN_KEY_CHECKS = 1')->execute();
+			}
+		}
+
+		Factory::getApplication()->enqueueMessage(
+			Text::sprintf('COM_JOOMLEAGUE_INSTALL_INCOMPLETE_SCHEMA_REMOVED', count($existing)),
+			'warning'
+		);
 
 		return true;
 	}
@@ -253,6 +333,7 @@ final class Com_JoomleagueInstallerScript
 	private function loadInstallerDependencies(): void
 	{
 		$services = [
+			ExactDecimal::class => 'ExactDecimal.php',
 			ProjectRuleValidator::class => 'ProjectRuleValidator.php',
 			EntryModelValidator::class => 'EntryModelValidator.php',
 			StandingsContractValidator::class => 'StandingsContractValidator.php',

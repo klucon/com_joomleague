@@ -10,6 +10,7 @@ use Joomla\CMS\Log\Log;
 use Joomla\Database\DatabaseInterface;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsRecalculator;
+use Joomleague\Component\Joomleague\Domain\Service\StandingsFreshnessState;
 
 /**
  * Republishes standings snapshots after a match result changes, so the
@@ -70,6 +71,7 @@ final class StandingsCascadeTrigger
 	{
 		$reader = new StandingsReader($this->database);
 		$recalculator = new StandingsRecalculator($this->database, $reader);
+		$freshness = new StandingsFreshnessState($this->database);
 
 		foreach ($stageIds as $targetStageId) {
 			try {
@@ -80,6 +82,7 @@ final class StandingsCascadeTrigger
 
 			foreach ($context['available_scopes'] as $scope) {
 				try {
+					$freshness->markDirty($projectId, $targetStageId, (string) $scope);
 					$recalculator->recalculate($projectId, $targetStageId, $scope, $actorId);
 				} catch (\Throwable $exception) {
 					Log::add($exception->getMessage(), Log::ERROR, 'com_joomleague.standings');

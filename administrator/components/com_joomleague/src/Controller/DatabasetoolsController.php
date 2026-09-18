@@ -15,7 +15,7 @@ final class DatabasetoolsController extends BaseController
 	public function export(): void
 	{
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));
-		if (!$this->app->getIdentity()->authorise('core.manage', 'com_joomleague')) throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		if (!$this->app->getIdentity()->authorise('joomleague.database.export', 'com_joomleague')) throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
 		$tables = array_values(array_filter((array) $this->input->post->get('tables', [], 'array'), 'is_string'));
 		if ($this->input->post->getBool('export_all')) $tables = array_column($this->getModel('Databasetools')->getTables(), 'name');
 		$sql = $this->getModel('Databasetools')->export($tables);

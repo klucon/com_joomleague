@@ -1,7 +1,7 @@
 # JoomLeague 6.2
 
 JoomLeague 6.2 is a new, sport-independent competition management system for
-Joomla 6.1 and 6.2. The current `6.2-dev` branch is a development preview intended for
+Joomla 6.1 and 6.2. The current `6.2-dev` branch contains the first public beta intended for
 testing, schema validation and migration testing. It is not a production
 release.
 
@@ -32,9 +32,9 @@ and review its migration report before using the converted data anywhere that
 matters. A successful conversion does not make 6.1 extensions, templates or
 database tables compatible with 6.2.
 
-## Current development package
+## Current beta package
 
-- Version: `6.2.0-dev7`
+- Version: `6.2.0-beta1`
 - Joomla: 6.1.x or 6.2.x
 - PHP: 8.3 or newer
 - Databases: MySQL 8.0+, MariaDB 10.6+ or PostgreSQL 14+
@@ -92,9 +92,10 @@ The package registers the official Joomla update feed:
 
 `https://downloads.joomleague.eu/update.xml`
 
-Development releases are correctly tagged as `dev`. Test installations must set
+Pre-release packages are correctly tagged as `beta`. Test installations must set
 **System -> Update -> Extensions -> Options -> Minimum Extension Stability** to
-**Development**. Stable sites should retain Joomla's default **Stable** value.
+**Beta** or a less restrictive value. Stable sites should retain Joomla's default
+**Stable** value.
 
 Each published package is checked with SHA-256, SHA-384 and SHA-512 hashes. The
 feed and changelog remain publicly accessible so Joomla can update without an

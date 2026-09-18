@@ -99,6 +99,9 @@ if ($all !== [] && $all[0]['participants'] !== []) {
 }
 
 foreach ($all as $event) {
+	if (empty($event['uuid']) || empty($event['created']) || empty($event['modified'])) {
+		throw new RuntimeException('Programme event is missing persistent calendar identity or modification metadata.');
+	}
 	if (!$event['played']) {
 		foreach ($event['participants'] as $participant) {
 			if ($participant['score'] !== null) {

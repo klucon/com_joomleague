@@ -2,12 +2,12 @@
 <extension type="component" method="upgrade">
 	<name>COM_JOOMLEAGUE</name>
 	<author>KLUCON</author>
-	<creationDate>August 2026</creationDate>
+	<creationDate>September 2026</creationDate>
 	<copyright>Copyright (C) 2026 KLUCON. All rights reserved.</copyright>
 	<license>GNU General Public License version 2 or later</license>
 	<authorEmail>info@klucon.cz</authorEmail>
 	<authorUrl>https://klucon.cz</authorUrl>
-	<version>6.2.0-dev7</version>
+	<version>6.2.0-beta1</version>
 	<description>COM_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Component\Joomleague</namespace>
 	<scriptfile>script.php</scriptfile>

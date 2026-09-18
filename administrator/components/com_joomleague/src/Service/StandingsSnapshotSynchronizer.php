@@ -10,9 +10,7 @@ use Joomla\CMS\Log\Log;
 use Joomla\Database\DatabaseInterface;
 
 /**
- * Completes missing published standings scopes without recalculating snapshots
- * that are already available. This also repairs data loaded outside Joomla's
- * normal result-save workflow, for example by a legacy SQL migration.
+ * Repairs missing or explicitly invalidated published standings scopes.
  */
 final class StandingsSnapshotSynchronizer
 {
@@ -37,29 +35,30 @@ final class StandingsSnapshotSynchronizer
 			return;
 		}
 
-		$missingScopes = [];
+		$staleScopes = [];
+		$freshness = new StandingsFreshnessState($this->database);
 
 		foreach ($context['available_scopes'] as $scope) {
 			try {
-				if ($reader->current($projectId, $stageId, (string) $scope)['snapshot'] === null) {
-					$missingScopes[] = (string) $scope;
+				if (!$freshness->isFresh($projectId, $stageId, (string) $scope)) {
+					$staleScopes[] = (string) $scope;
 				}
 			} catch (\Throwable $exception) {
 				Log::add($exception->getMessage(), Log::ERROR, 'com_joomleague.standings');
 			}
 		}
 
-		if ($missingScopes === []) {
+		if ($staleScopes === []) {
 			return;
 		}
 
 		$recalculator = new StandingsRecalculator($this->database, $reader);
 
-		foreach ($missingScopes as $scope) {
+		foreach ($staleScopes as $scope) {
 			try {
 				$recalculator->recalculate($projectId, $stageId, $scope, $actorId);
 			} catch (\Throwable $exception) {
-				// Another request may have completed the same missing scope first.
+				// Another request may have completed the same scope first.
 				// Keep the public page available and let its final read decide whether
 				// a published snapshot now exists.
 				Log::add($exception->getMessage(), Log::ERROR, 'com_joomleague.standings');

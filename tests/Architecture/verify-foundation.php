@@ -5,7 +5,10 @@ declare(strict_types=1);
 define('_JEXEC', 1);
 
 $root = dirname(__DIR__, 2);
+$ciWorkflow = $root . '/.github/workflows/verify-6.2.yml';
+$exactDecimalFile = $root . '/administrator/components/com_joomleague/src/Service/ExactDecimal.php';
 $ruleValidatorFile = $root . '/administrator/components/com_joomleague/src/Service/ProjectRuleValidator.php';
+require_once $exactDecimalFile;
 require_once $ruleValidatorFile;
 require_once $root . '/administrator/components/com_joomleague/src/Service/EntryModelValidator.php';
 require_once $root . '/administrator/components/com_joomleague/src/Service/SourceSchemaClassifier.php';
@@ -19,12 +22,28 @@ use Joomleague\Component\Joomleague\Administrator\Service\ProjectRuleValidator;
 use Joomleague\Component\Joomleague\Administrator\Service\SourceSchemaClassifier;
 use Joomleague\Component\Joomleague\Administrator\Service\SportProfileSchemaValidator;
 
+if (!is_file($ciWorkflow)) {
+	throw new RuntimeException('The JoomLeague 6.2 CI release gate is missing.');
+}
+
+$ciWorkflowSource = (string) file_get_contents($ciWorkflow);
+foreach (['6.2-dev', "php: ['8.3', '8.4']", 'tests/Unit/*.php', 'verify-foundation.php', 'verify-release.sh', 'build-package.sh', 'unzip -t'] as $ciRequirement) {
+	if (!str_contains($ciWorkflowSource, $ciRequirement)) {
+		throw new RuntimeException(sprintf('The JoomLeague 6.2 CI release gate is missing %s.', $ciRequirement));
+	}
+}
+
+if (str_contains($ciWorkflowSource, 'upload-artifact') || str_contains($ciWorkflowSource, 'upload-release-asset')) {
+	throw new RuntimeException('The JoomLeague 6.2 CI gate must not publish or retain ZIP artifacts on GitHub.');
+}
+
 $manifest = (string) file_get_contents($root . '/administrator/components/com_joomleague/joomleague.xml');
 $admin = $root . '/administrator/components/com_joomleague';
 $site = $root . '/components/com_joomleague';
 $quickIcon = $root . '/plugins/quickicon/joomleague';
 $consolePlugin = $root . '/plugins/console/joomleague';
 $taskPlugin = $root . '/plugins/task/joomleague';
+$finderPlugin = $root . '/plugins/finder/joomleague';
 $programModule = $root . '/modules/mod_joomleague_program';
 $nextEventModule = $root . '/modules/mod_joomleague_next_event';
 $navigationModule = $root . '/modules/mod_joomleague_navigation';
@@ -38,6 +57,16 @@ $programmeTickerModule = $root . '/modules/mod_joomleague_programme_ticker';
 $birthdaysModule = $root . '/modules/mod_joomleague_birthdays';
 $spotlightModule = $root . '/modules/mod_joomleague_spotlight';
 $latestResultsModule = $root . '/modules/mod_joomleague_latest_results';
+
+$finderSource = (string) file_get_contents($finderPlugin . '/src/Extension/Joomleague.php');
+if (stripos($finderSource, 'GREATEST(') !== false) {
+	throw new RuntimeException('Smart Search must not compare Joomla access-level identifiers numerically.');
+}
+foreach (['competition.access=project.access', 'season.access=project.access', 'club.access=team.access'] as $finderAccessContract) {
+	if (!str_contains($finderSource, $finderAccessContract)) {
+		throw new RuntimeException(sprintf('Smart Search is missing safe access-level contract %s.', $finderAccessContract));
+	}
+}
 $packageManifest = (string) file_get_contents($root . '/build/pkg_joomleague.xml');
 $packageInstaller = (string) file_get_contents($root . '/build/pkg_script.php');
 
@@ -222,6 +251,26 @@ foreach (['CrossProjectProgrammeReader', 'ProjectTemplateProvider', "['played']"
 		throw new RuntimeException(sprintf('Programme ticker module is missing contract %s.', $tickerContract));
 	}
 }
+$tickerManifest = (string) file_get_contents($programmeTickerModule . '/mod_joomleague_programme_ticker.xml');
+$tickerTemplate = (string) file_get_contents($programmeTickerModule . '/tmpl/default.php');
+foreach (['name="orientation"', 'value="horizontal"', 'value="vertical"'] as $orientationContract) {
+	if (!str_contains($tickerManifest, $orientationContract)) {
+		throw new RuntimeException(sprintf('Programme ticker orientation setting is missing %s.', $orientationContract));
+	}
+}
+foreach (['row-cols-md-2', 'row-cols-xl-3', 'list-group-item-action', 'MOD_JOOMLEAGUE_PROGRAMME_TICKER_EMPTY'] as $orientationContract) {
+	if (!str_contains($tickerTemplate, $orientationContract)) {
+		throw new RuntimeException(sprintf('Programme ticker responsive layout is missing %s.', $orientationContract));
+	}
+}
+foreach (['en-GB', 'cs-CZ'] as $languageTag) {
+	$languageSource = (string) file_get_contents($programmeTickerModule . '/language/' . $languageTag . '/mod_joomleague_programme_ticker.ini');
+	foreach (['ORIENTATION_LABEL', 'ORIENTATION_HORIZONTAL', 'ORIENTATION_VERTICAL'] as $languageContract) {
+		if (!str_contains($languageSource, 'MOD_JOOMLEAGUE_PROGRAMME_TICKER_' . $languageContract . '=')) {
+			throw new RuntimeException(sprintf('Programme ticker %s translation is missing %s.', $languageTag, $languageContract));
+		}
+	}
+}
 
 foreach (['/mod_joomleague_birthdays.xml', '/services/provider.php', '/src/Dispatcher/Dispatcher.php', '/src/Helper/BirthdaysHelper.php', '/tmpl/default.php'] as $birthdayFile) {
 	if (!is_file($birthdaysModule . $birthdayFile)) throw new RuntimeException(sprintf('Birthdays module is missing %s.', $birthdayFile));
@@ -249,6 +298,20 @@ $latestResultsHelper = (string) file_get_contents($latestResultsModule . '/src/H
 foreach (['CrossProjectProgrammeReader', "(bool)\$i['played']", 'sport_type_id', 'club_id', 'project_id', 'ProjectTemplateProvider'] as $latestResultsContract) {
 	if (!str_contains($latestResultsHelper, $latestResultsContract)) throw new RuntimeException(sprintf('Latest results module is missing contract %s.', $latestResultsContract));
 }
+$latestResultsManifest = (string) file_get_contents($latestResultsModule . '/mod_joomleague_latest_results.xml');
+$latestResultsTemplate = (string) file_get_contents($latestResultsModule . '/tmpl/default.php');
+foreach (['name="orientation"', 'value="horizontal"', 'value="vertical"'] as $orientationContract) {
+	if (!str_contains($latestResultsManifest, $orientationContract)) throw new RuntimeException(sprintf('Latest results orientation setting is missing %s.', $orientationContract));
+}
+foreach (['row-cols-md-2', 'list-group-item-action', 'justify-content-between', 'text-bg-dark'] as $displayContract) {
+	if (!str_contains($latestResultsTemplate, $displayContract)) throw new RuntimeException(sprintf('Latest results display is missing %s.', $displayContract));
+}
+foreach (['en-GB', 'cs-CZ'] as $languageTag) {
+	$languageSource = (string) file_get_contents($latestResultsModule . '/language/' . $languageTag . '/mod_joomleague_latest_results.ini');
+	foreach (['ORIENTATION_LABEL', 'ORIENTATION_HORIZONTAL', 'ORIENTATION_VERTICAL'] as $languageContract) {
+		if (!str_contains($languageSource, 'MOD_JOOMLEAGUE_LATEST_RESULTS_' . $languageContract . '=')) throw new RuntimeException(sprintf('Latest results %s translation is missing %s.', $languageTag, $languageContract));
+	}
+}
 
 $nextEventHelper = (string) file_get_contents($nextEventModule . '/src/Helper/NextEventHelper.php');
 foreach (['ProgrammeReader', 'ProgrammeScopeResolver', "!\$item['played']", "'entry'", "'club'"] as $nextEventContract) {
@@ -258,9 +321,16 @@ foreach (['ProgrammeReader', 'ProgrammeScopeResolver', "!\$item['played']", "'en
 }
 
 $programmeReader = (string) file_get_contents($admin . '/src/Service/ProgrammeReader.php');
-foreach (["project.published = 1", "match.published = 1", "participant.published = 1", "result.status_code = 'final'", 'formatNumericScore'] as $programmeGuard) {
+foreach (["project.published = 1", "match.published = 1", "participant.published = 1", "result.status_code = 'final'", 'match.created AS match_created', 'result.modified AS result_modified', 'latestDateTime', 'formatNumericScore'] as $programmeGuard) {
 	if (!str_contains($programmeReader, $programmeGuard)) {
 		throw new RuntimeException(sprintf('Programme reader is missing public-data guard %s.', $programmeGuard));
+	}
+}
+
+$icalBuilder = (string) file_get_contents($admin . '/src/Service/IcalendarBuilder.php');
+foreach (['DTSTAMP:', 'LAST-MODIFIED:', 'SEQUENCE:', "event['created']", "event['modified']"] as $calendarMetadataRequirement) {
+	if (!str_contains($icalBuilder, $calendarMetadataRequirement)) {
+		throw new RuntimeException(sprintf('iCalendar builder is missing persistent revision metadata %s.', $calendarMetadataRequirement));
 	}
 }
 
@@ -472,10 +542,22 @@ foreach (['mysql', 'postgresql'] as $driver) {
 
 $installerScript = (string) file_get_contents($admin . '/script.php');
 
-foreach (['ProjectRuleValidator.php', 'EntryModelValidator.php', 'StandingsContractValidator.php', 'SportProfileSchemaValidator.php'] as $installerDependency) {
+foreach (['ExactDecimal.php', 'ProjectRuleValidator.php', 'EntryModelValidator.php', 'StandingsContractValidator.php', 'SportProfileSchemaValidator.php'] as $installerDependency) {
 	if (!str_contains($installerScript, $installerDependency)) {
 		throw new RuntimeException(sprintf('Installer profile synchronisation is missing the explicit %s bootstrap.', $installerDependency));
 	}
+}
+
+$projectRuleValidatorSource = (string) file_get_contents($ruleValidatorFile);
+
+foreach (['ExactDecimal::fromNumber', 'ExactDecimal::multiply', 'ExactDecimal::add', 'ExactDecimal::compare'] as $decimalRequirement) {
+	if (!str_contains($projectRuleValidatorSource, $decimalRequirement)) {
+		throw new RuntimeException(sprintf('Project-rule relational constraints must use exact decimal operation %s.', $decimalRequirement));
+	}
+}
+
+if (str_contains($projectRuleValidatorSource, 'abs($left - $right)') || str_contains($projectRuleValidatorSource, '(float) $this->readPointer')) {
+	throw new RuntimeException('Project-rule relational constraints must not use floating-point epsilon arithmetic.');
 }
 
 foreach (['com_joomleague.getting-started', 'com_joomleague.create-competition', '#__guidedtours', '#__guidedtour_steps', 'synchroniseGuidedTours'] as $guidedTourRequirement) {
@@ -713,6 +795,7 @@ $expectedTables = [
 	'joomleague_match_score_value',
 	'joomleague_standing_adjustment',
 	'joomleague_standing_current',
+	'joomleague_standing_freshness',
 	'joomleague_standing_snapshot',
 	'joomleague_standing_snapshot_row',
 	'joomleague_profile_template_config',
@@ -748,6 +831,25 @@ sort($expectedTables);
 
 if ($mysqlTables !== $postgresTables || $mysqlTables !== $expectedTables) {
 	throw new RuntimeException('MariaDB/MySQL and PostgreSQL must define the same canonical foundation tables.');
+}
+
+if (preg_match('/private const SCHEMA_TABLES\s*=\s*\[(.*?)\];/s', $installerScript, $installerTableBlock) !== 1) {
+	throw new RuntimeException('Installer must define the canonical schema table list used for incomplete-install recovery.');
+}
+
+preg_match_all("/'([a-z0-9_]+)'/", $installerTableBlock[1], $installerTableMatches);
+$installerTables = array_map(static fn (string $table): string => 'joomleague_' . $table, $installerTableMatches[1] ?? []);
+$installerTables = array_values(array_unique($installerTables));
+sort($installerTables);
+
+if ($installerTables !== $expectedTables) {
+	throw new RuntimeException('Installer incomplete-schema recovery table list must match the canonical database schema.');
+}
+
+foreach (['prepareIncompleteInstallation', 'FOREIGN_KEY_CHECKS = 0', ' CASCADE', 'COUNT(*)', 'COM_JOOMLEAGUE_INSTALL_INCOMPLETE_SCHEMA_BLOCKED'] as $recoveryRequirement) {
+	if (!str_contains($installerScript, $recoveryRequirement)) {
+		throw new RuntimeException(sprintf('Installer recovery is missing requirement: %s.', $recoveryRequirement));
+	}
 }
 
 $extractSchemaColumns = static function (string $schema, string $driver): array {
@@ -872,6 +974,12 @@ if (
 	throw new RuntimeException('Both drivers must use start mode and a 7200-second automatic round offset for new projects.');
 }
 
+foreach (['mysql' => $mysqlInstall, 'postgresql' => $postgresInstall] as $driver => $schema) {
+	if (str_contains($schema, 'fk_jl_match_score_segment_parent')) {
+		throw new RuntimeException(sprintf('%s must not restore the MySQL-incompatible score-segment self-reference.', $driver));
+	}
+}
+
 foreach ([
 	'uq_jl_sport_type_profile_binding' => 'sport type/profile version binding key',
 	'fk_jl_project_sport_binding' => 'project sport type/profile version binding',
@@ -909,7 +1017,7 @@ foreach (['mysql' => $mysqlTables, 'postgresql' => $postgresTables] as $driver =
 		throw new RuntimeException(sprintf('%s update files must cumulatively create every fresh-install table.', $driver));
 	}
 
-	foreach (['uq_jl_sport_type_profile_binding', 'fk_jl_project_sport_binding', 'chk_jl_season_dates', 'chk_jl_project_dates', 'chk_jl_project_auto_advance', 'chk_jl_project_stage_dates', 'chk_jl_project_stage_entry_mode', 'fk_jl_stage_entry_stage', 'fk_jl_stage_entry_entry', 'fk_jl_stage_transition_source', 'fk_jl_stage_transition_target', 'chk_jl_stage_transition_distinct', 'chk_jl_project_round_sequence', 'chk_jl_project_round_dates', 'fk_jl_project_match_round', 'fk_jl_match_participant_match', 'uq_jl_match_participant_scope', 'fk_jl_match_lineup_participant', 'fk_jl_match_lineup_source', 'fk_jl_match_lineup_person', 'uq_jl_match_lineup_scope', 'fk_jl_lineup_change_outgoing', 'fk_jl_lineup_change_incoming', 'chk_jl_lineup_change_members', 'chk_jl_lineup_change_sequence', 'fk_jl_project_actor_role_project', 'chk_jl_project_actor_role_actor', 'chk_jl_project_actor_role_dates', 'fk_jl_match_actor_role_match', 'fk_jl_match_actor_role_source', 'chk_jl_match_actor_role_actor', 'fk_jl_match_event_match', 'fk_jl_match_event_participant', 'fk_jl_match_event_primary_person', 'fk_jl_match_event_secondary_person', 'chk_jl_match_event_people', 'chk_jl_match_event_clock_unit', 'fk_jl_match_stat_value_match', 'fk_jl_match_stat_value_participant', 'fk_jl_match_stat_value_person', 'chk_jl_match_stat_value_target', 'chk_jl_match_stat_value_payload', 'fk_jl_match_result_match', 'fk_jl_match_score_segment_parent', 'fk_jl_match_score_value_participant', 'chk_jl_match_score_value_payload', 'chk_jl_match_participant_slot', 'chk_jl_project_entry_target', 'chk_jl_entry_member_dates', 'chk_jl_org_name_history_owner', 'chk_jl_org_name_history_dates', 'chk_jl_org_media_history_owner', 'chk_jl_org_media_history_dates'] as $constraint) {
+	foreach (['uq_jl_sport_type_profile_binding', 'fk_jl_project_sport_binding', 'chk_jl_season_dates', 'chk_jl_project_dates', 'chk_jl_project_auto_advance', 'chk_jl_project_stage_dates', 'chk_jl_project_stage_entry_mode', 'fk_jl_stage_entry_stage', 'fk_jl_stage_entry_entry', 'fk_jl_stage_transition_source', 'fk_jl_stage_transition_target', 'chk_jl_stage_transition_distinct', 'chk_jl_project_round_sequence', 'chk_jl_project_round_dates', 'fk_jl_project_match_round', 'fk_jl_match_participant_match', 'uq_jl_match_participant_scope', 'fk_jl_match_lineup_participant', 'fk_jl_match_lineup_source', 'fk_jl_match_lineup_person', 'uq_jl_match_lineup_scope', 'fk_jl_lineup_change_outgoing', 'fk_jl_lineup_change_incoming', 'chk_jl_lineup_change_members', 'chk_jl_lineup_change_sequence', 'fk_jl_project_actor_role_project', 'chk_jl_project_actor_role_actor', 'chk_jl_project_actor_role_dates', 'fk_jl_match_actor_role_match', 'fk_jl_match_actor_role_source', 'chk_jl_match_actor_role_actor', 'fk_jl_match_event_match', 'fk_jl_match_event_participant', 'fk_jl_match_event_primary_person', 'fk_jl_match_event_secondary_person', 'chk_jl_match_event_people', 'chk_jl_match_event_clock_unit', 'fk_jl_match_stat_value_match', 'fk_jl_match_stat_value_participant', 'fk_jl_match_stat_value_person', 'chk_jl_match_stat_value_target', 'chk_jl_match_stat_value_payload', 'fk_jl_match_result_match', 'fk_jl_match_score_value_participant', 'chk_jl_match_score_value_payload', 'chk_jl_match_participant_slot', 'chk_jl_project_entry_target', 'chk_jl_entry_member_dates', 'chk_jl_org_name_history_owner', 'chk_jl_org_name_history_dates', 'chk_jl_org_media_history_owner', 'chk_jl_org_media_history_dates'] as $constraint) {
 		if (!str_contains($updateSql, $constraint)) {
 			throw new RuntimeException(sprintf('%s updates are missing canonical constraint %s.', $driver, $constraint));
 		}
@@ -918,7 +1026,7 @@ foreach (['mysql' => $mysqlTables, 'postgresql' => $postgresTables] as $driver =
 	sort($updateFiles, SORT_STRING);
 	$latestUpdate = basename((string) end($updateFiles));
 
-	if ($latestUpdate !== '6.2.0-2026082501.sql') {
+	if ($latestUpdate !== '6.2.0-2026091101.sql') {
 		throw new RuntimeException(sprintf('%s update ordering must end at the schema anchor.', $driver));
 	}
 
@@ -1194,20 +1302,45 @@ $dataImportController = (string) file_get_contents($admin . '/src/Controller/Dat
 
 if (!str_contains($sqlExchange, "'COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT'")
 	|| !str_contains($sqlExchange, "transactionStart()")
+	|| !str_contains($sqlExchange, 'acquireImportLock')
+	|| !str_contains($sqlExchange, 'recoverCreatedObjects')
+	|| !str_contains($sqlExchange, 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_RECOVERED')
+	|| !str_contains($sqlExchange, 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_RECOVERY_INCOMPLETE')
 	|| !str_contains($sqlExchange, "#__joomleague_")
 	|| !str_contains($sqlExchange, "'/^CREATE\\s")
 	|| !str_contains($sqlExchange, "'/^INSERT\\s")
 	|| !str_contains($databaseToolsController, "Session::checkToken()")
-	|| !str_contains($databaseToolsController, "authorise('core.manage', 'com_joomleague')")
+	|| !str_contains($databaseToolsController, "authorise('joomleague.database.export', 'com_joomleague')")
 	|| !str_contains($databaseToolsController, "->sendHeaders()")
 	|| !str_contains($dataImportController, "Session::checkToken()")
-	|| !str_contains($dataImportController, "authorise('core.manage', 'com_joomleague')")
+	|| !str_contains($dataImportController, "authorise('joomleague.database.import', 'com_joomleague')")
 	|| !str_contains($dataImportController, "is_uploaded_file")
 	|| !str_contains($dataImportController, 'Utility::getMaxUploadSize()')
 	|| !str_contains($sqlExchange, 'Utility::getMaxUploadSize()')
 	|| str_contains($dataImportController, '100 * 1024 * 1024')
 	|| str_contains($sqlExchange, '100 * 1024 * 1024')) {
 	throw new RuntimeException('SQL data exchange must retain restricted statements, transactions, upload validation, CSRF and ACL checks.');
+}
+
+if (!is_file($root . '/tests/Integration/sql-import-recovery.php')) {
+	throw new RuntimeException('SQL import recovery must have a dedicated database integration test.');
+}
+
+$accessXml = (string) file_get_contents($admin . '/access.xml');
+$databaseToolsView = (string) file_get_contents($admin . '/src/View/Databasetools/HtmlView.php');
+$dataImportView = (string) file_get_contents($admin . '/src/View/Dataimport/HtmlView.php');
+$toolsTemplate = (string) file_get_contents($admin . '/tmpl/tools/default.php');
+
+foreach (['joomleague.database.import', 'joomleague.database.export'] as $databaseAction) {
+	if (!str_contains($accessXml, 'name="' . $databaseAction . '"')
+		|| !str_contains($toolsTemplate, "'" . $databaseAction . "'")) {
+		throw new RuntimeException('Database action is not declared and filtered consistently: ' . $databaseAction);
+	}
+}
+
+if (!str_contains($dataImportView, "authorise('joomleague.database.import', 'com_joomleague')")
+	|| !str_contains($databaseToolsView, "authorise('joomleague.database.export', 'com_joomleague')")) {
+	throw new RuntimeException('Database import and export views must reject users without their dedicated permissions.');
 }
 
 $dataImportTemplate = (string) file_get_contents($admin . '/tmpl/dataimport/default.php');
@@ -1355,6 +1488,9 @@ if (!str_contains($entryMemberModel, 'loadStoredEntryId($memberId)')
 }
 
 $matchResultController = (string) file_get_contents($admin . '/src/Controller/MatchresultController.php');
+if (substr_count($matchResultController, '$this->assertEditPermission($matchId);') < 3) {
+	throw new RuntimeException('Match result save, mutation, and cancel actions must enforce project result ACL.');
+}
 $matchResultTemplate = (string) file_get_contents($admin . '/tmpl/matchresult/default.php');
 
 foreach (["Session::checkToken()", "authorise('joomleague.project.edit.results'", "Log::add(", 'addSegment()', 'removeSegment()', 'preserveResultForm('] as $resultSaveRequirement) {
@@ -1491,17 +1627,18 @@ if (!str_contains($matchLineupRepository, 'available_member_count')
 }
 
 // StandingsReader remains read-only. The recalculator owns publication and
-// the synchronizer repairs missing profile scopes after external imports.
+// the synchronizer repairs missing or invalidated profile scopes.
 $standingsReader = (string) file_get_contents($admin . '/src/Service/StandingsReader.php');
 $standingsRecalculator = (string) file_get_contents($admin . '/src/Service/StandingsRecalculator.php');
 $standingsSynchronizer = (string) file_get_contents($admin . '/src/Service/StandingsSnapshotSynchronizer.php');
-$standingsRepository = $standingsReader . "\n" . $standingsRecalculator;
+$standingsFreshness = (string) file_get_contents($admin . '/src/Service/StandingsFreshnessState.php');
+$standingsRepository = $standingsReader . "\n" . $standingsRecalculator . "\n" . $standingsFreshness;
 $standingsController = (string) file_get_contents($admin . '/src/Controller/StandingsController.php');
 $standingsTemplate = (string) file_get_contents($admin . '/tmpl/standings/default.php');
 $matchModelSource = (string) file_get_contents($admin . '/src/Model/MatchModel.php');
 $roundModelSource = (string) file_get_contents($admin . '/src/Model/RoundModel.php');
 
-foreach (['#__joomleague_standing_adjustment', '#__joomleague_standing_snapshot', '#__joomleague_standing_snapshot_row', '#__joomleague_standing_current'] as $standingTable) {
+foreach (['#__joomleague_standing_adjustment', '#__joomleague_standing_snapshot', '#__joomleague_standing_snapshot_row', '#__joomleague_standing_current', '#__joomleague_standing_freshness'] as $standingTable) {
 	if (!str_contains($standingsRepository, $standingTable)) {
 		throw new RuntimeException(sprintf('Standings repository is missing owned table %s.', $standingTable));
 	}
@@ -1526,13 +1663,22 @@ if (str_contains($standingsReader, 'recalculate') || str_contains($standingsRead
 	throw new RuntimeException('StandingsReader must stay read-only — no write/recalculation logic belongs there.');
 }
 
+if (!str_contains($standingsRecalculator, 'lockProject($projectId)')
+	|| !str_contains($standingsRecalculator, '$this->reader->context($projectId, $stageId, $scope)')
+	|| strpos($standingsRecalculator, 'lockProject($projectId)') > strpos($standingsRecalculator, '$this->reader->context($projectId, $stageId, $scope)')
+	|| !str_contains($standingsFreshness, 'FOR UPDATE')) {
+	throw new RuntimeException('Standings inputs must be rebuilt only after acquiring the portable project publication lock.');
+}
+
 $siteStandingsModel = (string) file_get_contents($root . '/components/com_joomleague/src/Model/StandingsModel.php');
 $siteStandingsTemplate = (string) file_get_contents($root . '/components/com_joomleague/tmpl/standings/default.php');
 
 if (!str_contains($siteStandingsModel, 'StandingsSnapshotSynchronizer')
 	|| !str_contains($standingsSynchronizer, "['available_scopes']")
-	|| !str_contains($standingsSynchronizer, "['snapshot'] === null")) {
-	throw new RuntimeException('Public standings must automatically publish every missing profile-defined scope.');
+	|| !str_contains($standingsSynchronizer, 'isFresh(')
+	|| !str_contains($standingsRecalculator, 'markFresh(')
+	|| !str_contains($standingsCascadeTrigger, 'markDirty(')) {
+	throw new RuntimeException('Public standings must automatically repair missing or invalidated profile-defined scopes.');
 }
 
 foreach (['project.published = 1', 'competition.published = 1', 'season.published = 1', 'sport_type.published = 1', 'stage.published = 1'] as $publishedGuard) {
@@ -1661,6 +1807,18 @@ foreach (['ProjectTemplateProvider', 'show_match_detail_button', 'presentationOv
 if (!str_contains($programModuleTemplate, "['show_detail']")
 	|| !str_contains($programModuleManifest, 'name="template_show_match_detail_button"')) {
 	throw new RuntimeException('Programme module does not apply its inherited event-detail link setting.');
+}
+foreach (['name="orientation"', 'value="horizontal"', 'value="vertical"'] as $orientationContract) {
+	if (!str_contains($programModuleManifest, $orientationContract)) throw new RuntimeException(sprintf('Programme orientation setting is missing %s.', $orientationContract));
+}
+foreach (['row-cols-md-2', 'list-group-item-action', 'card card-body h-100'] as $displayContract) {
+	if (!str_contains($programModuleTemplate, $displayContract)) throw new RuntimeException(sprintf('Programme responsive display is missing %s.', $displayContract));
+}
+foreach (['en-GB', 'cs-CZ'] as $languageTag) {
+	$languageSource = (string) file_get_contents($programModule . '/language/' . $languageTag . '/mod_joomleague_program.ini');
+	foreach (['ORIENTATION_LABEL', 'ORIENTATION_HORIZONTAL', 'ORIENTATION_VERTICAL'] as $languageContract) {
+		if (!str_contains($languageSource, 'MOD_JOOMLEAGUE_PROGRAM_' . $languageContract . '=')) throw new RuntimeException(sprintf('Programme %s translation is missing %s.', $languageTag, $languageContract));
+	}
 }
 
 $participantModuleHelper = (string) file_get_contents($root . '/modules/mod_joomleague_participant/src/Helper/ParticipantHelper.php');

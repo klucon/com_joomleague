@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS "#__joomleague_match_score_segment" (
   "id" BIGSERIAL PRIMARY KEY, "uuid" CHAR(36) NOT NULL, "match_id" BIGINT NOT NULL, "parent_id" BIGINT NULL, "level_code" VARCHAR(100) NOT NULL, "sequence_number" INTEGER NOT NULL, "status_code" VARCHAR(100) NOT NULL DEFAULT 'completed', "metadata_json" TEXT NULL,
   "created" TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP, "created_by" BIGINT NOT NULL DEFAULT 0, "modified" TIMESTAMP WITHOUT TIME ZONE NULL, "modified_by" BIGINT NOT NULL DEFAULT 0,
   CONSTRAINT "uq_jl_match_score_segment_uuid" UNIQUE ("uuid"), CONSTRAINT "uq_jl_match_score_segment_position" UNIQUE ("match_id", "parent_id", "level_code", "sequence_number"), CONSTRAINT "uq_jl_match_score_segment_scope" UNIQUE ("id", "match_id"),
-  CONSTRAINT "fk_jl_match_score_segment_match" FOREIGN KEY ("match_id") REFERENCES "#__joomleague_project_match" ("id") ON DELETE CASCADE, CONSTRAINT "fk_jl_match_score_segment_parent" FOREIGN KEY ("parent_id", "match_id") REFERENCES "#__joomleague_match_score_segment" ("id", "match_id") ON DELETE CASCADE, CONSTRAINT "chk_jl_match_score_segment_sequence" CHECK ("sequence_number" > 0)
+  CONSTRAINT "fk_jl_match_score_segment_match" FOREIGN KEY ("match_id") REFERENCES "#__joomleague_project_match" ("id") ON DELETE CASCADE, CONSTRAINT "chk_jl_match_score_segment_sequence" CHECK ("sequence_number" > 0)
 );
 CREATE INDEX "idx_jl_match_score_segment_parent" ON "#__joomleague_match_score_segment" ("parent_id", "match_id") /** CAN FAIL **/;
 CREATE TABLE IF NOT EXISTS "#__joomleague_match_score_value" (

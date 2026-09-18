@@ -290,10 +290,11 @@ final class ProjectRuleValidator
 		foreach ($constraints as $constraint) {
 			$left = $this->evaluateExpression($values, $constraint['left']);
 			$right = $this->evaluateExpression($values, $constraint['right']);
+			$comparison = ExactDecimal::compare($left, $right);
 			$valid = match ($constraint['operator']) {
-				'eq' => abs($left - $right) < 0.000000001,
-				'lte' => $left <= $right,
-				'gte' => $left >= $right,
+				'eq' => $comparison === 0,
+				'lte' => $comparison <= 0,
+				'gte' => $comparison >= 0,
 				default => false,
 			};
 
@@ -304,12 +305,14 @@ final class ProjectRuleValidator
 	}
 
 	/** @param array<string, mixed> $values @param array<string, mixed> $expression */
-	private function evaluateExpression(array $values, array $expression): float
+	private function evaluateExpression(array $values, array $expression): string
 	{
-		$result = (float) ($expression['constant'] ?? 0);
+		$result = ExactDecimal::fromNumber($expression['constant'] ?? 0);
 
 		foreach ($expression['terms'] as $term) {
-			$result += (float) $this->readPointer($values, $term['path']) * (float) ($term['factor'] ?? 1);
+			$value = ExactDecimal::fromNumber($this->readPointer($values, $term['path']));
+			$factor = ExactDecimal::fromNumber($term['factor'] ?? 1);
+			$result = ExactDecimal::add($result, ExactDecimal::multiply($value, $factor));
 		}
 
 		return $result;

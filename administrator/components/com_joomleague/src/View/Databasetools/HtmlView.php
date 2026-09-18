@@ -16,6 +16,10 @@ final class HtmlView extends BaseHtmlView
 	public array $items = [];
 	public function display($tpl = null): void
 	{
+		if (!Factory::getApplication()->getIdentity()->authorise('joomleague.database.export', 'com_joomleague')) {
+			throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		}
+
 		$this->items = $this->getModel()->getTables();
 		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_DATABASETOOLS_TITLE'), 'database');
 		ToolbarHelper::custom('databasetools.export', 'download', '', 'COM_JOOMLEAGUE_DATABASETOOLS_EXPORT_SELECTED', false);

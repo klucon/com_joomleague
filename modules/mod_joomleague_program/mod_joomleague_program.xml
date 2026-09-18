@@ -5,7 +5,7 @@
 	<creationDate>2026-08</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.2.0-dev7</version>
+	<version>6.2.0-beta1</version>
 	<description>MOD_JOOMLEAGUE_PROGRAM_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Program</namespace>
 	<files>
@@ -36,6 +36,10 @@
 					<option value="all">MOD_JOOMLEAGUE_PROGRAM_MODE_ALL</option>
 				</field>
 				<field name="limit" type="number" default="5" min="1" max="50" label="MOD_JOOMLEAGUE_PROGRAM_LIMIT_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_LIMIT_DESC" />
+				<field name="orientation" type="list" default="vertical" label="MOD_JOOMLEAGUE_PROGRAM_ORIENTATION_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_ORIENTATION_DESC">
+					<option value="vertical">MOD_JOOMLEAGUE_PROGRAM_ORIENTATION_VERTICAL</option>
+					<option value="horizontal">MOD_JOOMLEAGUE_PROGRAM_ORIENTATION_HORIZONTAL</option>
+				</field>
 				<field name="show_project_name" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_PROJECT_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_PROJECT_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
 				<field name="show_round" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_ROUND_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_ROUND_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
 				<field name="show_date" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_DATE_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_DATE_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>

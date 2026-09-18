@@ -19,6 +19,7 @@ final class ResetDemoDataCommand extends AbstractCommand
 	protected static $defaultName = 'joomleague:reset-demo-data';
 
 	private const TABLES = [
+		'#__joomleague_standing_freshness',
 		'#__joomleague_standing_current',
 		'#__joomleague_standing_snapshot_row',
 		'#__joomleague_standing_snapshot',

@@ -71,36 +71,187 @@ final class SqlDataExchangeService
 
 		$ddl = array_values(array_filter($statements, static fn (string $statement): bool => preg_match('/^CREATE\s/i', $statement) === 1));
 		$inserts = array_values(array_filter($statements, static fn (string $statement): bool => preg_match('/^INSERT\s/i', $statement) === 1));
+		$preparedDdl = array_map(fn (string $statement): string => $this->prepareStatement($statement), $ddl);
+		$preparedInserts = array_map(
+			fn (string $statement): string => $this->prepareStatement($this->duplicateTolerantInsert($statement)),
+			$inserts
+		);
 		$executed = 0;
 		$skipped = 0;
+		$createdTables = [];
+		$createdIndexes = [];
+		$transactionStarted = false;
+		$this->acquireImportLock();
 
-		foreach ($ddl as $statement) {
-			$this->database->setQuery($this->prepareStatement($statement))->execute();
-			$executed++;
-		}
-
-		$this->database->transactionStart();
 		try {
-			foreach ($inserts as $statement) {
-				$sql = $this->prepareStatement($this->duplicateTolerantInsert($statement));
-				$this->database->setQuery($sql)->execute();
+			foreach ($ddl as $index => $statement) {
+				$object = $this->ddlObject($statement);
+				$tableExisted = $this->tableExists($object['table']);
+				$indexExisted = $object['index'] !== null && $tableExisted
+					? $this->indexExists($object['table'], $object['index'])
+					: false;
+
+				$this->database->setQuery($preparedDdl[$index])->execute();
+				$executed++;
+
+				if (!$tableExisted && $this->tableExists($object['table'])) {
+					$createdTables[] = $object['table'];
+				}
+				if ($object['index'] !== null && !$indexExisted && $this->indexExists($object['table'], $object['index'])) {
+					$createdIndexes[] = $object;
+				}
+			}
+
+			$this->database->transactionStart();
+			$transactionStarted = true;
+			foreach ($preparedInserts as $statement) {
+				$this->database->setQuery($statement)->execute();
 				if ($this->database->getAffectedRows() === 0) $skipped++; else $executed++;
 			}
 			if ($isCanonicalMigration) {
 				$executed += $this->materializeImportedSportTypes($profileCodes);
 				$this->synchronizePostgreSqlIdentitySequences();
 			}
+			// Imported rows bypass model cascade hooks. Removing these cheap
+			// markers makes the next standings read rebuild every affected scope.
+			$this->database->setQuery(
+				$this->database->getQuery(true)->delete($this->database->quoteName('#__joomleague_standing_freshness'))
+			)->execute();
 			$this->database->transactionCommit();
+			$transactionStarted = false;
 		} catch (Throwable $error) {
-			try {
-				$this->database->transactionRollback();
-			} catch (Throwable) {
-				// Preserve the original data error when a driver already closed the transaction.
+			if ($transactionStarted) {
+				try {
+					$this->database->transactionRollback();
+				} catch (Throwable) {
+					// Preserve the original import error when a driver already closed the transaction.
+				}
 			}
+
+			if ($createdTables !== [] || $createdIndexes !== []) {
+				$recovered = $this->recoverCreatedObjects($createdTables, $createdIndexes);
+				throw new RuntimeException(
+					$recovered
+						? 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_RECOVERED'
+						: 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_RECOVERY_INCOMPLETE',
+					0,
+					$error
+				);
+			}
+
 			throw $error;
+		} finally {
+			$this->releaseImportLock();
 		}
 
 		return compact('executed', 'skipped');
+	}
+
+	private function acquireImportLock(): void
+	{
+		if ($this->database->getName() === 'pgsql') {
+			$this->database->setQuery("SELECT pg_advisory_lock(hashtext('com_joomleague.sql_import'))")->execute();
+			return;
+		}
+
+		$locked = (int) $this->database->setQuery("SELECT GET_LOCK('com_joomleague.sql_import', 30)")->loadResult();
+		if ($locked !== 1) {
+			throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_LOCK');
+		}
+	}
+
+	private function releaseImportLock(): void
+	{
+		try {
+			if ($this->database->getName() === 'pgsql') {
+				$this->database->setQuery("SELECT pg_advisory_unlock(hashtext('com_joomleague.sql_import'))")->execute();
+				return;
+			}
+
+			$this->database->setQuery("SELECT RELEASE_LOCK('com_joomleague.sql_import')")->execute();
+		} catch (Throwable) {
+			// The database connection also releases a session lock when it closes.
+		}
+	}
+
+	/** @return array{table: string, index: ?string} */
+	private function ddlObject(string $statement): array
+	{
+		if (preg_match('/^CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+[`"](#__joomleague_[a-z0-9_]+)[`"]\s*\(/i', $statement, $match) === 1) {
+			return ['table' => $match[1], 'index' => null];
+		}
+
+		if (preg_match('/^CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?[`"]([a-z0-9_]+)[`"]\s+ON\s+[`"](#__joomleague_[a-z0-9_]+)[`"]\s*\(/i', $statement, $match) === 1) {
+			return ['table' => $match[2], 'index' => $match[1]];
+		}
+
+		throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT');
+	}
+
+	private function tableExists(string $table): bool
+	{
+		return in_array($this->database->replacePrefix($table), $this->database->getTableList(), true);
+	}
+
+	private function indexExists(string $table, string $index): bool
+	{
+		if (!$this->tableExists($table)) {
+			return false;
+		}
+
+		foreach ($this->database->getTableKeys($this->database->replacePrefix($table)) as $key) {
+			$name = $key->Key_name ?? $key->idxName ?? null;
+			if (is_string($name) && strcasecmp($name, $index) === 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param list<string> $tables
+	 * @param list<array{table: string, index: ?string}> $indexes
+	 */
+	private function recoverCreatedObjects(array $tables, array $indexes): bool
+	{
+		$complete = true;
+
+		foreach (array_reverse($indexes) as $object) {
+			if ($object['index'] === null || !$this->indexExists($object['table'], $object['index'])) {
+				continue;
+			}
+
+			try {
+				$sql = $this->database->getName() === 'pgsql'
+					? 'DROP INDEX ' . $this->database->quoteName($object['index'])
+					: 'DROP INDEX ' . $this->database->quoteName($object['index']) . ' ON ' . $this->database->quoteName($object['table']);
+				$this->database->setQuery($sql)->execute();
+			} catch (Throwable) {
+				$complete = false;
+			}
+		}
+
+		foreach (array_reverse(array_unique($tables)) as $table) {
+			if (!$this->tableExists($table)) {
+				continue;
+			}
+
+			try {
+				$count = (int) $this->database->setQuery(
+					$this->database->getQuery(true)->select('COUNT(*)')->from($this->database->quoteName($table))
+				)->loadResult();
+				if ($count !== 0) {
+					$complete = false;
+					continue;
+				}
+				$this->database->setQuery('DROP TABLE ' . $this->database->quoteName($table))->execute();
+			} catch (Throwable) {
+				$complete = false;
+			}
+		}
+
+		return $complete;
 	}
 
 	private function synchronizePostgreSqlIdentitySequences(): void
