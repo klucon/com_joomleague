@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="module" client="site" method="upgrade">
-	<name>mod_joomleague_participant</name><author>Ondřej Klučka (https://joomleague.eu)</author><creationDate>2026-08</creationDate><copyright>(C) 2026 Ondřej Klučka.</copyright><license>GNU General Public License version 2 or later; see LICENSE.txt</license><version>6.2.0-beta1</version><description>MOD_JOOMLEAGUE_PARTICIPANT_XML_DESCRIPTION</description><namespace path="src">Joomleague\Module\Participant</namespace>
+	<name>mod_joomleague_participant</name><author>Ondřej Klučka (https://joomleague.eu)</author><creationDate>2026-08</creationDate><copyright>(C) 2026 Ondřej Klučka.</copyright><license>GNU General Public License version 2 or later; see LICENSE.txt</license><version>6.2.0-beta2</version><description>MOD_JOOMLEAGUE_PARTICIPANT_XML_DESCRIPTION</description><namespace path="src">Joomleague\Module\Participant</namespace>
 	<files><folder module="mod_joomleague_participant">services</folder><folder>src</folder><folder>tmpl</folder></files>
 	<languages><language tag="en-GB">language/en-GB/mod_joomleague_participant.ini</language><language tag="en-GB">language/en-GB/mod_joomleague_participant.sys.ini</language><language tag="cs-CZ">language/cs-CZ/mod_joomleague_participant.ini</language><language tag="cs-CZ">language/cs-CZ/mod_joomleague_participant.sys.ini</language></languages>
 	<config><fields name="params"><fieldset name="basic">

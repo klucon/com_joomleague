@@ -5,6 +5,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PACKAGE_MANIFEST="${ROOT}/build/pkg_joomleague.xml"
 VERSION="$(xmllint --xpath 'string(/extension/version)' "${PACKAGE_MANIFEST}")"
+EXPECTED_AUTHOR='Ondřej Klučka (https://joomleague.eu)'
+EXPECTED_AUTHOR_URL='https://joomleague.eu'
 
 php "${ROOT}/tests/Architecture/verify-frontend-contract.php"
 php "${ROOT}/tests/Architecture/verify-template-contract.php"
@@ -45,7 +47,11 @@ MANIFESTS=(
 for manifest in "${MANIFESTS[@]}"; do
 	xmllint --noout "${manifest}"
 	test "$(xmllint --xpath 'string(/extension/version)' "${manifest}")" = "${VERSION}"
+	test "$(xmllint --xpath 'string(/extension/author)' "${manifest}")" = "${EXPECTED_AUTHOR}"
 done
+
+test "$(xmllint --xpath 'string(/extension/authorUrl)' "${PACKAGE_MANIFEST}")" = "${EXPECTED_AUTHOR_URL}"
+test "$(xmllint --xpath 'string(/extension/authorUrl)' "${ROOT}/administrator/components/com_joomleague/joomleague.xml")" = "${EXPECTED_AUTHOR_URL}"
 
 test "$(xmllint --xpath 'string(/extension/updateservers/server)' "${PACKAGE_MANIFEST}")" = 'https://downloads.joomleague.eu/update.xml'
 test "$(xmllint --xpath 'string(/extension/updateservers/server/@type)' "${PACKAGE_MANIFEST}")" = 'extension'
@@ -56,7 +62,9 @@ for ((index = 1; index <= FILE_COUNT; index++)); do
 	[[ "${filename}" == *"-${VERSION}.zip" ]]
 done
 
-grep -Fq "'component_version' => '${VERSION}'" \
+grep -Fq "new InstalledVersionProvider" \
+	"${ROOT}/administrator/components/com_joomleague/src/Service/SystemDiagnosticsService.php"
+! grep -Eq "'component_version'[[:space:]]*=>[[:space:]]*'[0-9]" \
 	"${ROOT}/administrator/components/com_joomleague/src/Service/SystemDiagnosticsService.php"
 
 printf 'Release contract OK: %s\n' "${VERSION}"

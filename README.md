@@ -34,7 +34,7 @@ database tables compatible with 6.2.
 
 ## Current beta package
 
-- Version: `6.2.0-beta1`
+- Version: `6.2.0-beta2`
 - Joomla: 6.1.x or 6.2.x
 - PHP: 8.3 or newer
 - Databases: MySQL 8.0+, MariaDB 10.6+ or PostgreSQL 14+

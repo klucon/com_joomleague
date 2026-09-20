@@ -79,7 +79,6 @@ $clubMatchTile = function (array $match) use ($formatMatchDate, $clubMatchHref):
 };
 ?>
 <div class="container-fluid">
-
 	<?php // ---- Overview: a calm, neutral count of what exists, full width ------------- ?>
 	<div class="card mb-4">
 		<div class="card-header"><h2 class="h5 mb-0"><?php echo Text::_('COM_JOOMLEAGUE_DASHBOARD_OVERVIEW_TITLE'); ?></h2></div>

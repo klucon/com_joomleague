@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="module" client="site" method="upgrade">
 	<name>mod_joomleague_standings</name>
-	<author>Ondřej Klučka (https://klucon.cz)</author>
+	<author>Ondřej Klučka (https://joomleague.eu)</author>
 	<creationDate>2026-08</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.2.0-beta1</version>
+	<version>6.2.0-beta2</version>
 	<description>MOD_JOOMLEAGUE_STANDINGS_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Standings</namespace>
 	<files>

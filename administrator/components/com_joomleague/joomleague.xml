@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="component" method="upgrade">
 	<name>COM_JOOMLEAGUE</name>
-	<author>KLUCON</author>
+	<author>Ondřej Klučka (https://joomleague.eu)</author>
 	<creationDate>September 2026</creationDate>
 	<copyright>Copyright (C) 2026 KLUCON. All rights reserved.</copyright>
 	<license>GNU General Public License version 2 or later</license>
 	<authorEmail>info@klucon.cz</authorEmail>
-	<authorUrl>https://klucon.cz</authorUrl>
-	<version>6.2.0-beta1</version>
+	<authorUrl>https://joomleague.eu</authorUrl>
+	<version>6.2.0-beta2</version>
 	<description>COM_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Component\Joomleague</namespace>
 	<scriptfile>script.php</scriptfile>

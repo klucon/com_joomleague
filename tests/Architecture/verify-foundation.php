@@ -735,8 +735,11 @@ foreach (['domain', 'url', 'username', 'email', 'ip_address'] as $forbiddenPaylo
 	}
 }
 
-if (!str_contains($quickIconSource, 'index.php?option=com_joomleague&view=dashboard') || !str_contains($quickIconSource, "authorise('core.manage', 'com_joomleague')")) {
-	throw new RuntimeException('Quick Icon must link to the dashboard and enforce component management ACL.');
+if (!str_contains($quickIconSource, 'index.php?option=com_joomleague&view=dashboard')
+	|| !str_contains($quickIconSource, "authorise('core.manage', 'com_joomleague')")
+	|| !str_contains($quickIconSource, 'PLG_QUICKICON_JOOMLEAGUE_DASHBOARD_VERSION')
+	|| !str_contains($quickIconSource, "['package', 'pkg_joomleague']")) {
+	throw new RuntimeException('Quick Icon must link to the dashboard, enforce component management ACL and display the installed package version.');
 }
 
 $dashboardModel = (string) file_get_contents($admin . '/src/Model/DashboardModel.php');

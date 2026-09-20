@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="plugin" group="content" method="upgrade">
 	<name>PLG_CONTENT_JOOMLEAGUE</name>
-	<author>KLUCON</author>
+	<author>Ondřej Klučka (https://joomleague.eu)</author>
 	<creationDate>August 2026</creationDate>
 	<copyright>Copyright (C) 2026 KLUCON. All rights reserved.</copyright>
 	<license>GNU General Public License version 2 or later</license>
-	<version>6.2.0-beta1</version>
+	<version>6.2.0-beta2</version>
 	<description>PLG_CONTENT_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Plugin\Content\Joomleague</namespace>
 	<files>
