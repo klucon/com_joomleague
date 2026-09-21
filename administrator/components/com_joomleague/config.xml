@@ -59,6 +59,12 @@
 		<field name="placeholder_team_picture" type="media" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PICTURE_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PICTURE_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
 	</fieldset>
 
+	<fieldset name="safety" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_SAFETY_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_SAFETY_DESC">
+		<field name="allow_full_data_reset" type="radio" layout="joomla.form.field.radio.switcher" label="COM_JOOMLEAGUE_CONFIG_ALLOW_FULL_DATA_RESET_LABEL" description="COM_JOOMLEAGUE_CONFIG_ALLOW_FULL_DATA_RESET_DESC" default="0" filter="integer">
+			<option value="0">JNO</option><option value="1">JYES</option>
+		</field>
+	</fieldset>
+
 	<fieldset name="telemetry" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_TELEMETRY_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_TELEMETRY_DESC">
 		<field name="telemetry_information" type="note" label="COM_JOOMLEAGUE_CONFIG_TELEMETRY_INFORMATION_LABEL" description="COM_JOOMLEAGUE_CONFIG_TELEMETRY_INFORMATION_DESC" />
 		<field name="telemetry_consent" type="list" label="COM_JOOMLEAGUE_CONFIG_TELEMETRY_CONSENT_LABEL" description="COM_JOOMLEAGUE_CONFIG_TELEMETRY_CONSENT_DESC" default="never">

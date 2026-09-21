@@ -699,14 +699,39 @@ if (str_contains($quickIconSource, 'TelemetryService') || str_contains($quickIco
 }
 
 $resetCommandSource = (string) file_get_contents($consolePlugin . '/src/Console/ResetDemoDataCommand.php');
+$resetServiceSource = (string) file_get_contents($admin . '/src/Service/RuntimeDataResetter.php');
 
-foreach (['JOOMLEAGUE_ALLOW_DEMO_RESET', "addOption('force'", '#__joomleague_sport_type', 'RESTART IDENTITY CASCADE', 'FOREIGN_KEY_CHECKS'] as $resetGuard) {
+foreach (['RuntimeResetConfiguration', "addOption('force'", 'RuntimeDataResetter', 'configuration->disable()'] as $resetGuard) {
 	if (!str_contains($resetCommandSource, $resetGuard)) {
 		throw new RuntimeException(sprintf('Demo reset command is missing required guard or driver behavior: %s.', $resetGuard));
 	}
 }
 
-if (str_contains($resetCommandSource, '#__joomleague_sport_profile\'') || str_contains($resetCommandSource, '#__joomleague_sport_profile_version\'')) {
+foreach (['REMOVE AND CLEAN DEMO DATA', '#__joomleague_sport_type', 'RESTART IDENTITY CASCADE', 'FOREIGN_KEY_CHECKS'] as $resetServiceGuard) {
+	if (!str_contains($resetServiceSource, $resetServiceGuard)) {
+		throw new RuntimeException(sprintf('Demo reset service is missing required guard or driver behavior: %s.', $resetServiceGuard));
+	}
+}
+
+$demoControllerSource = (string) file_get_contents($admin . '/src/Controller/DemodataController.php');
+foreach (["authorise('core.admin'", 'Session::checkToken()', 'isResetEnabled()', 'hash_equals(RuntimeDataResetter::CONFIRMATION'] as $demoControllerGuard) {
+	if (!str_contains($demoControllerSource, $demoControllerGuard)) {
+		throw new RuntimeException(sprintf('Administrator demo-data controller is missing security guard: %s.', $demoControllerGuard));
+	}
+}
+
+$resetConfigurationSource = (string) file_get_contents($admin . '/src/Service/RuntimeResetConfiguration.php');
+foreach (['allow_full_data_reset', 'ComponentHelper::getParams', "params->set(self::PARAMETER, 0)"] as $configurationGuard) {
+	if (!str_contains($resetConfigurationSource, $configurationGuard)) {
+		throw new RuntimeException(sprintf('Runtime reset configuration is missing security behavior: %s.', $configurationGuard));
+	}
+}
+
+if (preg_match('/->bind\([^,]+,\s*[\'\"]/', $resetConfigurationSource) === 1) {
+	throw new RuntimeException('Runtime reset configuration must bind variables because Joomla database values are passed by reference.');
+}
+
+if (str_contains($resetServiceSource, '#__joomleague_sport_profile\'') || str_contains($resetServiceSource, '#__joomleague_sport_profile_version\'')) {
 	throw new RuntimeException('Demo reset must preserve bundled sport profiles and their immutable versions.');
 }
 
@@ -945,7 +970,7 @@ if ($mysqlChecks !== $postgresChecks) {
 	throw new RuntimeException('MariaDB/MySQL and PostgreSQL named check contracts differ.');
 }
 
-$resetCommand = (string) file_get_contents($consolePlugin . '/src/Console/ResetDemoDataCommand.php');
+$resetCommand = (string) file_get_contents($admin . '/src/Service/RuntimeDataResetter.php');
 $resetTables = array_values(array_diff($expectedTables, ['joomleague_sport_profile', 'joomleague_sport_profile_version']));
 
 foreach ($resetTables as $resetTable) {

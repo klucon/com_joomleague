@@ -10,6 +10,7 @@ $items = [
 	['sportprofiles', 'puzzle-piece', 'COM_JOOMLEAGUE_SPORTPROFILES_TITLE', 'COM_JOOMLEAGUE_SPORTPROFILES_SYNC_DESC'],
 	['templates', 'palette', 'COM_JOOMLEAGUE_TEMPLATES_TITLE', 'COM_JOOMLEAGUE_TEMPLATES_DESC'],
 	['diagnostics', 'health', 'COM_JOOMLEAGUE_DIAGNOSTICS_TITLE', 'COM_JOOMLEAGUE_DIAGNOSTICS_DESC'],
+	['demodata', 'database', 'COM_JOOMLEAGUE_DEMODATA_TITLE', 'COM_JOOMLEAGUE_DEMODATA_TOOLS_DESC', 'core.admin'],
 ];
 ?>
 <div class="container-fluid">

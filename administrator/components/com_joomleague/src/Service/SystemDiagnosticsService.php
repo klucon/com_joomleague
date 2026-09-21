@@ -38,7 +38,7 @@ final class SystemDiagnosticsService
 			'memory_limit' => (string) ini_get('memory_limit'),
 			'max_execution_time' => (string) ini_get('max_execution_time'),
 			'writable' => $writable,
-			'demo_reset_enabled' => getenv('JOOMLEAGUE_ALLOW_DEMO_RESET') === '1',
+			'demo_reset_enabled' => (new RuntimeResetConfiguration($this->database))->isEnabled(),
 		];
 	}
 }
