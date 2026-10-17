@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "esports",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS",
     "description_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_DESC",
     "scoring_model": "maps_rounds",
@@ -236,32 +236,45 @@
         {
             "code": "player",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_PLAYER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_PLAYER",
+            "role_domain": "participant"
         },
         {
             "code": "igl",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_IGL"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_IGL",
+            "role_domain": "participant"
         },
         {
             "code": "coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_COACH"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "analyst",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_ANALYST"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_ANALYST",
+            "role_domain": "team_staff"
         },
         {
             "code": "admin",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_ADMIN"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_ADMIN",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "observer",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_OBSERVER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ESPORTS_POSITION_OBSERVER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -375,7 +388,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true
         },

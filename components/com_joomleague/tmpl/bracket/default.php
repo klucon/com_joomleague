@@ -25,7 +25,7 @@ $roundCount = isset($bracket['rounds']) ? count($bracket['rounds']) : 0;
 
 $formatValue = static function (?object $value): string {
 	if ($value === null) return '';
-	if ($value->numeric_value !== null) return rtrim(rtrim((string) $value->numeric_value, '0'), '.');
+	if ($value->numeric_value !== null) return \Joomleague\Component\Joomleague\Domain\Service\DecimalDisplayFormatter::format((string) $value->numeric_value);
 	if ($value->text_value !== null && $value->text_value !== '') return (string) $value->text_value;
 	if ($value->status_code !== null && $value->status_code !== '') return (string) $value->status_code;
 	return $value->result_rank !== null ? '#' . (int) $value->result_rank : '';
@@ -33,6 +33,8 @@ $formatValue = static function (?object $value): string {
 ?>
 <div class="com-joomleague-bracket">
 	<?php if (isset($bracket['error'])) : ?>
+		<h1 class="com-joomleague-bracket__title"><?php echo Text::_('COM_JOOMLEAGUE_BRACKET_VIEW_TITLE'); ?></h1>
+		<p class="h4"><?php echo htmlspecialchars((string) $bracket['project']->name, ENT_QUOTES, 'UTF-8'); ?></p>
 		<div class="alert alert-warning"><?php echo Text::_($bracket['error']); ?></div>
 	<?php else : ?>
 		<h1 class="com-joomleague-bracket__title"><?php echo Text::_('COM_JOOMLEAGUE_BRACKET_VIEW_TITLE'); ?></h1>
@@ -52,7 +54,7 @@ $formatValue = static function (?object $value): string {
 			.jl-bracket-scroll::-webkit-scrollbar:horizontal { display: none; }
 			.jl-bracket-canvas { position: relative; }
 			.jl-bracket-header { position: sticky; top: 0; z-index: 2; display: flex; background: var(--bs-body-bg, #fff); border-bottom: 1px solid var(--bs-border-color, #dee2e6); }
-			.jl-bracket-header__col { flex: 0 0 <?php echo $columnWidth; ?>px; text-align: center; font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .03em; color: var(--bs-secondary-color, #6c757d); padding: .5rem 0; }
+			.jl-bracket-header__col { flex: 0 0 <?php echo $columnWidth; ?>px; min-width: 0; box-sizing: border-box; overflow-wrap: anywhere; text-align: center; font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: 0; color: var(--bs-secondary-color, #6c757d); padding: .5rem; }
 			.jl-bracket-svg { position: absolute; top: 0; left: 0; pointer-events: none; }
 			.jl-bracket-match { position: absolute; background: var(--bs-body-bg, #fff); border: 1px solid var(--bs-border-color, #dee2e6); border-radius: .375rem; padding: .3rem .55rem; font-size: .78rem; line-height: 1.25; box-sizing: border-box; overflow: hidden; }
 			.jl-bracket-match--active { border-color: var(--bs-primary, #0d6efd); box-shadow: inset 0 0 0 1px var(--bs-primary, #0d6efd); }
@@ -143,7 +145,7 @@ $formatValue = static function (?object $value): string {
 				var currentLabel = document.getElementById('jl-bracket-current');
 				var columnWidth = <?php echo $columnWidth; ?>;
 				var roundCount = <?php echo $roundCount; ?>;
-				var roundNames = <?php echo json_encode($roundNames, JSON_UNESCAPED_UNICODE); ?>;
+				var roundNames = <?php echo json_encode($roundNames, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR); ?>;
 				var current = <?php echo $focusRoundIndex; ?>;
 
 				// scroll-behavior:smooth turns a plain "scrollLeft = x" assignment into an

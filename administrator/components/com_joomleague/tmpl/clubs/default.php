@@ -13,7 +13,7 @@ $user = Factory::getApplication()->getIdentity();
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
 ?>
-<form action="<?php echo Route::_('index.php?option=com_joomleague&view=clubs'); ?>" method="post" name="adminForm" id="adminForm">
+<form action="<?php echo Route::_('index.php?option=com_joomleague&view=clubs'); ?>" method="post" name="adminForm" id="adminForm" class="js-stools-form">
 	<?php echo LayoutHelper::render('joomla.searchtools.default', ['view' => $this]); ?>
 	<div class="table-responsive">
 		<table class="table table-striped" id="clubList">
@@ -22,7 +22,7 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 				<th scope="col"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_NAME_LABEL', 'a.name', $listDirn, $listOrder); ?></th>
 				<th scope="col" class="d-none d-md-table-cell"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_SHORT_NAME_LABEL', 'a.short_name', $listDirn, $listOrder); ?></th>
 				<th scope="col" class="d-none d-lg-table-cell"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_COUNTRY_CODE_LABEL', 'a.country_code', $listDirn, $listOrder); ?></th>
-				<th scope="col" class="d-none d-md-table-cell text-center"><?php echo Text::_('COM_JOOMLEAGUE_FIELD_TEAM_COUNT_LABEL'); ?></th>
+				<th scope="col" class="d-none d-md-table-cell text-center"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_TEAM_COUNT_LABEL', 'team_count', $listDirn, $listOrder); ?></th>
 				<th scope="col" class="w-5 text-center"><?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.published', $listDirn, $listOrder); ?></th>
 				<th scope="col" class="d-none d-lg-table-cell w-5 text-center"><?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?></th>
 			</tr></thead>
@@ -51,7 +51,7 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 	<?php echo $this->pagination->getListFooter(); ?>
 	<input type="hidden" name="task" value="">
 	<input type="hidden" name="boxchecked" value="0">
-	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>">
-	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>">
+	
+	
 	<?php echo HTMLHelper::_('form.token'); ?>
 </form>

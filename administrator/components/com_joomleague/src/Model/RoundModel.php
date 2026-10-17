@@ -48,7 +48,8 @@ final class RoundModel extends AdminModel implements CurrentUserInterface
 
 	public function save($data): bool
 	{
-		$id = (int) ($data['id'] ?? 0);
+		$id = (int) ($data['id'] ?? $this->getState($this->getName() . '.id'));
+		$data['id'] = $id;
 		$oldPublished = null;
 		if ($id > 0) { $stored = $this->storedOwner($id); $data['stage_id'] = $stored->stage_id; $data['project_id'] = $stored->project_id; $oldPublished = (int) $stored->published; }
 		else {
@@ -57,6 +58,10 @@ final class RoundModel extends AdminModel implements CurrentUserInterface
 			if (trim((string) ($data['code'] ?? '')) === '') {
 				$data['code'] = $this->availableCode((int) $stage->id, (string) ($data['name'] ?? 'round'));
 			}
+		}
+		if ((int) $data['project_id'] < 1 || !$this->canEditSchedule((int) $data['project_id'])) {
+			$this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
+			return false;
 		}
 		$result = parent::save($data);
 		if ($result && $oldPublished !== null && array_key_exists('published', $data) && (int) $data['published'] !== $oldPublished) $this->refreshStandings([[(int) $data['project_id'], (int) $data['stage_id']]]);
@@ -79,6 +84,12 @@ final class RoundModel extends AdminModel implements CurrentUserInterface
 		return $result;
 	}
 
+	protected function getReorderConditions($table): array
+	{
+		$ownerId = (int) ($table->stage_id ?? 0);
+		return [$ownerId > 0 ? $this->getDatabase()->quoteName('stage_id') . ' = ' . $ownerId : '1 = 0'];
+	}
+
 	protected function canDelete($record): bool
 	{
 		return $this->canEditSchedule((int) ($record->project_id ?? 0));
@@ -91,7 +102,11 @@ final class RoundModel extends AdminModel implements CurrentUserInterface
 
 	private function canEditSchedule(int $projectId): bool
 	{
-		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		if ($projectId < 1) {
+			return false;
+		}
+
+		$asset = 'com_joomleague.project.' . $projectId;
 		return $this->getCurrentUser()->authorise('joomleague.project.edit.schedule', $asset);
 	}
 

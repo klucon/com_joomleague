@@ -18,10 +18,15 @@ $moduleclassSfx = htmlspecialchars($params->get('moduleclass_sfx', ''), ENT_QUOT
 ?>
 <div class="mod-joomleague-standings<?php echo $moduleclassSfx; ?>">
 	<?php if (isset($standings['error'])) : ?>
+		<?php if ((int) $params->get('show_empty', 1) === 1) : ?>
 		<div class="alert alert-warning mb-0"><?php echo Text::_($standings['error']); ?></div>
+		<?php endif; ?>
 	<?php else : ?>
 		<?php if ((int) $params->get('show_project_name', 1) === 1 && isset($standings['project'])) : ?>
 			<div class="mod-joomleague-standings__title fw-bold mb-2"><?php echo htmlspecialchars((string) $standings['project']->name, ENT_QUOTES, 'UTF-8'); ?></div>
+		<?php endif; ?>
+		<?php if ((int) $params->get('show_stage_name', 0) === 1 && !empty($standings['stage'])) : ?>
+			<div class="small mb-2"><?php echo htmlspecialchars((string) $standings['stage']->name, ENT_QUOTES, 'UTF-8'); ?></div>
 		<?php endif; ?>
 		<?php
 		$columns = $standings['columns'];
@@ -42,7 +47,7 @@ $moduleclassSfx = htmlspecialchars($params->get('moduleclass_sfx', ''), ENT_QUOT
 		$columnBaseKey = static fn (array $column): string => 'COM_JOOMLEAGUE_STANDING_METRIC_' . strtoupper($column['type'] === 'combined' ? $column['prefix'] . '_combined' : $column['code']);
 		$columnFullLabel = static function (array $column) use ($resolveLabel, $columnBaseKey): string {
 			$base = $columnBaseKey($column);
-			return $resolveLabel($base) ?? $base;
+			return $resolveLabel($base) ?? (string) ($column['definition']['label'] ?? $column['code'] ?? $column['prefix']);
 		};
 		$columnLabel = static function (array $column) use ($shortLabels, $resolveLabel, $columnBaseKey, $columnFullLabel): string {
 			if ($shortLabels) {
@@ -72,9 +77,17 @@ $moduleclassSfx = htmlspecialchars($params->get('moduleclass_sfx', ''), ENT_QUOT
 		// always visible; earlier columns collapse below the "md" breakpoint
 		// instead of forcing the table to scroll sideways.
 		$responsiveClass = static fn (int $columnIndex): string => $responsiveColumns && $columnIndex < $columnCount - 1 ? ' d-none d-md-table-cell' : '';
+		$formatValue = static function (mixed $value, array $column): string {
+			if ($value === null) return Text::_('JNONE');
+			if (($column['code'] ?? '') === 'elapsed' && is_numeric($value)) {
+				$seconds = max(0, (int) round((float) $value));
+				return sprintf('%d:%02d:%02d', intdiv($seconds, 3600), intdiv($seconds % 3600, 60), $seconds % 60);
+			}
+			return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+		};
 		?>
 		<div class="table-responsive">
-			<table class="table table-sm table-striped align-middle mb-1">
+			<table class="table<?php echo $params->get('density', 'compact') === 'standard' ? '' : ' table-sm'; ?> table-striped align-middle mb-1">
 				<thead>
 					<tr>
 						<th><?php echo Text::_('MOD_JOOMLEAGUE_STANDINGS_COLUMN_RANK'); ?></th>
@@ -126,9 +139,19 @@ $moduleclassSfx = htmlspecialchars($params->get('moduleclass_sfx', ''), ENT_QUOT
 						// the entry cell needs its weight stated explicitly in both directions.
 						$entryStyle = 'font-weight:' . (($active && $highlightBold) ? 'bold' : 'normal') . ';' . $cellStyle;
 					?>
-						<tr>
+						<tr data-entry-id="<?php echo (int) $row->project_entry_id; ?>">
 							<td<?php echo $cellStyle !== '' ? ' style="' . $cellStyle . '"' : ''; ?>><?php echo (int) $row->rank_number; ?></td>
-							<th scope="row" style="<?php echo $entryStyle; ?>"><a class="link-body-emphasis" href="<?php echo Route::_('index.php?option=com_joomleague&view=participant&project_id=' . (int) $standings['project']->id . '&entry_id=' . (int) $row->project_entry_id); ?>"><?php echo htmlspecialchars((string) $row->entry_name_snapshot, ENT_QUOTES, 'UTF-8'); ?></a></th>
+							<th scope="row" style="<?php echo $entryStyle; ?>">
+								<?php if ((int) $params->get('show_images', 0) === 1 && !empty($row->image)) :
+									$imageSize = (int) $params->get('image_size', 32);
+									$imageSize = in_array($imageSize, [24, 32, 48, 64], true) ? $imageSize : 32;
+								?>
+									<img src="<?php echo htmlspecialchars($row->image, ENT_QUOTES, 'UTF-8'); ?>" width="<?php echo $imageSize; ?>" height="<?php echo $imageSize; ?>" alt="" loading="lazy" class="me-2" style="object-fit:contain">
+								<?php endif; ?>
+								<?php if ((int) $params->get('link_entry', 1) === 1) : ?><a class="link-body-emphasis"<?php echo $active ? ' style="color:' . $highlightColorText . '!important"' : ''; ?> href="<?php echo Route::_('index.php?option=com_joomleague&view=participant&project_id=' . (int) $standings['project']->id . '&entry_id=' . (int) $row->project_entry_id); ?>"><?php endif; ?>
+								<?php echo htmlspecialchars((string) $row->entry_name_snapshot, ENT_QUOTES, 'UTF-8'); ?>
+								<?php if ((int) $params->get('link_entry', 1) === 1) : ?></a><?php endif; ?>
+							</th>
 							<?php foreach ($columns as $i => $column) :
 								if ($column['type'] === 'combined') {
 									$forValue = $row->metrics[$column['for']] ?? null;
@@ -138,7 +161,7 @@ $moduleclassSfx = htmlspecialchars($params->get('moduleclass_sfx', ''), ENT_QUOT
 										: htmlspecialchars((string) $forValue, ENT_QUOTES, 'UTF-8') . ':' . htmlspecialchars((string) $againstValue, ENT_QUOTES, 'UTF-8');
 								} else {
 									$value = $row->metrics[$column['code']] ?? null;
-									$cellText = $value === null ? Text::_('JNONE') : htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+									$cellText = $formatValue($value, $column);
 								}
 							?>
 								<td class="text-center<?php echo $responsiveClass($i); ?>"<?php echo $cellStyle !== '' ? ' style="' . $cellStyle . '"' : ''; ?>><?php echo $cellText; ?></td>
@@ -155,5 +178,14 @@ $moduleclassSfx = htmlspecialchars($params->get('moduleclass_sfx', ''), ENT_QUOT
 				</tbody>
 			</table>
 		</div>
+		<?php if ((int) $params->get('show_legend', 0) === 1) : ?>
+			<dl class="row gx-0 small mt-2 mb-0 mod-joomleague-standings__legend">
+				<?php foreach ($columns as $column) : ?>
+					<dt class="col-4"><?php echo htmlspecialchars($columnLabel($column), ENT_QUOTES, 'UTF-8'); ?></dt>
+					<dd class="col-8"><?php echo htmlspecialchars($columnFullLabel($column), ENT_QUOTES, 'UTF-8'); ?></dd>
+				<?php endforeach; ?>
+				<?php if ($formEnabled) : ?><dt class="col-4"><?php echo htmlspecialchars($formHeaderFull, ENT_QUOTES, 'UTF-8'); ?></dt><dd class="col-8"><?php echo htmlspecialchars(implode(' / ', $formLabels), ENT_QUOTES, 'UTF-8'); ?></dd><?php endif; ?>
+			</dl>
+		<?php endif; ?>
 	<?php endif; ?>
 </div>

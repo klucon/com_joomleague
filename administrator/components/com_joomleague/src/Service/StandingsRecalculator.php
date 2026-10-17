@@ -122,7 +122,7 @@ final class StandingsRecalculator
 			->innerJoin($this->database->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = match.round_id')
 			->innerJoin($this->database->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = match.stage_id')
 			->innerJoin($this->database->quoteName('#__joomleague_match_result', 'result') . ' ON result.match_id = match.id')
-			->where('match.project_id = :project')->where('match.published = 1')->where('round.published = 1')->where('stage.published = 1')
+			->where('match.project_id = :project')->where('match.published = 1')->where("match.status_code <> 'cancelled'")->where('round.published = 1')->where('stage.published = 1')
 			->bind(':project', $projectId, ParameterType::INTEGER)->order('match.id ASC');
 		if ($stageId !== null) $query->where('match.stage_id = :stage')->bind(':stage', $stageId, ParameterType::INTEGER);
 		$matches = []; foreach ($this->database->setQuery($query)->loadObjectList() as $match) $matches[(int) $match->id] = ['status' => (string) $match->status_code, 'scheduled_start' => $match->scheduled_start, 'round_id' => (int) $match->round_id, 'round_name' => (string) $match->round_name, 'round_sequence' => (int) $match->round_sequence, 'participants' => [], 'segments' => [], 'statistics' => []];
@@ -136,16 +136,31 @@ final class StandingsRecalculator
 		$typedStageId = $stageId === null ? null : (int) $stageId;
 		$this->segments($matches, $typedProjectId, $typedStageId, $participantEntries);
 		$this->statistics($matches, $typedProjectId, $typedStageId, $participantEntries, $profile);
+		if (($profile['code'] ?? '') === 'carom') {
+			$facts = new CaromStandingsFacts();
+			foreach ($matches as &$match) foreach ($facts->forMatch($match) as $entryId => $statistics) $match['statistics'][$entryId] = array_replace($match['statistics'][$entryId] ?? [], $statistics);
+			unset($match);
+		}
 		return array_values($matches);
 	}
 
 	/** @param array<int,array<string,mixed>> $matches @param array<int,int> $participantEntries */
 	private function segments(array &$matches, int $projectId, ?int $stageId, array $participantEntries): void
 	{
-		$query = $this->database->getQuery(true)->select(['segment.id', 'segment.match_id', 'segment.level_code', 'segment.sequence_number', 'value.participant_id', 'value.numeric_value'])->from($this->database->quoteName('#__joomleague_match_score_segment', 'segment'))->innerJoin($this->database->quoteName('#__joomleague_project_match', 'match') . ' ON match.id = segment.match_id')->leftJoin($this->database->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id = segment.id')->where('segment.parent_id IS NOT NULL')->where('match.project_id = :project')->bind(':project', $projectId, ParameterType::INTEGER)->order('segment.id ASC');
+		$query = $this->database->getQuery(true)->select(['segment.id', 'segment.match_id', 'segment.level_code', 'segment.status_code', 'segment.sequence_number', 'value.participant_id', 'value.numeric_value', 'value.metadata_json'])->from($this->database->quoteName('#__joomleague_match_score_segment', 'segment'))->innerJoin($this->database->quoteName('#__joomleague_project_match', 'match') . ' ON match.id = segment.match_id')->leftJoin($this->database->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id = segment.id AND value.match_id = segment.match_id')->where('segment.parent_id IS NOT NULL')->where('match.project_id = :project')->bind(':project', $projectId, ParameterType::INTEGER)->order('segment.id ASC');
 		if ($stageId !== null) $query->where('match.stage_id = :stage')->bind(':stage', $stageId, ParameterType::INTEGER);
 		$segments = [];
-		foreach ($this->database->setQuery($query)->loadObjectList() as $row) { $matchId = (int) $row->match_id; if (!isset($matches[$matchId])) continue; $key = $matchId . ':' . (int) $row->id; $segments[$key] ??= ['code' => (string) $row->level_code, 'sequence' => (int) $row->sequence_number, 'values' => []]; if ($row->participant_id !== null && $row->numeric_value !== null && isset($participantEntries[(int) $row->participant_id])) $segments[$key]['values'][$participantEntries[(int) $row->participant_id]] = (string) $row->numeric_value; }
+		foreach ($this->database->setQuery($query)->loadObjectList() as $row) {
+			$matchId = (int) $row->match_id;
+			if (!isset($matches[$matchId])) continue;
+			$key = $matchId . ':' . (int) $row->id;
+			$segments[$key] ??= ['code' => (string) $row->level_code, 'status' => (string) $row->status_code, 'sequence' => (int) $row->sequence_number, 'values' => [], 'metadata' => []];
+			if ($row->participant_id === null || !isset($participantEntries[(int) $row->participant_id])) continue;
+			$entryId = $participantEntries[(int) $row->participant_id];
+			if ($row->numeric_value !== null) $segments[$key]['values'][$entryId] = (string) $row->numeric_value;
+			$metadata = json_decode((string) $row->metadata_json, true);
+			$segments[$key]['metadata'][$entryId] = is_array($metadata) ? $metadata : [];
+		}
 		foreach ($segments as $key => $segment) { $matchId = (int) explode(':', $key, 2)[0]; $matches[$matchId]['segments'][] = $segment; }
 	}
 

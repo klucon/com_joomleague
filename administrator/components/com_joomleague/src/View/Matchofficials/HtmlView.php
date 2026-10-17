@@ -15,7 +15,7 @@ use Joomla\CMS\Toolbar\ToolbarHelper;
 
 final class HtmlView extends BaseHtmlView
 {
-	public object $match; public object $project; public array $roles = []; public array $available = []; public array $assignments = []; public bool $canEdit = false;
+	public object $match; public object $project; public array $roles = []; public array $phases = []; public array $persons = []; public array $teams = []; public array $available = []; public array $assignments = []; public array $changes = []; public array $effectiveRoles = []; public bool $canEdit = false;
 	public function display($tpl = null): void
 	{
 		$app = Factory::getApplication();
@@ -25,7 +25,7 @@ final class HtmlView extends BaseHtmlView
 			$app->redirect(Route::_('index.php?option=com_joomleague&view=projects', false));
 			return;
 		}
-		try { $context = $this->getModel()->getContext($matchId); $this->match = $context['match']; $this->project = $context['project']; $this->roles = $context['roles']; $this->available = $this->getModel()->getAvailable($matchId); $this->assignments = $this->getModel()->getAssignments($matchId); }
+		try { $model = $this->getModel(); $context = $model->getContext($matchId); $actors = $model->getActors(); $this->match = $context['match']; $this->project = $context['project']; $this->roles = $context['roles']; $this->phases = $context['profile']['match']['score']['segment_types'] ?? []; $this->persons = $actors['persons']; $this->teams = $actors['teams']; $this->available = $model->getAvailable($matchId); $this->assignments = $model->getAssignments($matchId); $this->changes = $model->getChanges($matchId); $this->effectiveRoles = $model->getEffectiveRoles($matchId); }
 		catch (\Throwable $error) { throw new GenericDataException($error->getMessage(), 500); }
 		$projectAsset = 'com_joomleague.project.' . (int) ($this->project->id ?? 0);
 		$this->canEdit = Factory::getApplication()->getIdentity()->authorise('joomleague.project.manage.officials', $projectAsset);

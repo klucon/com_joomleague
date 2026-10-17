@@ -34,11 +34,41 @@ final class ParticipantStatisticReader
 		$personId = (int) ($entry->person_id ?? 0);
 		$query = $db->getQuery(true)->select(['value.statistic_code', 'MAX(value.statistic_name_key) AS name_key', 'MAX(value.abbreviation_key) AS abbreviation_key', 'MAX(value.value_type) AS value_type', 'MAX(value.scope_code) AS scope_code', 'COUNT(DISTINCT value.match_id) AS appearances', 'SUM(value.numeric_value) AS total_value', 'AVG(value.numeric_value) AS average_value', 'MIN(value.numeric_value) AS minimum_value', 'MAX(value.numeric_value) AS maximum_value'])
 			->from($db->quoteName('#__joomleague_match_statistic_value', 'value'))->innerJoin($db->quoteName('#__joomleague_project_match', 'item') . ' ON item.id=value.match_id AND item.published=1')
-			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id=item.id AND result.status_code='final'")
+			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id=item.id AND result.status_code='final' AND item.status_code <> 'cancelled'")
 			->innerJoin($db->quoteName('#__joomleague_match_participant', 'participant') . ' ON participant.id=value.match_participant_id AND participant.published=1')
 			->where('value.project_id=:projectId')->where('participant.project_entry_id=:entryId')->where('value.published=1')->where('value.numeric_value IS NOT NULL')->where('value.segment_key=0')
 			->where("(value.target_kind='participant' OR (value.target_kind='person' AND :entryKind='person' AND value.person_id=:personId))")
 			->group('value.statistic_code')->order('value.statistic_code ASC')->bind(':projectId', $projectId, ParameterType::INTEGER)->bind(':entryId', $entryId, ParameterType::INTEGER)->bind(':entryKind', $entry->entry_kind)->bind(':personId', $personId, ParameterType::INTEGER);
-		return ['entry' => $entry, 'rows' => $db->setQuery($query)->loadObjectList()];
+		$rows = $db->setQuery($query)->loadObjectList();
+		return ['entry' => $entry, 'rows' => $rows, 'carom_summary' => $this->caromSummary((int) $projectId, (int) $entryId)];
+	}
+
+	private function caromSummary(int $projectId, int $entryId): ?array
+	{
+		$db = $this->database;
+		$payload = $db->setQuery($db->getQuery(true)->select('version.payload_json')
+			->from($db->quoteName('#__joomleague_project', 'project'))
+			->innerJoin($db->quoteName('#__joomleague_sport_profile_version', 'version') . ' ON version.id=project.profile_version_id')
+			->where('project.id=:projectId')->bind(':projectId', $projectId, ParameterType::INTEGER))->loadResult();
+		$profile = json_decode((string) $payload, true);
+		if (($profile['code'] ?? '') !== 'carom') return null;
+		$query = $db->getQuery(true)->select(['segment.id', 'segment.level_code', 'segment.status_code', 'value.numeric_value', 'value.metadata_json'])
+			->from($db->quoteName('#__joomleague_match_score_segment', 'segment'))
+			->innerJoin($db->quoteName('#__joomleague_project_match', 'item') . ' ON item.id=segment.match_id AND item.published=1')
+			->innerJoin($db->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id=item.stage_id AND stage.published=1')
+			->innerJoin($db->quoteName('#__joomleague_project_round', 'round') . ' ON round.id=item.round_id AND round.published=1')
+			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id=item.id AND result.status_code='final' AND item.status_code <> 'cancelled'")
+			->innerJoin($db->quoteName('#__joomleague_match_participant', 'participant') . ' ON participant.match_id=item.id AND participant.published=1')
+			->leftJoin($db->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id=segment.id AND value.participant_id=participant.id AND value.match_id=item.id')
+			->where('item.project_id=:projectId')->where('participant.project_entry_id=:entryId')
+			->where("segment.level_code='duel'")->where("segment.status_code='completed'")
+			->order('segment.id ASC')->bind(':projectId', $projectId, ParameterType::INTEGER)->bind(':entryId', $entryId, ParameterType::INTEGER);
+		$segments = []; $values = [];
+		foreach ($db->setQuery($query)->loadObjectList() as $row) {
+			$segments[] = $row;
+			$row->metadata = json_decode((string) $row->metadata_json, true) ?: [];
+			$values[(int) $row->id][$entryId] = $row;
+		}
+		return (new \Joomleague\Component\Joomleague\Administrator\Service\CaromEncounterSummary())->summarize($segments, $values, [$entryId])[$entryId];
 	}
 }

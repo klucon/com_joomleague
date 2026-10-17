@@ -13,7 +13,7 @@ final class ClubsModel extends ListModel
 {
 	public function __construct($config = [])
 	{
-		$config['filter_fields'] ??= ['id', 'a.id', 'name', 'a.name', 'short_name', 'a.short_name', 'country_code', 'a.country_code', 'published', 'a.published', 'ordering', 'a.ordering'];
+		$config['filter_fields'] ??= ['id', 'a.id', 'name', 'a.name', 'short_name', 'a.short_name', 'country_code', 'a.country_code', 'published', 'a.published', 'ordering', 'a.ordering', 'team_count'];
 		parent::__construct($config);
 	}
 
@@ -58,7 +58,7 @@ final class ClubsModel extends ListModel
 			}
 		}
 
-		$query->order($database->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . ($this->getState('list.direction') === 'desc' ? 'DESC' : 'ASC'));
+		$query->order($database->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC'));
 
 		return $query;
 	}

@@ -75,7 +75,7 @@ final class ProjectNavigationReader
 		$counts['results'] = (int) $db->setQuery(
 			$db->getQuery(true)->select('COUNT(*)')->from($db->quoteName('#__joomleague_match_result', 'result'))
 				->innerJoin($db->quoteName('#__joomleague_project_match', 'item') . ' ON item.id = result.match_id AND item.published = 1')
-				->where('item.project_id = :projectId')->where("result.status_code = 'final'")
+				->where('item.project_id = :projectId')->where("result.status_code = 'final'")->where("item.status_code <> 'cancelled'")
 				->bind(':projectId', $projectId, ParameterType::INTEGER)
 		)->loadResult();
 		$counts['statistics'] = (int) $db->setQuery(

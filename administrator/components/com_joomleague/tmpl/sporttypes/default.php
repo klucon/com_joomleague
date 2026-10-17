@@ -13,7 +13,7 @@ $user = Factory::getApplication()->getIdentity();
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
 ?>
-<form action="<?php echo Route::_('index.php?option=com_joomleague&view=sporttypes'); ?>" method="post" name="adminForm" id="adminForm">
+<form action="<?php echo Route::_('index.php?option=com_joomleague&view=sporttypes'); ?>" method="post" name="adminForm" id="adminForm" class="js-stools-form">
 	<?php echo LayoutHelper::render('joomla.searchtools.default', ['view' => $this]); ?>
 	<div class="table-responsive">
 		<table class="table table-striped" id="sporttypeList">
@@ -52,6 +52,6 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 	</div>
 	<?php echo $this->pagination->getListFooter(); ?>
 	<input type="hidden" name="task" value=""><input type="hidden" name="boxchecked" value="0">
-	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"><input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>">
+	
 	<?php echo HTMLHelper::_('form.token'); ?>
 </form>

@@ -1,0 +1,78 @@
+import { readFileSync } from 'node:fs';
+import { firefox } from '/mnt/disk-a/dev/uklid/2026-09-19/office-browser-tests/node_modules/playwright-core/index.mjs';
+
+const fixture = JSON.parse(process.argv[2]);
+const credentials = readFileSync('/mnt/disk-a/pswd/2026-joomla-joomla62-ai-developer.md', 'utf8');
+const value = name => credentials.match(new RegExp(`^- ${name}:\\s*(.+)$`, 'm'))[1].replace(/^`|`$/g, '');
+const origin = process.env.JOOMLEAGUE_TEST_ORIGIN || 'https://joomla62.klucon.cz';
+const url = `${origin}/administrator/index.php?option=com_joomleague&view=sportvariants&id=${fixture.variant}`;
+const browser = await firefox.launch({ headless: true });
+try {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.stack || error.message));
+    await page.goto(`${origin}/administrator/`);
+    await page.locator('#mod-login-username').fill(value('Username'));
+    await page.locator('#mod-login-password').fill(value('Password'));
+    await page.locator('#form-login button[type=submit]').click();
+    await page.waitForURL(u => !u.searchParams.has('task'));
+    await page.goto(`${origin}/administrator/index.php?option=com_joomleague&view=sportvariants`);
+    const basketball = await page.locator('#variant-sport option').filter({ hasText: /^Basketball$|^Basketbal$/ }).getAttribute('value');
+    await page.locator('#variant-sport').selectOption(basketball);
+    await page.locator('#variant-name').fill(`Browser creation ${fixture.variant}`);
+    await page.locator('#variant-code').fill(`browser-variant-create-${fixture.variant}`);
+    await page.locator('button[value="sportvariants.create"]').click();
+    await page.locator('#variant-uuid').waitFor();
+    if (!(await page.locator('button[value="sportvariants.publish"]').isDisabled())) throw new Error('Empty variant can be published.');
+    await page.goto(url);
+    if (/COM_JOOMLEAGUE_|Fatal error|SQLSTATE/.test(await page.locator('main').innerText())) throw new Error('Untranslated variant view or runtime error.');
+    if (await page.locator('form form').count()) throw new Error('Nested forms.');
+    if (!/^[0-9a-f-]{36}$/.test(await page.locator('#variant-uuid').inputValue())) throw new Error('Missing immutable UUID.');
+    await page.locator('#variant-base').selectOption(String(fixture.base));
+    await page.locator('button').filter({ hasText: /Load profile rules|Načíst pravidla profilu/ }).click();
+    await page.locator('#variant-revision').fill('3.0.0');
+    const players = page.locator('label.form-label').filter({ hasText: /^Players on the field$|^Hráči na hřišti$/ });
+    const key = await players.getAttribute('for');
+    await page.locator(`#${key}-enabled`).check();
+    await page.locator(`#${key}`).fill('4');
+    await page.locator('button[value="sportvariants.revision"]').click();
+    await page.locator('table tr').filter({ has: page.locator('th', { hasText: /^3\.0\.0$/ }) }).waitFor();
+    await page.goto(`${origin}/administrator/index.php?option=com_joomleague&view=project&layout=edit&id=${fixture.project}&profile_check=1`);
+    await page.locator('#profile-acknowledge').check();
+    await page.locator('button[form="profile-migration-form"]').click();
+    await page.waitForURL(u => u.searchParams.get('view') === 'project' && !u.searchParams.has('task'));
+    if (!(await page.locator('#jform_sport_variant_version_id option:checked').textContent()).includes('3.0.0')) throw new Error('Confirmed variant migration was not reflected in the pinned project selector.');
+    if (await page.locator('button[form="profile-migration-form"]').count()) throw new Error('Applied revision is still offered for migration.');
+    await page.goto(url);
+    await page.locator('#variant-base').selectOption(String(fixture.base));
+    await page.locator('button').filter({ hasText: /Load profile rules|Načíst pravidla profilu/ }).click();
+    await page.locator('#variant-revision').fill('4.0.0');
+    await page.locator(`#${key}-enabled`).check();
+    await page.locator(`#${key}`).fill('3');
+    await page.locator('button[value="sportvariants.revision"]').click();
+    await page.locator('table tr').filter({ has: page.locator('th', { hasText: /^4\.0\.0$/ }) }).waitFor();
+    await page.screenshot({ path: '/mnt/disk-a/dev/com_joomleague_6-2-0/dist/sport-variants.png', fullPage: true });
+    for (const task of ['sportvariants.create', 'sportvariants.revision', 'sportvariants.publish', 'projectprofile.migrate']) {
+        const response = await page.request.post(`${origin}/administrator/index.php?option=com_joomleague`, { form: { task } });
+        if (response.status() !== 403) throw new Error(`Missing CSRF protection for ${task}.`);
+    }
+    await page.goto(`${origin}/administrator/index.php?option=com_joomleague&view=project&layout=edit&id=${fixture.project}`);
+    if (/COM_JOOMLEAGUE_|Fatal error|SQLSTATE/.test(await page.locator('main').innerText())) throw new Error('Project form has untranslated labels or errors.');
+    if (!(await page.locator('#jform_sport_variant_version_id').isDisabled())) throw new Error('Existing project variant is editable.');
+    await page.goto(`${origin}/administrator/index.php?option=com_joomleague&view=project&layout=edit&id=${fixture.project}&profile_check=1`);
+    const reviewText = await page.locator('main').textContent();
+    if (!reviewText.includes('4.0.0') || !reviewText.includes('/lineup/players_on_field')) throw new Error('Variant revision differences are missing from the project preview.');
+    if (/COM_JOOMLEAGUE_|Fatal error|SQLSTATE/.test(reviewText)) throw new Error('Variant preview contains untranslated labels or runtime errors.');
+    if (await page.locator('button[form="profile-migration-form"]').count()) throw new Error('Read-only variant preview exposes migration apply.');
+    await page.goto(`${origin}/administrator/index.php?option=com_joomleague&view=project&layout=edit`);
+    if (await page.locator('#jform_sport_variant_version_id').isDisabled()) throw new Error('New project variant selection is disabled.');
+    if (!(await page.locator('#jform_sport_variant_version_id option').filter({ hasText: /Variant fixture/ }).count())) throw new Error('Published variant is missing from new project selection.');
+    await page.goto(url);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ path: '/mnt/disk-a/dev/com_joomleague_6-2-0/dist/sport-variants-mobile.png', fullPage: true });
+    await page.locator('button[value="sportvariants.publish"]').click();
+    if (errors.length) throw new Error(errors.join('\n'));
+    console.log('Firefox variant rules, immutable history, project selectors, translations and CSRF OK.');
+} finally {
+    await browser.close();
+}

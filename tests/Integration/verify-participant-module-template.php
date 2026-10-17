@@ -23,6 +23,7 @@ $container->alias('session', 'session.cli')
 	->alias(Joomla\Session\Session::class, 'session.cli')
 	->alias(Joomla\Session\SessionInterface::class, 'session.cli');
 Factory::$application = $container->get(Joomla\CMS\Application\SiteApplication::class);
+Factory::getApplication()->createExtensionNamespaceMap();
 Factory::getApplication()->bootComponent('com_joomleague');
 
 require_once JPATH_ROOT . '/components/com_joomleague/src/Service/ProjectTemplateProvider.php';
@@ -48,8 +49,7 @@ foreach ($rows as $row) {
 	}
 }
 if ($fixture === null) {
-	printf("Participant module template SKIP: no participant-profile fixture\n");
-	exit(0);
+	throw new RuntimeException('Participant module template FAIL: required participant-profile fixture is missing.');
 }
 
 $summary = (new ParticipantHelper())->getSummary(new Registry([

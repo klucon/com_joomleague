@@ -14,10 +14,14 @@ final class HtmlView extends BaseHtmlView
 {
 	/** @var list<object> */
 	public array $items = [];
+	public array $categories = [];
+	public array $assignments = [];
 
 	public function display($tpl = null): void
 	{
 		$this->items = $this->getModel()->getItems();
+		$this->categories = $this->getModel()->getCategories();
+		$this->assignments = $this->getModel()->getCategoryAssignments();
 		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_SPORTPROFILES_TITLE'), 'puzzle-piece');
 		ToolbarHelper::custom('sportprofiles.synchronise', 'refresh', '', 'COM_JOOMLEAGUE_SPORTPROFILES_SYNC_ACTION', false);
 		parent::display($tpl);

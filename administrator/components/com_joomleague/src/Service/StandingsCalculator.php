@@ -29,7 +29,7 @@ final class StandingsCalculator
 			$id = filter_var($entry['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 			if ($id === false || isset($rows[$id]) || !is_string($entry['name'] ?? null)) throw new \InvalidArgumentException('Standings entry is invalid.');
 			if (($entry['included'] ?? true) !== true) continue;
-			$initial = []; foreach ($metricDefinitions as $code => $definition) $initial[$code] = in_array($definition['operation'], ['best_rank', 'status_order'], true) ? null : '0';
+			$initial = []; foreach ($metricDefinitions as $code => $definition) $initial[$code] = in_array($definition['operation'], ['best_rank', 'status_order', 'max_statistic'], true) ? null : '0';
 			$rows[$id] = ['id' => $id, 'name' => trim($entry['name']), 'rank' => 0, 'metrics' => $initial];
 		}
 		$eligibleStatuses = array_fill_keys($contract['included_result_statuses'], true);
@@ -62,14 +62,65 @@ final class StandingsCalculator
 		}
 		foreach ($rows as &$row) foreach ($metricDefinitions as $code => $definition) {
 			if ($definition['operation'] === 'difference') $row['metrics'][$code] = StandingsDecimal::subtract($row['metrics'][$definition['left_metric']] ?? '0', $row['metrics'][$definition['right_metric']] ?? '0');
-			if ($definition['operation'] === 'ratio') $row['metrics'][$code] = StandingsDecimal::divide($row['metrics'][$definition['left_metric']] ?? '0', $row['metrics'][$definition['right_metric']] ?? '0');
+			if ($definition['operation'] === 'ratio') $row['metrics'][$code] = ($row['metrics'][$definition['left_metric']] === null || $row['metrics'][$definition['right_metric']] === null) ? null : StandingsDecimal::divide($row['metrics'][$definition['left_metric']], $row['metrics'][$definition['right_metric']]);
 		}
 		unset($row);
 		$rows = array_values($rows); $ordering = $contract['ordering'];
-		usort($rows, fn (array $left, array $right): int => $this->compareRows($left, $right, $ordering, true));
+		if (array_filter($ordering, static fn (array $clause): bool => ($clause['scope'] ?? 'overall') === 'head_to_head') !== []) {
+			$matchIndex = [];
+			foreach ($matches as $index => $match) foreach ($match['participants'] ?? [] as $participant) $matchIndex[(int) ($participant['entry_id'] ?? 0)][$index] = true;
+			$groups = $this->orderedGroups($rows, $ordering, $metricDefinitions, $contract, $matches, $matchIndex, $scope);
+			$ranked = [];
+			foreach ($groups as $group) {
+				$rank = count($ranked) + 1;
+				foreach ($group as $row) { $row['rank'] = $rank; $ranked[] = $row; }
+			}
+			return $ranked;
+		}
+		usort($rows, fn (array $left, array $right): int => $this->compareRows($left, $right, $ordering, true, $metricDefinitions));
 		$previous = null;
-		foreach ($rows as $index => &$row) { $row['rank'] = $previous !== null && $this->compareRows($previous, $row, $ordering, false) === 0 ? $previous['rank'] : $index + 1; $previous = $row; }
+		foreach ($rows as $index => &$row) { $row['rank'] = $previous !== null && $this->compareRows($previous, $row, $ordering, false, $metricDefinitions) === 0 ? $previous['rank'] : $index + 1; $previous = $row; }
 		return $rows;
+	}
+
+	/** Partition ties before applying each criterion; pairwise mini-tables are not transitive. */
+	private function orderedGroups(array $rows, array $ordering, array $definitions, array $contract, array $matches, array $matchIndex, ?string $scope, ?array $miniRows = null): array
+	{
+		if (count($rows) < 2 || $ordering === []) {
+			usort($rows, static fn (array $left, array $right): int => strnatcasecmp($left['name'], $right['name']) ?: ($left['id'] <=> $right['id']));
+			return [$rows];
+		}
+		$clause = array_shift($ordering);
+		if (($clause['scope'] ?? 'overall') === 'head_to_head') {
+			if ($miniRows === null) {
+				$ids = array_fill_keys(array_column($rows, 'id'), true);
+				$candidates = [];
+				foreach ($ids as $id => $_) $candidates += $matchIndex[$id] ?? [];
+				$miniMatches = [];
+				foreach ($candidates as $index => $_) {
+					$participants = $matches[$index]['participants'] ?? [];
+					if (count($participants) === 2 && isset($ids[(int) $participants[0]['entry_id']], $ids[(int) $participants[1]['entry_id']])) $miniMatches[] = $matches[$index];
+				}
+				$miniContract = $contract;
+				$miniContract['ordering'] = [['metric' => $clause['metric'], 'direction' => $clause['direction'], 'nulls' => $clause['nulls']]];
+				$miniRows = array_column($this->calculate($miniContract, $rows, $miniMatches, $scope), null, 'id');
+			}
+			$comparisonRows = $miniRows;
+		} else {
+			$miniRows = null;
+			$comparisonRows = array_column($rows, null, 'id');
+		}
+		$compare = fn (array $left, array $right): int => $this->compareRows($comparisonRows[$left['id']], $comparisonRows[$right['id']], [$clause], false, $definitions);
+		usort($rows, $compare);
+		$partitions = []; $previous = null;
+		foreach ($rows as $row) {
+			if ($previous === null || $compare($previous, $row) !== 0) $partitions[] = [];
+			$partitions[array_key_last($partitions)][] = $row;
+			$previous = $row;
+		}
+		$result = [];
+		foreach ($partitions as $partition) array_push($result, ...$this->orderedGroups($partition, $ordering, $definitions, $contract, $matches, $matchIndex, $scope, $miniRows));
+		return $result;
 	}
 
 	/** @param list<array<string,mixed>> $scopes @return array<string,mixed> */
@@ -144,6 +195,16 @@ final class StandingsCalculator
 		$operation = $definition['operation'];
 		if (in_array($operation, ['difference', 'ratio'], true)) return;
 		if (isset($definition['when']) && !$this->condition($definition['when'], $facts)) return;
+		if (in_array($operation, ['sum_statistic', 'max_statistic'], true)) {
+			$statistic = $definition['statistic_code'] ?? '';
+			if (!array_key_exists($statistic, $facts['statistics'])) return;
+			$value = $facts['statistics'][$statistic];
+			if ($operation === 'max_statistic') {
+				if ($value !== null && ($metrics[$code] === null || StandingsDecimal::compare((string) $value, $metrics[$code]) > 0)) $metrics[$code] = StandingsDecimal::normalize((string) $value);
+			} elseif ($value === null || $metrics[$code] === null) $metrics[$code] = null;
+			else $metrics[$code] = StandingsDecimal::add($metrics[$code], (string) $value);
+			return;
+		}
 		if ($operation === 'best_rank' || $operation === 'status_order') {
 			$value = $operation === 'best_rank' ? $facts['participant']['result_rank'] : array_search($facts['participant']['status'], $definition['status_precedence'], true);
 			if ($value === null || $value === false) return; $value = (string) $value;
@@ -215,12 +276,20 @@ final class StandingsCalculator
 	}
 
 	/** @param list<array<string,string>> $ordering */
-	private function compareRows(array $left, array $right, array $ordering, bool $fallback): int
+	private function compareRows(array $left, array $right, array $ordering, bool $fallback, array $metricDefinitions): int
 	{
 		foreach ($ordering as $clause) {
 			$leftValue = $left['metrics'][$clause['metric']] ?? null; $rightValue = $right['metrics'][$clause['metric']] ?? null;
-			if ($leftValue === null || $rightValue === null) { if ($leftValue === $rightValue) continue; $result = $leftValue === null ? ($clause['nulls'] === 'first' ? -1 : 1) : ($clause['nulls'] === 'first' ? 1 : -1); }
-			else $result = StandingsDecimal::compare($leftValue, $rightValue);
+			if ($leftValue === null || $rightValue === null) {
+				if ($leftValue === $rightValue) continue;
+				return $leftValue === null ? ($clause['nulls'] === 'first' ? -1 : 1) : ($clause['nulls'] === 'first' ? 1 : -1);
+			}
+			else {
+				$definition = $metricDefinitions[$clause['metric']];
+				$result = $definition['operation'] === 'ratio'
+					? StandingsDecimal::compareRatios($left['metrics'][$definition['left_metric']], $left['metrics'][$definition['right_metric']], $right['metrics'][$definition['left_metric']], $right['metrics'][$definition['right_metric']])
+					: StandingsDecimal::compare($leftValue, $rightValue);
+			}
 			if ($result !== 0) return $clause['direction'] === 'desc' ? -$result : $result;
 		}
 		if (!$fallback) return 0;

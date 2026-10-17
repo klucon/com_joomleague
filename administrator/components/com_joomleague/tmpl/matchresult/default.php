@@ -5,8 +5,10 @@ defined('_JEXEC') or die;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Domain\Service\DecimalDisplayFormatter;
 
 $context = $this->context;
+$this->getDocument()->getWebAssetManager()->useScript('com_joomleague.matchresult');
 $state = $context['form_state'];
 $participantNames = [];
 
@@ -30,17 +32,46 @@ $renderSegment = function (array $segment, string $path, string $locator) use (&
 		<input type="hidden" name="<?php echo $this->escape($path); ?>[level_code]" value="<?php echo $this->escape($segment['level_code']); ?>">
 		<input type="hidden" name="<?php echo $this->escape($path); ?>[sequence_number]" value="<?php echo (int) $segment['sequence_number']; ?>">
 		<input type="hidden" name="<?php echo $this->escape($path); ?>[required]" value="<?php echo $segment['required'] ? 1 : 0; ?>">
+		<?php if ($segment['level_code'] === 'duel' && is_array($context['editor_schema']['encounter'] ?? null)) :
+			$contract = $context['editor_schema']['encounter'];
+			$nomination = [];
+			foreach ($context['form_state']['duels'] ?? [] as $duel) if ($duel['sequence_number'] === (int) $segment['sequence_number']) $nomination = $duel;
+			$selected = [];
+			foreach ($nomination['sides'] ?? [] as $side) $selected[(int) $side['participant_id']] = $side['lineup_member_ids'];
+		?>
+		<div class="row g-3 mb-3">
+		<div class="col-md-6"><label class="form-label" for="<?php echo $this->escape($id . '_format'); ?>"><?php echo Text::_('COM_JOOMLEAGUE_ENCOUNTER_FORMAT'); ?></label><select class="form-select" id="<?php echo $this->escape($id . '_format'); ?>" name="<?php echo $this->escape($path); ?>[encounter_format]">
+		<?php foreach ($contract['formats'] as $format => $size) : ?><option value="<?php echo $this->escape($format); ?>"<?php echo ($nomination['format_code'] ?? array_key_first($contract['formats'])) === $format ? ' selected' : ''; ?>><?php echo $this->escape(Text::sprintf('COM_JOOMLEAGUE_ENCOUNTER_FORMAT_SIZE', $size)); ?></option><?php endforeach; ?></select></div>
+		<div class="col-md-6"><label class="form-label" for="<?php echo $this->escape($id . '_duel_status'); ?>"><?php echo Text::_('COM_JOOMLEAGUE_ENCOUNTER_STATUS'); ?></label><select class="form-select" id="<?php echo $this->escape($id . '_duel_status'); ?>" name="<?php echo $this->escape($path); ?>[duel_status]">
+		<?php foreach (['completed', 'cancelled', 'walkover'] as $status) : ?><option value="<?php echo $this->escape($status); ?>"<?php echo ($segment['status_code'] ?? 'completed') === $status ? ' selected' : ''; ?>><?php echo $this->escape(Text::_('COM_JOOMLEAGUE_ENCOUNTER_STATUS_' . strtoupper($status))); ?></option><?php endforeach; ?></select></div>
+		<?php foreach ($participantNames as $team => $name) : ?><fieldset class="col-md-6"><legend class="h6"><?php echo $this->escape($name); ?></legend>
+		<?php for ($slot = 0; $slot < max($contract['formats']); $slot++) : $fieldId = $id . '_team_' . $team . '_player_' . $slot; ?>
+		<label class="form-label" for="<?php echo $this->escape($fieldId); ?>"><?php echo $this->escape(Text::sprintf('COM_JOOMLEAGUE_ENCOUNTER_PLAYER', $slot + 1)); ?></label><select class="form-select mb-2" id="<?php echo $this->escape($fieldId); ?>" name="<?php echo $this->escape($path); ?>[nominations][<?php echo (int) $team; ?>][]"><option value=""><?php echo Text::_('JNONE'); ?></option>
+		<?php foreach ($context['encounter_roster'] as $member) : if ((int) $member['match_participant_id'] !== (int) $team) continue; ?><option value="<?php echo (int) $member['id']; ?>"<?php echo (int) ($selected[$team][$slot] ?? 0) === (int) $member['id'] ? ' selected' : ''; ?>><?php echo $this->escape(trim($member['last_name'] . ' ' . $member['first_name'])); ?></option><?php endforeach; ?></select>
+		<?php endfor; ?></fieldset><?php endforeach; ?>
+		</div><p class="form-text"><?php echo Text::_('COM_JOOMLEAGUE_ENCOUNTER_HELP'); ?></p>
+		<?php endif; ?>
 		<?php if ($segment['level_code'] !== 'result' && !$segment['required'] && $segment['condition_code'] === null) : ?>
 		<div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox" value="1" id="<?php echo $this->escape($id . '_included'); ?>" name="<?php echo $this->escape($path); ?>[included]"<?php echo $segment['included'] ? ' checked' : ''; ?>><label class="form-check-label" for="<?php echo $this->escape($id . '_included'); ?>"><?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_INCLUDE_SEGMENT'); ?></label></div>
 		<?php elseif ($segment['required']) : ?><input type="hidden" name="<?php echo $this->escape($path); ?>[included]" value="1"><?php endif; ?>
 		<?php if ($editorControl !== 'none') : ?>
 		<div class="table-responsive"><table class="table align-middle"><thead><tr><th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_PARTICIPANT'); ?></th><?php if ($editorControl !== 'status_rank') : ?><th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_VALUE'); ?></th><?php endif; ?><th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_RANK'); ?></th><th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_PARTICIPANT_STATUS'); ?></th></tr></thead><tbody>
 		<?php foreach ($segment['values'] as $value) : $participantId = (int) $value['participant_id']; $valuePath = $path . '[values][' . $participantId . ']'; ?>
+		<?php $value['numeric_value'] = DecimalDisplayFormatter::format($value['numeric_value'] ?? ''); ?>
 		<tr><th scope="row"><?php echo $this->escape($participantNames[$participantId] ?? Text::sprintf('COM_JOOMLEAGUE_MATCHRESULT_UNKNOWN_PARTICIPANT', $participantId)); ?></th>
 		<?php if ($editorControl !== 'status_rank') : ?><td>
 		<?php if ($editorControl === 'text') : ?><input class="form-control" type="text" maxlength="255" name="<?php echo $this->escape($valuePath); ?>[text_value]" value="<?php echo $this->escape((string) ($value['text_value'] ?? '')); ?>" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_VALUE'); ?>">
 		<?php elseif ($editorControl === 'duration') : ?><input class="form-control" type="text" inputmode="decimal" maxlength="20" placeholder="<?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_DURATION_PLACEHOLDER'); ?>" name="<?php echo $this->escape($valuePath); ?>[duration_value]" value="<?php echo $this->escape((string) ($value['duration_value'] ?? '')); ?>" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_VALUE'); ?>"><div class="form-text"><?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_DURATION_DESC'); ?></div>
-		<?php else : ?><input class="form-control" type="number" step="<?php echo $segment['value_type'] === 'integer' ? '1' : '0.001'; ?>" name="<?php echo $this->escape($valuePath); ?>[numeric_value]" value="<?php echo $this->escape((string) ($value['numeric_value'] ?? '')); ?>" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_VALUE'); ?>"><?php endif; ?>
+		<?php else : ?><input class="form-control" type="number"<?php echo isset($context['editor_schema']['encounter']) && $segment['level_code'] === 'result' ? ' readonly' : ''; ?> step="<?php echo $segment['value_type'] === 'integer' ? '1' : '0.001'; ?>" name="<?php echo $this->escape($valuePath); ?>[numeric_value]" value="<?php echo $this->escape((string) ($value['numeric_value'] ?? '')); ?>" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_VALUE'); ?>"><?php endif; ?>
+		<?php foreach ($segmentTypes[$segment['level_code']]['value_fields'] ?? [] as $field => $definition) : $fieldId = $id . '_' . $participantId . '_' . $field; ?>
+		<label class="form-label mt-2" for="<?php echo $this->escape($fieldId); ?>"><?php echo $this->escape(Text::_($definition['name_key'])); ?></label>
+		<?php if (($definition['reference'] ?? '') === 'encounter_lineup') : ?>
+		<select class="form-select" id="<?php echo $this->escape($fieldId); ?>" name="<?php echo $this->escape($valuePath . '[metadata][' . $field . ']'); ?>"><option value=""><?php echo Text::_('JNONE'); ?></option>
+		<?php foreach ($context['encounter_roster'] as $member) : if ((int) $member['match_participant_id'] !== $participantId) continue; ?>
+		<option value="<?php echo (int) $member['id']; ?>"<?php echo (int) ($value['metadata'][$field] ?? 0) === (int) $member['id'] ? ' selected' : ''; ?>><?php echo $this->escape(trim($member['last_name'] . ' ' . $member['first_name'])); ?></option>
+		<?php endforeach; ?></select>
+		<?php else : ?><input class="form-control" type="number" step="1" min="<?php echo (int) $definition['minimum']; ?>" max="<?php echo (int) $definition['maximum']; ?>" id="<?php echo $this->escape($fieldId); ?>" name="<?php echo $this->escape($valuePath . '[metadata][' . $field . ']'); ?>" value="<?php echo $this->escape((string) ($value['metadata'][$field] ?? '')); ?>"><?php endif; ?>
+		<?php endforeach; ?>
 		</td><?php endif; ?><td><input class="form-control" type="number" min="1" step="1" name="<?php echo $this->escape($valuePath); ?>[result_rank]" value="<?php echo $this->escape((string) ($value['result_rank'] ?? '')); ?>" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_RANK'); ?>"></td><td><select class="form-select" name="<?php echo $this->escape($valuePath); ?>[status_code]" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_PARTICIPANT_STATUS'); ?>"><option value=""><?php echo Text::_('JNONE'); ?></option><?php foreach ($context['editor_schema']['participant_statuses'] as $status) : ?><option value="<?php echo $this->escape($status); ?>"<?php echo ($value['status_code'] ?? null) === $status ? ' selected' : ''; ?>><?php echo $this->escape($codeLabel($status)); ?></option><?php endforeach; ?></select></td></tr>
 		<?php endforeach; ?></tbody></table></div>
 		<?php endif; ?>
@@ -58,14 +89,14 @@ $renderSegment = function (array $segment, string $path, string $locator) use (&
 			if (!$canAdd) continue;
 			$addUrl = 'index.php?option=com_joomleague&segment_locator=' . rawurlencode($locator) . '&segment_code=' . rawurlencode((string) $childType['code']);
 			?>
-			<button type="submit" class="btn btn-success btn-sm me-2 mb-2" name="task" value="matchresult.addSegment" formaction="<?php echo $this->escape(Route::_($addUrl, false)); ?>"><span class="icon-plus" aria-hidden="true"></span> <?php echo $this->escape(Text::sprintf('COM_JOOMLEAGUE_MATCHRESULT_ADD_SEGMENT', Text::_((string) $childType['name_key']))); ?></button>
+			<button type="submit" class="btn btn-success btn-sm me-2 mb-2" data-result-task="matchresult.addSegment" formaction="<?php echo $this->escape(Route::_($addUrl, false)); ?>"><span class="icon-plus" aria-hidden="true"></span> <?php echo $this->escape(Text::sprintf('COM_JOOMLEAGUE_MATCHRESULT_ADD_SEGMENT', Text::_((string) $childType['name_key']))); ?></button>
 		<?php endforeach; ?>
 		<?php
 		$currentType = $segmentTypes[$segment['level_code']] ?? null;
 		if ($segment['level_code'] !== 'result' && is_array($currentType) && ($currentType['repeatable'] ?? false) === true && !isset($currentType['expected_count']) && $segment['included']) :
 			$removeUrl = 'index.php?option=com_joomleague&segment_locator=' . rawurlencode($locator);
 			?>
-			<button type="submit" class="btn btn-danger btn-sm mb-2" name="task" value="matchresult.removeSegment" formaction="<?php echo $this->escape(Route::_($removeUrl, false)); ?>"><span class="icon-minus" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_REMOVE_SEGMENT'); ?></button>
+			<button type="submit" class="btn btn-danger btn-sm mb-2" data-result-task="matchresult.removeSegment" formaction="<?php echo $this->escape(Route::_($removeUrl, false)); ?>"><span class="icon-minus" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_MATCHRESULT_REMOVE_SEGMENT'); ?></button>
 		<?php endif; ?>
 	</section>
 	<?php
@@ -87,6 +118,7 @@ $renderSegment = function (array $segment, string $path, string $locator) use (&
 	</fieldset>
 	<?php endif; ?>
 	<input type="hidden" name="jform[result_type]" value="<?php echo $this->escape($state['result_type']); ?>">
+	<?php if (isset($context['editor_schema']['encounter'])) : ?><input type="hidden" name="jform[encounter_revision]" value="<?php echo $this->escape((string) ($state['encounter_revision'] ?? 'new')); ?>"><?php endif; ?>
 	<input type="hidden" name="jform[finalized_at]" value="<?php echo $this->escape((string) ($state['finalized_at'] ?? '')); ?>">
 	<?php echo $renderSegment($state['segments'][0], 'jform[segments][0]', 'result:1'); ?>
 	<div class="mb-3"><label class="form-label" for="jform_notes"><?php echo Text::_('COM_JOOMLEAGUE_FIELD_NOTES_LABEL'); ?></label><textarea class="form-control" id="jform_notes" name="jform[notes]" rows="4"><?php echo $this->escape((string) ($state['notes'] ?? '')); ?></textarea></div>

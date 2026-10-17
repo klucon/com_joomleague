@@ -17,12 +17,13 @@ $report = [
 		'duration_minutes' => 90,
 		'status_code' => 'scheduled',
 		'venue_name' => 'Universal venue',
+		'venue_url' => 'https://example.test/venue/2',
 		'competition_name' => 'Universal competition',
 		'description' => '<p>Public description</p>',
 	],
 	'participants' => [
-		(object) ['name' => 'Demo Team', 'team_id' => 4, 'person_id' => null],
-		(object) ['name' => 'Alex Example', 'team_id' => null, 'person_id' => 8],
+		(object) ['name' => 'Demo Team', 'team_id' => 4, 'person_id' => null, 'schema_url' => 'https://example.test/team/4'],
+		(object) ['name' => 'Alex Example', 'team_id' => null, 'person_id' => 8, 'schema_url' => 'https://example.test/person/8'],
 	],
 ];
 
@@ -39,8 +40,10 @@ $assert(($schema['startDate'] ?? null) === '2026-09-05T17:00:00+02:00', 'Timezon
 $assert(($schema['endDate'] ?? null) === '2026-09-05T18:30:00+02:00', 'Duration-derived end date is invalid.');
 $assert(($schema['eventStatus'] ?? null) === 'https://schema.org/EventScheduled', 'Event status is invalid.');
 $assert(($schema['location']['@type'] ?? null) === 'Place', 'Venue schema is invalid.');
-$assert(($schema['performer'][0]['@type'] ?? null) === 'Organization', 'Team performer type is invalid.');
+$assert(($schema['location']['url'] ?? null) === 'https://example.test/venue/2', 'Venue canonical URL is missing.');
+$assert(($schema['performer'][0]['@type'] ?? null) === 'SportsTeam', 'Team performer type is invalid.');
 $assert(($schema['performer'][1]['@type'] ?? null) === 'Person', 'Person performer type is invalid.');
+$assert(($schema['performer'][0]['url'] ?? null) === 'https://example.test/team/4', 'Team canonical URL is missing.');
 $assert(($schema['description'] ?? null) === 'Public description', 'Description was not sanitized.');
 $assert((new EventSchemaBuilder())->build([], 'https://example.test') === [], 'Invalid report must not generate schema.');
 

@@ -13,6 +13,19 @@ use Joomla\CMS\Session\Session;
 
 final class SportprofilesController extends BaseController
 {
+	public function categories(): void
+	{
+		if (!Session::checkToken()) throw new \RuntimeException(Text::_('JINVALID_TOKEN'), 403);
+		if (!$this->app->getIdentity()->authorise('core.edit', 'com_joomleague')) throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
+		try {
+			$this->getModel('Sportprofiles')->assignCategories($this->input->post->get('cid', [], 'array'), $this->input->post->get('category_ids', [], 'array'));
+			$this->app->enqueueMessage(Text::_('COM_JOOMLEAGUE_SPORTCATEGORY_ASSIGN_SAVED'));
+		} catch (\Throwable $error) {
+			$this->app->enqueueMessage($error instanceof \InvalidArgumentException ? $error->getMessage() : Text::_('COM_JOOMLEAGUE_SPORTCATEGORY_SAVE_FAILED'), 'error');
+		}
+		$this->setRedirect(Route::_('index.php?option=com_joomleague&view=sportprofiles', false));
+	}
+
 	public function synchronise(): void
 	{
 		Session::checkToken() or jexit(Text::_('JINVALID_TOKEN'));

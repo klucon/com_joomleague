@@ -36,6 +36,9 @@ $payload = static fn (string $type): array => [
 $mutator = new MatchResultFormStateMutator();
 $tennis = $loadSchema('tennis');
 $result = $mutator->add($payload('nested_score'), $tennis, 'result:1', 'set');
+if ($result['segments'][0]['children'][0]['segment_type_ordinal'] !== 10) {
+	throw new RuntimeException('A newly added set lost its schema ordering.');
+}
 $result = $mutator->add($result, $tennis, 'result:1/set:1', 'game');
 $result = $mutator->add($result, $tennis, 'result:1/set:1/game:1', 'point');
 

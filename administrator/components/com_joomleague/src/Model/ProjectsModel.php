@@ -13,7 +13,7 @@ final class ProjectsModel extends ListModel
 {
 	public function __construct($config = [])
 	{
-		$config['filter_fields'] ??= ['id', 'a.id', 'name', 'a.name', 'competition', 'competition.name', 'season', 'season.name', 'sport_type', 'sport_type.name', 'project_type', 'a.project_type', 'lifecycle_state', 'a.lifecycle_state', 'published', 'a.published', 'ordering', 'a.ordering'];
+		$config['filter_fields'] ??= ['id', 'a.id', 'name', 'a.name', 'competition', 'competition.name', 'season', 'season.name', 'sport_type', 'sport_type.name', 'project_type', 'a.project_type', 'lifecycle_state', 'a.lifecycle_state', 'published', 'a.published', 'ordering', 'a.ordering', 'override_count'];
 		parent::__construct($config);
 	}
 
@@ -36,6 +36,7 @@ final class ProjectsModel extends ListModel
 			->select([$db->quoteName('profile.name_key', 'profile_name_key'), $db->quoteName('version.profile_version'), $db->quoteName('editor.name', 'editor_name')])
 			->select('(' . $ruleCount . ') AS rule_override_count')
 			->select('(' . $templateCount . ') AS template_override_count')
+			->select('((' . $ruleCount . ') + (' . $templateCount . ')) AS override_count')
 			->from($db->quoteName('#__joomleague_project', 'a'))
 			->innerJoin($db->quoteName('#__joomleague_competition', 'competition') . ' ON competition.id = a.competition_id')
 			->innerJoin($db->quoteName('#__joomleague_season', 'season') . ' ON season.id = a.season_id')
@@ -76,7 +77,7 @@ final class ProjectsModel extends ListModel
 			}
 		}
 
-		$query->order($db->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . ($this->getState('list.direction') === 'desc' ? 'DESC' : 'ASC'));
+		$query->order($db->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC'));
 		return $query;
 	}
 }

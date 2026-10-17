@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "running_race",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE",
     "description_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_DESC",
     "scoring_model": "time",
@@ -20,8 +20,7 @@
         "default_kind": "person",
         "members_supported": true,
         "member_person_types": [
-            "participant",
-            "staff"
+            "participant"
         ]
     },
     "project_rule_schema": {
@@ -215,7 +214,8 @@
             "lineup_group": "participant",
             "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_PARTICIPANT",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "guide_runner",
@@ -223,47 +223,80 @@
             "lineup_group": "participant",
             "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_GUIDE_RUNNER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "organizer",
-            "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_ORGANIZER"
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_ORGANIZER",
+            "role_domain": "event_staff",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "race_director",
-            "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_RACE_DIRECTOR"
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_RACE_DIRECTOR",
+            "role_domain": "event_staff",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "course_manager",
-            "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_COURSE_MANAGER"
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_COURSE_MANAGER",
+            "role_domain": "event_staff",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "medical_staff",
-            "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_MEDICAL_STAFF"
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_MEDICAL_STAFF",
+            "role_domain": "event_staff",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "timekeeper",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_TIMEKEEPER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_TIMEKEEPER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "start_referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_START_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_START_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "finish_referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_FINISH_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_FINISH_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "course_referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_COURSE_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUNNING_RACE_POSITION_COURSE_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [

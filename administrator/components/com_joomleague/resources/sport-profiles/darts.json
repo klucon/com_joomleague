@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "darts",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS",
     "description_key": "COM_JOOMLEAGUE_PROFILE_DARTS_DESC",
     "scoring_model": "legs_sets",
@@ -235,17 +235,26 @@
         {
             "code": "player",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_POSITION_PLAYER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_POSITION_PLAYER",
+            "role_domain": "participant"
         },
         {
             "code": "caller",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_POSITION_CALLER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_POSITION_CALLER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "marker",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_POSITION_MARKER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_DARTS_POSITION_MARKER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -339,7 +348,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true
         },

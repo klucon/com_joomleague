@@ -13,6 +13,39 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_sport_profile` (
   KEY `idx_jl_sport_profile_published` (`published`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `#__joomleague_sport_category` (
+ `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+ `uuid` CHAR(36) NOT NULL,
+ `code` VARCHAR(100) NOT NULL,
+ `parent_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+ `name` VARCHAR(255) NOT NULL,
+ `description` TEXT NOT NULL,
+ `published` TINYINT NOT NULL DEFAULT 1,
+ `ordering` INT NOT NULL DEFAULT 0,
+ `created` DATETIME NOT NULL,
+ `created_by` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+ `modified` DATETIME NULL DEFAULT NULL,
+ `modified_by` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `uq_jl_sport_category_uuid` (`uuid`),
+ UNIQUE KEY `uq_jl_sport_category_code` (`code`),
+ KEY `idx_jl_sport_category_parent` (`parent_id`),
+ CONSTRAINT `fk_jl_sport_category_parent` FOREIGN KEY (`parent_id`) REFERENCES `#__joomleague_sport_category` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS `#__joomleague_sport_category_lock` (
+ `id` INT NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+INSERT INTO `#__joomleague_sport_category_lock` (`id`) VALUES (1);
+CREATE TABLE IF NOT EXISTS `#__joomleague_sport_profile_category` (
+ `profile_id` BIGINT UNSIGNED NOT NULL,
+ `category_id` BIGINT UNSIGNED NOT NULL,
+ PRIMARY KEY (`profile_id`, `category_id`),
+ KEY `idx_jl_profile_category_category` (`category_id`),
+ CONSTRAINT `fk_jl_profile_category_profile` FOREIGN KEY (`profile_id`) REFERENCES `#__joomleague_sport_profile` (`id`) ON DELETE CASCADE,
+ CONSTRAINT `fk_jl_profile_category_category` FOREIGN KEY (`category_id`) REFERENCES `#__joomleague_sport_category` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `#__joomleague_sport_profile_version` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `profile_id` BIGINT UNSIGNED NOT NULL,
@@ -30,6 +63,43 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_sport_profile_version` (
   CONSTRAINT `fk_jl_profile_version_profile`
     FOREIGN KEY (`profile_id`) REFERENCES `#__joomleague_sport_profile` (`id`)
     ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `#__joomleague_sport_variant` (
+ `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+ `uuid` CHAR(36) NOT NULL,
+ `profile_id` BIGINT UNSIGNED NOT NULL,
+ `code` VARCHAR(100) NOT NULL,
+ `name` VARCHAR(255) NOT NULL,
+ `published` TINYINT NOT NULL DEFAULT 0,
+ `created` DATETIME NOT NULL,
+ `created_by` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `uq_jl_variant_uuid` (`uuid`),
+ UNIQUE KEY `uq_jl_variant_code` (`profile_id`, `code`),
+ CONSTRAINT `fk_jl_variant_profile` FOREIGN KEY (`profile_id`) REFERENCES `#__joomleague_sport_profile` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `#__joomleague_sport_variant_version` (
+ `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+ `variant_id` BIGINT UNSIGNED NOT NULL,
+ `base_profile_version_id` BIGINT UNSIGNED NOT NULL,
+ `compiled_profile_version_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+ `revision` VARCHAR(50) NOT NULL,
+ `overrides_json` LONGTEXT NOT NULL,
+ `overrides_checksum` CHAR(64) NOT NULL,
+ `base_checksum` CHAR(64) NOT NULL,
+ `payload_json` LONGTEXT NOT NULL,
+ `payload_checksum` CHAR(64) NOT NULL,
+ `created` DATETIME NOT NULL,
+ `created_by` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `uq_jl_variant_revision` (`variant_id`, `revision`),
+ UNIQUE KEY `uq_jl_variant_compiled_binding` (`id`, `compiled_profile_version_id`),
+ KEY `idx_jl_variant_base` (`base_profile_version_id`),
+ CONSTRAINT `fk_jl_variant_revision_variant` FOREIGN KEY (`variant_id`) REFERENCES `#__joomleague_sport_variant` (`id`) ON DELETE RESTRICT,
+ CONSTRAINT `fk_jl_variant_compiled_profile` FOREIGN KEY (`compiled_profile_version_id`) REFERENCES `#__joomleague_sport_profile_version` (`id`) ON DELETE RESTRICT,
+ CONSTRAINT `fk_jl_variant_revision_base` FOREIGN KEY (`base_profile_version_id`) REFERENCES `#__joomleague_sport_profile_version` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `#__joomleague_sport_type` (
@@ -61,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_sport_position` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, `uuid` CHAR(36) NOT NULL,
   `sport_type_id` BIGINT UNSIGNED NOT NULL, `source_profile_version_id` BIGINT UNSIGNED NULL DEFAULT NULL,
   `code` VARCHAR(100) NOT NULL, `name` VARCHAR(255) NOT NULL DEFAULT '', `name_key` VARCHAR(255) NULL DEFAULT NULL,
-  `person_type` VARCHAR(100) NOT NULL, `lineup_group` VARCHAR(100) NULL DEFAULT NULL,
+  `person_type` VARCHAR(100) NOT NULL, `role_domain` VARCHAR(100) NOT NULL, `lineup_group` VARCHAR(100) NULL DEFAULT NULL,
   `parent_id` BIGINT UNSIGNED NULL DEFAULT NULL, `has_events` TINYINT NULL DEFAULT NULL, `has_statistics` TINYINT NULL DEFAULT NULL,
   `source` VARCHAR(30) NOT NULL DEFAULT 'local', `source_checksum` CHAR(64) NULL DEFAULT NULL,
   `published` TINYINT NOT NULL DEFAULT 1, `ordering` INT NOT NULL DEFAULT 0,
@@ -210,6 +280,7 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_project` (
   `season_id` BIGINT UNSIGNED NOT NULL,
   `sport_type_id` BIGINT UNSIGNED NOT NULL,
   `profile_version_id` BIGINT UNSIGNED NOT NULL,
+  `sport_variant_version_id` BIGINT UNSIGNED NULL DEFAULT NULL,
   `name` VARCHAR(255) NOT NULL,
   `alias` VARCHAR(255) NOT NULL DEFAULT '',
   `code` VARCHAR(100) NULL DEFAULT NULL,
@@ -246,12 +317,30 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_project` (
     FOREIGN KEY (`competition_id`) REFERENCES `#__joomleague_competition` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `fk_jl_project_season`
     FOREIGN KEY (`season_id`) REFERENCES `#__joomleague_season` (`id`) ON DELETE RESTRICT,
-  CONSTRAINT `fk_jl_project_sport_binding`
-    FOREIGN KEY (`sport_type_id`, `profile_version_id`)
-    REFERENCES `#__joomleague_sport_type` (`id`, `profile_version_id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_jl_project_sport_type`
+    FOREIGN KEY (`sport_type_id`) REFERENCES `#__joomleague_sport_type` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_jl_project_profile_version`
+    FOREIGN KEY (`profile_version_id`) REFERENCES `#__joomleague_sport_profile_version` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_jl_project_variant_binding` FOREIGN KEY (`sport_variant_version_id`, `profile_version_id`) REFERENCES `#__joomleague_sport_variant_version` (`id`, `compiled_profile_version_id`) ON DELETE RESTRICT,
   CONSTRAINT `chk_jl_project_dates` CHECK (`end_date` IS NULL OR `start_date` IS NULL OR `end_date` >= `start_date`),
   CONSTRAINT `chk_jl_project_auto_advance` CHECK (`auto_advance_seconds` IS NULL OR `auto_advance_seconds` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `#__joomleague_project_profile_migration` (
+ `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+ `project_id` BIGINT UNSIGNED NOT NULL,
+ `from_version_id` BIGINT UNSIGNED NOT NULL,
+ `to_version_id` BIGINT UNSIGNED NOT NULL,
+ `review_checksum` CHAR(64) NOT NULL,
+ `changes_json` LONGTEXT NOT NULL,
+ `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `created_by` BIGINT UNSIGNED NOT NULL,
+ PRIMARY KEY (`id`),
+ KEY `idx_jl_profile_migration_project` (`project_id`, `id`),
+ CONSTRAINT `fk_jl_profile_migration_project` FOREIGN KEY (`project_id`) REFERENCES `#__joomleague_project` (`id`) ON DELETE CASCADE,
+ CONSTRAINT `fk_jl_profile_migration_from` FOREIGN KEY (`from_version_id`) REFERENCES `#__joomleague_sport_profile_version` (`id`) ON DELETE RESTRICT,
+ CONSTRAINT `fk_jl_profile_migration_to` FOREIGN KEY (`to_version_id`) REFERENCES `#__joomleague_sport_profile_version` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `#__joomleague_project_stage` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -527,6 +616,8 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_person` (
   `country_code` VARCHAR(8) NULL DEFAULT NULL,
   `birth_date` DATE NULL DEFAULT NULL,
   `death_date` DATE NULL DEFAULT NULL,
+  `height_cm` DECIMAL(6,2) NULL DEFAULT NULL,
+  `weight_kg` DECIMAL(6,2) NULL DEFAULT NULL,
   `picture` VARCHAR(255) NULL DEFAULT NULL,
   `description` TEXT NULL,
   `external_code` VARCHAR(191) NULL DEFAULT NULL,
@@ -547,6 +638,8 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_person` (
   KEY `idx_jl_person_state` (`published`, `ordering`),
   KEY `idx_jl_person_club` (`club_id`),
   CONSTRAINT `chk_jl_person_dates` CHECK (`death_date` IS NULL OR `birth_date` IS NULL OR `death_date` >= `birth_date`),
+  CONSTRAINT `chk_jl_person_height` CHECK (`height_cm` IS NULL OR (`height_cm` >= 20 AND `height_cm` <= 300)),
+  CONSTRAINT `chk_jl_person_weight` CHECK (`weight_kg` IS NULL OR (`weight_kg` >= 1 AND `weight_kg` <= 500)),
   CONSTRAINT `fk_jl_person_club` FOREIGN KEY (`club_id`) REFERENCES `#__joomleague_club` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
@@ -755,7 +848,7 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_match_lineup_change` (
 CREATE TABLE IF NOT EXISTS `#__joomleague_project_actor_role` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, `uuid` CHAR(36) NOT NULL, `project_id` BIGINT UNSIGNED NOT NULL,
   `actor_kind` VARCHAR(20) NOT NULL, `person_id` BIGINT UNSIGNED NULL DEFAULT NULL, `team_id` BIGINT UNSIGNED NULL DEFAULT NULL,
-  `role_code` VARCHAR(100) NOT NULL, `person_type` VARCHAR(100) NOT NULL,
+  `role_code` VARCHAR(100) NOT NULL, `person_type` VARCHAR(100) NOT NULL, `role_domain` VARCHAR(100) NOT NULL,
   `valid_from` DATE NULL DEFAULT NULL, `valid_until` DATE NULL DEFAULT NULL, `lifecycle_state` VARCHAR(30) NOT NULL DEFAULT 'active',
   `notes` TEXT NULL, `metadata_json` LONGTEXT NULL, `published` TINYINT NOT NULL DEFAULT 1, `ordering` INT NOT NULL DEFAULT 0,
   `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, `created_by` BIGINT UNSIGNED NOT NULL DEFAULT 0,
@@ -775,11 +868,12 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_match_actor_role` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, `uuid` CHAR(36) NOT NULL, `match_id` BIGINT UNSIGNED NOT NULL, `project_id` BIGINT UNSIGNED NOT NULL,
   `source_project_actor_role_id` BIGINT UNSIGNED NULL DEFAULT NULL, `actor_kind` VARCHAR(20) NOT NULL,
   `person_id` BIGINT UNSIGNED NULL DEFAULT NULL, `team_id` BIGINT UNSIGNED NULL DEFAULT NULL,
-  `role_code` VARCHAR(100) NOT NULL, `person_type` VARCHAR(100) NOT NULL, `display_name_snapshot` VARCHAR(255) NOT NULL,
+  `role_code` VARCHAR(100) NOT NULL, `person_type` VARCHAR(100) NOT NULL, `role_domain` VARCHAR(100) NOT NULL,
+  `delegation_status` VARCHAR(30) NOT NULL DEFAULT 'delegated', `display_name_snapshot` VARCHAR(255) NOT NULL,
   `notes` TEXT NULL, `metadata_json` LONGTEXT NULL, `published` TINYINT NOT NULL DEFAULT 1, `ordering` INT NOT NULL DEFAULT 0,
   `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, `created_by` BIGINT UNSIGNED NOT NULL DEFAULT 0,
   `modified` DATETIME NULL DEFAULT NULL, `modified_by` BIGINT UNSIGNED NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`), UNIQUE KEY `uq_jl_match_actor_role_uuid` (`uuid`),
+  PRIMARY KEY (`id`), UNIQUE KEY `uq_jl_match_actor_role_uuid` (`uuid`), UNIQUE KEY `uq_jl_match_actor_role_scope` (`id`, `match_id`),
   UNIQUE KEY `uq_jl_match_actor_role_source` (`match_id`, `source_project_actor_role_id`),
   KEY `idx_jl_match_actor_role_match` (`match_id`, `person_type`, `ordering`), KEY `idx_jl_match_actor_role_project` (`project_id`),
   KEY `idx_jl_match_actor_role_person` (`person_id`), KEY `idx_jl_match_actor_role_team` (`team_id`),
@@ -788,6 +882,29 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_match_actor_role` (
   CONSTRAINT `fk_jl_match_actor_role_person` FOREIGN KEY (`person_id`) REFERENCES `#__joomleague_person` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `fk_jl_match_actor_role_team` FOREIGN KEY (`team_id`) REFERENCES `#__joomleague_team` (`id`) ON DELETE RESTRICT,
   CONSTRAINT `chk_jl_match_actor_role_actor` CHECK ((`actor_kind` = 'person' AND `person_id` IS NOT NULL AND `team_id` IS NULL) OR (`actor_kind` = 'team' AND `team_id` IS NOT NULL AND `person_id` IS NULL))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `#__joomleague_match_actor_role_change` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, `uuid` CHAR(36) NOT NULL,
+  `match_id` BIGINT UNSIGNED NOT NULL, `project_id` BIGINT UNSIGNED NOT NULL,
+  `outgoing_match_actor_role_id` BIGINT UNSIGNED NULL DEFAULT NULL, `incoming_match_actor_role_id` BIGINT UNSIGNED NOT NULL,
+  `role_code` VARCHAR(100) NOT NULL, `role_domain` VARCHAR(100) NOT NULL, `sequence_number` INT UNSIGNED NOT NULL,
+  `phase_code` VARCHAR(100) NULL DEFAULT NULL, `phase_sequence` INT UNSIGNED NULL DEFAULT NULL,
+  `clock_value` DECIMAL(30,9) NULL DEFAULT NULL, `clock_unit` VARCHAR(50) NULL DEFAULT NULL,
+  `occurred_at` DATETIME NULL DEFAULT NULL, `reason_code` VARCHAR(100) NOT NULL DEFAULT 'other', `notes` TEXT NULL,
+  `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, `created_by` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`), UNIQUE KEY `uq_jl_match_actor_change_uuid` (`uuid`), UNIQUE KEY `uq_jl_match_actor_change_sequence` (`match_id`, `sequence_number`),
+  KEY `idx_jl_match_actor_change_role` (`match_id`, `role_domain`, `role_code`),
+  KEY `idx_jl_match_actor_change_outgoing` (`outgoing_match_actor_role_id`, `match_id`),
+  KEY `idx_jl_match_actor_change_incoming` (`incoming_match_actor_role_id`, `match_id`),
+  CONSTRAINT `fk_jl_match_actor_change_match` FOREIGN KEY (`match_id`, `project_id`) REFERENCES `#__joomleague_project_match` (`id`, `project_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_jl_match_actor_change_outgoing` FOREIGN KEY (`outgoing_match_actor_role_id`, `match_id`) REFERENCES `#__joomleague_match_actor_role` (`id`, `match_id`) ON DELETE RESTRICT,
+  CONSTRAINT `fk_jl_match_actor_change_incoming` FOREIGN KEY (`incoming_match_actor_role_id`, `match_id`) REFERENCES `#__joomleague_match_actor_role` (`id`, `match_id`) ON DELETE RESTRICT,
+  CONSTRAINT `chk_jl_match_actor_change_people` CHECK (`outgoing_match_actor_role_id` IS NULL OR `outgoing_match_actor_role_id` <> `incoming_match_actor_role_id`),
+  CONSTRAINT `chk_jl_match_actor_change_sequence` CHECK (`sequence_number` > 0),
+  CONSTRAINT `chk_jl_match_actor_change_phase` CHECK (`phase_sequence` IS NULL OR `phase_sequence` > 0),
+  CONSTRAINT `chk_jl_match_actor_change_clock` CHECK (`clock_value` IS NULL OR `clock_value` >= 0),
+  CONSTRAINT `chk_jl_match_actor_change_clock_unit` CHECK ((`clock_value` IS NULL AND `clock_unit` IS NULL) OR (`clock_value` IS NOT NULL AND `clock_unit` IS NOT NULL))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `#__joomleague_match_event` (
@@ -1082,4 +1199,43 @@ CREATE TABLE IF NOT EXISTS `#__joomleague_migration_issue` (
   CONSTRAINT `fk_jl_migration_issue_record`
     FOREIGN KEY (`record_id`) REFERENCES `#__joomleague_migration_record` (`id`)
     ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `#__joomleague_match_duel` (
+ `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+ `uuid` CHAR(36) NOT NULL,
+ `match_id` BIGINT UNSIGNED NOT NULL,
+ `sequence_number` INT NOT NULL,
+ `format_code` VARCHAR(64) NOT NULL,
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `uq_jl_duel_uuid` (`uuid`),
+ UNIQUE KEY `uq_jl_duel_sequence` (`match_id`, `sequence_number`),
+ UNIQUE KEY `uq_jl_duel_scope` (`id`, `match_id`),
+ CONSTRAINT `fk_jl_duel_match` FOREIGN KEY (`match_id`) REFERENCES `#__joomleague_project_match` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `#__joomleague_match_duel_member` (
+ `duel_id` BIGINT UNSIGNED NOT NULL,
+ `match_id` BIGINT UNSIGNED NOT NULL,
+ `match_participant_id` BIGINT UNSIGNED NOT NULL,
+ `lineup_member_id` BIGINT UNSIGNED NOT NULL,
+ `ordering` INT NOT NULL,
+ PRIMARY KEY (`duel_id`, `lineup_member_id`),
+ UNIQUE KEY `uq_jl_duel_member_order` (`duel_id`, `match_participant_id`, `ordering`),
+ CONSTRAINT `fk_jl_duel_member_duel` FOREIGN KEY (`duel_id`, `match_id`) REFERENCES `#__joomleague_match_duel` (`id`, `match_id`) ON DELETE CASCADE,
+ CONSTRAINT `fk_jl_duel_member_lineup` FOREIGN KEY (`lineup_member_id`, `match_id`, `match_participant_id`) REFERENCES `#__joomleague_match_lineup_member` (`id`, `match_id`, `match_participant_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `#__joomleague_match_encounter_revision` (
+ `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+ `uuid` CHAR(36) NOT NULL,
+ `match_id` BIGINT UNSIGNED NOT NULL,
+ `payload_json` LONGTEXT NOT NULL,
+ `checksum` CHAR(64) NOT NULL,
+ `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `created_by` BIGINT UNSIGNED NOT NULL DEFAULT 0,
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `uq_jl_encounter_revision_uuid` (`uuid`),
+ KEY `idx_jl_encounter_revision_match` (`match_id`, `id`),
+ CONSTRAINT `fk_jl_encounter_revision_match` FOREIGN KEY (`match_id`) REFERENCES `#__joomleague_project_match` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;

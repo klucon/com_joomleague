@@ -62,19 +62,20 @@ final class Pkg_JoomleagueInstallerScript
 	{
 		$language = Factory::getApplication()->getLanguage();
 		$source = (string) $adapter->getParent()->getPath('source');
-		$loaded = false;
+		foreach (array_unique(array_filter([$source, JPATH_SITE])) as $basePath) {
+			// Joomla may return false for a missing translation even after loading fallback strings.
+			if (!$language->load('pkg_joomleague', $basePath, 'en-GB', true, false)) {
+				continue;
+			}
 
-		if ($source !== '') {
-			$loaded = $language->load('pkg_joomleague', $source, null, true);
+			if ($language->getTag() !== 'en-GB') {
+				$language->load('pkg_joomleague', $basePath, $language->getTag(), true, false);
+			}
+
+			return;
 		}
 
-		if (!$loaded) {
-			$loaded = $language->load('pkg_joomleague', JPATH_SITE, null, true);
-		}
-
-		if (!$loaded) {
-			throw new RuntimeException('Unable to load the JoomLeague package language.');
-		}
+		throw new RuntimeException('Unable to load the JoomLeague package language.');
 	}
 
 	/** @param list<array{label: string, passed: bool}> $checks */
@@ -94,10 +95,10 @@ final class Pkg_JoomleagueInstallerScript
 
 		echo '<section class="mb-4">'
 			. '<div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3"><div>'
-			. '<div class="text-uppercase text-muted small fw-bold mb-1">' . $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_REPORT_LABEL')) . '</div>'
-			. '<h2 class="h4 mb-1"><span class="icon-shield" aria-hidden="true"></span> '
-			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_PREFLIGHT_TITLE')) . '</h2>'
-			. '<p class="text-muted mb-0">' . $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_PREFLIGHT_DESC')) . '</p></div>'
+			. '<div class="text-uppercase text-white small fw-bold mb-1 opacity-75">' . $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_REPORT_LABEL')) . '</div>'
+			. '<h2 class="h4 mb-1 d-flex align-items-center gap-2"><span class="icon-shield" aria-hidden="true"></span><span>'
+			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_PREFLIGHT_TITLE')) . '</span></h2>'
+			. '<p class="text-white mb-0 opacity-75">' . $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_PREFLIGHT_DESC')) . '</p></div>'
 			. '<span class="badge text-bg-dark">' . $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_VERSION')) . '</span></div>'
 			. '<div class="row g-2">' . $items . '</div></section>';
 	}
@@ -118,7 +119,7 @@ final class Pkg_JoomleagueInstallerScript
 			$areaItems .= '<div class="col-12 col-lg-4"><article class="card h-100 shadow-sm border-0"><div class="card-body">'
 				. '<div class="text-success mb-3"><span class="' . $area['icon'] . ' fs-2" aria-hidden="true"></span></div>'
 				. '<h3 class="h5">' . $this->escape(Text::_($area['title'])) . '</h3>'
-				. '<p class="text-muted mb-0">' . $this->escape(Text::_($area['description'])) . '</p>'
+				. '<p class="text-body-secondary mb-0">' . $this->escape(Text::_($area['description'])) . '</p>'
 				. '</div></article></div>';
 		}
 
@@ -133,7 +134,7 @@ final class Pkg_JoomleagueInstallerScript
 			$stepItems .= '<div class="col-12 col-lg-4"><div class="d-flex gap-3 h-100">'
 				. '<span class="badge rounded-circle text-bg-primary fs-3 px-3 py-2 shadow-sm align-self-start">' . $step['number'] . '</span><div class="pt-1">'
 				. '<h3 class="h6 mb-1">' . $this->escape(Text::_($step['title'])) . '</h3>'
-				. '<p class="text-muted small mb-0">' . $this->escape(Text::_($step['description'])) . '</p>'
+				. '<p class="text-white small mb-0 opacity-75">' . $this->escape(Text::_($step['description'])) . '</p>'
 				. '</div></div></div>';
 		}
 
@@ -143,26 +144,26 @@ final class Pkg_JoomleagueInstallerScript
 		$modulesUrl = 'index.php?option=com_modules&view=modules&client_id=0';
 
 		echo '<section class="mb-4">'
-			. '<div class="alert alert-success d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 p-4 mb-4" role="status">'
-			. '<div><div class="text-uppercase small fw-bold mb-1"><span class="icon-check-circle" aria-hidden="true"></span> '
-			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_REPORT_LABEL')) . '</div>'
-			. '<h2 class="h3 mb-1">' . $this->escape($title) . '</h2><p class="mb-0">' . $this->escape($description) . '</p></div>'
-			. '<a class="btn btn-success btn-lg flex-shrink-0" href="' . $this->escape($dashboardUrl) . '"><span class="text-white"><span class="icon-home" aria-hidden="true"></span> '
-			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_OPEN_DASHBOARD')) . '</span></a></div>'
+			. '<div class="alert alert-success d-flex flex-column flex-lg-row align-items-stretch p-0 mb-4 overflow-hidden" role="status">'
+			. '<div class="d-flex flex-grow-1 align-items-stretch">'
+			. '<div class="d-flex align-items-center justify-content-center px-3 border-end border-success-subtle"><span class="icon-check-circle fs-3" aria-hidden="true"></span></div>'
+			. '<div class="p-3"><h2 class="h3 mb-1">' . $this->escape($title) . '</h2><p class="mb-0">' . $this->escape($description) . '</p></div></div>'
+			. '<div class="d-flex align-items-center p-3 pt-0 pt-lg-3"><a class="btn btn-dark btn-lg flex-shrink-0 d-inline-flex align-items-center gap-2 text-decoration-none" href="' . $this->escape($dashboardUrl) . '"><span class="icon-home" aria-hidden="true"></span><span>'
+			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_OPEN_DASHBOARD')) . '</span></a></div></div>'
 			. '<div class="row g-3 mb-4">' . $areaItems . '</div>'
-			. '<div class="border-top border-bottom py-4 mb-4"><h2 class="h5 mb-3"><span class="icon-lightbulb" aria-hidden="true"></span> '
-			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_NEXT_TITLE')) . '</h2><div class="row g-4">' . $stepItems . '</div></div>'
+			. '<div class="border-top border-bottom py-4 mb-4"><h2 class="h5 mb-3 d-flex align-items-center gap-2"><span class="icon-lightbulb" aria-hidden="true"></span><span>'
+			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_NEXT_TITLE')) . '</span></h2><div class="row g-4">' . $stepItems . '</div></div>'
 			. '<div class="d-flex flex-wrap gap-2">'
-			. '<a class="btn btn-primary" href="' . $this->escape($profilesUrl) . '"><span class="text-white"><span class="icon-list" aria-hidden="true"></span> '
+			. '<a class="btn btn-primary d-inline-flex align-items-center gap-2 text-decoration-none" href="' . $this->escape($profilesUrl) . '"><span class="icon-list" aria-hidden="true"></span><span>'
 			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_OPEN_PROFILES')) . '</span></a>'
-			. '<a class="btn btn-outline-primary" href="' . $this->escape($settingsUrl) . '"><span class="icon-options" aria-hidden="true"></span> '
-			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_OPEN_SETTINGS')) . '</a>'
-			. '<a class="btn btn-outline-secondary" href="' . $this->escape($modulesUrl) . '"><span class="icon-cube" aria-hidden="true"></span> '
-			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_OPEN_MODULES')) . '</a>'
-			. '<button type="button" class="button-start-guidedtour btn btn-outline-success" data-gt-uid="com_joomleague.getting-started">'
-			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_START_GUIDE')) . '</button>'
-			. '<button type="button" class="button-start-guidedtour btn btn-success" data-gt-uid="com_joomleague.create-competition">'
-			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_CREATE_COMPETITION_GUIDE')) . '</button></div></section>';
+			. '<a class="btn btn-primary d-inline-flex align-items-center gap-2 text-decoration-none" href="' . $this->escape($settingsUrl) . '"><span class="icon-options" aria-hidden="true"></span><span>'
+			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_OPEN_SETTINGS')) . '</span></a>'
+			. '<a class="btn btn-primary d-inline-flex align-items-center gap-2 text-decoration-none" href="' . $this->escape($modulesUrl) . '"><span class="icon-cube" aria-hidden="true"></span><span>'
+			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_OPEN_MODULES')) . '</span></a>'
+			. '<button type="button" class="button-start-guidedtour btn btn-primary d-inline-flex align-items-center gap-2" data-gt-uid="com_joomleague.getting-started"><span class="icon-play" aria-hidden="true"></span><span>'
+			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_START_GUIDE')) . '</span></button>'
+			. '<button type="button" class="button-start-guidedtour btn btn-success d-inline-flex align-items-center gap-2" data-gt-uid="com_joomleague.create-competition"><span class="icon-plus" aria-hidden="true"></span><span>'
+			. $this->escape(Text::_('PKG_JOOMLEAGUE_INSTALL_CREATE_COMPETITION_GUIDE')) . '</span></button></div></section>';
 	}
 
 	private function escape(string $value): string

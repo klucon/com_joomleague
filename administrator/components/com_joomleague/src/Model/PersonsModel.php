@@ -13,7 +13,7 @@ final class PersonsModel extends ListModel
 {
 	public function __construct($config = [])
 	{
-		$config['filter_fields'] ??= ['id', 'a.id', 'first_name', 'a.first_name', 'last_name', 'a.last_name', 'nickname', 'a.nickname', 'country_code', 'a.country_code', 'published', 'a.published', 'ordering', 'a.ordering'];
+		$config['filter_fields'] ??= ['id', 'a.id', 'first_name', 'a.first_name', 'last_name', 'a.last_name', 'nickname', 'a.nickname', 'country_code', 'a.country_code', 'published', 'a.published', 'ordering', 'a.ordering', 'assignment_count'];
 		parent::__construct($config);
 	}
 
@@ -33,6 +33,7 @@ final class PersonsModel extends ListModel
 			->select('a.*')
 			->select('(' . $entryCount . ') AS project_count')
 			->select('(' . $membershipCount . ') AS membership_count')
+			->select('((' . $entryCount . ') + (' . $membershipCount . ')) AS assignment_count')
 			->select($database->quoteName('editor.name', 'editor_name'))
 			->from($database->quoteName('#__joomleague_person', 'a'))
 			->leftJoin($database->quoteName('#__users', 'editor') . ' ON editor.id = a.checked_out');
@@ -58,7 +59,7 @@ final class PersonsModel extends ListModel
 			}
 		}
 
-		$query->order($database->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . ($this->getState('list.direction') === 'desc' ? 'DESC' : 'ASC'));
+		$query->order($database->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC'));
 
 		return $query;
 	}

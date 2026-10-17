@@ -21,22 +21,25 @@ final class EntrymemberController extends FormController
 	{
 		$entryId = (int) ($data['entry_id'] ?? $this->input->getInt('entry_id', 0));
 		$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectIdFromEntry($entryId);
-		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		if ($projectId < 1) return false;
+		$asset = 'com_joomleague.project.' . $projectId;
 		return $this->app->getIdentity()->authorise('core.create', $asset);
 	}
 
 	protected function allowEdit($data = [], $key = 'id'): bool
 	{
-		$entryId = (int) ($data['entry_id'] ?? 0);
-		if ($entryId < 1) {
+		$entryId = 0;
+		if ((int) ($data[$key] ?? 0) > 0) {
 			$id = (int) ($data[$key] ?? 0);
 			$db = Factory::getContainer()->get(DatabaseInterface::class);
 			$query = $db->getQuery(true)->select($db->quoteName('entry_id'))->from($db->quoteName('#__joomleague_project_entry_member'))
 				->where($db->quoteName('id') . ' = :id')->bind(':id', $id, ParameterType::INTEGER);
 			$entryId = (int) $db->setQuery($query)->loadResult();
 		}
+		if ($entryId < 1) return false;
 		$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectIdFromEntry($entryId);
-		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		if ($projectId < 1) return false;
+		$asset = 'com_joomleague.project.' . $projectId;
 		return $this->app->getIdentity()->authorise('core.edit', $asset);
 	}
 

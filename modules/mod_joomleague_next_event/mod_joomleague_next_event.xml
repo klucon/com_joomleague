@@ -1,47 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="module" client="site" method="upgrade">
-	<name>mod_joomleague_next_event</name>
-	<author>Ondřej Klučka (https://joomleague.eu)</author>
-	<creationDate>2026-08</creationDate>
-	<copyright>(C) 2026 Ondřej Klučka.</copyright>
-	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.2.0-beta3</version>
-	<description>MOD_JOOMLEAGUE_NEXT_EVENT_XML_DESCRIPTION</description>
-	<namespace path="src">Joomleague\Module\NextEvent</namespace>
-	<files>
-		<folder module="mod_joomleague_next_event">services</folder>
-		<folder>src</folder>
-		<folder>tmpl</folder>
-	</files>
-	<languages>
-		<language tag="en-GB">language/en-GB/mod_joomleague_next_event.ini</language>
-		<language tag="en-GB">language/en-GB/mod_joomleague_next_event.sys.ini</language>
-		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_next_event.ini</language>
-		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_next_event.sys.ini</language>
-	</languages>
-	<config>
-		<fields name="params">
-			<fieldset name="basic">
-				<field name="project_id" type="sql" required="true" label="MOD_JOOMLEAGUE_NEXT_EVENT_PROJECT_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_PROJECT_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text" />
-				<field name="scope" type="list" default="project" label="MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_DESC">
-					<option value="project">MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_PROJECT</option>
-					<option value="entry">MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_ENTRY</option>
-					<option value="club">MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_CLUB</option>
-				</field>
-				<field name="entry_id" type="sql" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_ENTRY_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_ENTRY_DESC" showon="scope:entry" query="SELECT entry.id AS value, CONCAT(project.name, ' — ', COALESCE(NULLIF(entry.display_name, ''), team.name, CONCAT(person.first_name, ' ', person.last_name), CONCAT('ID ', entry.id))) AS text FROM #__joomleague_project_entry AS entry INNER JOIN #__joomleague_project AS project ON project.id = entry.project_id LEFT JOIN #__joomleague_team AS team ON team.id = entry.team_id LEFT JOIN #__joomleague_person AS person ON person.id = entry.person_id WHERE entry.published = 1 ORDER BY project.name, text" key_field="value" value_field="text"><option value="0">MOD_JOOMLEAGUE_NEXT_EVENT_SELECT_ENTRY</option></field>
-				<field name="club_id" type="sql" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_CLUB_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_CLUB_DESC" showon="scope:club" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text"><option value="0">MOD_JOOMLEAGUE_NEXT_EVENT_SELECT_CLUB</option></field>
-				<field name="show_project_name" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_PROJECT_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_PROJECT_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
-				<field name="show_round" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_ROUND_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_ROUND_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
-				<field name="show_venue" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_VENUE_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_VENUE_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
-				<field name="show_calendar" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_CALENDAR_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_CALENDAR_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
-			</fieldset>
-			<fieldset name="advanced">
-				<field name="layout" type="modulelayout" label="JFIELD_ALT_LAYOUT_LABEL" class="form-select" validate="moduleLayout" />
-				<field name="moduleclass_sfx" type="textarea" label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL" rows="3" validate="CssIdentifier" />
-				<field name="cache" type="list" default="1" label="COM_MODULES_FIELD_CACHING_LABEL"><option value="1">JGLOBAL_USE_GLOBAL</option><option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option></field>
-				<field name="cache_time" type="number" default="900" label="COM_MODULES_FIELD_CACHE_TIME_LABEL" />
-				<field name="cachemode" type="hidden" default="id" />
-			</fieldset>
-		</fields>
-	</config>
+	<name>mod_joomleague_next_event</name><author>Ondřej Klučka (https://joomleague.eu)</author><creationDate>2026-09</creationDate><copyright>(C) 2026 Ondřej Klučka.</copyright><license>GNU General Public License version 2 or later; see LICENSE.txt</license><version>6.2.0-rc1</version><description>MOD_JOOMLEAGUE_NEXT_EVENT_XML_DESCRIPTION</description><namespace path="src">Joomleague\Module\NextEvent</namespace>
+	<files><folder module="mod_joomleague_next_event">services</folder><folder>src</folder><folder>tmpl</folder></files>
+	<languages><language tag="en-GB">language/en-GB/mod_joomleague_next_event.ini</language><language tag="en-GB">language/en-GB/mod_joomleague_next_event.sys.ini</language><language tag="cs-CZ">language/cs-CZ/mod_joomleague_next_event.ini</language><language tag="cs-CZ">language/cs-CZ/mod_joomleague_next_event.sys.ini</language></languages>
+	<config><fields name="params">
+		<fieldset name="basic" label="MOD_JOOMLEAGUE_NEXT_EVENT_FIELDSET_SOURCE">
+			<field name="project_id" type="sql" required="true" label="MOD_JOOMLEAGUE_NEXT_EVENT_PROJECT_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_PROJECT_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text" />
+			<field name="sport_type_id" type="sql" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_SPORT_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SPORT_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_sport_type WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text"><option value="0">MOD_JOOMLEAGUE_NEXT_EVENT_ALL_SPORTS</option></field>
+			<field name="stage_id" type="sql" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_STAGE_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_STAGE_DESC" query="SELECT stage.id AS value, CONCAT(project.name, ' — ', stage.name) AS text FROM #__joomleague_project_stage AS stage INNER JOIN #__joomleague_project AS project ON project.id = stage.project_id WHERE stage.published = 1 AND project.published = 1 ORDER BY project.name, stage.ordering, stage.id" key_field="value" value_field="text"><option value="0">JALL</option></field>
+			<field name="venue_id" type="sql" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_VENUE_FILTER_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_VENUE_FILTER_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_venue WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text"><option value="0">MOD_JOOMLEAGUE_NEXT_EVENT_ALL_VENUES</option></field>
+			<field name="scope" type="list" default="project" label="MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_DESC"><option value="project">MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_PROJECT</option><option value="entry">MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_ENTRY</option><option value="club">MOD_JOOMLEAGUE_NEXT_EVENT_SCOPE_CLUB</option></field>
+			<field name="entry_id" type="sql" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_ENTRY_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_ENTRY_DESC" showon="scope:entry" query="SELECT entry.id AS value, CONCAT(project.name, ' — ', COALESCE(NULLIF(entry.display_name, ''), team.name, CONCAT(person.first_name, ' ', person.last_name), CONCAT('ID ', entry.id))) AS text FROM #__joomleague_project_entry AS entry INNER JOIN #__joomleague_project AS project ON project.id = entry.project_id LEFT JOIN #__joomleague_team AS team ON team.id = entry.team_id LEFT JOIN #__joomleague_person AS person ON person.id = entry.person_id WHERE entry.published = 1 AND project.published = 1 ORDER BY project.name, text" key_field="value" value_field="text"><option value="0">MOD_JOOMLEAGUE_NEXT_EVENT_SELECT_ENTRY</option></field>
+			<field name="club_id" type="sql" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_CLUB_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_CLUB_DESC" showon="scope:club" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text"><option value="0">MOD_JOOMLEAGUE_NEXT_EVENT_SELECT_CLUB</option></field>
+		</fieldset>
+		<fieldset name="filters" label="MOD_JOOMLEAGUE_NEXT_EVENT_FIELDSET_FILTERS">
+			<field name="status_codes" type="sql" multiple="true" layout="joomla.form.field.list-fancy-select" label="MOD_JOOMLEAGUE_NEXT_EVENT_STATUS_FILTER_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_STATUS_FILTER_DESC" query="SELECT DISTINCT status_code AS value, status_code AS text FROM #__joomleague_project_match WHERE status_code IS NOT NULL AND status_code &lt;&gt; '' ORDER BY status_code" key_field="value" value_field="text" />
+			<field name="previous_days" type="number" default="365" min="0" max="5000" label="MOD_JOOMLEAGUE_NEXT_EVENT_PREVIOUS_DAYS_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_PREVIOUS_DAYS_DESC" />
+			<field name="future_days" type="number" default="365" min="0" max="5000" label="MOD_JOOMLEAGUE_NEXT_EVENT_FUTURE_DAYS_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_FUTURE_DAYS_DESC" />
+			<field name="upcoming_limit" type="number" default="1" min="0" max="100" label="MOD_JOOMLEAGUE_NEXT_EVENT_UPCOMING_LIMIT_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_UPCOMING_LIMIT_DESC" />
+			<field name="previous_limit" type="number" default="0" min="0" max="100" label="MOD_JOOMLEAGUE_NEXT_EVENT_PREVIOUS_LIMIT_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_PREVIOUS_LIMIT_DESC" />
+			<field name="participant_limit" type="number" default="4" min="0" max="100" label="MOD_JOOMLEAGUE_NEXT_EVENT_PARTICIPANT_LIMIT_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_PARTICIPANT_LIMIT_DESC" />
+			<field name="unscheduled_mode" type="list" default="hide" label="MOD_JOOMLEAGUE_NEXT_EVENT_UNSCHEDULED_MODE_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_UNSCHEDULED_MODE_DESC"><option value="hide">MOD_JOOMLEAGUE_NEXT_EVENT_UNSCHEDULED_HIDE</option><option value="after_upcoming">MOD_JOOMLEAGUE_NEXT_EVENT_UNSCHEDULED_AFTER</option></field>
+			<field name="tie_breaker" type="list" default="id_asc" label="MOD_JOOMLEAGUE_NEXT_EVENT_TIE_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_TIE_DESC"><option value="id_asc">MOD_JOOMLEAGUE_NEXT_EVENT_TIE_ASC</option><option value="id_desc">MOD_JOOMLEAGUE_NEXT_EVENT_TIE_DESCENDING</option></field>
+		</fieldset>
+		<fieldset name="display" label="MOD_JOOMLEAGUE_NEXT_EVENT_FIELDSET_DISPLAY">
+			<field name="orientation" type="list" default="vertical" label="MOD_JOOMLEAGUE_NEXT_EVENT_ORIENTATION_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_ORIENTATION_DESC"><option value="vertical">MOD_JOOMLEAGUE_NEXT_EVENT_ORIENTATION_VERTICAL</option><option value="horizontal">MOD_JOOMLEAGUE_NEXT_EVENT_ORIENTATION_HORIZONTAL</option></field>
+			<field name="density" type="list" default="standard" label="MOD_JOOMLEAGUE_NEXT_EVENT_DENSITY_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_DENSITY_DESC"><option value="compact">MOD_JOOMLEAGUE_NEXT_EVENT_DENSITY_COMPACT</option><option value="standard">MOD_JOOMLEAGUE_NEXT_EVENT_DENSITY_STANDARD</option><option value="detailed">MOD_JOOMLEAGUE_NEXT_EVENT_DENSITY_DETAILED</option></field>
+			<field name="group_by" type="list" default="type" label="MOD_JOOMLEAGUE_NEXT_EVENT_GROUP_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_GROUP_DESC"><option value="none">JNONE</option><option value="type">MOD_JOOMLEAGUE_NEXT_EVENT_GROUP_TYPE</option><option value="date">MOD_JOOMLEAGUE_NEXT_EVENT_GROUP_DATE</option><option value="round">MOD_JOOMLEAGUE_NEXT_EVENT_GROUP_ROUND</option></field>
+			<field name="heading" type="text" filter="string" label="MOD_JOOMLEAGUE_NEXT_EVENT_HEADING_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_HEADING_DESC" />
+			<field name="show_sport" type="radio" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_SPORT_LABEL" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_season" type="radio" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_SEASON_LABEL" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_project_name" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_PROJECT_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_PROJECT_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_stage" type="radio" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_STAGE_LABEL" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_round" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_ROUND_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_ROUND_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_date" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_DATE_LABEL" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="date_format" type="list" default="medium" label="MOD_JOOMLEAGUE_NEXT_EVENT_DATE_FORMAT_LABEL" showon="show_date:1"><option value="short">MOD_JOOMLEAGUE_NEXT_EVENT_FORMAT_SHORT</option><option value="medium">MOD_JOOMLEAGUE_NEXT_EVENT_FORMAT_MEDIUM</option><option value="long">MOD_JOOMLEAGUE_NEXT_EVENT_FORMAT_LONG</option></field>
+			<field name="show_time" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_TIME_LABEL" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="time_format" type="list" default="short" label="MOD_JOOMLEAGUE_NEXT_EVENT_TIME_FORMAT_LABEL" showon="show_time:1"><option value="short">MOD_JOOMLEAGUE_NEXT_EVENT_FORMAT_SHORT</option><option value="medium">MOD_JOOMLEAGUE_NEXT_EVENT_FORMAT_MEDIUM</option></field>
+			<field name="show_venue" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_VENUE_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_VENUE_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_status" type="radio" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_STATUS_LABEL" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_contest_type" type="radio" default="0" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_CONTEST_LABEL" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_scores" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_SCORES_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_SCORES_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_decider" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_DECIDER_LABEL" layout="joomla.form.field.radio.switcher" showon="show_scores:1"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="emphasize_winner" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_WINNER_LABEL" layout="joomla.form.field.radio.switcher" showon="show_scores:1"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_images" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_IMAGES_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_IMAGES_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="image_size" type="list" default="40" label="MOD_JOOMLEAGUE_NEXT_EVENT_IMAGE_SIZE_LABEL" showon="show_images:1"><option value="32">32 px</option><option value="40">40 px</option><option value="48">48 px</option><option value="64">64 px</option></field>
+			<field name="image_style" type="list" default="contain" label="MOD_JOOMLEAGUE_NEXT_EVENT_IMAGE_STYLE_LABEL" showon="show_images:1"><option value="contain">MOD_JOOMLEAGUE_NEXT_EVENT_IMAGE_CONTAIN</option><option value="cover">MOD_JOOMLEAGUE_NEXT_EVENT_IMAGE_COVER</option><option value="circle">MOD_JOOMLEAGUE_NEXT_EVENT_IMAGE_CIRCLE</option></field>
+			<field name="show_participant_links" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_PARTICIPANT_LINKS_LABEL" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_project_link" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_PROJECT_LINK_LABEL" layout="joomla.form.field.radio.switcher" showon="show_project_name:1"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_venue_link" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_VENUE_LINK_LABEL" layout="joomla.form.field.radio.switcher" showon="show_venue:1"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_detail_link" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_DETAIL_LINK_LABEL" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_calendar" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_CALENDAR_LABEL" description="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_CALENDAR_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+			<field name="show_empty" type="radio" default="1" label="MOD_JOOMLEAGUE_NEXT_EVENT_SHOW_EMPTY_LABEL" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+		</fieldset>
+		<fieldset name="advanced"><field name="layout" type="modulelayout" label="JFIELD_ALT_LAYOUT_LABEL" class="form-select" validate="moduleLayout"/><field name="moduleclass_sfx" type="textarea" label="COM_MODULES_FIELD_MODULECLASS_SFX_LABEL" rows="3" validate="CssIdentifier"/><field name="cache" type="list" default="1" label="COM_MODULES_FIELD_CACHING_LABEL"><option value="1">JGLOBAL_USE_GLOBAL</option><option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option></field><field name="cache_time" type="number" default="900" label="COM_MODULES_FIELD_CACHE_TIME_LABEL"/><field name="cachemode" type="hidden" default="id"/></fieldset>
+	</fields></config>
 </extension>

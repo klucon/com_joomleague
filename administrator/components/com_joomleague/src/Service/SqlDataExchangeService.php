@@ -7,12 +7,16 @@ namespace Joomleague\Component\Joomleague\Administrator\Service;
 defined('_JEXEC') or die;
 
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use Joomla\CMS\Utility\Utility;
 use RuntimeException;
 use Throwable;
 
 final class SqlDataExchangeService
 {
+	private ?array $trustedImportDdl = null;
+	private ?array $trustedImportTables = null;
+	private array $importColumns = [];
 	public function __construct(private readonly DatabaseInterface $database, private readonly string $componentRoot)
 	{
 	}
@@ -21,7 +25,7 @@ final class SqlDataExchangeService
 	public function export(array $requestedTables): string
 	{
 		$installed = ComponentTableCatalog::installed($this->database);
-		$tables = array_values(array_intersect($installed, array_unique($requestedTables)));
+		$tables = array_values(array_intersect(array_keys($this->schemaTables()), $installed, array_unique($requestedTables)));
 
 		if ($tables === []) {
 			throw new RuntimeException('COM_JOOMLEAGUE_DATAEXCHANGE_ERROR_NO_TABLES');
@@ -57,25 +61,31 @@ final class SqlDataExchangeService
 	/** @return array{executed: int, skipped: int} */
 	public function import(string $sql): array
 	{
+		$this->importColumns = [];
 		if (strlen($sql) > (int) Utility::getMaxUploadSize()) {
 			throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_SIZE');
 		}
 
-		$isCanonicalMigration = str_contains($sql, '-- Canonical JoomLeague 6.2 migration package');
-		$profileCodes = $isCanonicalMigration ? $this->profileCodes($sql) : [];
+		$isCanonicalMigration = preg_match('/\A(?:\xEF\xBB\xBF)?\s*-- Canonical JoomLeague 6\.2 migration package(?:\r?\n|$)/', $sql) === 1;
 		$statements = $this->splitSql($sql);
 		$statements = array_values(array_filter(array_map('trim', $statements)));
+		if ($statements === []) throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT');
 		foreach ($statements as $statement) {
 			if (!$this->isAllowedImportStatement($statement)) throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT');
 		}
 
 		$ddl = array_values(array_filter($statements, static fn (string $statement): bool => preg_match('/^CREATE\s/i', $statement) === 1));
 		$inserts = array_values(array_filter($statements, static fn (string $statement): bool => preg_match('/^INSERT\s/i', $statement) === 1));
+		$ddlOrder = array_flip($this->trustedDdl());
+		usort($ddl, static fn (string $a, string $b): int => $ddlOrder[rtrim($a, ';')] <=> $ddlOrder[rtrim($b, ';')]);
 		$preparedDdl = array_map(fn (string $statement): string => $this->prepareStatement($statement), $ddl);
-		$preparedInserts = array_map(
-			fn (string $statement): string => $this->prepareStatement($this->duplicateTolerantInsert($statement)),
-			$inserts
-		);
+		// Joomla SQL exports escape backslashes on both supported database drivers.
+		$preparedInserts = array_map(fn (string $statement): array => (new SqlInsertDataParser())->parse($statement), $inserts);
+		$preparedInserts = $this->orderInserts($preparedInserts);
+		$profileCodes = [];
+		foreach ($preparedInserts as $insert) foreach ($insert['rows'] as $row) foreach ($row as $value) {
+			if (is_array($value)) $profileCodes[$value['profile']] = true;
+		}
 		$executed = 0;
 		$skipped = 0;
 		$createdTables = [];
@@ -90,6 +100,7 @@ final class SqlDataExchangeService
 				$indexExisted = $object['index'] !== null && $tableExisted
 					? $this->indexExists($object['table'], $object['index'])
 					: false;
+				if ($indexExisted) { $skipped++; continue; }
 
 				$this->database->setQuery($preparedDdl[$index])->execute();
 				$executed++;
@@ -104,19 +115,23 @@ final class SqlDataExchangeService
 
 			$this->database->transactionStart();
 			$transactionStarted = true;
-			foreach ($preparedInserts as $statement) {
-				$this->database->setQuery($statement)->execute();
+			$this->lockPostgreSqlTables();
+			foreach ($preparedInserts as $insert) {
+				$query = $this->boundInsert($insert);
+				$this->database->setQuery($query)->execute();
 				if ($this->database->getAffectedRows() === 0) $skipped++; else $executed++;
 			}
 			if ($isCanonicalMigration) {
-				$executed += $this->materializeImportedSportTypes($profileCodes);
-				$this->synchronizePostgreSqlIdentitySequences();
+				$executed += $this->materializeImportedSportTypes(array_keys($profileCodes));
 			}
+			$this->synchronizePostgreSqlIdentitySequences();
 			// Imported rows bypass model cascade hooks. Removing these cheap
 			// markers makes the next standings read rebuild every affected scope.
-			$this->database->setQuery(
-				$this->database->getQuery(true)->delete($this->database->quoteName('#__joomleague_standing_freshness'))
-			)->execute();
+			if ($this->tableExists('#__joomleague_standing_freshness')) {
+				$this->database->setQuery(
+					$this->database->getQuery(true)->delete($this->database->quoteName('#__joomleague_standing_freshness'))
+				)->execute();
+			}
 			$this->database->transactionCommit();
 			$transactionStarted = false;
 		} catch (Throwable $error) {
@@ -150,8 +165,13 @@ final class SqlDataExchangeService
 	private function acquireImportLock(): void
 	{
 		if ($this->database->getName() === 'pgsql') {
-			$this->database->setQuery("SELECT pg_advisory_lock(hashtext('com_joomleague.sql_import'))")->execute();
-			return;
+			$deadline = microtime(true) + 30;
+			do {
+				$locked = $this->database->setQuery("SELECT pg_try_advisory_lock(hashtext('com_joomleague.sql_import'))")->loadResult();
+				if (in_array($locked, [true, 1, '1', 't'], true)) return;
+				usleep(100000);
+			} while (microtime(true) < $deadline);
+			throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_LOCK');
 		}
 
 		$locked = (int) $this->database->setQuery("SELECT GET_LOCK('com_joomleague.sql_import', 30)")->loadResult();
@@ -260,7 +280,7 @@ final class SqlDataExchangeService
 			return;
 		}
 
-		foreach (ComponentTableCatalog::installed($this->database) as $table) {
+		foreach (array_intersect(array_keys($this->schemaTables()), ComponentTableCatalog::installed($this->database)) as $table) {
 			if (!array_key_exists('id', $this->database->getTableColumns($table, false))) {
 				continue;
 			}
@@ -278,20 +298,27 @@ final class SqlDataExchangeService
 				->select('COALESCE(MAX(' . $this->database->quoteName('id') . '), 0)')
 				->from($this->database->quoteName($table));
 			$maximum = (int) $this->database->setQuery($query)->loadResult();
-			$called = $maximum > 0 ? 'TRUE' : 'FALSE';
-			$nextValue = max(1, $maximum);
+			$nameQuery = $this->database->getQuery(true)->select(['n.nspname', 'c.relname'])
+				->from('pg_catalog.pg_class AS c')->innerJoin('pg_catalog.pg_namespace AS n ON n.oid = c.relnamespace')
+				->where('c.oid = CAST(:sequence AS regclass)')->bind(':sequence', $sequence);
+			$name = $this->database->setQuery($nameQuery)->loadAssoc();
+			if (!$name) throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT');
+			$identifier = $this->database->quoteName($name['nspname']) . '.' . $this->database->quoteName($name['relname']);
+			$state = $this->database->setQuery('SELECT last_value, is_called FROM ' . $identifier)->loadAssoc();
+			$called = $maximum > 0 || in_array($state['is_called'], [true, 1, '1', 't'], true) ? 'TRUE' : 'FALSE';
+			$nextValue = max(1, $maximum, (int) $state['last_value']);
 			$this->database->setQuery(
 				'SELECT setval(' . $this->database->quote($sequence) . ', ' . $nextValue . ', ' . $called . ')'
 			)->execute();
 		}
 	}
 
-	/** @return list<string> */
-	private function profileCodes(string $sql): array
+	private function lockPostgreSqlTables(): void
 	{
-		preg_match_all('/\{\{profile_version:([a-z][a-z0-9_]*)\}\}/', $sql, $matches);
-
-		return array_values(array_unique($matches[1] ?? []));
+		if ($this->database->getName() !== 'pgsql') return;
+		$this->database->setQuery("SET LOCAL lock_timeout = '30s'")->execute();
+		$tables = array_intersect(array_keys($this->schemaTables()), ComponentTableCatalog::installed($this->database));
+		if ($tables !== []) $this->database->setQuery('LOCK TABLE ' . implode(', ', $this->database->quoteName($tables)) . ' IN SHARE ROW EXCLUSIVE MODE')->execute();
 	}
 
 	/** @param list<string> $profileCodes */
@@ -312,20 +339,10 @@ final class SqlDataExchangeService
 				->bind(':profileCode', $profileCode);
 
 			foreach ($this->database->setQuery($query)->loadObjectList() as $sportType) {
-				$options = [
-					'positions' => !$this->sportCatalogExists('#__joomleague_sport_position', (int) $sportType->id),
-					'event_types' => !$this->sportCatalogExists('#__joomleague_event_type', (int) $sportType->id),
-					'statistics' => !$this->sportCatalogExists('#__joomleague_statistic', (int) $sportType->id),
-				];
-
-				if (!in_array(true, $options, true)) {
-					continue;
-				}
-
 				$counts = (new SportTypeProfileMaterializer($this->database))->materialize(
 					(int) $sportType->id,
 					(int) $sportType->profile_version_id,
-					$options,
+					['positions' => true, 'event_types' => true, 'statistics' => true],
 					0
 				);
 				$created += array_sum($counts);
@@ -333,17 +350,6 @@ final class SqlDataExchangeService
 		}
 
 		return $created;
-	}
-
-	private function sportCatalogExists(string $table, int $sportTypeId): bool
-	{
-		$query = $this->database->getQuery(true)
-			->select('COUNT(*)')
-			->from($this->database->quoteName($table))
-			->where($this->database->quoteName('sport_type_id') . ' = :sportTypeId')
-			->bind(':sportTypeId', $sportTypeId, \Joomla\Database\ParameterType::INTEGER);
-
-		return (int) $this->database->setQuery($query)->loadResult() > 0;
 	}
 
 	/** @param list<string> $output */
@@ -354,6 +360,12 @@ final class SqlDataExchangeService
 		$query = $this->database->getQuery(true)->select('*')->from($this->database->quoteName($table));
 		if (in_array('id', $columns, true)) $query->order($this->database->quoteName('id') . ' ASC');
 		$rows = $this->database->setQuery($query)->loadAssocList();
+		$parents = $this->schemaTables()[$table]['parents'];
+		if ($parents !== []) {
+			$ordered = $this->orderInserts([['table' => $table, 'columns' => $columns, 'rows' => array_map('array_values', $rows)]]);
+			$rows = [];
+			foreach ($ordered as $insert) foreach ($insert['rows'] as $row) $rows[] = array_combine($columns, $row);
+		}
 		$columnSql = implode(', ', array_map([$this->database, 'quoteName'], $columns));
 
 		foreach ($rows as $row) {
@@ -376,27 +388,102 @@ final class SqlDataExchangeService
 
 	private function isAllowedImportStatement(string $statement): bool
 	{
-		$patterns = [
-			'/^CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS\s+[`"]#__joomleague_[a-z0-9_]+[`"]\s*\(/i',
-			'/^CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?[`"][a-z0-9_]+[`"]\s+ON\s+[`"]#__joomleague_[a-z0-9_]+[`"]\s*\(/i',
-			'/^INSERT\s+INTO\s+[`"]#__joomleague_[a-z0-9_]+[`"]\s*\(/i',
-		];
-		foreach ($patterns as $pattern) {
-			if (preg_match($pattern, $statement) === 1) return true;
-		}
-
-		return false;
+		try {
+			if (preg_match('/^INSERT\s/i', $statement) === 1) {
+				$insert = (new SqlInsertDataParser())->parse($statement);
+				$schema = $this->schemaTables()[$insert['table']] ?? null;
+				return $schema !== null && array_diff($insert['columns'], $schema['columns']) === [];
+			}
+			return in_array(rtrim(trim($statement), ';'), $this->trustedDdl(), true)
+				&& preg_match('/^CREATE\s/i', $statement) === 1;
+		} catch (RuntimeException) { return false; }
 	}
 
-	private function duplicateTolerantInsert(string $statement): string
+	private function trustedDdl(): array
 	{
-		$statement = rtrim($statement, "; \t\r\n");
-		if ($this->database->getName() === 'pgsql') return $statement . ' ON CONFLICT DO NOTHING';
-		if (preg_match('/^INSERT\s+INTO\s+[`"]#__joomleague_[a-z0-9_]+[`"]\s*\(\s*([`"])([a-z0-9_]+)\1/i', $statement, $match) !== 1) {
-			throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT');
+		if ($this->trustedImportDdl !== null) return $this->trustedImportDdl;
+		$driver = $this->database->getName() === 'pgsql' ? 'postgresql' : 'mysql.utf8';
+		$schema = $this->splitSql((string) file_get_contents($this->componentRoot . '/sql/install.' . $driver . '.sql'));
+		return $this->trustedImportDdl = array_values(array_map(
+			static fn ($item) => rtrim(trim($item), ';'),
+			array_filter($schema, static fn ($item) => preg_match('/^CREATE\s/i', $item) === 1)
+		));
+	}
+
+	/** Metadata comes exclusively from the packaged schema, never uploaded SQL. */
+	private function schemaTables(): array
+	{
+		if ($this->trustedImportTables !== null) return $this->trustedImportTables;
+		$tables = [];
+		foreach ($this->trustedDdl() as $ddl) {
+			if (preg_match('/^CREATE\s+TABLE\b/i', $ddl) !== 1) continue;
+			$table = $this->ddlObject($ddl)['table'];
+			preg_match_all('/(?:\(|,)\s*[`"]([a-z][a-z0-9_]*)[`"]\s+[a-z]/i', $ddl, $columns);
+			preg_match_all('/FOREIGN\s+KEY\s*\(\s*([`"])([a-z0-9_]+)\1\s*\)\s+REFERENCES\s+([`"])(#__joomleague_[a-z0-9_]+)\3\s*\(\s*[`"]id[`"]\s*\)/i', $ddl, $references, PREG_SET_ORDER);
+			$parents = [];
+			foreach ($references as $reference) if ($reference[4] === $table) $parents[] = $reference[2];
+			$tables[$table] = ['columns' => $columns[1], 'parents' => $parents];
 		}
-		$column = $this->database->quoteName($match[2]);
-		return $statement . ' ON DUPLICATE KEY UPDATE ' . $column . ' = ' . $column;
+		return $this->trustedImportTables = $tables;
+	}
+
+	/** Keep foreign keys enabled: parents and referenced tables precede their children. */
+	private function orderInserts(array $inserts): array
+	{
+		$groups = [];
+		foreach ($inserts as $insert) $groups[$insert['table']][] = $insert;
+		$result = [];
+		foreach ($this->schemaTables() as $table => $schema) {
+			$group = $groups[$table] ?? [];
+			if ($schema['parents'] === []) { array_push($result, ...$group); continue; }
+			$rows = []; $ids = [];
+			foreach ($group as $insert) foreach ($insert['rows'] as $row) {
+				$values = array_combine($insert['columns'], $row);
+				$index = count($rows);
+				$rows[] = ['table' => $table, 'columns' => $insert['columns'], 'rows' => [$row], 'values' => $values];
+				if (isset($values['id']) && !is_array($values['id'])) $ids[(string) $values['id']] ??= $index;
+			}
+			$degrees = array_fill(0, count($rows), 0); $children = [];
+			foreach ($rows as $index => $row) foreach ($schema['parents'] as $parent) {
+				$value = $row['values'][$parent] ?? null;
+				if ($value === null || is_array($value) || !isset($ids[(string) $value])) continue;
+				$degrees[$index]++; $children[$ids[(string) $value]][] = $index;
+			}
+			$queue = array_keys(array_filter($degrees, static fn (int $degree): bool => $degree === 0));
+			for ($cursor = 0; $cursor < count($queue); $cursor++) {
+				$index = $queue[$cursor]; $row = $rows[$index]; unset($row['values']); $result[] = $row;
+				foreach ($children[$index] ?? [] as $child) if (--$degrees[$child] === 0) $queue[] = $child;
+			}
+			if (count($queue) !== count($rows)) throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT');
+		}
+		return $result;
+	}
+
+	private function boundInsert(array $insert): \Joomla\Database\DatabaseQuery
+	{
+		if (!isset($this->importColumns[$insert['table']])) {
+			if (!$this->tableExists($insert['table'])) throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT');
+			$this->importColumns[$insert['table']] = array_keys($this->database->getTableColumns($insert['table'], false));
+		}
+		$columns = $this->importColumns[$insert['table']];
+		if (array_diff($insert['columns'], $columns) !== []) throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT');
+		$query = $this->database->getQuery(true);
+		$rows = [];
+		$values = [];
+		foreach ($insert['rows'] as $row) {
+			$holders = [];
+			foreach ($row as $value) {
+				$key = ':jl' . count($values);
+				$values[$key] = is_array($value) ? (string) $this->activeProfileVersionId($value['profile']) : $value;
+				$holders[] = $key;
+			}
+			$rows[] = '(' . implode(',', $holders) . ')';
+		}
+		$sql = 'INSERT INTO ' . $this->database->quoteName($insert['table']) . ' (' . implode(',', $this->database->quoteName($insert['columns'])) . ') VALUES ' . implode(',', $rows);
+		$sql .= $this->database->getName() === 'pgsql' ? ' ON CONFLICT DO NOTHING' : ' ON DUPLICATE KEY UPDATE ' . $this->database->quoteName($insert['columns'][0]) . '=' . $this->database->quoteName($insert['columns'][0]);
+		$query->setQuery($sql);
+		foreach ($values as $key => &$value) $query->bind($key, $value, $value === null ? ParameterType::NULL : ParameterType::STRING);
+		return $query;
 	}
 
 	private function prepareStatement(string $statement): string

@@ -52,12 +52,18 @@ final class SporttypeModel extends AdminModel implements CurrentUserInterface
 		if ($field === null) return;
 
 		$db = $this->getDatabase();
+		$currentVersionId = 0;
+		if ($id > 0) {
+			$current = $this->getTable();
+			if ($current->load($id)) $currentVersionId = (int) $current->profile_version_id;
+		}
 		$query = $db->getQuery(true)
 			->select(['version.id', 'version.profile_version', 'profile.name_key'])
 			->from($db->quoteName('#__joomleague_sport_profile_version', 'version'))
 			->innerJoin($db->quoteName('#__joomleague_sport_profile', 'profile') . ' ON profile.id = version.profile_id')
 			->where('profile.published = 1')
-			->where("version.state = " . $db->quote('active'))
+			->where('(version.state = ' . $db->quote('active') . ' OR version.id = :currentVersion)')
+			->bind(':currentVersion', $currentVersionId, ParameterType::INTEGER)
 			->order(['profile.code ASC', 'version.id DESC']);
 		foreach ($db->setQuery($query)->loadObjectList() as $version) {
 			$field->addOption(Text::_($version->name_key) . ' · ' . $version->profile_version, ['value' => (int) $version->id]);
@@ -75,15 +81,16 @@ final class SporttypeModel extends AdminModel implements CurrentUserInterface
 		unset($data['create_positions'], $data['create_event_types'], $data['create_statistics']);
 
 		$versionId = (int) ($data['profile_version_id'] ?? 0);
-		if (!$this->profileVersionExists($versionId)) {
+		$id = (int) ($data['id'] ?? 0);
+		$current = $id > 0 ? $this->getTable() : null;
+		$currentVersionId = $current !== null && $current->load($id) ? (int) $current->profile_version_id : 0;
+		if (!$this->profileVersionExists($versionId, $currentVersionId)) {
 			$this->setError(Text::_('COM_JOOMLEAGUE_ERROR_SPORTTYPE_PROFILE_INVALID'));
 			return false;
 		}
 
-		$id = (int) ($data['id'] ?? 0);
 		if ($id > 0) {
-			$current = $this->getTable();
-			if ($current->load($id) && (int) $current->profile_version_id !== $versionId && $this->countProjects($id) > 0) {
+			if ($currentVersionId !== $versionId && $this->countProjects($id) > 0) {
 				$this->setError(Text::_('COM_JOOMLEAGUE_ERROR_SPORTTYPE_PROFILE_IN_USE'));
 				return false;
 			}
@@ -143,11 +150,12 @@ final class SporttypeModel extends AdminModel implements CurrentUserInterface
 		return true;
 	}
 
-	private function profileVersionExists(int $versionId): bool
+	private function profileVersionExists(int $versionId, int $currentVersionId = 0): bool
 	{
 		if ($versionId < 1) return false;
 		$db = $this->getDatabase();
-		$query = $db->getQuery(true)->select('COUNT(*)')->from($db->quoteName('#__joomleague_sport_profile_version', 'version'))->innerJoin($db->quoteName('#__joomleague_sport_profile', 'profile') . ' ON profile.id = version.profile_id')->where('version.id = :versionId')->where('profile.published = 1')->where("version.state = " . $db->quote('active'))->bind(':versionId', $versionId, ParameterType::INTEGER);
+		$query = $db->getQuery(true)->select('COUNT(*)')->from($db->quoteName('#__joomleague_sport_profile_version', 'version'))->innerJoin($db->quoteName('#__joomleague_sport_profile', 'profile') . ' ON profile.id = version.profile_id')->where('version.id = :versionId')->where('profile.published = 1')->bind(':versionId', $versionId, ParameterType::INTEGER);
+		if ($versionId !== $currentVersionId) $query->where('version.state = ' . $db->quote('active'));
 		return (int) $db->setQuery($query)->loadResult() === 1;
 	}
 

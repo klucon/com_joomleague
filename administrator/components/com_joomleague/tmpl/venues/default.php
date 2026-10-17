@@ -13,7 +13,7 @@ $user = Factory::getApplication()->getIdentity();
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
 ?>
-<form action="<?php echo Route::_('index.php?option=com_joomleague&view=venues'); ?>" method="post" name="adminForm" id="adminForm">
+<form action="<?php echo Route::_('index.php?option=com_joomleague&view=venues'); ?>" method="post" name="adminForm" id="adminForm" class="js-stools-form">
 	<?php echo LayoutHelper::render('joomla.searchtools.default', ['view' => $this]); ?>
 	<div class="table-responsive"><table class="table table-striped" id="venueList">
 		<thead><tr>
@@ -21,7 +21,7 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 			<th scope="col"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_NAME_LABEL', 'a.name', $listDirn, $listOrder); ?></th>
 			<th scope="col" class="d-none d-md-table-cell"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_SHORT_NAME_LABEL', 'a.short_name', $listDirn, $listOrder); ?></th>
 			<th scope="col"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_CITY_LABEL', 'a.city', $listDirn, $listOrder); ?></th>
-			<th scope="col" class="d-none d-lg-table-cell"><?php echo Text::_('COM_JOOMLEAGUE_FIELD_COUNTRY_LABEL'); ?></th>
+			<th scope="col" class="d-none d-lg-table-cell"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_COUNTRY_LABEL', 'a.country_code', $listDirn, $listOrder); ?></th>
 			<th scope="col" class="d-none d-lg-table-cell"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_VENUE_OWNER_CLUB_LABEL', 'club.name', $listDirn, $listOrder); ?></th>
 			<th scope="col" class="d-none d-md-table-cell text-center"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_CAPACITY_LABEL', 'a.capacity', $listDirn, $listOrder); ?></th>
 			<th scope="col" class="w-5 text-center"><?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.published', $listDirn, $listOrder); ?></th>
@@ -44,6 +44,6 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 		</tr><?php endforeach; ?></tbody>
 	</table></div>
 	<?php echo $this->pagination->getListFooter(); ?>
-	<input type="hidden" name="task" value=""><input type="hidden" name="boxchecked" value="0"><input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"><input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>">
+	<input type="hidden" name="task" value=""><input type="hidden" name="boxchecked" value="0">
 	<?php echo HTMLHelper::_('form.token'); ?>
 </form>

@@ -40,7 +40,13 @@ final class StandingadjustmentModel extends AdminModel implements CurrentUserInt
 
 	public function save($data): bool
 	{
-		$id = (int) ($data['id'] ?? 0); if ($id > 0) { $query = $this->getDatabase()->getQuery(true)->select(['project_id', 'stage_id'])->from($this->getDatabase()->quoteName('#__joomleague_standing_adjustment'))->where('id = :id')->bind(':id', $id, ParameterType::INTEGER); $owner = $this->getDatabase()->setQuery($query)->loadObject(); if (!$owner) throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_STANDING_ADJUSTMENT_INVALID')); $data['project_id'] = (int) $owner->project_id; $data['stage_id'] = $owner->stage_id === null ? null : (int) $owner->stage_id; }
+		$id = (int) ($data['id'] ?? $this->getState($this->getName() . '.id'));
+		$data['id'] = $id;
+		if ($id > 0) { $query = $this->getDatabase()->getQuery(true)->select(['project_id', 'stage_id'])->from($this->getDatabase()->quoteName('#__joomleague_standing_adjustment'))->where('id = :id')->bind(':id', $id, ParameterType::INTEGER); $owner = $this->getDatabase()->setQuery($query)->loadObject(); if (!$owner) throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_STANDING_ADJUSTMENT_INVALID')); $data['project_id'] = (int) $owner->project_id; $data['stage_id'] = $owner->stage_id === null ? null : (int) $owner->stage_id; }
+		if ((int) ($data['project_id'] ?? 0) < 1 || !$this->canEditResults((int) $data['project_id'])) {
+			$this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
+			return false;
+		}
 		$result = parent::save($data);
 		if ($result) $this->cascadeStandings((int) $data['project_id'], isset($data['stage_id']) && (int) $data['stage_id'] > 0 ? (int) $data['stage_id'] : null);
 		return $result;
@@ -68,6 +74,12 @@ final class StandingadjustmentModel extends AdminModel implements CurrentUserInt
 		return $result;
 	}
 
+	protected function getReorderConditions($table): array
+	{
+		$ownerId = (int) ($table->project_id ?? 0);
+		return [$ownerId > 0 ? $this->getDatabase()->quoteName('project_id') . ' = ' . $ownerId : '1 = 0'];
+	}
+
 	protected function canDelete($record): bool
 	{
 		return $this->canEditResults((int) ($record->project_id ?? 0));
@@ -80,7 +92,11 @@ final class StandingadjustmentModel extends AdminModel implements CurrentUserInt
 
 	private function canEditResults(int $projectId): bool
 	{
-		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		if ($projectId < 1) {
+			return false;
+		}
+
+		$asset = 'com_joomleague.project.' . $projectId;
 		return $this->getCurrentUser()->authorise('joomleague.project.edit.results', $asset);
 	}
 

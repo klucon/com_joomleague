@@ -56,7 +56,9 @@ final class ProjectrulesModel extends FormModel
 			$valueXml = new SimpleXMLElement($this->buildValueFieldXml($key . '_value', $definition));
 			$form->setField($valueXml, 'rules', true, 'rules');
 			$form->setValue($key . '_value', 'rules', $this->formatValue($value));
-			$this->ruleFields[] = ['pointer' => $pointer, 'label' => $this->humanizePointer($pointer), 'description' => Text::sprintf('COM_JOOMLEAGUE_PROJECTRULES_RULE_DESC', $this->humanizePointer($pointer)), 'default' => $default, 'enabled_field' => $form->getField($key . '_enabled', 'rules'), 'value_field' => $form->getField($key . '_value', 'rules')];
+			$label = isset($definition['name_key']) ? Text::_($definition['name_key']) : $this->humanizePointer($pointer);
+			if (isset($definition['enum_label_prefix'])) $default = Text::_($definition['enum_label_prefix'] . strtoupper((string) $default));
+			$this->ruleFields[] = ['pointer' => $pointer, 'label' => $label, 'description' => Text::sprintf('COM_JOOMLEAGUE_PROJECTRULES_RULE_DESC', $label), 'default' => $default, 'enabled_field' => $form->getField($key . '_enabled', 'rules'), 'value_field' => $form->getField($key . '_value', 'rules')];
 		}
 		return $form;
 	}
@@ -98,7 +100,10 @@ final class ProjectrulesModel extends FormModel
 		}
 		if (isset($definition['enum'])) {
 			$options = '';
-			foreach ($definition['enum'] as $option) $options .= '<option value="' . htmlspecialchars((string) $option, ENT_XML1) . '">' . htmlspecialchars((string) $option, ENT_XML1) . '</option>';
+			foreach ($definition['enum'] as $option) {
+				$label = isset($definition['enum_label_prefix']) ? $definition['enum_label_prefix'] . strtoupper((string) $option) : (string) $option;
+				$options .= '<option value="' . htmlspecialchars((string) $option, ENT_XML1) . '">' . htmlspecialchars($label, ENT_XML1) . '</option>';
+			}
 			return '<field' . $attributes . ' type="list">' . $options . '</field>';
 		}
 		return '<field' . $attributes . ' type="text" maxlength="' . (int) ($definition['max_length'] ?? 255) . '" />';

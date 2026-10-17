@@ -17,8 +17,15 @@ $format = static function (mixed $value): string {
 	<?php if (isset($data['error'])) : ?><div class="alert alert-warning"><?php echo Text::_($data['error']); ?></div>
 	<?php else : $entry = $data['entry']; ?>
 		<header class="border-bottom pb-3 mb-4"><h1 class="mb-1"><?php echo Text::sprintf('COM_JOOMLEAGUE_PARTICIPANTSTATS_HEADING', htmlspecialchars((string) $entry->display_name, ENT_QUOTES, 'UTF-8')); ?></h1><div class="text-body-secondary"><?php echo htmlspecialchars((string) $entry->project_name, ENT_QUOTES, 'UTF-8'); ?></div></header>
-		<?php if ($data['rows'] === []) : ?><div class="alert alert-info"><?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANTSTATS_EMPTY'); ?></div>
-		<?php else : ?><div class="table-responsive"><table class="table table-striped align-middle">
+		<?php if (($data['carom_summary'] ?? null) !== null) : $summary = $data['carom_summary']; ?>
+		<div class="table-responsive"><table class="table align-middle">
+		<caption><?php echo Text::_('COM_JOOMLEAGUE_CAROM_SEASON_SUMMARY'); ?></caption>
+		<thead><tr><?php foreach (['GAMES', 'CAROMS', 'INNINGS', 'AVERAGE', 'HIGH_RUN'] as $metric) : ?><th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_CAROM_SEASON_' . $metric); ?></th><?php endforeach; ?></tr></thead>
+		<tbody><tr><td><?php echo (int) $summary['games']; ?></td><td><?php echo (int) $summary['caroms']; ?></td><td><?php echo $summary['complete'] ? (int) $summary['innings'] : '&mdash;'; ?></td><td><?php echo $summary['average'] !== null ? number_format($summary['average'], 3, '.', '') : '&mdash;'; ?></td><td><?php echo $summary['high_run'] !== null ? (int) $summary['high_run'] : '&mdash;'; ?></td></tr></tbody>
+		</table></div>
+		<?php endif; ?>
+		<?php if ($data['rows'] === [] && ($data['carom_summary'] ?? null) === null) : ?><div class="alert alert-info"><?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANTSTATS_EMPTY'); ?></div>
+		<?php elseif ($data['rows'] !== []) : ?><div class="table-responsive"><table class="table table-striped align-middle">
 			<thead><tr><th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANTSTATS_STATISTIC'); ?></th><th scope="col" class="text-center"><?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANTSTATS_APPEARANCES'); ?></th><th scope="col" class="text-end"><?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANTSTATS_TOTAL'); ?></th><th scope="col" class="text-end"><?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANTSTATS_AVERAGE'); ?></th><th scope="col" class="text-end"><?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANTSTATS_MINIMUM'); ?></th><th scope="col" class="text-end"><?php echo Text::_('COM_JOOMLEAGUE_PARTICIPANTSTATS_MAXIMUM'); ?></th></tr></thead>
 			<tbody><?php foreach ($data['rows'] as $row) : ?><tr><th scope="row"><?php echo htmlspecialchars(Text::_((string) $row->name_key), ENT_QUOTES, 'UTF-8'); ?></th><td class="text-center"><?php echo (int) $row->appearances; ?></td><td class="text-end fw-semibold"><?php echo htmlspecialchars($format($row->total_value), ENT_QUOTES, 'UTF-8'); ?></td><td class="text-end"><?php echo htmlspecialchars($format($row->average_value), ENT_QUOTES, 'UTF-8'); ?></td><td class="text-end"><?php echo htmlspecialchars($format($row->minimum_value), ENT_QUOTES, 'UTF-8'); ?></td><td class="text-end"><?php echo htmlspecialchars($format($row->maximum_value), ENT_QUOTES, 'UTF-8'); ?></td></tr><?php endforeach; ?></tbody>
 		</table></div><?php endif; ?>

@@ -34,7 +34,7 @@ final class MatchActorRoleRepository
 		$profile = json_decode((string) $project->payload_json, true, 512, JSON_THROW_ON_ERROR);
 		$this->profileValidator->validate($profile);
 		unset($project->payload_json);
-		return ['project' => $project, 'profile' => $profile, 'roles' => $this->officialRoles($profile)];
+		return ['project' => $project, 'profile' => $profile, 'roles' => $this->competitionRoles($profile)];
 	}
 
 	/** @return array{match:object,project:object,profile:array<string,mixed>,roles:array<string,array<string,string>>} */
@@ -54,7 +54,7 @@ final class MatchActorRoleRepository
 		$this->profileValidator->validate($profile);
 		unset($match->payload_json);
 		$project = (object) ['id' => (int) $match->project_id, 'name' => (string) $match->project_name, 'timezone' => (string) $match->project_timezone];
-		return ['match' => $match, 'project' => $project, 'profile' => $profile, 'roles' => $this->officialRoles($profile)];
+		return ['match' => $match, 'project' => $project, 'profile' => $profile, 'roles' => $this->competitionRoles($profile)];
 	}
 
 	/** @return array{persons:list<object>,teams:list<object>} */
@@ -89,6 +89,7 @@ final class MatchActorRoleRepository
 		$context = $this->getProjectContext($projectId);
 		$role = $this->role($context['roles'], $roleCode);
 		[$actorKind, $targetId, $displayName] = $this->actor($actorReference);
+		$this->assertActorKind($role, $actorKind);
 		[$validFrom, $validUntil] = $this->dateRange($validFrom, $validUntil);
 		foreach ($this->getProjectAssignments($projectId) as $existing) {
 			$existingTarget = $actorKind === 'person' ? $existing->person_id : $existing->team_id;
@@ -100,7 +101,8 @@ final class MatchActorRoleRepository
 		$record = (object) [
 			'uuid' => UuidFactory::v4(), 'project_id' => $projectId, 'actor_kind' => $actorKind,
 			'person_id' => $actorKind === 'person' ? $targetId : null, 'team_id' => $actorKind === 'team' ? $targetId : null,
-			'role_code' => $roleCode, 'person_type' => $role['person_type'], 'valid_from' => $validFrom, 'valid_until' => $validUntil,
+			'role_code' => $roleCode, 'person_type' => $role['person_type'], 'role_domain' => $role['role_domain'],
+			'valid_from' => $validFrom, 'valid_until' => $validUntil,
 			'notes' => $this->notes($notes), 'created' => gmdate('Y-m-d H:i:s'), 'created_by' => $actorId,
 		];
 		$this->database->insertObject('#__joomleague_project_actor_role', $record, 'id');
@@ -148,7 +150,8 @@ final class MatchActorRoleRepository
 		$source = null;
 		foreach ($this->getProjectAssignments((int) $context['project']->id) as $candidate) if ((int) $candidate->id === $projectAssignmentId) $source = $candidate;
 		if (!$source || (int) $source->published !== 1 || $source->lifecycle_state !== 'active') throw new \InvalidArgumentException('The project role is not available for this match.');
-		$this->role($context['roles'], (string) $source->role_code, (string) $source->person_type);
+		$role = $this->role($context['roles'], (string) $source->role_code, (string) $source->person_type);
+		$this->assertActorKind($role, (string) $source->actor_kind);
 		$matchDate = $this->matchDate($context['match']);
 		if ($matchDate !== null && (($source->valid_from && $source->valid_from > $matchDate) || ($source->valid_until && $source->valid_until < $matchDate))) {
 			throw new \InvalidArgumentException('The project role is not valid on the match date.');
@@ -160,6 +163,7 @@ final class MatchActorRoleRepository
 			'source_project_actor_role_id' => (int) $source->id, 'actor_kind' => (string) $source->actor_kind,
 			'person_id' => $source->person_id ? (int) $source->person_id : null, 'team_id' => $source->team_id ? (int) $source->team_id : null,
 			'role_code' => (string) $source->role_code, 'person_type' => (string) $source->person_type,
+			'role_domain' => (string) $source->role_domain, 'delegation_status' => 'delegated',
 			'display_name_snapshot' => $displayName, 'notes' => $this->notes($notes),
 			'created' => gmdate('Y-m-d H:i:s'), 'created_by' => $actorId,
 		];
@@ -167,34 +171,139 @@ final class MatchActorRoleRepository
 		return (int) $record->id;
 	}
 
+	public function addDirectMatchAssignment(int $matchId, string $actorReference, string $roleCode, string $delegationStatus, ?string $notes, int $actorId): int
+	{
+		$context = $this->getMatchContext($matchId);
+		$role = $this->role($context['roles'], $roleCode);
+		if (!in_array($delegationStatus, ['delegated', 'non_delegated'], true)) throw new \InvalidArgumentException('The delegation status is invalid.');
+		[$actorKind, $targetId, $displayName] = $this->actor($actorReference);
+		$this->assertActorKind($role, $actorKind);
+		foreach ($this->getMatchAssignments($matchId) as $existing) {
+			$existingTarget = $actorKind === 'person' ? $existing->person_id : $existing->team_id;
+			if ($existing->actor_kind === $actorKind && (int) $existingTarget === $targetId && $existing->role_code === $roleCode) {
+				throw new \InvalidArgumentException('This actor already has this match role.');
+			}
+		}
+		$record = (object) [
+			'uuid' => UuidFactory::v4(), 'match_id' => $matchId, 'project_id' => (int) $context['project']->id,
+			'source_project_actor_role_id' => null, 'actor_kind' => $actorKind,
+			'person_id' => $actorKind === 'person' ? $targetId : null, 'team_id' => $actorKind === 'team' ? $targetId : null,
+			'role_code' => $roleCode, 'person_type' => $role['person_type'], 'role_domain' => $role['role_domain'],
+			'delegation_status' => $delegationStatus, 'display_name_snapshot' => $displayName, 'notes' => $this->notes($notes),
+			'created' => gmdate('Y-m-d H:i:s'), 'created_by' => $actorId,
+		];
+		$this->database->insertObject('#__joomleague_match_actor_role', $record, 'id');
+		return (int) $record->id;
+	}
+
+	/** @return list<object> */
+	public function getMatchRoleChanges(int $matchId): array
+	{
+		$this->getMatchContext($matchId);
+		$boundId = $matchId;
+		$query = $this->database->getQuery(true)->select('role_change.*')
+			->from($this->database->quoteName('#__joomleague_match_actor_role_change', 'role_change'))
+			->where('role_change.match_id = :matchId')->bind(':matchId', $boundId, ParameterType::INTEGER)
+			->order('role_change.sequence_number ASC, role_change.id ASC');
+		return $this->database->setQuery($query)->loadObjectList();
+	}
+
+	/** @return array<string,int> role code to current match assignment ID */
+	public function getEffectiveMatchRoles(int $matchId): array
+	{
+		$effective = [];
+		foreach ($this->getMatchAssignments($matchId) as $assignment) {
+			if ((int) $assignment->published === 1 && !isset($effective[(string) $assignment->role_code])) {
+				$effective[(string) $assignment->role_code] = (int) $assignment->id;
+			}
+		}
+		foreach ($this->getMatchRoleChanges($matchId) as $change) {
+			$effective[(string) $change->role_code] = (int) $change->incoming_match_actor_role_id;
+		}
+		return $effective;
+	}
+
+	public function recordMatchRoleChange(int $matchId, ?int $outgoingAssignmentId, int $incomingAssignmentId, string $roleCode, string $reasonCode, ?string $phaseCode, ?int $phaseSequence, ?string $clockValue, ?string $clockUnit, ?string $notes, int $actorId): int
+	{
+		$context = $this->getMatchContext($matchId);
+		$role = $this->role($context['roles'], $roleCode);
+		if (preg_match('/^[a-z][a-z0-9_]{0,99}$/', $reasonCode) !== 1) throw new \InvalidArgumentException('The role-change reason is invalid.');
+		$assignments = [];
+		foreach ($this->getMatchAssignments($matchId) as $assignment) $assignments[(int) $assignment->id] = $assignment;
+		if (!isset($assignments[$incomingAssignmentId]) || (int) $assignments[$incomingAssignmentId]->published !== 1) throw new \InvalidArgumentException('The incoming actor is not actively assigned to this match.');
+		if ((string) $assignments[$incomingAssignmentId]->role_domain !== $role['role_domain']) throw new \InvalidArgumentException('The incoming actor belongs to a different role domain.');
+		$effective = $this->getEffectiveMatchRoles($matchId);
+		$currentId = $effective[$roleCode] ?? null;
+		if ($outgoingAssignmentId === null ? $currentId !== null : $currentId !== $outgoingAssignmentId) {
+			throw new \InvalidArgumentException('The outgoing actor does not currently hold this role.');
+		}
+		if ($outgoingAssignmentId === $incomingAssignmentId) throw new \InvalidArgumentException('The incoming actor must differ from the outgoing actor.');
+		$phaseCode = $this->phaseCode($context['profile'], $phaseCode);
+		if ($phaseSequence !== null && ($phaseSequence < 1 || $phaseCode === null)) throw new \InvalidArgumentException('A positive phase sequence requires a profile phase.');
+		$clockValue = $this->decimalOrNull($clockValue);
+		$clockUnit = $this->codeOrNull($clockUnit, 50);
+		if (($clockValue === null) !== ($clockUnit === null)) throw new \InvalidArgumentException('Clock value and unit must be provided together.');
+		$boundMatchId = $matchId;
+		$sequence = (int) $this->database->setQuery($this->database->getQuery(true)
+			->select('COALESCE(MAX(sequence_number), 0)')->from($this->database->quoteName('#__joomleague_match_actor_role_change'))
+			->where('match_id = :matchId')->bind(':matchId', $boundMatchId, ParameterType::INTEGER))->loadResult() + 1;
+		$record = (object) [
+			'uuid' => UuidFactory::v4(), 'match_id' => $matchId, 'project_id' => (int) $context['project']->id,
+			'outgoing_match_actor_role_id' => $outgoingAssignmentId, 'incoming_match_actor_role_id' => $incomingAssignmentId,
+			'role_code' => $roleCode, 'role_domain' => $role['role_domain'], 'sequence_number' => $sequence,
+			'phase_code' => $phaseCode, 'phase_sequence' => $phaseSequence, 'clock_value' => $clockValue, 'clock_unit' => $clockUnit,
+			'reason_code' => $reasonCode, 'notes' => $this->notes($notes), 'created' => gmdate('Y-m-d H:i:s'), 'created_by' => $actorId,
+		];
+		$this->database->insertObject('#__joomleague_match_actor_role_change', $record, 'id');
+		return (int) $record->id;
+	}
+
 	public function removeFromMatch(int $matchId, int $assignmentId): void
 	{
 		$this->getMatchContext($matchId);
 		$boundId = $assignmentId; $boundMatchId = $matchId;
-		$query = $this->database->getQuery(true)->delete($this->database->quoteName('#__joomleague_match_actor_role'))
+		$modified = gmdate('Y-m-d H:i:s');
+		$query = $this->database->getQuery(true)->update($this->database->quoteName('#__joomleague_match_actor_role'))
+			->set($this->database->quoteName('published') . ' = 0')
+			->set($this->database->quoteName('modified') . ' = :modified')
 			->where('id = :id')->where('match_id = :matchId')
-			->bind(':id', $boundId, ParameterType::INTEGER)->bind(':matchId', $boundMatchId, ParameterType::INTEGER);
+			->where($this->database->quoteName('published') . ' = 1')
+			->bind(':modified', $modified)->bind(':id', $boundId, ParameterType::INTEGER)->bind(':matchId', $boundMatchId, ParameterType::INTEGER);
 		$this->database->setQuery($query)->execute();
 		if ($this->database->getAffectedRows() !== 1) throw new \InvalidArgumentException('The match role assignment does not belong to this match.');
 	}
 
-	/** @param array<string,mixed> $profile @return array<string,array<string,string>> */
-	private function officialRoles(array $profile): array
+	/** @param array<string,mixed> $profile @return array<string,array<string,mixed>> */
+	private function competitionRoles(array $profile): array
 	{
 		$roles = [];
 		foreach ($profile['positions'] ?? [] as $position) {
-			if (($position['person_type'] ?? null) !== 'official' || !is_string($position['code'] ?? null) || !is_string($position['name_key'] ?? null)) continue;
-			$roles[$position['code']] = ['name_key' => $position['name_key'], 'person_type' => $position['person_type']];
+			$domain = is_string($position['role_domain'] ?? null) ? $position['role_domain'] : (($position['person_type'] ?? null) === 'official' ? RoleDomain::COMPETITION_OFFICIAL : null);
+			if (!is_string($domain) || !RoleDomain::isCompetitionActor($domain) || !is_string($position['code'] ?? null) || !is_string($position['name_key'] ?? null)) continue;
+			$roles[$position['code']] = [
+				'name_key' => $position['name_key'],
+				'person_type' => (string) $position['person_type'],
+				'role_domain' => $domain,
+				'actor_kinds' => is_array($position['actor_kinds'] ?? null) ? array_values($position['actor_kinds']) : ['person', 'team'],
+			];
 		}
 		return $roles;
 	}
 
-	/** @param array<string,array<string,string>> $roles @return array<string,string> */
+	/** @param array<string,array<string,mixed>> $roles @return array<string,mixed> */
 	private function role(array $roles, string $roleCode, ?string $personType = null): array
 	{
 		$roleCode = trim($roleCode);
-		if (!isset($roles[$roleCode]) || ($personType !== null && $roles[$roleCode]['person_type'] !== $personType)) throw new \InvalidArgumentException('The role is not an official position in the active profile.');
+		if (!isset($roles[$roleCode]) || ($personType !== null && $roles[$roleCode]['person_type'] !== $personType)) throw new \InvalidArgumentException('The role is not a competition role in the active profile.');
 		return $roles[$roleCode];
+	}
+
+	/** @param array<string,mixed> $role */
+	private function assertActorKind(array $role, string $actorKind): void
+	{
+		if (!in_array($actorKind, $role['actor_kinds'] ?? [], true)) {
+			throw new \InvalidArgumentException('This actor kind is not permitted for the selected competition role.');
+		}
 	}
 
 	/** @return array{0:string,1:int,2:string} */
@@ -247,5 +356,28 @@ final class MatchActorRoleRepository
 		$notes = trim((string) $notes); if ($notes === '') return null;
 		if (strlen($notes) > 65535) throw new \LengthException('The notes are too long.');
 		return $notes;
+	}
+
+	/** @param array<string,mixed> $profile */
+	private function phaseCode(array $profile, ?string $phaseCode): ?string
+	{
+		$phaseCode = $this->codeOrNull($phaseCode, 100);
+		if ($phaseCode === null) return null;
+		foreach ($profile['match']['score']['segment_types'] ?? [] as $segment) if (($segment['code'] ?? null) === $phaseCode) return $phaseCode;
+		throw new \InvalidArgumentException('The role-change phase is not defined by the match profile.');
+	}
+
+	private function decimalOrNull(?string $value): ?string
+	{
+		$value = trim((string) $value); if ($value === '') return null;
+		if (preg_match('/^\d{1,21}(?:\.\d{1,9})?$/', $value) !== 1) throw new \InvalidArgumentException('The role-change clock value is invalid.');
+		return $value;
+	}
+
+	private function codeOrNull(?string $value, int $maximum): ?string
+	{
+		$value = trim((string) $value); if ($value === '') return null;
+		if (mb_strlen($value) > $maximum || preg_match('/^[a-z0-9][a-z0-9_.-]*$/', $value) !== 1) throw new \InvalidArgumentException('The role-change code is invalid.');
+		return $value;
 	}
 }

@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "volleyball",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL",
     "description_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_DESC",
     "scoring_model": "sets",
@@ -152,14 +152,14 @@
         "technical_timeouts": false,
         "default_start_time": "18:00"
     },
-	"lineup": {
-		"substitutions": {
-			"supported": true,
-			"reentry_supported": true,
-			"limit_scope": "segment",
-			"maximum_per_scope": 6
-		},
-		"players_on_court": 6,
+    "lineup": {
+        "substitutions": {
+            "supported": true,
+            "reentry_supported": true,
+            "limit_scope": "segment",
+            "maximum_per_scope": 6
+        },
+        "players_on_court": 6,
         "minimum_players_to_start": 6,
         "libero_supported": true,
         "captain_supported": true,
@@ -445,7 +445,8 @@
             "lineup_group": "player",
             "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_SETTER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "outside_hitter",
@@ -453,7 +454,8 @@
             "lineup_group": "player",
             "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_OUTSIDE_HITTER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "middle_blocker",
@@ -461,7 +463,8 @@
             "lineup_group": "player",
             "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_MIDDLE_BLOCKER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "opposite",
@@ -469,7 +472,8 @@
             "lineup_group": "player",
             "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_OPPOSITE",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "libero",
@@ -477,52 +481,78 @@
             "lineup_group": "libero",
             "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_LIBERO",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "head_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_HEAD_COACH"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_HEAD_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "assistant_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_ASSISTANT_COACH"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_ASSISTANT_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "team_manager",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_TEAM_MANAGER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_TEAM_MANAGER",
+            "role_domain": "team_staff"
         },
         {
             "code": "physiotherapist",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_PHYSIOTHERAPIST"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_PHYSIOTHERAPIST",
+            "role_domain": "team_staff"
         },
         {
             "code": "first_referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_FIRST_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_FIRST_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "second_referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_SECOND_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_SECOND_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "scorer",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_SCORER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_SCORER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "line_judge",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_LINE_JUDGE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_LINE_JUDGE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "delegate",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_DELEGATE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_VOLLEYBALL_POSITION_DELEGATE",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -700,7 +730,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true,
             "show_set_scores": true

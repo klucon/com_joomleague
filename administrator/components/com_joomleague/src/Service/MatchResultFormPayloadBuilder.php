@@ -21,10 +21,11 @@ final class MatchResultFormPayloadBuilder
 		}
 
 		$conditions = is_array($input['conditions'] ?? null) ? $input['conditions'] : [];
-		$root = $this->segment($segments[0], $types, $conditions, true);
+		$encounter = is_array($schema['encounter'] ?? null);
+		$root = $this->segment($segments[0], $types, $conditions, true, $encounter);
 		if ($root === null) throw new \InvalidArgumentException('Result form has no root segment.');
 
-		return [
+		$payload = [
 			'result_type' => (string) ($input['result_type'] ?? ''),
 			'status_code' => (string) ($input['status_code'] ?? 'draft'),
 			'outcome_code' => ($input['outcome_code'] ?? '') === '' ? null : (string) $input['outcome_code'],
@@ -33,10 +34,23 @@ final class MatchResultFormPayloadBuilder
 			'metadata' => [],
 			'segments' => [$root],
 		];
+		if (is_array($schema['encounter'] ?? null)) {
+			$payload['encounter_revision'] = (string) ($input['encounter_revision'] ?? '');
+			$payload['duels'] = [];
+			foreach ($segments[0]['children'] ?? [] as $segment) {
+				if (!is_array($segment) || ($segment['level_code'] ?? null) !== 'duel') continue;
+				$sequence = (int) ($segment['sequence_number'] ?? 0);
+				if (!in_array($sequence, array_column(array_filter($root['children'], static fn (array $child): bool => $child['level_code'] === 'duel'), 'sequence_number'), true)) continue;
+				$sides = [];
+				foreach ($segment['nominations'] ?? [] as $id => $members) $sides[] = ['participant_id' => $id, 'lineup_member_ids' => is_array($members) ? array_values(array_filter($members, static fn($v): bool => $v !== '')) : []];
+				$payload['duels'][] = ['sequence_number' => $sequence, 'format_code' => (string) ($segment['encounter_format'] ?? ''), 'sides' => $sides];
+			}
+		}
+		return $payload;
 	}
 
 	/** @param array<string,mixed> $input @param array<string,array<string,mixed>> $types @param array<string,mixed> $conditions @return array<string,mixed>|null */
-	private function segment(array $input, array $types, array $conditions, bool $root = false): ?array
+	private function segment(array $input, array $types, array $conditions, bool $root = false, bool $encounter = false): ?array
 	{
 		$levelCode = (string) ($input['level_code'] ?? '');
 		$type = $types[$levelCode] ?? null;
@@ -60,13 +74,18 @@ final class MatchResultFormPayloadBuilder
 				throw new MatchResultValidationException('COM_JOOMLEAGUE_MATCHRESULT_ERROR_DURATION_FORMAT');
 			}
 
+			$metadata = [];
+			foreach ($type['value_fields'] ?? [] as $field => $definition) {
+				$raw = $value['metadata'][$field] ?? null;
+				if ($raw !== null && $raw !== '') $metadata[$field] = $raw;
+			}
 			$normalized = [
 				'participant_id' => $participantId,
 				'numeric_value' => $numericValue,
 				'text_value' => $this->nullable($value['text_value'] ?? null),
 				'status_code' => $this->nullable($value['status_code'] ?? null),
 				'result_rank' => $this->nullable($value['result_rank'] ?? null),
-				'metadata' => [],
+				'metadata' => $metadata,
 			];
 			if ($normalized['numeric_value'] !== null || $normalized['text_value'] !== null || $normalized['status_code'] !== null || $normalized['result_rank'] !== null) $values[] = $normalized;
 		}
@@ -74,17 +93,18 @@ final class MatchResultFormPayloadBuilder
 		$children = [];
 		foreach (($input['children'] ?? []) as $child) {
 			if (!is_array($child)) continue;
-			$normalized = $this->segment($child, $types, $conditions);
+			$normalized = $this->segment($child, $types, $conditions, false, $encounter);
 			if ($normalized !== null) $children[] = $normalized;
 		}
 
 		$included = $root || is_string($condition) || (int) ($input['included'] ?? 0) === 1 || $values !== [] || $children !== [];
 		if (!$included) return null;
+		if ($encounter && $levelCode === 'duel' && ($input['duel_status'] ?? null) === 'cancelled') { $values = []; $children = []; }
 
 		return [
 			'level_code' => $levelCode,
 			'sequence_number' => (int) ($input['sequence_number'] ?? 1),
-			'status_code' => 'completed',
+			'status_code' => $encounter && $levelCode === 'duel' ? (string) ($input['duel_status'] ?? 'completed') : 'completed',
 			'metadata' => [],
 			'values' => $values,
 			'children' => $children,

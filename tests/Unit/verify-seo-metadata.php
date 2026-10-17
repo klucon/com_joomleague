@@ -31,4 +31,9 @@ if (($document->metadata['twitter:card'][0] ?? '') !== 'summary_large_image') th
 if (($document->metadata['twitter:image'][0] ?? '') !== 'https://example.test/image.jpg') throw new RuntimeException('Twitter image metadata is invalid.');
 if (!str_contains($document->tags[0] ?? '', '\\u003C/script\u003E')) throw new RuntimeException('Structured data JSON is not script-safe.');
 
+$seo->apply($document, 'Long description', 'https://example.test/long', str_repeat('Competition description ', 20));
+if (strlen($document->description) > 180 || !str_ends_with($document->description, '...')) {
+	throw new RuntimeException('SEO description length normalization failed.');
+}
+
 echo "Canonical, Open Graph and structured-data metadata service OK\n";

@@ -8,6 +8,8 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomleague\Component\Joomleague\Site\Service\PublicViewGuard;
+use Joomleague\Component\Joomleague\Site\Service\SeoMetadata;
 
 final class HtmlView extends BaseHtmlView
 {
@@ -17,7 +19,9 @@ final class HtmlView extends BaseHtmlView
 	public function display($tpl = null): void
 	{
 		$this->event = $this->getModel()->getEvent();
-		$this->getDocument()->setTitle(isset($this->event['item']) ? (string) $this->event['item']->project_name : Text::_('COM_JOOMLEAGUE_NEXTMATCH_VIEW_TITLE'));
+		PublicViewGuard::requireItem($this->event, 'project');
+		$title = Text::sprintf('COM_JOOMLEAGUE_NEXTMATCH_PAGE_TITLE', $this->event['project']->name);
+		(new SeoMetadata())->applyView($this->getDocument(), 'nextmatch', ['project_id' => (int) $this->event['project']->id], $title, Text::sprintf('COM_JOOMLEAGUE_SEO_PROJECT_DESCRIPTION', Text::_('COM_JOOMLEAGUE_NEXTMATCH_VIEW_TITLE'), $this->event['project']->name));
 		parent::display($tpl);
 	}
 }

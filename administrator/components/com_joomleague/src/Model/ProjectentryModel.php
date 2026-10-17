@@ -62,7 +62,8 @@ final class ProjectentryModel extends AdminModel implements CurrentUserInterface
 
 	public function save($data): bool
 	{
-		$entryId = (int) ($data['id'] ?? 0);
+		$entryId = (int) ($data['id'] ?? $this->getState($this->getName() . '.id'));
+		$data['id'] = $entryId;
 		$kind = strtolower(trim((string) ($data['entry_kind'] ?? '')));
 
 		try {
@@ -74,6 +75,10 @@ final class ProjectentryModel extends AdminModel implements CurrentUserInterface
 			return false;
 		}
 
+		if ($projectId < 1 || !$this->canEditProject($projectId, $entryId > 0 ? 'core.edit' : 'core.create')) {
+			$this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
+			return false;
+		}
 		$data['project_id'] = $projectId;
 
 		$allowedKinds = $project->profile['entry_model']['allowed_kinds'] ?? [];
@@ -117,6 +122,12 @@ final class ProjectentryModel extends AdminModel implements CurrentUserInterface
 		return $result;
 	}
 
+	protected function getReorderConditions($table): array
+	{
+		$ownerId = (int) ($table->project_id ?? 0);
+		return [$ownerId > 0 ? $this->getDatabase()->quoteName('project_id') . ' = ' . $ownerId : '1 = 0'];
+	}
+
 	protected function canDelete($record): bool
 	{
 		return $this->canEditProject((int) ($record->project_id ?? 0), 'core.delete');
@@ -129,7 +140,11 @@ final class ProjectentryModel extends AdminModel implements CurrentUserInterface
 
 	private function canEditProject(int $projectId, string $action): bool
 	{
-		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		if ($projectId < 1) {
+			return false;
+		}
+
+		$asset = 'com_joomleague.project.' . $projectId;
 		return $this->getCurrentUser()->authorise($action, $asset);
 	}
 

@@ -12,6 +12,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Utility\Utility;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Log\Log;
 
 final class DataimportController extends BaseController
 {
@@ -26,18 +27,22 @@ final class DataimportController extends BaseController
 				throw new \RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_SIZE');
 			}
 			if (!is_array($file) || ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK || strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION)) !== 'sql') {
-				throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_DATAIMPORT_ERROR_FILE'));
+				throw new \RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_FILE');
 			}
 			if ((int) ($file['size'] ?? 0) > $maxUploadSize) throw new \RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_SIZE');
-			if (!is_uploaded_file((string) $file['tmp_name'])) throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_DATAIMPORT_ERROR_FILE'));
+			if (!is_uploaded_file((string) $file['tmp_name'])) throw new \RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_FILE');
 			$sql = file_get_contents((string) $file['tmp_name']);
-			if ($sql === false) throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_DATAIMPORT_ERROR_FILE'));
+			if ($sql === false) throw new \RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_FILE');
 			$result = $this->getModel('Dataimport')->import($sql);
 			$this->app->enqueueMessage(Text::sprintf('COM_JOOMLEAGUE_DATAIMPORT_SUCCESS', $result['executed'], $result['skipped']));
 		} catch (\Throwable $error) {
+			$knownErrors = ['COM_JOOMLEAGUE_DATAIMPORT_ERROR_FILE', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_SIZE', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_LOCK', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_RECOVERED', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_RECOVERY_INCOMPLETE', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_PROFILE'];
+			if (!in_array($error->getMessage(), $knownErrors, true)) {
+				Log::add('SQL import failed (' . get_class($error) . ', code ' . $error->getCode() . ').', Log::ERROR, 'com_joomleague.import');
+			}
 			$message = $error->getMessage() === 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_SIZE'
 				? Text::sprintf('COM_JOOMLEAGUE_DATAIMPORT_ERROR_SIZE', HTMLHelper::_('number.bytes', $maxUploadSize))
-				: (str_starts_with($error->getMessage(), 'COM_JOOMLEAGUE_') ? Text::_($error->getMessage()) : $error->getMessage());
+				: Text::_(in_array($error->getMessage(), $knownErrors, true) ? $error->getMessage() : 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_FAILED');
 			$this->app->enqueueMessage($message, 'error');
 		}
 		$this->setRedirect(Route::_('index.php?option=com_joomleague&view=dataimport', false));

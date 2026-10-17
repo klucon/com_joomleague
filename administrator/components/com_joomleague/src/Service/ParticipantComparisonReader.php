@@ -35,7 +35,7 @@ final class ParticipantComparisonReader
 		if($firstId===$secondId||!isset($entries[$firstId],$entries[$secondId]))throw new \InvalidArgumentException('Two distinct project entries are required.');
 		$ids=[$firstId,$secondId]; $matchQuery=$db->getQuery(true)->select('participant.match_id')->from($db->quoteName('#__joomleague_match_participant','participant'))
 			->innerJoin($db->quoteName('#__joomleague_project_match','item').' ON item.id=participant.match_id AND item.published=1')
-			->innerJoin($db->quoteName('#__joomleague_match_result','result')." ON result.match_id=item.id AND result.status_code='final'")
+			->innerJoin($db->quoteName('#__joomleague_match_result','result')." ON result.match_id=item.id AND result.status_code='final' AND item.status_code <> 'cancelled'")
 			->where('item.project_id=:project')->where('participant.published=1')->whereIn('participant.project_entry_id',$ids,ParameterType::INTEGER)
 			->group('participant.match_id')->having('COUNT(DISTINCT participant.project_entry_id)=2')->bind(':project',$projectId,ParameterType::INTEGER);
 		$matchIds=array_map('intval',$db->setQuery($matchQuery)->loadColumn()); $profile=json_decode((string)$project->payload_json,true); unset($project->payload_json);

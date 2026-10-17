@@ -13,6 +13,16 @@ php "${ROOT}/tests/Architecture/verify-template-contract.php"
 php "${ROOT}/tests/Architecture/verify-custom-fields-contract.php"
 php "${ROOT}/tests/Architecture/verify-seo-contract.php"
 php "${ROOT}/tests/Architecture/verify-toolbar-contract.php"
+php "${ROOT}/tests/Architecture/verify-sport-categories.php"
+php "${ROOT}/tests/Unit/verify-sport-category-tree.php"
+php "${ROOT}/tests/Unit/verify-sport-variant-compiler.php"
+php "${ROOT}/tests/Unit/verify-sport-variant-rules.php"
+if php -r 'exit(extension_loaded("simplexml") ? 0 : 1);'; then
+	php "${ROOT}/tests/Unit/verify-component-language-manifest.php"
+else
+	printf '%s\n' 'SimpleXML unavailable: checking language manifest with xmllint.'
+	test "$(xmllint --xpath 'count(/extension/administration/languages/language)' "${ROOT}/administrator/components/com_joomleague/joomleague.xml")" = '12'
+fi
 
 if [[ -z "${VERSION}" ]] || ! php -r 'exit(version_compare($argv[1], "6.2.0-dev", ">=") ? 0 : 1);' "${VERSION}"; then
 	printf '%s\n' 'Package version is missing or invalid.' >&2

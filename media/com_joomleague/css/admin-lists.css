@@ -1,0 +1,10 @@
+/* Allow Atum's flex content column to shrink before tables start scrolling. */
+body.com_joomleague:is(.view-matches, .view-positions, .view-projects, .view-sportprofiles) .container-main {
+    min-width: 0;
+}
+body.com_joomleague:is(.view-matches, .view-positions, .view-projects, .view-sportprofiles) main .row {
+    margin-inline: 0;
+}
+body.com_joomleague:is(.view-matches, .view-positions, .view-projects, .view-sportprofiles) main .pagination {
+    flex-wrap: wrap;
+}

@@ -12,6 +12,13 @@
 			<option value="">JGLOBAL_SORT_BY</option><option value="sport_type.name ASC">COM_JOOMLEAGUE_POSITION_SORT_SPORT_TYPE_ASC</option><option value="sport_type.name DESC">COM_JOOMLEAGUE_POSITION_SORT_SPORT_TYPE_DESC</option>
 			<option value="statistic.name ASC">JGLOBAL_TITLE_ASC</option><option value="statistic.name DESC">JGLOBAL_TITLE_DESC</option><option value="statistic.code ASC">COM_JOOMLEAGUE_POSITION_SORT_CODE_ASC</option><option value="statistic.code DESC">COM_JOOMLEAGUE_POSITION_SORT_CODE_DESC</option>
 			<option value="statistic.id ASC">JGRID_HEADING_ID_ASC</option><option value="statistic.id DESC">JGRID_HEADING_ID_DESC</option>
+		
+			<option value="statistic.statistic_type ASC">COM_JOOMLEAGUE_SORT_STATISTIC_STATISTIC_TYPE_ASC</option>
+			<option value="statistic.statistic_type DESC">COM_JOOMLEAGUE_SORT_STATISTIC_STATISTIC_TYPE_DESC</option>
+			<option value="statistic.scope ASC">COM_JOOMLEAGUE_SORT_STATISTIC_SCOPE_ASC</option>
+			<option value="statistic.scope DESC">COM_JOOMLEAGUE_SORT_STATISTIC_SCOPE_DESC</option>
+			<option value="statistic.published ASC">COM_JOOMLEAGUE_SORT_STATISTIC_PUBLISHED_ASC</option>
+			<option value="statistic.published DESC">COM_JOOMLEAGUE_SORT_STATISTIC_PUBLISHED_DESC</option>
 		</field>
 		<field name="limit" type="limitbox" label="JGLOBAL_LIST_LIMIT" labelclass="visually-hidden" default="20" onchange="this.form.submit();" />
 	</fields>

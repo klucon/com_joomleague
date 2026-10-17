@@ -12,12 +12,16 @@ $description = $this->form->getField('description');
 ?>
 <form action="<?php echo Route::_('index.php?option=com_joomleague&layout=edit&id=' . (int) $this->item->id); ?>" method="post" name="adminForm" id="project-form" class="form-validate">
 	<div class="main-card">
-		<?php echo HTMLHelper::_('uitab.startTabSet', 'projectTabs', ['active' => 'details', 'recall' => true, 'breakpoint' => 768]); ?>
+		<?php echo HTMLHelper::_('uitab.startTabSet', 'projectTabs', ['active' => \Joomla\CMS\Factory::getApplication()->getInput()->getBool('profile_check') ? 'sportprofile' : 'details', 'recall' => !\Joomla\CMS\Factory::getApplication()->getInput()->getBool('profile_check'), 'breakpoint' => 768]); ?>
 
 		<?php echo HTMLHelper::_('uitab.addTab', 'projectTabs', 'details', Text::_('COM_JOOMLEAGUE_FIELDSET_PROJECT_DETAILS')); ?>
 		<div class="row"><div class="col-12">
 			<fieldset class="options-form"><legend><?php echo Text::_('COM_JOOMLEAGUE_FIELDSET_PROJECT_DETAILS'); ?></legend><?php echo $this->form->renderFieldset('details'); ?></fieldset>
 		</div></div>
+		<?php echo HTMLHelper::_('uitab.endTab'); ?>
+
+		<?php echo HTMLHelper::_('uitab.addTab', 'projectTabs', 'sportprofile', Text::_('COM_JOOMLEAGUE_PROFILE_MIGRATION_TAB')); ?>
+		<?php echo $this->loadTemplate('sportprofile'); ?>
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
 		<?php echo HTMLHelper::_('uitab.addTab', 'projectTabs', 'schedule', Text::_('COM_JOOMLEAGUE_FIELDSET_PROJECT_SCHEDULE')); ?>
@@ -61,3 +65,13 @@ $description = $this->form->getField('description');
 	<?php if ($this->return !== null) : ?><input type="hidden" name="return" value="<?php echo $this->escape($this->return); ?>"><?php endif; ?>
 	<input type="hidden" name="task" value=""><?php echo HTMLHelper::_('form.token'); ?>
 </form>
+<?php $migrationTarget = $this->profileMigration['variant_target'] ?? $this->profileMigration['target'] ?? null; ?>
+<?php if ($migrationTarget !== null) : ?>
+<form id="profile-migration-form" action="<?php echo Route::_('index.php?option=com_joomleague'); ?>" method="post">
+	<input type="hidden" name="task" value="projectprofile.migrate">
+	<input type="hidden" name="project_id" value="<?php echo (int) $this->item->id; ?>">
+	<input type="hidden" name="target_version_id" value="<?php echo (int) $migrationTarget['id']; ?>">
+	<input type="hidden" name="review_checksum" value="<?php echo $this->escape($this->profileMigration['checksum']); ?>">
+	<?php echo HTMLHelper::_('form.token'); ?>
+</form>
+<?php endif; ?>

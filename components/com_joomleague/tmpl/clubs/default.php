@@ -55,6 +55,6 @@ $itemId = Factory::getApplication()->getInput()->getInt('Itemid', 0);
 				</div></article></div>
 			<?php endforeach; ?>
 		</div>
-		<?php if ($this->pagination->pagesTotal > 1) : ?><nav class="mt-4" aria-label="<?php echo Text::_('JLIB_HTML_PAGINATION'); ?>"><?php echo $this->pagination->getPagesLinks(); ?></nav><?php endif; ?>
+		<?php if ($this->pagination->pagesTotal > 1) : ?><nav class="mt-4 overflow-auto" aria-label="<?php echo Text::_('JLIB_HTML_PAGINATION'); ?>"><?php echo $this->pagination->getPagesLinks(); ?></nav><?php endif; ?>
 	<?php endif; ?>
 </div>

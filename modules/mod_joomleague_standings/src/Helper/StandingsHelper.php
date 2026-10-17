@@ -16,6 +16,7 @@ use Joomla\Registry\Registry;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
 use Joomleague\Component\Joomleague\Site\Service\ProjectTemplateProvider;
 use Joomleague\Component\Joomleague\Site\Service\RankingColumnFilter;
+use Joomleague\Component\Joomleague\Site\Service\PublicAccess;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -67,10 +68,28 @@ class StandingsHelper
         $stageId = $stageId > 0 ? $stageId : null;
 
         try {
+            if (!PublicAccess::projectAllowed($database, $projectId)) {
+                return ['error' => 'MOD_JOOMLEAGUE_STANDINGS_UNAVAILABLE'];
+            }
+            $visibility = $database->getQuery(true)->select('COUNT(*)')
+                ->from($database->quoteName('#__joomleague_project', 'project'))
+                ->innerJoin($database->quoteName('#__joomleague_sport_type', 'sport') . ' ON sport.id = project.sport_type_id AND sport.published = 1')
+                ->where('project.id = :project')->bind(':project', $projectId, \Joomla\Database\ParameterType::INTEGER);
+            if ($stageId !== null) {
+                $visibility->innerJoin($database->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.project_id = project.id AND stage.published = 1')
+                    ->where('stage.id = :stage')->bind(':stage', $stageId, \Joomla\Database\ParameterType::INTEGER);
+            }
+            if ((int) $database->setQuery($visibility)->loadResult() !== 1) {
+                return ['error' => 'MOD_JOOMLEAGUE_STANDINGS_UNAVAILABLE'];
+            }
             $context = $reader->describe($projectId, $stageId);
-            $scope = (string) $context['default_scope'];
+            $scope = (string) $params->get('scope', '');
+            if ($scope === '') $scope = (string) $context['default_scope'];
+            if (!in_array($scope, $context['available_scopes'], true)) {
+                return ['error' => 'MOD_JOOMLEAGUE_STANDINGS_UNAVAILABLE'];
+            }
             $current = $reader->current($projectId, $stageId, $scope);
-        } catch (\Throwable $exception) {
+        } catch (\Throwable $exception) { \Joomla\CMS\Log\Log::add('mod_joomleague_standings failure: ' . get_debug_type($exception), \Joomla\CMS\Log\Log::WARNING, 'com_joomleague.modules');
             return ['error' => 'MOD_JOOMLEAGUE_STANDINGS_UNAVAILABLE'];
         }
 
@@ -80,24 +99,45 @@ class StandingsHelper
 
         $rows = $current['rows'];
         $highlightEntryId = (int) $params->get('highlight_entry_id', 0);
-        $limit = (int) $params->get('limit', 0);
+        $limit = max(0, min(200, (int) $params->get('limit', 0)));
+        $offset = max(0, min(10000, (int) $params->get('offset', 0)));
 
-        // Zone boundaries are absolute ranks (rank 3 of 14 stays rank 3 of
-        // 14 regardless of the row-limit window below), so they must be
-        // resolved against the full row count before any windowing happens.
+        // Zone boundaries use positions in the full table, not tied ranks.
         $this->markZoneBoundaries($rows, $params);
 
         // The row-limit window still centres on the highlighted entry even
         // when its visual style is "none" — centring and the visual cue are
         // independent choices.
-        if ($limit > 0 && \count($rows) > $limit) {
+        if ($offset > 0) {
+            $rows = array_slice($rows, $offset, $limit > 0 ? $limit : null);
+        } elseif ($limit > 0 && \count($rows) > $limit) {
             $rows = $this->windowRows($rows, $limit, $highlightEntryId);
         }
+        if ($rows === []) {
+            return ['error' => 'MOD_JOOMLEAGUE_STANDINGS_EMPTY', 'project' => $context['project']];
+        }
 
-        $formEnabled = (int) $params->get('form_enabled', 0) === 1;
+        if ((int) $params->get('show_images', 0) === 1 && $rows !== []) {
+            $ids = array_map(static fn ($row): int => (int) $row->project_entry_id, $rows);
+            $query = $database->getQuery(true)->select(['entry.id', 'entry.entry_kind', 'team.logo AS team_logo', 'team.picture AS team_picture', 'person.picture AS person_picture', 'club.logo AS club_logo'])
+                ->from($database->quoteName('#__joomleague_project_entry', 'entry'))
+                ->leftJoin($database->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.published = 1 AND ' . PublicAccess::condition($database, 'team'))
+                ->leftJoin($database->quoteName('#__joomleague_club', 'club') . ' ON club.id = team.club_id AND club.published = 1 AND ' . PublicAccess::condition($database, 'club'))
+                ->leftJoin($database->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id AND person.published = 1 AND ' . PublicAccess::condition($database, 'person'))
+                ->where('entry.project_id = :project')->where('entry.published = 1')
+                ->whereIn('entry.id', $ids, \Joomla\Database\ParameterType::INTEGER)
+                ->bind(':project', $projectId, \Joomla\Database\ParameterType::INTEGER);
+            $images = $database->setQuery($query)->loadObjectList('id');
+            foreach ($rows as $row) {
+                $imageRow = $images[(int) $row->project_entry_id] ?? null;
+                $row->image = $imageRow === null ? '' : \Joomleague\Component\Joomleague\Site\Service\MediaResolver::participantImage($imageRow);
+            }
+        }
+        $formEnabled = ($context['profile']['contest']['type'] ?? '') === 'head_to_head'
+            && (int) $params->get('form_enabled', 0) === 1;
         $form = [];
         if ($formEnabled) {
-            $formCount = max(1, (int) $params->get('form_count', 5));
+            $formCount = max(1, min(20, (int) $params->get('form_count', 5)));
             $entryIds = array_values(array_unique(array_map(static fn ($row) => (int) $row->project_entry_id, $rows)));
             $outcomeSource = (string) ($context['contract']['outcome_source'] ?? 'root_numeric');
             $includedStatuses = $context['contract']['included_result_statuses'] ?? ['final'];
@@ -120,7 +160,7 @@ class StandingsHelper
             $templateConfig = $provider->supports($projectId, 'ranking')
                 ? $provider->resolve($projectId, 'ranking', $presentationOverrides)
                 : [];
-        } catch (\Throwable) {
+        } catch (\Throwable $moduleFailure) { \Joomla\CMS\Log\Log::add('mod_joomleague_standings failure: ' . get_debug_type($moduleFailure), \Joomla\CMS\Log\Log::WARNING, 'com_joomleague.modules');
             $templateConfig = [];
         }
 
@@ -142,12 +182,12 @@ class StandingsHelper
         // radio pair always has exactly one option selected and therefore
         // always submits a value, whichever way the admin sets it.
         $columns = $this->buildColumns($context['contract']['metrics'] ?? [], $params->get('metric_codes', []), (int) $params->get('combined_score_format', 0) === 1);
-        if ($templateConfig !== []) {
-            $columns = (new RankingColumnFilter())->apply($columns, $templateConfig);
-        }
+        $columns = (new RankingColumnFilter())->apply($columns, array_replace($templateConfig, $presentationOverrides));
 
         return [
             'project' => $context['project'],
+            'stage' => $context['stage'],
+            'scope' => $scope,
             'columns' => $columns,
             'short_labels' => (int) $params->get('short_labels', 0) === 1,
             'short_label_tooltips' => (int) $params->get('short_label_tooltips', 1) === 1,
@@ -193,8 +233,8 @@ class StandingsHelper
         $bottomCount = max(0, (int) $params->get('zone_bottom_count', 3));
         $bottomColor = $this->sanitizeColor((string) $params->get('zone_bottom_color', '#dc3545'), '#dc3545');
 
-        foreach ($rows as $row) {
-            $rank = (int) $row->rank_number;
+        foreach ($rows as $index => $row) {
+            $rank = $index + 1;
             $row->zone_top = ($topEnabled && $topCount > 0 && $topCount < $total && $rank === $topCount) ? $topColor : null;
             $row->zone_bottom = ($bottomEnabled && $bottomCount > 0 && $bottomCount < $total && $rank === $total - $bottomCount + 1) ? $bottomColor : null;
         }
@@ -244,7 +284,7 @@ class StandingsHelper
         $allowed = array_filter(array_map(static fn ($code) => strtolower(trim((string) $code)), $codes));
 
         if ($allowed === []) {
-            return $metrics;
+            return array_values(array_filter($metrics, static fn (array $metric): bool => ($metric['operation'] ?? '') !== 'status_order'));
         }
 
         return array_values(array_filter(
@@ -269,9 +309,11 @@ class StandingsHelper
     {
         $metrics = $this->filterMetrics($metrics, $metricCodes);
         $codes = array_map(static fn (array $m) => (string) $m['code'], $metrics);
+        $definitions = [];
+        foreach ($metrics as $metric) $definitions[(string) $metric['code']] = $metric;
 
         if (!$combine) {
-            return array_map(static fn (string $code) => ['type' => 'single', 'code' => $code], $codes);
+            return array_map(static fn (string $code) => ['type' => 'single', 'code' => $code, 'definition' => $definitions[$code]], $codes);
         }
 
         $present = array_fill_keys($codes, true);
@@ -307,7 +349,7 @@ class StandingsHelper
                 continue;
             }
 
-            $columns[] = ['type' => 'single', 'code' => $code];
+            $columns[] = ['type' => 'single', 'code' => $code, 'definition' => $definitions[$code]];
         }
 
         return $columns;

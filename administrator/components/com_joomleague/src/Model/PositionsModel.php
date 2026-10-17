@@ -13,7 +13,7 @@ final class PositionsModel extends ListModel
 {
 	public function __construct($config = [])
 	{
-		$config['filter_fields'] ??= ['id', 'position.id', 'name', 'position.name', 'code', 'position.code', 'sport_type', 'sport_type.name', 'person_type', 'position.person_type', 'published', 'position.published', 'ordering', 'position.ordering'];
+		$config['filter_fields'] ??= ['id', 'position.id', 'name', 'position.name', 'code', 'position.code', 'sport_type', 'sport_type.name', 'person_type', 'position.person_type', 'role_domain', 'position.role_domain', 'published', 'position.published', 'ordering', 'position.ordering'];
 		parent::__construct($config);
 	}
 
@@ -22,6 +22,7 @@ final class PositionsModel extends ListModel
 		$this->setState('filter.search', $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search'));
 		$this->setState('filter.sport_type_id', $this->getUserStateFromRequest($this->context . '.filter.sport_type_id', 'filter_sport_type_id', ''));
 		$this->setState('filter.person_type', $this->getUserStateFromRequest($this->context . '.filter.person_type', 'filter_person_type', ''));
+		$this->setState('filter.role_domain', $this->getUserStateFromRequest($this->context . '.filter.role_domain', 'filter_role_domain', ''));
 		$this->setState('filter.published', $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', ''));
 		parent::populateState($ordering, $direction);
 	}
@@ -45,6 +46,8 @@ final class PositionsModel extends ListModel
 		if ($personType !== '') {
 			$query->where('position.person_type = :personType')->bind(':personType', $personType);
 		}
+		$roleDomain = (string) $this->getState('filter.role_domain');
+		if ($roleDomain !== '') $query->where('position.role_domain = :roleDomain')->bind(':roleDomain', $roleDomain);
 
 		$published = $this->getState('filter.published');
 		if ($published !== '') {

@@ -27,6 +27,7 @@ final class MatchResultEditorContext
 		$query = $this->database->getQuery(true)
 			->select([
 				$this->database->quoteName('match.id', 'match_id'),
+				$this->database->quoteName('match.stage_id'),
 				$this->database->quoteName('match.match_number'),
 				$this->database->quoteName('match.status_code', 'match_status_code'),
 				$this->database->quoteName('match.scheduled_start'),
@@ -52,6 +53,8 @@ final class MatchResultEditorContext
 		$profile = json_decode((string) $row['payload_json'], true, 512, JSON_THROW_ON_ERROR);
 
 		if (!is_array($profile)) throw new \UnexpectedValueException('Match profile payload is invalid.');
+		$profile = (new ProjectRuleConfigRepository($this->database))->resolve((int) $row['project_id'], $profile);
+		$profile = (new StageEncounterRules($this->database))->resolve($profile, (int) $row['project_id'], $row['stage_id'] === null ? null : (int) $row['stage_id']);
 
 		$query = $this->database->getQuery(true)
 			->select([
@@ -90,6 +93,14 @@ final class MatchResultEditorContext
 
 		$editorSchema = $this->schemaBuilder->build($profile);
 		$result = $this->repository->get((int) $matchId);
+		$encounter = isset($profile['match']['encounter']) ? new TeamEncounterRepository($this->database) : null;
+		$formResult = $result;
+		if ($encounter && $formResult !== null) {
+			$formResult['duels'] = $encounter->get((int) $matchId);
+			$formResult['encounter_revision'] = $encounter->revision((int) $matchId);
+		}
+		$formState = $this->formStateBuilder->build($editorSchema, $participants, $formResult);
+		if ($encounter) $formState['encounter_revision'] = $encounter->revision((int) $matchId);
 
 		return [
 			'match' => [
@@ -105,7 +116,8 @@ final class MatchResultEditorContext
 			'editor_schema' => $editorSchema,
 			'participants' => $participants,
 			'result' => $result,
-			'form_state' => $this->formStateBuilder->build($editorSchema, $participants, $result),
+			'form_state' => $formState,
+			'encounter_roster' => $encounter ? $encounter->roster((int) $matchId, $profile['match']['encounter']) : [],
 		];
 	}
 }

@@ -5,7 +5,7 @@
 	<creationDate>2026-08</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.2.0-beta3</version>
+	<version>6.2.0-rc1</version>
 	<description>MOD_JOOMLEAGUE_PROGRAM_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Program</namespace>
 	<files>
@@ -21,7 +21,7 @@
 	</languages>
 	<config>
 		<fields name="params">
-			<fieldset name="basic">
+			<fieldset name="basic" label="MOD_JOOMLEAGUE_PROGRAM_FIELDSET_SCOPE">
 				<field name="project_id" type="sql" required="true" label="MOD_JOOMLEAGUE_PROGRAM_PROJECT_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_PROJECT_DESC" query="SELECT id AS value, COALESCE(NULLIF(name, ''), CONCAT('ID ', id)) AS text FROM #__joomleague_project WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text" />
 				<field name="scope" type="list" default="project" label="MOD_JOOMLEAGUE_PROGRAM_SCOPE_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SCOPE_DESC">
 					<option value="project">MOD_JOOMLEAGUE_PROGRAM_SCOPE_PROJECT</option>
@@ -35,17 +35,45 @@
 					<option value="played">MOD_JOOMLEAGUE_PROGRAM_MODE_PLAYED</option>
 					<option value="all">MOD_JOOMLEAGUE_PROGRAM_MODE_ALL</option>
 				</field>
-				<field name="limit" type="number" default="5" min="1" max="50" label="MOD_JOOMLEAGUE_PROGRAM_LIMIT_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_LIMIT_DESC" />
+			</fieldset>
+			<fieldset name="filters" label="MOD_JOOMLEAGUE_PROGRAM_FIELDSET_FILTERS">
+				<field name="stage_id" type="sql" default="0" label="MOD_JOOMLEAGUE_PROGRAM_STAGE_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_STAGE_DESC" query="SELECT stage.id AS value, CONCAT(project.name, ' — ', stage.name) AS text FROM #__joomleague_project_stage AS stage INNER JOIN #__joomleague_project AS project ON project.id = stage.project_id WHERE stage.published = 1 AND project.published = 1 ORDER BY project.name, stage.ordering, stage.id" key_field="value" value_field="text"><option value="0">JALL</option></field>
+				<field name="round_id" type="sql" default="0" label="MOD_JOOMLEAGUE_PROGRAM_ROUND_FILTER_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_ROUND_FILTER_DESC" query="SELECT round.id AS value, CONCAT(project.name, ' — ', stage.name, ' — ', round.name) AS text FROM #__joomleague_project_round AS round INNER JOIN #__joomleague_project_stage AS stage ON stage.id = round.stage_id INNER JOIN #__joomleague_project AS project ON project.id = round.project_id WHERE round.published = 1 AND stage.published = 1 AND project.published = 1 ORDER BY project.name, stage.ordering, round.ordering, round.id" key_field="value" value_field="text"><option value="0">JALL</option></field>
+				<field name="venue_id" type="sql" default="0" label="MOD_JOOMLEAGUE_PROGRAM_VENUE_FILTER_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_VENUE_FILTER_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_venue WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text"><option value="0">JALL</option></field>
+				<field name="status_codes" type="sql" multiple="true" layout="joomla.form.field.list-fancy-select" label="MOD_JOOMLEAGUE_PROGRAM_STATUS_FILTER_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_STATUS_FILTER_DESC" query="SELECT DISTINCT status_code AS value, status_code AS text FROM #__joomleague_project_match WHERE status_code IS NOT NULL AND status_code &lt;&gt; '' ORDER BY status_code" key_field="value" value_field="text" />
+				<field name="days_before" type="number" default="0" min="0" max="5000" label="MOD_JOOMLEAGUE_PROGRAM_DAYS_BEFORE_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_DAYS_BEFORE_DESC" />
+				<field name="days_after" type="number" default="0" min="0" max="5000" label="MOD_JOOMLEAGUE_PROGRAM_DAYS_AFTER_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_DAYS_AFTER_DESC" />
+				<field name="limit" type="number" default="5" min="1" max="100" label="MOD_JOOMLEAGUE_PROGRAM_LIMIT_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_LIMIT_DESC" />
+				<field name="participant_limit" type="number" default="0" min="0" max="100" label="MOD_JOOMLEAGUE_PROGRAM_PARTICIPANT_LIMIT_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_PARTICIPANT_LIMIT_DESC" />
+				<field name="sort_by" type="list" default="date" label="MOD_JOOMLEAGUE_PROGRAM_SORT_BY_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SORT_BY_DESC">
+					<option value="date">MOD_JOOMLEAGUE_PROGRAM_SORT_DATE</option><option value="round">MOD_JOOMLEAGUE_PROGRAM_SORT_ROUND</option><option value="venue">MOD_JOOMLEAGUE_PROGRAM_SORT_VENUE</option><option value="status">MOD_JOOMLEAGUE_PROGRAM_SORT_STATUS</option>
+				</field>
+				<field name="sort_direction" type="list" default="auto" label="MOD_JOOMLEAGUE_PROGRAM_SORT_DIRECTION_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SORT_DIRECTION_DESC">
+					<option value="auto">MOD_JOOMLEAGUE_PROGRAM_SORT_AUTO</option><option value="asc">JGLOBAL_ORDER_ASCENDING</option><option value="desc">JGLOBAL_ORDER_DESCENDING</option>
+				</field>
+			</fieldset>
+			<fieldset name="display" label="MOD_JOOMLEAGUE_PROGRAM_FIELDSET_DISPLAY">
 				<field name="orientation" type="list" default="vertical" label="MOD_JOOMLEAGUE_PROGRAM_ORIENTATION_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_ORIENTATION_DESC">
 					<option value="vertical">MOD_JOOMLEAGUE_PROGRAM_ORIENTATION_VERTICAL</option>
 					<option value="horizontal">MOD_JOOMLEAGUE_PROGRAM_ORIENTATION_HORIZONTAL</option>
 				</field>
+				<field name="density" type="list" default="standard" label="MOD_JOOMLEAGUE_PROGRAM_DENSITY_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_DENSITY_DESC"><option value="compact">MOD_JOOMLEAGUE_PROGRAM_DENSITY_COMPACT</option><option value="standard">MOD_JOOMLEAGUE_PROGRAM_DENSITY_STANDARD</option><option value="detailed">MOD_JOOMLEAGUE_PROGRAM_DENSITY_DETAILED</option></field>
+				<field name="group_by" type="list" default="none" label="MOD_JOOMLEAGUE_PROGRAM_GROUP_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_GROUP_DESC"><option value="none">JNONE</option><option value="date">MOD_JOOMLEAGUE_PROGRAM_GROUP_DATE</option><option value="round">MOD_JOOMLEAGUE_PROGRAM_GROUP_ROUND</option></field>
+				<field name="heading" type="text" filter="string" label="MOD_JOOMLEAGUE_PROGRAM_HEADING_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_HEADING_DESC" />
 				<field name="show_project_name" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_PROJECT_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_PROJECT_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
 				<field name="show_round" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_ROUND_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_ROUND_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
 				<field name="show_date" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_DATE_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_DATE_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
 				<field name="show_venue" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_VENUE_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_VENUE_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
 				<field name="show_result" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_RESULT_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_RESULT_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="show_status" type="radio" default="0" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_STATUS_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_STATUS_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="show_contest_type" type="radio" default="0" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_CONTEST_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_CONTEST_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="show_images" type="radio" default="0" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_IMAGES_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_IMAGES_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="image_size" type="list" default="40" label="MOD_JOOMLEAGUE_PROGRAM_IMAGE_SIZE_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_IMAGE_SIZE_DESC" showon="show_images:1"><option value="32">32 px</option><option value="40">40 px</option><option value="48">48 px</option><option value="64">64 px</option></field>
+				<field name="show_participant_links" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_PARTICIPANT_LINKS_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_PARTICIPANT_LINKS_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="show_venue_link" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_VENUE_LINK_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_VENUE_LINK_DESC" layout="joomla.form.field.radio.switcher" showon="show_venue:1"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="date_format" type="list" default="medium" label="MOD_JOOMLEAGUE_PROGRAM_DATE_FORMAT_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_DATE_FORMAT_DESC" showon="show_date:1"><option value="short">MOD_JOOMLEAGUE_PROGRAM_DATE_SHORT</option><option value="medium">MOD_JOOMLEAGUE_PROGRAM_DATE_MEDIUM</option><option value="long">MOD_JOOMLEAGUE_PROGRAM_DATE_LONG</option></field>
 				<field name="show_calendar" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_CALENDAR_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_CALENDAR_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="show_empty" type="radio" default="1" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_EMPTY_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_EMPTY_DESC" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
 				<field name="template_show_match_detail_button" type="list" default="" label="MOD_JOOMLEAGUE_PROGRAM_SHOW_DETAIL_LABEL" description="MOD_JOOMLEAGUE_PROGRAM_SHOW_DETAIL_DESC"><option value="">MOD_JOOMLEAGUE_PROGRAM_INHERIT</option><option value="0">JNO</option><option value="1">JYES</option></field>
 			</fieldset>
 			<fieldset name="advanced">

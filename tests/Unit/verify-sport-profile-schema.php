@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 define('_JEXEC', 1);
 require_once dirname(__DIR__, 2) . '/administrator/components/com_joomleague/src/Service/StandingsContractValidator.php';
+require_once dirname(__DIR__, 2) . '/administrator/components/com_joomleague/src/Service/RoleDomain.php';
 require_once dirname(__DIR__, 2) . '/administrator/components/com_joomleague/src/Service/SportProfileSchemaValidator.php';
 
 use Joomleague\Component\Joomleague\Administrator\Service\SportProfileSchemaValidator;
@@ -20,6 +21,26 @@ $calculation = [
 $base = ['schema_version' => '1.4.0', 'code' => 'test_sport', 'contest' => ['type' => 'head_to_head'], 'entry_model' => ['allowed_kinds' => ['team'], 'default_kind' => 'team'], 'match' => ['structure' => ['type' => 'timed_periods'], 'score' => ['type' => 'numeric_score', 'unit' => 'points', 'segment_types' => [['code' => 'period', 'name_key' => 'TEST_PERIOD', 'unit' => 'periods', 'value_type' => 'integer', 'parent_code' => null, 'ordinal' => 10, 'repeatable' => true, 'expected_count' => 2]], 'aggregation' => ['mode' => 'validate', 'from' => ['period'], 'final_only' => true]], 'result_status_codes' => ['draft', 'in_progress', 'final'], 'outcome_codes' => ['completed'], 'participant_status_codes' => ['started', 'finished']], 'standings' => ['type' => 'team_table', 'sort_order' => ['points'], 'columns' => ['rank', 'points'], 'calculation' => $calculation], 'positions' => [['code' => 'player']], 'event_types' => [['code' => 'point'], ['code' => 'bonus_point']], 'statistics' => [['code' => 'points', 'source' => 'event', 'event_codes' => ['point', 'bonus_point']]]];
 $validator = new SportProfileSchemaValidator();
 $validator->validate($base);
+
+$current = $base;
+$current['schema_version'] = '1.5.0';
+$current['positions'][0] += ['person_type' => 'player', 'role_domain' => 'participant'];
+$validator->validate($current);
+$recordOwner = $current;
+$recordOwner['positions'][0] = ['code' => 'head_coach', 'person_type' => 'staff', 'role_domain' => 'team_staff', 'tracks_team_record' => true];
+$validator->validate($recordOwner);
+$recordOwner['positions'][0]['tracks_team_record'] = 'yes';
+try { $validator->validate($recordOwner); throw new RuntimeException('A non-boolean team-record flag was accepted.'); } catch (UnexpectedValueException) {}
+$recordOwner['positions'][0] = ['code' => 'player', 'person_type' => 'player', 'role_domain' => 'participant', 'tracks_team_record' => true];
+try { $validator->validate($recordOwner); throw new RuntimeException('A participant was allowed to own a team record.'); } catch (UnexpectedValueException) {}
+$current['positions'][0]['role_domain'] = 'adjudicator';
+try { $validator->validate($current); throw new RuntimeException('A participant position was accepted as an adjudicator.'); } catch (UnexpectedValueException) {}
+$adjudicator = $base;
+$adjudicator['schema_version'] = '1.5.0';
+$adjudicator['positions'][0] += ['person_type' => 'official', 'role_domain' => 'adjudicator', 'actor_kinds' => ['person']];
+$validator->validate($adjudicator);
+unset($adjudicator['positions'][0]['actor_kinds']);
+try { $validator->validate($adjudicator); throw new RuntimeException('A competition position without actor kinds was accepted.'); } catch (UnexpectedValueException) {}
 
 $substitutions = $base;
 $substitutions['lineup']['substitutions'] = ['supported' => true, 'reentry_supported' => true, 'limit_scope' => 'unlimited', 'maximum_per_scope' => null];
@@ -63,4 +84,4 @@ $missingSubstitutionLimit = $base;
 $missingSubstitutionLimit['lineup']['substitutions'] = ['supported' => true, 'reentry_supported' => false, 'limit_scope' => 'match', 'maximum_per_scope' => null];
 try { $validator->validate($missingSubstitutionLimit); throw new RuntimeException('A limited substitution contract without a maximum was accepted.'); } catch (UnexpectedValueException) {}
 
-echo "Sport profile schema 1.4 validator OK\n";
+echo "Sport profile schema 1.4 compatibility and 1.5 role domains OK\n";

@@ -90,7 +90,7 @@ final class ResultMatrixReader
 			->from($db->quoteName('#__joomleague_project_match', 'match'))
 			->innerJoin($db->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = match.stage_id AND stage.published = 1')
 			->innerJoin($db->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = match.round_id AND round.published = 1')
-			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = match.id AND result.status_code = 'final'")
+			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = match.id AND result.status_code = 'final' AND match.status_code <> 'cancelled'")
 			->where('match.project_id = :project')
 			->where('match.published = 1')
 			->bind(':project', $projectId, ParameterType::INTEGER)

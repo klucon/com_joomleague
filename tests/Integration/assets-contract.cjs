@@ -1,0 +1,1 @@
+module.exports={required:['asset-http','duallist-assign','duallist-remove','reject-cross-sport','roles-filter','person-link','dashboard-link'],nativeRequired:['public-id','private-id','unpublished-id','missing-id','legacy-name','private-legacy-name','html-label','quickicon-guest','quickicon-admin']};

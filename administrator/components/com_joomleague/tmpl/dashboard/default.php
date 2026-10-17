@@ -3,6 +3,8 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
@@ -27,6 +29,7 @@ $overviewTiles = [
 $explore = [
 	'COM_JOOMLEAGUE_DASHBOARD_GROUP_COMPETITIONS' => [
 		['sportprofiles', 'COM_JOOMLEAGUE_SPORTPROFILES_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_DESC_SPORTPROFILES', 'puzzle-piece'],
+		['sportcategories', 'COM_JOOMLEAGUE_SPORTCATEGORIES_TITLE', 'COM_JOOMLEAGUE_SPORTCATEGORIES_DESC', 'folder'],
 		['sporttypes', 'COM_JOOMLEAGUE_SPORTTYPES_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_DESC_SPORTTYPES', 'options'],
 		['competitions', 'COM_JOOMLEAGUE_COMPETITIONS_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_DESC_COMPETITIONS', 'flag'],
 		['seasons', 'COM_JOOMLEAGUE_SEASONS_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_DESC_SEASONS', 'calendar'],
@@ -43,7 +46,9 @@ $explore = [
 		['events', 'COM_JOOMLEAGUE_EVENTS_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_DESC_EVENTS', 'bolt'],
 		['statistics', 'COM_JOOMLEAGUE_STATISTICS_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_DESC_STATISTICS', 'chart'],
 		['templates', 'COM_JOOMLEAGUE_TEMPLATES_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_DESC_TEMPLATES', 'palette'],
+		['index.php?option=com_fields&view=fields&context=com_joomleague.project', 'COM_JOOMLEAGUE_DASHBOARD_CUSTOM_FIELDS_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_DESC_CUSTOM_FIELDS', 'list'],
 		['tools', 'COM_JOOMLEAGUE_TOOLS_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_DESC_TOOLS', 'wrench'],
+		['migrations', 'COM_JOOMLEAGUE_MIGRATIONS_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_AVAILABLE_MIGRATIONS_DESC', 'refresh'],
 	],
 ];
 $formatMatchDate = static function (?string $utc): string {
@@ -79,6 +84,17 @@ $clubMatchTile = function (array $match) use ($formatMatchDate, $clubMatchHref):
 };
 ?>
 <div class="container-fluid">
+	<div class="mb-3">
+		<?php echo HTMLHelper::_('image', Uri::root(true) . '/media/com_joomleague/brand/joomleague-logo.png', 'JoomLeague', ['class' => 'img-fluid', 'width' => 320, 'height' => 100, 'decoding' => 'async'], false, -1); ?>
+	</div>
+	<div class="d-flex justify-content-end mb-3">
+		<span class="badge text-bg-light border fs-6">
+			<?php echo Text::sprintf(
+				'COM_JOOMLEAGUE_DASHBOARD_INSTALLED_VERSION',
+				$this->escape($this->installedVersion !== '' ? $this->installedVersion : Text::_('JUNKNOWN'))
+			); ?>
+		</span>
+	</div>
 	<?php // ---- Overview: a calm, neutral count of what exists, full width ------------- ?>
 	<div class="card mb-4">
 		<div class="card-header"><h2 class="h5 mb-0"><?php echo Text::_('COM_JOOMLEAGUE_DASHBOARD_OVERVIEW_TITLE'); ?></h2></div>
@@ -152,7 +168,7 @@ $clubMatchTile = function (array $match) use ($formatMatchDate, $clubMatchHref):
 					<div class="card-header"><h3 class="h6 mb-0 text-uppercase text-body-secondary"><?php echo Text::_($groupLabel); ?></h3></div>
 					<div class="list-group list-group-flush">
 						<?php foreach ($items as [$view, $label, $desc, $icon]) : ?>
-							<a class="list-group-item list-group-item-action d-flex align-items-center gap-3" style="min-height:5.5rem" href="<?php echo Route::_('index.php?option=com_joomleague&view=' . $view); ?>">
+							<a class="list-group-item list-group-item-action d-flex align-items-center gap-3" style="min-height:5.5rem" href="<?php echo Route::_(str_starts_with($view, 'index.php?') ? $view : 'index.php?option=com_joomleague&view=' . $view); ?>">
 								<span class="icon-<?php echo $icon; ?> text-body-secondary d-inline-block text-center flex-shrink-0" style="width:1.25rem" aria-hidden="true"></span>
 								<span><span class="fw-semibold d-block"><?php echo Text::_($label); ?></span><span class="small text-body-secondary" style="display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden"><?php echo Text::_($desc); ?></span></span>
 							</a>

@@ -18,7 +18,7 @@ $roundId = (int) $this->state->get('filter.round_id');
 // com_content's Icon::create() (Uri::getInstance() there is already absolute).
 $scheduleReturn = base64_encode(Uri::getInstance()->toString(['scheme', 'host', 'port']) . Route::_('index.php?option=com_joomleague&view=projectschedule&project_id=' . $projectId, false));
 ?>
-<form action="<?php echo Route::_('index.php?option=com_joomleague&view=projectschedule&project_id=' . $projectId); ?>" method="post" name="adminForm" id="adminForm">
+<form action="<?php echo Route::_('index.php?option=com_joomleague&view=projectschedule&project_id=' . $projectId); ?>" method="post" name="adminForm" id="adminForm" class="js-stools-form">
 	<div class="alert alert-info" role="status"><strong><?php echo $this->escape($this->project->name); ?></strong></div>
 
 	<?php echo LayoutHelper::render('joomla.searchtools.default', ['view' => $this]); ?>

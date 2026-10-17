@@ -57,6 +57,7 @@ final class EventSchemaBuilder
 
 		if (!empty($item->venue_name)) {
 			$schema['location'] = ['@type' => 'Place', 'name' => (string) $item->venue_name];
+			if (!empty($item->venue_url)) $schema['location']['url'] = (string) $item->venue_url;
 			$schema['eventAttendanceMode'] = 'https://schema.org/OfflineEventAttendanceMode';
 		}
 		if (!empty($item->competition_name)) {
@@ -69,10 +70,12 @@ final class EventSchemaBuilder
 			if ($participantName === '') {
 				continue;
 			}
-			$performers[] = [
-				'@type' => !empty($participant->person_id) ? 'Person' : 'Organization',
+			$performer = [
+				'@type' => !empty($participant->person_id) ? 'Person' : (!empty($participant->team_id) ? 'SportsTeam' : 'Organization'),
 				'name' => $participantName,
 			];
+			if (!empty($participant->schema_url)) $performer['url'] = (string) $participant->schema_url;
+			$performers[] = $performer;
 		}
 		if ($performers !== []) {
 			$schema['performer'] = $performers;

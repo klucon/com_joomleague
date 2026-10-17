@@ -13,6 +13,8 @@ use Joomla\CMS\Toolbar\ToolbarHelper;
 
 final class HtmlView extends BaseHtmlView
 {
+	public string $installedVersion = '';
+
 	/** @var array<string, int> */
 	public array $overview = [];
 
@@ -29,6 +31,7 @@ final class HtmlView extends BaseHtmlView
 	public function display($tpl = null): void
 	{
 		$model = $this->getModel();
+		$this->installedVersion = $model->getInstalledVersion();
 		$this->overview = $model->getOverview();
 		$this->siteClub = $model->getSiteClub();
 

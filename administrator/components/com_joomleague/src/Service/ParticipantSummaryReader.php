@@ -31,6 +31,7 @@ final class ParticipantSummaryReader
 			$db->quoteName('project.id', 'project_id'), $db->quoteName('project.name', 'project_name'),
 			$db->quoteName('sport_type.name', 'sport_type_name'),
 			$db->quoteName('team.logo', 'team_logo'), $db->quoteName('team.picture', 'team_picture'),
+			$db->quoteName('club.logo', 'club_logo'),
 			$db->quoteName('team.description', 'team_description'), $db->quoteName('team.website', 'team_website'),
 			$db->quoteName('person.picture', 'person_picture'), $db->quoteName('person.description', 'person_description'),
 			$db->quoteName('person.country_code', 'person_country_code'), $db->quoteName('club.id', 'club_id'), $db->quoteName('club.name', 'club_name'),
@@ -69,7 +70,7 @@ final class ParticipantSummaryReader
 		$statisticCount = $db->getQuery(true)->select('COUNT(*)')->from($db->quoteName('#__joomleague_match_statistic_value', 'value'))
 			->innerJoin($db->quoteName('#__joomleague_match_participant', 'match_participant') . ' ON match_participant.id = value.match_participant_id AND match_participant.published = 1')
 			->innerJoin($db->quoteName('#__joomleague_project_match', 'item') . ' ON item.id = value.match_id AND item.published = 1')
-			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = item.id AND result.status_code = 'final'")
+			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = item.id AND result.status_code = 'final' AND item.status_code <> 'cancelled'")
 			->where('match_participant.project_entry_id = :statEntryId')->where('value.published = 1')->where('value.numeric_value IS NOT NULL')->where('value.segment_key = 0')
 			->where("(value.target_kind = 'participant' OR (value.target_kind = 'person' AND :statEntryKind = 'person' AND value.person_id = :statPersonId))")
 			->bind(':statEntryId', $entryId, ParameterType::INTEGER)->bind(':statEntryKind', $participant->entry_kind)

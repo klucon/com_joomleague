@@ -18,8 +18,8 @@ foreach (glob($directory . '/*.json') ?: [] as $file) {
 	$profiles[$profile['code']] = $profile['entry_model'];
 }
 
-if (count($profiles) !== 15) {
-	throw new RuntimeException('Expected 15 validated entry models.');
+if (count($profiles) !== 17 || !isset($profiles['carom'])) {
+	throw new RuntimeException('Expected 17 validated entry models including carom.');
 }
 
 if ($profiles['football']['allowed_kinds'] !== ['team']) {

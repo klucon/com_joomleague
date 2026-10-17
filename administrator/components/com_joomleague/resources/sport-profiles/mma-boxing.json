@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "mma_boxing",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING",
     "description_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_DESC",
     "scoring_model": "decision_result",
@@ -195,32 +195,48 @@
         {
             "code": "fighter",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_FIGHTER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_FIGHTER",
+            "role_domain": "participant"
         },
         {
             "code": "cornerman",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_CORNERMAN"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_CORNERMAN",
+            "role_domain": "team_staff"
         },
         {
             "code": "coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_COACH"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "judge",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_JUDGE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_JUDGE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "doctor",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_DOCTOR"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MMA_BOXING_POSITION_DOCTOR",
+            "role_domain": "event_staff",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -335,7 +351,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true
         },

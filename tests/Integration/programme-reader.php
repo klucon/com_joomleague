@@ -54,6 +54,8 @@ $projectId = (int) $database->setQuery(
 	0,
 	1
 )->loadResult();
+$requestedProject = (int) getenv('JOOMLEAGUE_TEST_PROJECT_ID');
+if ($requestedProject > 0) $projectId = $requestedProject;
 
 if ($projectId < 1) {
 	$database->transactionStart();
@@ -92,15 +94,43 @@ if ($projectId < 1) {
 
 $reader = new ProgrammeReader($database);
 $all = $reader->forProject($projectId, null, [1, 2, 3, 4, 5, 6, 7]);
+if ($all === [] || $all[0]['participants'] === []) {
+	throw new RuntimeException('Non-empty programme and participants required for acceptance.');
+}
 $scoped = [];
+$filtered = [];
 
 if ($all !== [] && $all[0]['participants'] !== []) {
-	$scoped = $reader->forProject($projectId, [(int) $all[0]['participants'][0]['entry_id']], [1, 2, 3, 4, 5, 6, 7]);
+	$scopedEntryId = (int) $all[0]['participants'][0]['entry_id'];
+	$scoped = $reader->forProject($projectId, [$scopedEntryId], [1, 2, 3, 4, 5, 6, 7]);
+	if ($scoped === []) throw new RuntimeException('Existing participant scope returned no events.');
+	foreach ($scoped as $event) {
+		if (!in_array($scopedEntryId, array_map('intval', array_column($event['participants'], 'entry_id')), true)) {
+			throw new RuntimeException('Participant scope leaked an unrelated event.');
+		}
+	}
+	$foreignEntryId = (int) $database->setQuery(
+		$database->getQuery(true)->select('id')->from($database->quoteName('#__joomleague_project_entry'))->where('project_id <> ' . (int) $projectId)->order('id'), 0, 1
+	)->loadResult();
+	if ($foreignEntryId > 0 && $reader->forProject($projectId, [$foreignEntryId], [1, 2, 3, 4, 5, 6, 7]) !== []) {
+		throw new RuntimeException('Foreign-project participant scope returned events.');
+	}
+	$filtered = $reader->forProject(
+		$projectId,
+		null,
+		[1, 2, 3, 4, 5, 6, 7],
+		$all[0]['venue_id'],
+		(int) $all[0]['stage_id'],
+		(int) $all[0]['round_id']
+	);
 }
 
 foreach ($all as $event) {
 	if (empty($event['uuid']) || empty($event['created']) || empty($event['modified'])) {
 		throw new RuntimeException('Programme event is missing persistent calendar identity or modification metadata.');
+	}
+	if ((int) $event['stage_id'] < 1 || (int) $event['round_id'] < 1) {
+		throw new RuntimeException('Programme event is missing its public stage or round context.');
 	}
 	if (!$event['played']) {
 		foreach ($event['participants'] as $participant) {
@@ -111,7 +141,14 @@ foreach ($all as $event) {
 	}
 }
 
-echo sprintf("Programme reader OK: project %d, %d events, %d scoped events\n", $projectId, count($all), count($scoped));
+if ($all !== [] && $filtered === []) throw new RuntimeException('Valid stage and round filters removed the selected programme event.');
+foreach ($filtered as $event) {
+	if ((int) $event['stage_id'] !== (int) $all[0]['stage_id'] || (int) $event['round_id'] !== (int) $all[0]['round_id']) {
+		throw new RuntimeException('Programme reader stage or round filter leaked another event.');
+	}
+}
+
+echo sprintf("Programme reader OK: project %d, %d events, %d scoped events, %d filtered events\n", $projectId, count($all), count($scoped), count($filtered));
 
 if ($created !== []) {
 	$database->transactionRollback();

@@ -70,4 +70,16 @@ $race = $calculator->calculate($raceContract, $raceEntries, [$raceMatch]);
 if (array_column($race, 'id') !== [2, 1, 3]) throw new RuntimeException('Lower-is-better classification is invalid.');
 
 if (StandingsDecimal::add('999999999999999999999.999999999', '0.000000001') !== '1000000000000000000000' || StandingsDecimal::divide('1', '3') !== '0.333333333') throw new RuntimeException('Exact standings decimal arithmetic is invalid.');
+$ratioMetrics = [$metric('average', 'ratio', ['left_metric' => 'score_for', 'right_metric' => 'score_against'])];
+$ratioEntries = [...$entries, ['id' => 3, 'name' => 'No games'], ['id' => 4, 'name' => 'Also no games']];
+foreach (['asc', 'desc'] as $direction) foreach (['first', 'last'] as $nulls) {
+	$contract = $headToHead($regularRules, $ratioMetrics, [['metric' => 'average', 'direction' => $direction, 'nulls' => $nulls]]);
+	$sorted = $calculator->calculate($contract, $ratioEntries, [$match('2', '1')]);
+	$expected = $direction === 'asc' ? [2, 1] : [1, 2];
+	$missing = [4, 3];
+	$expected = $nulls === 'first' ? [...$missing, ...$expected] : [...$expected, ...$missing];
+	if (array_column($sorted, 'id') !== $expected) throw new RuntimeException('Null placement must be independent of standings direction.');
+	$byId = array_column($sorted, null, 'id');
+	if ($byId[3]['rank'] !== $byId[4]['rank'] || $byId[3]['metrics']['average'] !== null) throw new RuntimeException('Missing averages must remain null and share a rank.');
+}
 echo "Universal football, hockey, volleyball, chess and race standings kernel OK\n";

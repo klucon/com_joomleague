@@ -38,6 +38,7 @@ final class MatchResultFormStateMutator
 
 		$parent['children'][] = [
 			'level_code' => $segmentCode,
+			'segment_type_ordinal' => (int) ($type['ordinal'] ?? 0),
 			'sequence_number' => $sequences === [] ? 1 : max($sequences) + 1,
 			'status_code' => 'completed',
 			'metadata' => [],

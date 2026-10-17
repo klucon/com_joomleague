@@ -10,7 +10,8 @@ defined('_JEXEC') or die;
 
 final class SportProfileSchemaValidator
 {
-	public const CURRENT_VERSION = '1.4.0';
+	public const CURRENT_VERSION = '1.5.0';
+	private const LEGACY_VERSION = '1.4.0';
 	private const SCORE_TYPES = ['numeric_score', 'nested_score', 'time_result', 'decision_result'];
 	private const EDITOR_CONTROLS = ['number', 'duration', 'text', 'status_rank', 'none'];
 
@@ -19,7 +20,8 @@ final class SportProfileSchemaValidator
 	/** @param array<string, mixed> $profile */
 	public function validate(array $profile): void
 	{
-		if (($profile['schema_version'] ?? null) !== self::CURRENT_VERSION) {
+		$schemaVersion = $profile['schema_version'] ?? null;
+		if (!in_array($schemaVersion, [self::CURRENT_VERSION, self::LEGACY_VERSION], true)) {
 			throw new \UnexpectedValueException('Unsupported sport profile schema version.');
 		}
 
@@ -28,10 +30,50 @@ final class SportProfileSchemaValidator
 		$this->entryModel($profile['entry_model'] ?? null);
 		$this->lineup($profile['lineup'] ?? null);
 		$this->match($profile['match'] ?? null);
+		if (isset($profile['match']['encounter']) && ($profile['entry_model']['allowed_kinds'] !== ['team'] || $profile['entry_model']['default_kind'] !== 'team')) {
+			throw new \UnexpectedValueException('Team encounters require team entries.');
+		}
 		$this->standings($profile['standings'] ?? null);
 		$this->catalog($profile['positions'] ?? null, 'position');
+		if ($schemaVersion === self::CURRENT_VERSION) $this->positionDomains($profile['positions']);
 		$this->catalog($profile['event_types'] ?? null, 'event');
 		$this->statistics($profile['statistics'] ?? null, $profile['event_types'] ?? []);
+	}
+
+	/** @param list<array<string,mixed>> $positions */
+	private function positionDomains(array $positions): void
+	{
+		foreach ($positions as $position) {
+			if (isset($position['tracks_team_record']) && !is_bool($position['tracks_team_record'])) {
+				throw new \UnexpectedValueException('Position team-record tracking flag must be boolean.');
+			}
+			$domain = $position['role_domain'] ?? null;
+			if (!is_string($domain) || !in_array($domain, RoleDomain::VALUES, true)) {
+				throw new \UnexpectedValueException('Position role domain is invalid.');
+			}
+
+			$personType = $position['person_type'] ?? null;
+			if (!is_string($personType)) throw new \UnexpectedValueException('Position person type is required.');
+			$isLegacyEntryType = in_array($personType, ['player', 'participant', 'staff'], true);
+			if (RoleDomain::isEntryMember($domain) !== $isLegacyEntryType
+				|| (RoleDomain::isCompetitionActor($domain) && $personType !== 'official')) {
+				throw new \UnexpectedValueException('Position role domain does not match its assignment model.');
+			}
+			$actorKinds = $position['actor_kinds'] ?? null;
+			if (RoleDomain::isCompetitionActor($domain)) {
+				if (!is_array($actorKinds) || $actorKinds === [] || array_values(array_unique($actorKinds)) !== $actorKinds) {
+					throw new \UnexpectedValueException('Competition position actor kinds are required and must be unique.');
+				}
+				foreach ($actorKinds as $actorKind) {
+					if (!in_array($actorKind, ['person', 'team'], true)) throw new \UnexpectedValueException('Position actor kind is invalid.');
+				}
+			} elseif ($actorKinds !== null) {
+				throw new \UnexpectedValueException('Entry-member positions cannot define competition actor kinds.');
+			}
+			if (($position['tracks_team_record'] ?? false) === true && $domain !== RoleDomain::TEAM_STAFF) {
+				throw new \UnexpectedValueException('Only team-staff positions can track a team record.');
+			}
+		}
 	}
 
 	private function lineup(mixed $lineup): void
@@ -78,6 +120,47 @@ final class SportProfileSchemaValidator
 		if ($match['result_status_codes'] !== ['draft', 'in_progress', 'final']) throw new \UnexpectedValueException('Core result statuses must be draft, in_progress and final.');
 		$this->codes($match['outcome_codes'] ?? null, 'outcome');
 		$this->codes($match['participant_status_codes'] ?? null, 'participant status');
+		if (isset($match['encounter'])) {
+			$encounter = $match['encounter'];
+			if (isset($encounter['draw_supported']) && !is_bool($encounter['draw_supported'])) throw new \UnexpectedValueException('Encounter draw support must be boolean.');
+			if (isset($encounter['duel_points'])) {
+				$points = $encounter['duel_points'];
+				if (!is_array($points) || count($points) !== 3) throw new \UnexpectedValueException('Encounter awards require win, draw and loss.');
+				foreach (['win', 'draw', 'loss'] as $outcome) if (!isset($points[$outcome]) || !is_int($points[$outcome]) || $points[$outcome] < 0 || $points[$outcome] > 1000) throw new \UnexpectedValueException('Invalid encounter award.');
+				if ($points['win'] <= $points['loss']) throw new \UnexpectedValueException('Encounter win award must exceed loss award.');
+				if ($points['draw'] < $points['loss'] || $points['draw'] > $points['win']) throw new \UnexpectedValueException('Encounter draw award must be between loss and win awards.');
+			}
+			if (isset($encounter['game_rules'])) {
+				$rules = $encounter['game_rules'];
+				if (!is_array($rules) || !is_bool($rules['equal_innings'] ?? null)) throw new \UnexpectedValueException('Invalid encounter game rules.');
+				foreach (['games_per_encounter' => [1, 128], 'target_score' => [1, 100000], 'inning_limit' => [0, 100000]] as $field => [$min, $max]) {
+					if (!is_int($rules[$field] ?? null) || $rules[$field] < $min || $rules[$field] > $max) throw new \UnexpectedValueException('Invalid encounter game rule bounds.');
+				}
+			}
+			if (!is_array($encounter) || ($encounter['aggregation'] ?? null) !== 'duel_wins' || !is_array($encounter['formats'] ?? null) || $encounter['formats'] === [] || count($encounter['formats']) > 32) throw new \UnexpectedValueException('Invalid team encounter contract.');
+			foreach ($encounter['formats'] as $code => $size) {
+				$this->code($code, 'encounter format');
+				if (!is_int($size) || $size < 1 || $size > 64) throw new \UnexpectedValueException('Invalid encounter side size.');
+			}
+			$this->codes($encounter['member_person_types'] ?? null, 'encounter member type');
+			if (($score['value_type'] ?? null) !== 'integer' || ($score['editor_control'] ?? null) !== 'number' || ($score['higher_is_better'] ?? null) !== true) throw new \UnexpectedValueException('Encounter scores must be non-negative integer win counts.');
+			$types = array_column($score['segment_types'], null, 'code');
+			if (($score['type'] ?? null) !== 'nested_score' || ($score['aggregation']['mode'] ?? null) !== 'none' || !isset($types['duel']) || ($types['duel']['parent_code'] ?? null) !== null || array_diff(array_keys($types), ['duel', 'set', 'penalty_round']) !== [] || (isset($types['set']) && ($types['set']['parent_code'] ?? null) !== 'duel')) throw new \UnexpectedValueException('Encounter requires a duel level and optionally set/penalty levels.');
+			if (isset($types['penalty_round']) !== isset($encounter['penalty_series'])) throw new \UnexpectedValueException('Penalty rounds require a penalty-series contract.');
+			if (isset($encounter['penalty_series'])) {
+				$penalty = $encounter['penalty_series'];
+				if (isset($penalty['resolution']) && !in_array($penalty['resolution'], ['sudden_death', 'team_cycle'], true)) throw new \UnexpectedValueException('Invalid penalty resolution.');
+				if (isset($penalty['cycle_length']) && (!is_int($penalty['cycle_length']) || $penalty['cycle_length'] < 1 || $penalty['cycle_length'] > 64)) throw new \UnexpectedValueException('Invalid penalty cycle size.');
+				if (isset($penalty['player_order']) && !in_array($penalty['player_order'], ['manual', 'ascending', 'descending', 'descending_last'], true)) throw new \UnexpectedValueException('Invalid penalty player order.');
+				if (($penalty['player_order'] ?? '') === 'descending_last' && ($penalty['resolution'] ?? 'sudden_death') !== 'sudden_death') throw new \UnexpectedValueException('Last-board continuation requires sudden death.');
+				if ((($penalty['resolution'] ?? '') === 'team_cycle' || ($penalty['player_order'] ?? 'manual') !== 'manual') && !isset($penalty['cycle_length'])) throw new \UnexpectedValueException('Team cycles and ordered nominations require a cycle size.');
+				if (isset($penalty['nominations']) && $penalty['nominations'] !== 'optional_single') throw new \UnexpectedValueException('Invalid penalty nomination mode.');
+				if (isset($types['penalty_round']['value_fields']['lineup_member_id']) && ($penalty['nominations'] ?? null) !== 'optional_single') throw new \UnexpectedValueException('Lineup references require penalty nomination support.');
+				if (!is_array($penalty) || !is_bool($penalty['enabled'] ?? null) || !is_bool($penalty['required'] ?? null) || ($penalty['required'] && !$penalty['enabled']) || !is_int($penalty['maximum_points'] ?? null) || $penalty['maximum_points'] < 1 || $penalty['maximum_points'] > 100000 || ($types['penalty_round']['parent_code'] ?? null) !== null || isset($types['penalty_round']['expected_count'])) throw new \UnexpectedValueException('Invalid penalty-series contract.');
+				if (!in_array('winner', $match['participant_status_codes'], true) || !in_array('loser', $match['participant_status_codes'], true)) throw new \UnexpectedValueException('Penalty decisions require winner/loser statuses.');
+			}
+			foreach ($types as $type) if ($type['value_type'] !== 'integer' || $type['editor_control'] !== 'number' || !isset($type['maximum_count']) || $type['maximum_count'] > 128) throw new \UnexpectedValueException('Invalid encounter result limits.');
+		}
 	}
 
 	private function segmentTypes(mixed $segments): void
@@ -93,6 +176,14 @@ final class SportProfileSchemaValidator
 			$this->code($segment['unit'] ?? null, 'score segment unit');
 			if (!in_array($segment['value_type'] ?? null, ['integer', 'decimal', 'duration', 'structured'], true)) throw new \UnexpectedValueException('Score segment value type is invalid.');
 			$this->editorControl($segment['editor_control'] ?? null, $segment['value_type'] ?? null);
+			if (isset($segment['value_fields'])) {
+				if (!is_array($segment['value_fields']) || array_is_list($segment['value_fields']) || count($segment['value_fields']) > 20) throw new \UnexpectedValueException('Invalid score statistic definitions.');
+				foreach ($segment['value_fields'] as $field => $definition) {
+					if (isset($definition['reference']) && ($definition['reference'] !== 'encounter_lineup' || $field !== 'lineup_member_id' || $segment['code'] !== 'penalty_round')) throw new \UnexpectedValueException('Invalid lineup reference field.');
+					$this->code($field, 'score statistic');
+					if (!is_array($definition) || !is_string($definition['name_key'] ?? null) || !preg_match('/^COM_JOOMLEAGUE_[A-Z0-9_]+$/', $definition['name_key']) || !is_int($definition['minimum'] ?? null) || !is_int($definition['maximum'] ?? null) || $definition['minimum'] < 0 || $definition['maximum'] < $definition['minimum'] || $definition['maximum'] > 1000000000 || (isset($definition['bounded_by_score']) && !is_bool($definition['bounded_by_score']))) throw new \UnexpectedValueException('Invalid score statistic bounds or label.');
+				}
+			}
 			if (!is_string($segment['name_key'] ?? null) || trim($segment['name_key']) === '') throw new \UnexpectedValueException('Score segment name key is required.');
 			if (!is_int($segment['ordinal'] ?? null) || $segment['ordinal'] < 0) throw new \UnexpectedValueException('Score segment ordinal is invalid.');
 			if (!is_bool($segment['repeatable'] ?? null)) throw new \UnexpectedValueException('Score segment repeatable flag is required.');

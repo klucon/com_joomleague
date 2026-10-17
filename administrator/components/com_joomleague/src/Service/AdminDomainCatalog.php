@@ -35,6 +35,8 @@ final class AdminDomainCatalog
 
 		return [
 			'sportprofiles' => self::dashboardItem('COM_JOOMLEAGUE_SPORTPROFILES_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_AVAILABLE_PROFILES_DESC', 'puzzle-piece', 'available'),
+			'sportcategories' => self::dashboardItem('COM_JOOMLEAGUE_SPORTCATEGORIES_TITLE', 'COM_JOOMLEAGUE_SPORTCATEGORIES_DESC', 'folder', 'available'),
+			'sportvariants' => self::dashboardItem('COM_JOOMLEAGUE_SPORTVARIANTS_TITLE', 'COM_JOOMLEAGUE_SPORTVARIANTS_DESC', 'options', 'available'),
 			'sporttypes' => self::dashboardItem('COM_JOOMLEAGUE_SPORTTYPES_TITLE', 'COM_JOOMLEAGUE_DASHBOARD_AVAILABLE_SPORTTYPES_DESC', 'options', 'available'),
 			'competitions' => self::dashboardItem($domains['competitions']['title'], 'COM_JOOMLEAGUE_DASHBOARD_AVAILABLE_COMPETITIONS_DESC', $domains['competitions']['icon'], $domains['competitions']['status']),
 			'seasons' => self::dashboardItem($domains['seasons']['title'], 'COM_JOOMLEAGUE_DASHBOARD_AVAILABLE_SEASONS_DESC', $domains['seasons']['icon'], $domains['seasons']['status']),

@@ -7,6 +7,7 @@ use Joomla\CMS\Table\Table;
 use Joomla\Database\DatabaseDriver;
 use Joomla\Database\ParameterType;
 use Joomla\String\StringHelper;
+use Joomleague\Component\Joomleague\Administrator\Service\RoleDomain;
 final class PositionTable extends Table
 {
 	protected $_supportNullValue = true;
@@ -17,11 +18,15 @@ final class PositionTable extends Table
 		$this->name = StringHelper::trim((string) $this->name);
 		$this->code = strtolower(StringHelper::trim((string) $this->code));
 		$this->person_type = StringHelper::trim((string) $this->person_type);
+		$this->role_domain = StringHelper::trim((string) $this->role_domain);
 		$this->lineup_group = StringHelper::trim((string) ($this->lineup_group ?? '')) ?: null;
 		$this->parent_id = (int) ($this->parent_id ?? 0) ?: null;
 		if ((int) $this->sport_type_id < 1 || $this->name === '' || $this->person_type === '') { $this->setError(Text::_('COM_JOOMLEAGUE_ERROR_POSITION_REQUIRED')); return false; }
 		if (preg_match('/^[a-z][a-z0-9_]{0,99}$/', $this->code) !== 1) { $this->setError(Text::_('COM_JOOMLEAGUE_ERROR_POSITION_CODE_INVALID')); return false; }
 		if (preg_match('/^[a-z][a-z0-9_]{0,99}$/', $this->person_type) !== 1 || ($this->lineup_group !== null && preg_match('/^[a-z][a-z0-9_]{0,99}$/', $this->lineup_group) !== 1)) { $this->setError(Text::_('COM_JOOMLEAGUE_ERROR_POSITION_CLASSIFICATION_INVALID')); return false; }
+		if (!in_array($this->role_domain, RoleDomain::VALUES, true)) { $this->setError(Text::_('COM_JOOMLEAGUE_ERROR_POSITION_ROLE_DOMAIN_INVALID')); return false; }
+		$isEntryType = in_array($this->person_type, ['player', 'participant', 'staff'], true);
+		if (RoleDomain::isEntryMember($this->role_domain) !== $isEntryType || (RoleDomain::isCompetitionActor($this->role_domain) && $this->person_type !== 'official')) { $this->setError(Text::_('COM_JOOMLEAGUE_ERROR_POSITION_ROLE_DOMAIN_MISMATCH')); return false; }
 		$db = $this->getDatabase();
 		$id = (int) $this->id;
 		$sportTypeId = (int) $this->sport_type_id;

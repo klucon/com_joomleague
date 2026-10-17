@@ -13,7 +13,7 @@ final class VenuesModel extends ListModel
 {
 	public function __construct($config = [])
 	{
-		$config['filter_fields'] ??= ['id', 'a.id', 'name', 'a.name', 'short_name', 'a.short_name', 'city', 'a.city', 'owner_club_name', 'club.name', 'capacity', 'a.capacity', 'published', 'a.published', 'ordering', 'a.ordering'];
+		$config['filter_fields'] ??= ['id', 'a.id', 'name', 'a.name', 'short_name', 'a.short_name', 'city', 'a.city', 'owner_club_name', 'club.name', 'capacity', 'a.capacity', 'published', 'a.published', 'ordering', 'a.ordering', 'a.country_code'];
 		parent::__construct($config);
 	}
 
@@ -57,7 +57,7 @@ final class VenuesModel extends ListModel
 					->bind(':searchName', $search)->bind(':searchShort', $search)->bind(':searchCity', $search)->bind(':searchCode', $search);
 			}
 		}
-		$query->order($database->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . ($this->getState('list.direction') === 'desc' ? 'DESC' : 'ASC'));
+		$query->order($database->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC'));
 		return $query;
 	}
 }

@@ -33,7 +33,7 @@ class EventreportModel extends BaseDatabaseModel
 				->select([
 					'match.id', 'match.match_number', 'match.contest_type', 'match.scheduled_start',
 					'match.timezone', 'match.duration_minutes', 'match.attendance', 'match.status_code',
-					'match.description', 'project.id AS project_id', 'project.name AS project_name',
+					'match.description', 'project.id AS project_id', 'project.name AS project_name', 'project.sport_type_id',
 					'profile_version.payload_json AS profile_payload_json',
 					'stage.name AS stage_name', 'round.name AS round_name',
 					'venue.id AS venue_id', 'venue.name AS venue_name',
@@ -61,6 +61,13 @@ class EventreportModel extends BaseDatabaseModel
 
 		if (!$item) {
 			return ['error' => 'COM_JOOMLEAGUE_EVENTREPORT_UNAVAILABLE'];
+		}
+		$profile = json_decode((string) $item->profile_payload_json, true);
+		$profilePositionOrder = [];
+		foreach (is_array($profile) ? ($profile['positions'] ?? []) : [] as $positionIndex => $positionDefinition) {
+			if (is_array($positionDefinition) && is_string($positionDefinition['code'] ?? null)) {
+				$profilePositionOrder[$positionDefinition['code']] = (int) $positionIndex;
+			}
 		}
 
 		$participants = $db->setQuery(
@@ -90,7 +97,6 @@ class EventreportModel extends BaseDatabaseModel
 		$segments = [];
 		$valuesBySegment = [];
 		if ($item->result_status === 'final') {
-			$profile = json_decode((string) $item->profile_payload_json, true);
 			$segmentLabels = [];
 			foreach (is_array($profile) ? ($profile['match']['score']['segment_types'] ?? []) : [] as $segmentType) {
 				if (is_array($segmentType) && is_string($segmentType['code'] ?? null) && is_string($segmentType['name_key'] ?? null)) {
@@ -99,7 +105,7 @@ class EventreportModel extends BaseDatabaseModel
 			}
 			$segments = $db->setQuery(
 			$db->getQuery(true)
-				->select(['segment.id', 'segment.parent_id', 'segment.level_code', 'segment.sequence_number', 'segment.status_code'])
+				->select(['segment.id', 'segment.parent_id', 'segment.level_code', 'segment.sequence_number', 'segment.status_code', 'segment.metadata_json'])
 				->from($db->quoteName('#__joomleague_match_score_segment', 'segment'))
 				->where('segment.match_id = :eventId')
 				->bind(':eventId', $matchId, ParameterType::INTEGER)
@@ -107,24 +113,49 @@ class EventreportModel extends BaseDatabaseModel
 			)->loadObjectList();
 
 			foreach ($segments as $segment) {
+				$segment->metadata = json_decode((string) $segment->metadata_json, true) ?: [];
 				$segment->name_key = $segment->level_code === 'result'
 					? 'COM_JOOMLEAGUE_EVENTREPORT_RESULT'
 					: ($segmentLabels[(string) $segment->level_code] ?? null);
 			}
+			if (isset($profile['match']['encounter'])) {
+				$byParent = [];
+				foreach ($segments as $segment) $byParent[(int) ($segment->parent_id ?? 0)][] = $segment;
+				$ordered = []; $visited = [];
+				$walk = function (int $parent) use (&$walk, &$ordered, &$visited, $byParent): void {
+					foreach ($byParent[$parent] ?? [] as $segment) {
+						$id = (int) $segment->id;
+						if (isset($visited[$id])) throw new \UnexpectedValueException('Cyclic encounter result.');
+						$visited[$id] = true; $ordered[] = $segment; $walk($id);
+					}
+				};
+				$walk(0); $segments = $ordered;
+			}
 
 			$values = $db->setQuery(
 			$db->getQuery(true)
-				->select(['value.segment_id', 'value.participant_id', 'value.numeric_value', 'value.text_value', 'value.status_code', 'value.result_rank'])
+				->select(['value.segment_id', 'value.participant_id', 'value.numeric_value', 'value.text_value', 'value.status_code', 'value.result_rank', 'value.metadata_json'])
 				->from($db->quoteName('#__joomleague_match_score_value', 'value'))
 				->where('value.match_id = :eventId')
 				->bind(':eventId', $matchId, ParameterType::INTEGER)
 			)->loadObjectList();
 
 			foreach ($values as $value) {
+				$value->metadata = json_decode((string) $value->metadata_json, true) ?: [];
 				$valuesBySegment[(int) $value->segment_id][(int) $value->participant_id] = $value;
 			}
 		}
 
+		$encounterMembers = [];
+		if (isset($profile['match']['encounter']) && $item->result_status === 'final') {
+			$q = $db->getQuery(true)->select(['duel.sequence_number', 'nomination.match_participant_id', 'person.id AS person_id', 'person.first_name', 'person.last_name'])
+				->from($db->quoteName('#__joomleague_match_duel', 'duel'))
+				->innerJoin($db->quoteName('#__joomleague_match_duel_member', 'nomination') . ' ON nomination.duel_id = duel.id')
+				->innerJoin($db->quoteName('#__joomleague_match_lineup_member', 'member') . ' ON member.id = nomination.lineup_member_id AND member.published = 1')
+				->leftJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = member.person_id AND person.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'person'))
+				->where('duel.match_id = :match')->order('duel.sequence_number, nomination.match_participant_id, nomination.ordering')->bind(':match', $matchId, ParameterType::INTEGER);
+			foreach ($db->setQuery($q)->loadObjectList() as $member) $encounterMembers[(int) $member->sequence_number][(int) $member->match_participant_id][] = $member;
+		}
 		$events = $db->setQuery(
 			$db->getQuery(true)
 				->select(['event.event_name_key', 'event.primary_name_snapshot', 'event.secondary_name_snapshot', 'event.clock_value', 'event.clock_unit', 'event.numeric_value', 'event.text_value', 'event.notes'])
@@ -136,22 +167,68 @@ class EventreportModel extends BaseDatabaseModel
 
 		$officials = $db->setQuery(
 			$db->getQuery(true)
-				->select(['role.role_code', 'role.display_name_snapshot', 'role.notes'])
+				->select(['role.id', 'role.actor_kind', 'role.person_id', 'role.team_id', 'role.role_code', 'role.role_domain', 'role.delegation_status', 'role.display_name_snapshot', 'role.notes'])
 				->from($db->quoteName('#__joomleague_match_actor_role', 'role'))
 				->where('role.match_id = :eventId')->where('role.published = 1')
 				->bind(':eventId', $matchId, ParameterType::INTEGER)
 				->order('role.ordering ASC, role.id ASC')
 		)->loadObjectList();
+		$roleLabels = [];
+		$profile = json_decode((string) $item->profile_payload_json, true);
+		foreach (is_array($profile) ? ($profile['positions'] ?? []) : [] as $position) {
+			if (is_array($position) && is_string($position['code'] ?? null) && is_string($position['name_key'] ?? null)) $roleLabels[$position['code']] = $position['name_key'];
+		}
+		$assignmentsById = []; $effective = [];
+		foreach ($officials as $official) { $assignmentsById[(int) $official->id] = $official; $effective[$official->role_code] ??= (int) $official->id; }
+		$roleChanges = $db->setQuery($db->getQuery(true)->select(['role_code', 'incoming_match_actor_role_id', 'sequence_number', 'reason_code'])->from($db->quoteName('#__joomleague_match_actor_role_change'))->where('match_id = :eventId')->bind(':eventId', $matchId, ParameterType::INTEGER)->order('sequence_number ASC, id ASC'))->loadObjectList();
+		foreach ($roleChanges as $change) $effective[(string) $change->role_code] = (int) $change->incoming_match_actor_role_id;
+		$officials = [];
+		foreach ($effective as $roleCode => $assignmentId) {
+			if (!isset($assignmentsById[$assignmentId])) continue;
+			$official = clone $assignmentsById[$assignmentId]; $official->role_code = $roleCode; $official->role_name_key = $roleLabels[$roleCode] ?? null; $officials[] = $official;
+		}
 
 		$lineup = $db->setQuery(
 			$db->getQuery(true)
-				->select(['member.match_participant_id', 'member.member_person_type', 'member.role_code', 'member.shirt_number', 'member.lineup_status', 'member.is_captain', 'person.id AS person_id', 'person.first_name', 'person.last_name'])
+				->select([
+					'member.id', 'member.match_participant_id', 'member.member_person_type', 'member.role_code', 'member.shirt_number',
+					'member.lineup_status', 'member.is_captain', 'member.ordering', 'person.id AS person_id', 'person.first_name', 'person.last_name',
+					'position.name AS role_name', 'position.name_key AS role_name_key', 'position.lineup_group', 'position.ordering AS position_ordering',
+				])
 				->from($db->quoteName('#__joomleague_match_lineup_member', 'member'))
 				->innerJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = member.person_id AND person.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'person'))
+				->leftJoin($db->quoteName('#__joomleague_sport_position', 'position') . ' ON position.sport_type_id = ' . (int) $item->sport_type_id . ' AND position.code = member.role_code AND position.published = 1')
 				->where('member.match_id = :eventId')->where('member.published = 1')
 				->bind(':eventId', $matchId, ParameterType::INTEGER)
-				->order('member.match_participant_id ASC, member.ordering ASC, member.id ASC')
+				->order([
+					'member.match_participant_id ASC',
+					"CASE member.member_person_type WHEN 'player' THEN 0 WHEN 'participant' THEN 1 WHEN 'staff' THEN 2 ELSE 3 END ASC",
+					"CASE member.lineup_status WHEN 'starter' THEN 0 WHEN 'started' THEN 0 WHEN 'substitute' THEN 1 WHEN 'available' THEN 2 ELSE 3 END ASC",
+					'COALESCE(position.ordering, 2147483647) ASC',
+					'member.ordering ASC', 'person.last_name ASC', 'person.first_name ASC', 'member.id ASC',
+				])
 		)->loadObjectList();
+		$typeOrder = ['player' => 0, 'participant' => 1, 'staff' => 2];
+		$statusOrder = ['starter' => 0, 'started' => 0, 'substitute' => 1, 'available' => 2];
+		usort($lineup, static function (object $left, object $right) use ($profilePositionOrder, $typeOrder, $statusOrder): int {
+			$leftPosition = $profilePositionOrder[(string) $left->role_code] ?? ($left->position_ordering !== null ? (int) $left->position_ordering : PHP_INT_MAX);
+			$rightPosition = $profilePositionOrder[(string) $right->role_code] ?? ($right->position_ordering !== null ? (int) $right->position_ordering : PHP_INT_MAX);
+			$comparison = [
+				[(int) $left->match_participant_id, (int) $right->match_participant_id],
+				[$typeOrder[(string) $left->member_person_type] ?? 3, $typeOrder[(string) $right->member_person_type] ?? 3],
+				[$statusOrder[(string) $left->lineup_status] ?? 3, $statusOrder[(string) $right->lineup_status] ?? 3],
+				[$leftPosition, $rightPosition],
+				[(int) $left->ordering, (int) $right->ordering],
+				[strnatcasecmp((string) $left->last_name, (string) $right->last_name), 0],
+				[strnatcasecmp((string) $left->first_name, (string) $right->first_name), 0],
+				[(int) $left->id, (int) $right->id],
+			];
+			foreach ($comparison as [$leftValue, $rightValue]) {
+				$result = $leftValue <=> $rightValue;
+				if ($result !== 0) return $result;
+			}
+			return 0;
+		});
 
 		foreach ($lineup as $member) {
 			$member->name = trim((string) $member->first_name . ' ' . (string) $member->last_name);
@@ -212,6 +289,13 @@ class EventreportModel extends BaseDatabaseModel
 			'next_id' => is_int($currentIndex) && isset($programmeIds[$currentIndex + 1]) ? $programmeIds[$currentIndex + 1] : null,
 		];
 
-		return compact('item', 'participants', 'segments', 'valuesBySegment', 'events', 'officials', 'lineup', 'substitutions', 'statistics', 'navigation');
+		$isTeamEncounter = isset($profile['match']['encounter']);
+		$caromSummary = ($profile['code'] ?? '') === 'carom'
+			? (new \Joomleague\Component\Joomleague\Administrator\Service\CaromEncounterSummary())->summarize($segments, $valuesBySegment, array_map(static fn ($participant): int => (int) $participant->id, $participants))
+			: [];
+		$caromPlayers = ($profile['code'] ?? '') === 'carom'
+			? (new \Joomleague\Component\Joomleague\Administrator\Service\CaromEncounterSummary())->players($segments, $valuesBySegment, $encounterMembers)
+			: [];
+		return compact('item', 'participants', 'segments', 'valuesBySegment', 'events', 'officials', 'roleChanges', 'lineup', 'substitutions', 'statistics', 'navigation', 'encounterMembers', 'isTeamEncounter', 'caromSummary', 'caromPlayers');
 	}
 }

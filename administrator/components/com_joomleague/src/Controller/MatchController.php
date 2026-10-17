@@ -17,26 +17,20 @@ final class MatchController extends FormController
 
 	protected function allowAdd($data = []): bool
 	{
-		$projectId = (int) ($data['project_id'] ?? $this->input->getInt('project_id', 0));
-		if ($projectId < 1) {
-			$form = $this->input->get('jform', [], 'array');
-			$roundId = $this->input->getInt('round_id', 0) ?: (int) ($form['round_id'] ?? 0);
-			if ($roundId > 0) {
-				$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectIdFromRound($roundId);
-			}
-		}
-		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		$form = $this->input->get('jform', [], 'array');
+		$roundId = (int) ($data['round_id'] ?? $form['round_id'] ?? $this->input->getInt('round_id', 0));
+		$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectIdFromRound($roundId);
+		if ($projectId < 1) return false;
+		$asset = 'com_joomleague.project.' . $projectId;
 		return $this->app->getIdentity()->authorise('joomleague.project.edit.schedule', $asset);
 	}
 
 	protected function allowEdit($data = [], $key = 'id'): bool
 	{
-		$projectId = (int) ($data['project_id'] ?? 0);
-		if ($projectId < 1) {
-			$matchId = (int) ($data[$key] ?? 0);
-			$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectId($matchId);
-		}
-		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		$matchId = (int) ($data[$key] ?? 0);
+		$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectId($matchId);
+		if ($projectId < 1) return false;
+		$asset = 'com_joomleague.project.' . $projectId;
 		return $this->app->getIdentity()->authorise('joomleague.project.edit.schedule', $asset);
 	}
 	protected function getRedirectToItemAppend($recordId = null, $urlVar = 'id'): string { return parent::getRedirectToItemAppend($recordId, $urlVar) . $this->roundAppend(); }

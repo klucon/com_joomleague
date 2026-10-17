@@ -16,9 +16,10 @@ foreach (['FieldsFormServiceInterface', 'FieldsServiceTrait', 'validateSection',
 }
 
 $manifest = (string) file_get_contents($admin . '/joomleague.xml');
+$dashboard = (string) file_get_contents($admin . '/tmpl/dashboard/default.php');
 
-if (!str_contains($manifest, 'context=com_joomleague.project') || substr_count($manifest, '<folder>layouts</folder>') < 2) {
-	throw new RuntimeException('Custom Fields menu or packaged layout directories are missing.');
+if (!str_contains($dashboard, 'context=com_joomleague.project') || substr_count($manifest, '<folder>layouts</folder>') < 2) {
+	throw new RuntimeException('Custom Fields dashboard entry or packaged layout directories are missing.');
 }
 
 $adminLayout = (string) file_get_contents($admin . '/layouts/joomleague/edit/customfields.php');

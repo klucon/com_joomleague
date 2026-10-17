@@ -2,11 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const table = document.getElementById('matchList');
   if (!table) return;
 
-  const token = document.querySelector('#adminForm input[type="hidden"][value="1"]');
+  const tokenName = table.dataset.csrfToken;
   const requests = new Map();
 
   const save = async (row) => {
-    if (!token || row.dataset.editable !== '1') return;
+    if (!tokenName || row.dataset.editable !== '1') return;
     requests.get(row.dataset.matchId)?.abort();
     const controller = new AbortController();
     requests.set(row.dataset.matchId, controller);
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     status.textContent = table.dataset.saving;
 
     const data = new FormData();
-    data.append(token.name, '1');
+    data.append(tokenName, '1');
     data.append('match_id', row.dataset.matchId);
     data.append('round_id', table.dataset.roundId);
     row.querySelectorAll('[data-schedule-field]').forEach((field) => data.append(`schedule[${field.dataset.scheduleField}]`, field.value));

@@ -11,6 +11,11 @@
 			<option value="">JGLOBAL_SORT_BY</option><option value="sport_type.name ASC">COM_JOOMLEAGUE_POSITION_SORT_SPORT_TYPE_ASC</option><option value="sport_type.name DESC">COM_JOOMLEAGUE_POSITION_SORT_SPORT_TYPE_DESC</option>
 			<option value="event.name ASC">JGLOBAL_TITLE_ASC</option><option value="event.name DESC">JGLOBAL_TITLE_DESC</option><option value="event.code ASC">COM_JOOMLEAGUE_POSITION_SORT_CODE_ASC</option><option value="event.code DESC">COM_JOOMLEAGUE_POSITION_SORT_CODE_DESC</option>
 			<option value="event.id ASC">JGRID_HEADING_ID_ASC</option><option value="event.id DESC">JGRID_HEADING_ID_DESC</option>
+		
+			<option value="event.timeline ASC">COM_JOOMLEAGUE_SORT_EVENT_TIMELINE_ASC</option>
+			<option value="event.timeline DESC">COM_JOOMLEAGUE_SORT_EVENT_TIMELINE_DESC</option>
+			<option value="event.published ASC">COM_JOOMLEAGUE_SORT_EVENT_PUBLISHED_ASC</option>
+			<option value="event.published DESC">COM_JOOMLEAGUE_SORT_EVENT_PUBLISHED_DESC</option>
 		</field>
 		<field name="limit" type="limitbox" label="JGLOBAL_LIST_LIMIT" labelclass="visually-hidden" default="20" onchange="this.form.submit();" />
 	</fields>

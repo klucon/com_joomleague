@@ -14,12 +14,27 @@ final class MatchofficialsModel extends BaseDatabaseModel
 {
 	private function repository(): MatchActorRoleRepository { return new MatchActorRoleRepository($this->getDatabase(), (string) Factory::getApplication()->get('offset', 'UTC')); }
 	public function getContext(int $matchId): array { return $this->repository()->getMatchContext($matchId); }
+	public function getActors(): array { return $this->repository()->getActors(); }
 	public function getAvailable(int $matchId): array { return $this->repository()->getAvailableForMatch($matchId); }
 	public function getAssignments(int $matchId): array { return $this->repository()->getMatchAssignments($matchId); }
+	public function getChanges(int $matchId): array { return $this->repository()->getMatchRoleChanges($matchId); }
+	public function getEffectiveRoles(int $matchId): array { return $this->repository()->getEffectiveMatchRoles($matchId); }
 	public function assign(int $matchId, int $projectAssignmentId, ?string $notes): void
 	{
 		$db = $this->getDatabase(); $db->transactionStart();
 		try { $this->repository()->assignToMatch($matchId, $projectAssignmentId, $notes, (int) Factory::getApplication()->getIdentity()->id); $db->transactionCommit(); }
+		catch (\Throwable $error) { $db->transactionRollback(); throw $error; }
+	}
+	public function assignDirect(int $matchId, string $actor, string $roleCode, string $delegationStatus, ?string $notes): void
+	{
+		$db = $this->getDatabase(); $db->transactionStart();
+		try { $this->repository()->addDirectMatchAssignment($matchId, $actor, $roleCode, $delegationStatus, $notes, (int) Factory::getApplication()->getIdentity()->id); $db->transactionCommit(); }
+		catch (\Throwable $error) { $db->transactionRollback(); throw $error; }
+	}
+	public function changeRole(int $matchId, ?int $outgoingId, int $incomingId, string $roleCode, string $reasonCode, ?string $phaseCode, ?int $phaseSequence, ?string $clockValue, ?string $clockUnit, ?string $notes): void
+	{
+		$db = $this->getDatabase(); $db->transactionStart();
+		try { $this->repository()->recordMatchRoleChange($matchId, $outgoingId, $incomingId, $roleCode, $reasonCode, $phaseCode, $phaseSequence, $clockValue, $clockUnit, $notes, (int) Factory::getApplication()->getIdentity()->id); $db->transactionCommit(); }
 		catch (\Throwable $error) { $db->transactionRollback(); throw $error; }
 	}
 	/** @param list<int> $ids */

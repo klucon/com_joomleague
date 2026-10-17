@@ -1,0 +1,27 @@
+<?php
+declare(strict_types=1);
+define('_JEXEC', 1);
+$base = dirname(__DIR__, 2) . '/administrator/components/com_joomleague/src/Service/';
+require $base . 'StandingsDecimal.php';
+require $base . 'MatchOutcomeResolver.php';
+use Joomleague\Component\Joomleague\Domain\Service\MatchOutcomeResolver as Resolver;
+$values = static fn($a, $b): array => [(object) ['participant_id'=>10, 'numeric_value'=>$a], (object) ['participant_id'=>20, 'numeric_value'=>$b]];
+$check = static function(array $expected, array $actual): void { if ($expected !== $actual) throw new RuntimeException(json_encode([$expected,$actual])); };
+$tie = $values('1.000000000', '1');
+$check([10], Resolver::resolve($tie, $values('4','3')));
+$check([20], Resolver::resolve($tie, $values('3','4')));
+$check([20], Resolver::resolve($tie, $values('4','3'), true, 'loser'));
+$check([], Resolver::resolve($tie));
+$check([], Resolver::resolve($tie, $values('4','4')));
+$check([], Resolver::resolve($tie, $values('4',null)));
+$foreign = $values('4','3'); $foreign[1]->participant_id = 30;
+$check([], Resolver::resolve($tie, $foreign));
+$check([10], Resolver::resolve($values('2','1'), $values('3','4')));
+$check([20], Resolver::resolve($values('2','1'), [], false));
+$check([10], Resolver::resolve($values('999999999999999999.000000001','999999999999999999.000000000')));
+$ambiguous = $values('2','2'); $ambiguous[] = (object) ['participant_id'=>30,'numeric_value'=>'1'];
+$check([], Resolver::resolve($ambiguous));
+$explicit = $tie; $explicit[1]->result_rank=1;
+$check([20], Resolver::resolve($explicit));
+if (!Resolver::isDecider('shootout', []) || !Resolver::isDecider('tie_break', ['decider'=>true]) || Resolver::isDecider('period', [])) throw new RuntimeException('Decider identification failed');
+echo "Match outcome resolver OK\n";

@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "tennis",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS",
     "description_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_DESC",
     "scoring_model": "sets_games",
@@ -268,27 +268,39 @@
         {
             "code": "singles_player",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_SINGLES_PLAYER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_SINGLES_PLAYER",
+            "role_domain": "participant"
         },
         {
             "code": "doubles_player",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_DOUBLES_PLAYER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_DOUBLES_PLAYER",
+            "role_domain": "participant"
         },
         {
             "code": "captain",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_CAPTAIN"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_CAPTAIN",
+            "role_domain": "team_staff"
         },
         {
             "code": "chair_umpire",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_CHAIR_UMPIRE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_CHAIR_UMPIRE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "line_umpire",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_LINE_UMPIRE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_LINE_UMPIRE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -392,7 +404,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true
         },

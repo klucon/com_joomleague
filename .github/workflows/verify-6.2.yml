@@ -2,9 +2,9 @@ name: Verify JoomLeague 6.2
 
 on:
   pull_request:
-    branches: [6.2-dev]
+    branches: [main, 6.2-dev]
   push:
-    branches: [6.2-dev]
+    branches: [main, 6.2-dev]
   workflow_dispatch:
 
 permissions:

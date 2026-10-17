@@ -30,6 +30,22 @@ $formatValues = static function (array $values, array $fields): string {
 		<h2 class="h5 alert-heading"><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_SCOPE_TITLE'); ?></h2>
 		<p class="mb-0"><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_SCOPE_DESC'); ?></p>
 	</div>
+	<div class="row row-cols-1 row-cols-lg-2 g-3 mb-4">
+		<div class="col">
+			<div class="border rounded p-3 h-100">
+				<h2 class="h5"><span class="icon-palette me-2" aria-hidden="true"></span><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_PROFILE_SCOPE_TITLE'); ?></h2>
+				<p><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_PROFILE_SCOPE_DESC'); ?></p>
+				<a class="btn btn-outline-primary" href="#templateProfiles"><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_PROFILE_SCOPE_ACTION'); ?></a>
+			</div>
+		</div>
+		<div class="col">
+			<div class="border rounded p-3 h-100">
+				<h2 class="h5"><span class="icon-folder-open me-2" aria-hidden="true"></span><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_PROJECT_SCOPE_TITLE'); ?></h2>
+				<p><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_PROJECT_SCOPE_DESC'); ?></p>
+				<a class="btn btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=projects'); ?>"><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_PROJECT_SCOPE_ACTION'); ?></a>
+			</div>
+		</div>
+	</div>
 
 	<div class="row row-cols-2 row-cols-lg-4 g-3 mb-4">
 		<?php foreach ([
@@ -45,7 +61,8 @@ $formatValues = static function (array $values, array $fields): string {
 		<?php endforeach; ?>
 	</div>
 
-	<div class="accordion d-grid gap-3" id="templateProfiles">
+	<h2 class="h4 mb-3" id="templateProfilesTitle"><?php echo Text::_('COM_JOOMLEAGUE_TEMPLATES_PROFILE_LIST_TITLE'); ?></h2>
+	<div class="accordion d-grid gap-3" id="templateProfiles" aria-labelledby="templateProfilesTitle">
 		<?php foreach ($this->items as $index => $profile) : ?>
 			<div class="accordion-item">
 				<h2 class="accordion-header" id="profile-heading-<?php echo (int) $index; ?>">

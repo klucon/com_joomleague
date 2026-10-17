@@ -1,0 +1,28 @@
+<?php
+declare(strict_types=1);
+if (PHP_SAPI !== 'cli') exit(1);
+$_SERVER['HTTP_HOST'] = 'joomla62.local';
+$_SERVER['REQUEST_URI'] = '/administrator/index.php';
+$_SERVER['SCRIPT_NAME'] = '/administrator/index.php';
+define('_JEXEC', 1);
+define('JPATH_BASE', '/var/www/html');
+require JPATH_BASE . '/includes/defines.php';
+require JPATH_BASE . '/includes/framework.php';
+$container = Joomla\CMS\Factory::getContainer();
+$container->alias('session', 'session.cli')->alias(Joomla\Session\SessionInterface::class, 'session.cli');
+$app = $container->get(Joomla\CMS\Application\AdministratorApplication::class);
+Joomla\CMS\Factory::$application = $app;
+$db = $container->get(Joomla\Database\DatabaseInterface::class);
+$userId = (int) $db->setQuery('SELECT id FROM ' . $db->quoteName('#__users') . ' WHERE username = ' . $db->quote('admin'))->loadResult();
+if (!$userId) throw new RuntimeException('Local administrator not found.');
+$user = new Joomla\CMS\User\User($userId);
+$app->loadIdentity($user);
+$app->createExtensionNamespaceMap();
+$app->loadLanguage(Joomla\CMS\Language\Language::getInstance('en-GB'));
+$archive = $argv[1] ?? '/tmp/pkg_joomleague-6.2.0-beta6.zip';
+if (!is_file($archive) || !str_ends_with($archive, '.zip') || !$user->authorise('core.admin')) throw new RuntimeException('Invalid local installation request.');
+$package = Joomla\CMS\Installer\InstallerHelper::unpack($archive);
+$installer = new Joomla\CMS\Installer\Installer();
+$installer->setDatabase($db);
+if (!$package || !$installer->install($package['dir'])) throw new RuntimeException('Local package installation failed.');
+echo "Local package installed: " . basename($archive) . "\n";

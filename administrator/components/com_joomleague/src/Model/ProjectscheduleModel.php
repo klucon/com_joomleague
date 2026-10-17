@@ -113,7 +113,7 @@ final class ProjectscheduleModel extends ListModel
 			}
 		}
 
-		$query->order($db->escape((string) $this->getState('list.ordering', 'a.scheduled_start')) . ' ' . ($this->getState('list.direction') === 'desc' ? 'DESC' : 'ASC'));
+		$query->order($db->escape((string) $this->getState('list.ordering', 'a.scheduled_start')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC'));
 
 		return $query;
 	}

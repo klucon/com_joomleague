@@ -32,6 +32,7 @@ final class MatchResultPayloadValidator
 		$segmentBudget = 1000; $valueBudget = 10000;
 		$root = $this->segment($segments[0], $participants, $segmentTypes, null, $profile['match']['participant_status_codes'] ?? [], $status === 'final' && !$legacyAggregateOnly, $segmentBudget, $valueBudget);
 		if ($root['level_code'] !== 'result') throw new \InvalidArgumentException('The root score segment must use the result level.');
+		if (isset($profile['match']['encounter'])) $root = (new TeamEncounterScoreNormalizer())->normalize($root, $participantIds, $status, $profile['match']['encounter']);
 		$root = $this->aggregationValidator->normalize($score, $root, $participantIds, $status, $legacyAggregateOnly);
 		if ($status === 'final' && count($root['values']) !== count($participantIds)) throw new MatchResultValidationException('COM_JOOMLEAGUE_MATCHRESULT_ERROR_FINAL_ROOT_VALUES_REQUIRED');
 		$this->aggregationValidator->validate($score, $root, $participantIds, $status, $legacyAggregateOnly);
@@ -56,7 +57,16 @@ final class MatchResultPayloadValidator
 			$numeric = $this->decimal($value['numeric_value'] ?? null); $text = $this->text($value['text_value'] ?? null, 255); $status = $this->nullableAllowedCode($value['status_code'] ?? null, $participantStatuses, 'participant status'); $rank = $value['result_rank'] ?? null;
 			if ($rank !== null && $rank !== '') { $rank = filter_var($rank, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]); if ($rank === false) throw new MatchResultValidationException('COM_JOOMLEAGUE_MATCHRESULT_ERROR_RANK_POSITIVE'); } else $rank = null;
 			if ($numeric === null && $text === null && $status === null && $rank === null) throw new MatchResultValidationException('COM_JOOMLEAGUE_MATCHRESULT_ERROR_VALUE_REQUIRED');
-			$values[] = ['participant_id' => $participantId, 'numeric_value' => $numeric, 'text_value' => $text, 'status_code' => $status, 'result_rank' => $rank, 'metadata' => $this->metadata($value['metadata'] ?? [])];
+			$valueMetadata = $this->metadata($value['metadata'] ?? []);
+			foreach ($type['value_fields'] ?? [] as $field => $definition) {
+				if (!array_key_exists($field, $valueMetadata)) continue;
+				$raw = $valueMetadata[$field];
+				if (!is_int($raw) && !is_string($raw)) throw new \InvalidArgumentException('Result statistic must be an integer.');
+				$statistic = filter_var($raw, FILTER_VALIDATE_INT, ['options' => ['min_range' => $definition['minimum'], 'max_range' => $definition['maximum']]]);
+				if ($statistic === false || (($definition['bounded_by_score'] ?? false) && ($numeric === null || $statistic > (float) $numeric))) throw new \InvalidArgumentException('Result statistic is outside its allowed range.');
+				$valueMetadata[$field] = $statistic;
+			}
+			$values[] = ['participant_id' => $participantId, 'numeric_value' => $numeric, 'text_value' => $text, 'status_code' => $status, 'result_rank' => $rank, 'metadata' => $valueMetadata];
 		}
 		$children = []; foreach (($input['children'] ?? []) as $child) $children[] = $this->segment($child, $participants, $segmentTypes, $level, $participantStatuses, $enforceExpectedCounts, $segmentBudget, $valueBudget);
 		$counts = array_count_values(array_column($children, 'level_code'));

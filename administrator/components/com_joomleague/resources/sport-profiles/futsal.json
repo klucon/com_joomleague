@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "futsal",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL",
     "description_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_DESC",
     "scoring_model": "goals",
@@ -85,14 +85,14 @@
             "initial_kicks_per_team": 5
         }
     },
-	"lineup": {
-		"substitutions": {
-			"supported": true,
-			"reentry_supported": true,
-			"limit_scope": "unlimited",
-			"maximum_per_scope": null
-		},
-		"preferred_order": [
+    "lineup": {
+        "substitutions": {
+            "supported": true,
+            "reentry_supported": true,
+            "limit_scope": "unlimited",
+            "maximum_per_scope": null
+        },
+        "preferred_order": [
             "goalkeeper",
             "fixo",
             "ala",
@@ -248,37 +248,51 @@
         {
             "code": "goalkeeper",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_GOALKEEPER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_GOALKEEPER",
+            "role_domain": "participant"
         },
         {
             "code": "fixo",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_FIXO"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_FIXO",
+            "role_domain": "participant"
         },
         {
             "code": "ala",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_ALA"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_ALA",
+            "role_domain": "participant"
         },
         {
             "code": "pivot",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_PIVOT"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_PIVOT",
+            "role_domain": "participant"
         },
         {
             "code": "head_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_HEAD_COACH"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_HEAD_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "timekeeper",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_TIMEKEEPER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FUTSAL_POSITION_TIMEKEEPER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -387,7 +401,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true
         },

@@ -42,27 +42,51 @@ final class SportTypeProfileMaterializer
 		$now = gmdate('Y-m-d H:i:s');
 
 		if ($options['positions']) {
+			$existing = $this->existingCodes('#__joomleague_sport_position', $sportTypeId);
 			foreach ($definitions['positions'] as $ordering => $definition) {
+				if (isset($existing[$definition['code']])) {
+					continue;
+				}
 				$this->insertPosition($sportTypeId, $profileVersionId, $definition, $ordering + 1, $actorId, $now);
 				$counts['positions']++;
 			}
 		}
 
 		if ($options['event_types']) {
+			$existing = $this->existingCodes('#__joomleague_event_type', $sportTypeId);
 			foreach ($definitions['event_types'] as $ordering => $definition) {
+				if (isset($existing[$definition['code']])) {
+					continue;
+				}
 				$this->insertEventType($sportTypeId, $profileVersionId, $definition, $ordering + 1, $actorId, $now);
 				$counts['event_types']++;
 			}
 		}
 
 		if ($options['statistics']) {
+			$existing = $this->existingCodes('#__joomleague_statistic', $sportTypeId);
 			foreach ($definitions['statistics'] as $ordering => $definition) {
+				if (isset($existing[$definition['code']])) {
+					continue;
+				}
 				$this->insertStatistic($sportTypeId, $profileVersionId, $definition, $ordering + 1, $actorId, $now);
 				$counts['statistics']++;
 			}
 		}
 
 		return $counts;
+	}
+
+	/** @return array<string, true> */
+	private function existingCodes(string $table, int $sportTypeId): array
+	{
+		$query = $this->database->getQuery(true)
+			->select($this->database->quoteName('code'))
+			->from($this->database->quoteName($table))
+			->where($this->database->quoteName('sport_type_id') . ' = :sportTypeId')
+			->bind(':sportTypeId', $sportTypeId, ParameterType::INTEGER);
+
+		return array_fill_keys(array_map('strval', $this->database->setQuery($query)->loadColumn()), true);
 	}
 
 	/** @return array<string, mixed> */
@@ -115,14 +139,16 @@ final class SportTypeProfileMaterializer
 	private function insertPosition(int $sportTypeId, int $profileVersionId, array $definition, int $ordering, int $actorId, string $now): void
 	{
 		$personType = $this->nullableString($definition['person_type'] ?? null);
-		if ($personType === null) {
-			throw new \RuntimeException('Every position requires a person_type.');
+		$roleDomain = $this->nullableString($definition['role_domain'] ?? null);
+		if ($personType === null || $roleDomain === null || !in_array($roleDomain, RoleDomain::VALUES, true)) {
+			throw new \RuntimeException('Every position requires a valid person_type and role_domain.');
 		}
 
 		$row = (object) [
 			'uuid' => UuidFactory::v4(), 'sport_type_id' => $sportTypeId, 'source_profile_version_id' => $profileVersionId,
 			'code' => $definition['code'], 'name' => '', 'name_key' => $this->nullableString($definition['name_key'] ?? null),
-			'person_type' => $personType, 'lineup_group' => $this->nullableString($definition['lineup_group'] ?? null),
+			'person_type' => $personType, 'role_domain' => $roleDomain,
+			'lineup_group' => $this->nullableString($definition['lineup_group'] ?? null),
 			'parent_id' => null, 'has_events' => $this->nullableBool($definition, 'has_events'),
 			'has_statistics' => $this->nullableBool($definition, 'has_statistics'), 'source' => 'profile',
 			'source_checksum' => CanonicalJson::checksum($definition), 'published' => 1, 'ordering' => $ordering,

@@ -7,15 +7,18 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Session\Session;
+
+Factory::getApplication()->getDocument()->getWebAssetManager()->useStyle('com_joomleague.admin-lists');
 
 HTMLHelper::_('behavior.multiselect'); $user = Factory::getApplication()->getIdentity(); $roundId = (int) $this->round->id; $listOrder = $this->escape($this->state->get('list.ordering')); $listDirn = $this->escape($this->state->get('list.direction')); $model = $this->getModel(); $headToHead = $this->contestType === 'head_to_head';
 $matchReturn = (string) (Factory::getApplication()->getInput()->get('return', '', 'base64') ?? '');
 $matchReturnAppend = $matchReturn !== '' ? '&return=' . $matchReturn : '';
 ?>
-<form action="<?php echo Route::_('index.php?option=com_joomleague&view=matches&round_id=' . $roundId); ?>" method="post" name="adminForm" id="adminForm">
+<form action="<?php echo Route::_('index.php?option=com_joomleague&view=matches&round_id=' . $roundId); ?>" method="post" name="adminForm" id="adminForm" class="js-stools-form">
 	<div class="alert alert-info" role="status"><strong><?php echo $this->escape($this->round->project_name); ?></strong><span class="mx-2">/</span><?php echo $this->escape($this->round->stage_name); ?><span class="mx-2">/</span><?php echo $this->escape($this->round->name); ?></div><?php echo LayoutHelper::render('joomla.searchtools.default', ['view' => $this]); ?>
 	<div class="table-responsive">
-		<table class="table table-striped align-middle" id="matchList" data-round-id="<?php echo $roundId; ?>" data-saving="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_MATCH_AUTOSAVE_SAVING')); ?>" data-saved="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_MATCH_AUTOSAVE_SAVED')); ?>" data-failed="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_MATCH_AUTOSAVE_FAILED')); ?>">
+		<table class="table table-striped align-middle" id="matchList" data-round-id="<?php echo $roundId; ?>" data-csrf-token="<?php echo $this->escape(Session::getFormToken()); ?>" data-saving="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_MATCH_AUTOSAVE_SAVING')); ?>" data-saved="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_MATCH_AUTOSAVE_SAVED')); ?>" data-failed="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_MATCH_AUTOSAVE_FAILED')); ?>">
 			<thead>
 				<tr>
 					<td class="w-1 text-center"><?php echo HTMLHelper::_('grid.checkall'); ?></td>
@@ -48,7 +51,9 @@ $matchReturnAppend = $matchReturn !== '' ? '&return=' . $matchReturn : '';
 				$statusKey = 'COM_JOOMLEAGUE_MATCH_STATUS_' . strtoupper((string) $item->status_code);
 				$statusLabel = Text::_($statusKey);
 				if ($statusLabel === $statusKey) $statusLabel = (string) $item->status_code;
-				$canInlineEdit = $canEdit && !$checkedOut;
+				$canInlineEdit = $this->canEditSchedule && !$checkedOut;
+				$participantsLocked = (bool) ($item->participants_locked ?? false);
+				$canEditParticipants = $canInlineEdit && !$participantsLocked;
 				$homeEntry = (int) ($item->participant_entries[1] ?? 0);
 				$awayEntry = (int) ($item->participant_entries[2] ?? 0);
 				?>
@@ -57,8 +62,8 @@ $matchReturnAppend = $matchReturn !== '' ? '&return=' . $matchReturn : '';
 					<td><?php if ($canEdit && !$checkedOut) : ?><a class="btn btn-sm btn-outline-secondary" href="<?php echo Route::_('index.php?option=com_joomleague&task=match.edit&id=' . (int) $item->id . '&round_id=' . $roundId . $matchReturnAppend); ?>" title="<?php echo Text::_('JACTION_EDIT'); ?>"><span class="icon-edit" aria-hidden="true"></span><span class="visually-hidden"><?php echo Text::_('JACTION_EDIT'); ?></span></a><?php endif; ?></td>
 					<td><input class="form-control form-control-sm" type="text" value="<?php echo $this->escape((string) $item->match_number); ?>" data-initial-value="<?php echo $this->escape((string) $item->match_number); ?>" data-schedule-field="match_number" maxlength="100" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_FIELD_MATCH_NUMBER_SHORT_LABEL'); ?>" <?php echo $canInlineEdit ? '' : 'disabled'; ?>></td>
 					<?php if ($headToHead) : ?>
-						<td><select class="form-select form-select-sm" data-schedule-field="participant_slot_1" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_MATCH_COLUMN_HOME'); ?>" <?php echo $canInlineEdit ? '' : 'disabled'; ?>><option value=""><?php echo Text::_('COM_JOOMLEAGUE_OPTION_SELECT_PARTICIPANT'); ?></option><?php foreach ($this->entryOptions as $option) : ?><option value="<?php echo (int) $option->value; ?>" <?php echo (int) $option->value === $homeEntry ? 'selected' : ''; ?>><?php echo $this->escape($option->text); ?></option><?php endforeach; ?></select></td>
-						<td><select class="form-select form-select-sm" data-schedule-field="participant_slot_2" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_MATCH_COLUMN_AWAY'); ?>" <?php echo $canInlineEdit ? '' : 'disabled'; ?>><option value=""><?php echo Text::_('COM_JOOMLEAGUE_OPTION_SELECT_PARTICIPANT'); ?></option><?php foreach ($this->entryOptions as $option) : ?><option value="<?php echo (int) $option->value; ?>" <?php echo (int) $option->value === $awayEntry ? 'selected' : ''; ?>><?php echo $this->escape($option->text); ?></option><?php endforeach; ?></select></td>
+						<td><select class="form-select form-select-sm" data-schedule-field="participant_slot_1" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_MATCH_COLUMN_HOME'); ?>" <?php echo $canEditParticipants ? '' : 'disabled'; ?>><option value=""><?php echo Text::_('COM_JOOMLEAGUE_OPTION_SELECT_PARTICIPANT'); ?></option><?php foreach ($this->entryOptions as $option) : ?><option value="<?php echo (int) $option->value; ?>" <?php echo (int) $option->value === $homeEntry ? 'selected' : ''; ?>><?php echo $this->escape($option->text); ?></option><?php endforeach; ?></select><?php if ($participantsLocked) : ?><div class="small text-body-secondary"><?php echo $this->escape(Text::_('COM_JOOMLEAGUE_MATCH_SCHEDULE_PARTICIPANTS_LOCKED')); ?></div><?php endif; ?></td>
+						<td><select class="form-select form-select-sm" data-schedule-field="participant_slot_2" aria-label="<?php echo Text::_('COM_JOOMLEAGUE_MATCH_COLUMN_AWAY'); ?>" <?php echo $canEditParticipants ? '' : 'disabled'; ?>><option value=""><?php echo Text::_('COM_JOOMLEAGUE_OPTION_SELECT_PARTICIPANT'); ?></option><?php foreach ($this->entryOptions as $option) : ?><option value="<?php echo (int) $option->value; ?>" <?php echo (int) $option->value === $awayEntry ? 'selected' : ''; ?>><?php echo $this->escape($option->text); ?></option><?php endforeach; ?></select><?php if ($participantsLocked) : ?><div class="small text-body-secondary"><?php echo $this->escape(Text::_('COM_JOOMLEAGUE_MATCH_SCHEDULE_PARTICIPANTS_LOCKED')); ?></div><?php endif; ?></td>
 					<?php else : ?>
 						<td class="text-center">
 							<span class="badge text-bg-light border"><?php echo count($item->participant_details); ?></span>
@@ -85,8 +90,8 @@ $matchReturnAppend = $matchReturn !== '' ? '&return=' . $matchReturn : '';
 		</table>
 	</div>
 	<?php echo $this->pagination->getListFooter(); ?>
-	<input type="hidden" name="task" value=""><input type="hidden" name="boxchecked" value="0"><input type="hidden" name="round_id" value="<?php echo $roundId; ?>"><input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"><input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>"><?php echo HTMLHelper::_('form.token'); ?>
-	<?php if ($user->authorise('core.edit', 'com_joomleague')) : ?>
+	<input type="hidden" name="task" value=""><input type="hidden" name="boxchecked" value="0"><input type="hidden" name="round_id" value="<?php echo $roundId; ?>"><?php echo HTMLHelper::_('form.token'); ?>
+	<?php if ($this->canEditSchedule) : ?>
 	<div class="modal fade" id="matches-batch-modal" tabindex="-1" aria-labelledby="matches-batch-modal-label" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">

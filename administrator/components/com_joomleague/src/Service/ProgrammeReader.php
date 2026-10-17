@@ -19,7 +19,7 @@ final class ProgrammeReader
 	 * @param list<int> $viewLevels Joomla access levels authorised for the current visitor.
 	 * @return list<array<string,mixed>>
 	 */
-	public function forProject(int $projectId, ?array $entryIds, array $viewLevels, ?int $venueId = null): array
+	public function forProject(int $projectId, ?array $entryIds, array $viewLevels, ?int $venueId = null, ?int $stageId = null, ?int $roundId = null): array
 	{
 		if ($projectId < 1) {
 			throw new \InvalidArgumentException('Programme project is invalid.');
@@ -39,14 +39,19 @@ final class ProgrammeReader
 			->select([
 				'match.id', 'match.uuid', 'match.project_id', 'match.scheduled_start', 'match.timezone', 'match.duration_minutes', 'match.status_code',
 				'match.created AS match_created', 'match.modified AS match_modified',
-				'match.contest_type', 'project.name AS project_name', 'round.name AS round_name', 'venue.id AS venue_id', 'venue.name AS venue_name',
+				'match.contest_type', 'project.season_id', 'project.sport_type_id', 'project.name AS project_name', 'competition.name AS competition_name', 'season.name AS season_name', 'sport_type.name AS sport_name',
+				'round.id AS round_id', 'round.stage_id', 'stage.name AS stage_name', 'round.name AS round_name', 'venue.id AS venue_id', 'venue.name AS venue_name',
 				'result.status_code AS result_status', 'result.created AS result_created', 'result.modified AS result_modified', 'result.finalized_at',
 			])
 			->from($db->quoteName('#__joomleague_project_match', 'match'))
 			->innerJoin($db->quoteName('#__joomleague_project', 'project') . ' ON project.id = match.project_id AND project.published = 1 AND project.access IN (' . implode(',', $viewLevels) . ')')
+			->innerJoin($db->quoteName('#__joomleague_competition', 'competition') . ' ON competition.id = project.competition_id AND competition.published = 1 AND competition.access IN (' . implode(',', $viewLevels) . ')')
+			->innerJoin($db->quoteName('#__joomleague_season', 'season') . ' ON season.id = project.season_id AND season.published = 1 AND season.access IN (' . implode(',', $viewLevels) . ')')
+			->innerJoin($db->quoteName('#__joomleague_sport_type', 'sport_type') . ' ON sport_type.id = project.sport_type_id AND sport_type.published = 1')
 			->innerJoin($db->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = match.round_id AND round.published = 1')
+			->innerJoin($db->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = round.stage_id AND stage.project_id = match.project_id AND stage.published = 1')
 			->leftJoin($db->quoteName('#__joomleague_venue', 'venue') . ' ON venue.id = match.venue_id AND venue.published = 1 AND venue.access IN (' . implode(',', $viewLevels) . ')')
-			->leftJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = match.id AND result.status_code = 'final'")
+			->leftJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = match.id AND result.status_code = 'final' AND match.status_code <> 'cancelled'")
 			->where('match.project_id = :projectId')
 			->where('match.published = 1')
 			->bind(':projectId', $projectId, ParameterType::INTEGER)
@@ -55,11 +60,17 @@ final class ProgrammeReader
 		if ($venueId !== null) {
 			$query->where('match.venue_id = :venueId')->bind(':venueId', $venueId, ParameterType::INTEGER);
 		}
+		if ($stageId !== null) {
+			$query->where('round.stage_id = :stageId')->bind(':stageId', $stageId, ParameterType::INTEGER);
+		}
+		if ($roundId !== null) {
+			$query->where('round.id = :roundId')->bind(':roundId', $roundId, ParameterType::INTEGER);
+		}
 
 		if ($entryIds !== null) {
 			$query->innerJoin($db->quoteName('#__joomleague_match_participant', 'scope_participant') . ' ON scope_participant.match_id = match.id AND scope_participant.published = 1')
 				->whereIn('scope_participant.project_entry_id', $entryIds, ParameterType::INTEGER)
-				->group('match.id, match.uuid, match.project_id, match.scheduled_start, match.timezone, match.duration_minutes, match.status_code, match.created, match.modified, match.contest_type, project.name, round.name, venue.id, venue.name, result.status_code, result.created, result.modified, result.finalized_at');
+				->group('match.id, match.uuid, match.project_id, match.scheduled_start, match.timezone, match.duration_minutes, match.status_code, match.created, match.modified, match.contest_type, project.season_id, project.sport_type_id, project.name, competition.name, season.name, sport_type.name, round.id, round.stage_id, stage.name, round.name, venue.id, venue.name, result.status_code, result.created, result.modified, result.finalized_at');
 		}
 
 		$items = $db->setQuery($query)->loadObjectList();
@@ -73,10 +84,13 @@ final class ProgrammeReader
 				->select([
 					'participant.id AS participant_id', 'participant.match_id', 'participant.slot_number', 'participant.project_entry_id',
 					'COALESCE(NULLIF(entry.display_name, \'\'), team.name, NULLIF(TRIM(CONCAT(person.first_name, \' \', person.last_name)), \'\'), CONCAT(\'ID \', entry.id)) AS display_name',
+					'COALESCE(NULLIF(team.logo, \'\'), NULLIF(team.picture, \'\'), NULLIF(person.picture, \'\')) AS image',
+					'entry.entry_kind', 'team.logo AS team_logo', 'team.picture AS team_picture', 'person.picture AS person_picture', 'club.logo AS club_logo',
 				])
 				->from($db->quoteName('#__joomleague_match_participant', 'participant'))
 				->innerJoin($db->quoteName('#__joomleague_project_entry', 'entry') . ' ON entry.id = participant.project_entry_id AND entry.published = 1')
 				->leftJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.published = 1 AND team.access IN (' . implode(',', $viewLevels) . ')')
+				->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = team.club_id AND club.published = 1 AND club.access IN (' . implode(',', $viewLevels) . ')')
 				->leftJoin($db->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id AND person.published = 1 AND person.access IN (' . implode(',', $viewLevels) . ')')
 				->whereIn('participant.match_id', $eventIds, ParameterType::INTEGER)
 				->where('participant.published = 1')
@@ -90,17 +104,19 @@ final class ProgrammeReader
 		if ($participantIds !== []) {
 			$scoreRows = $db->setQuery(
 				$db->getQuery(true)
-					->select(['segment.match_id', 'value.participant_id', 'value.numeric_value', 'value.text_value'])
+					->select(['segment.match_id', 'value.participant_id', 'value.numeric_value', 'value.text_value', 'value.result_rank'])
 					->from($db->quoteName('#__joomleague_match_score_segment', 'segment'))
 					->innerJoin($db->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id = segment.id')
 					->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = segment.match_id AND result.status_code = 'final'")
+					->innerJoin($db->quoteName('#__joomleague_project_match', 'scored_match') . " ON scored_match.id = segment.match_id AND scored_match.status_code <> 'cancelled'")
 					->whereIn('segment.match_id', $eventIds, ParameterType::INTEGER)
 					->where('segment.level_code = ' . $db->quote('result'))
 			)->loadObjectList();
 			foreach ($scoreRows as $score) {
-				$scores[(int) $score->match_id][(int) $score->participant_id] = $score->numeric_value !== null
-					? self::formatNumericScore((string) $score->numeric_value)
-					: $score->text_value;
+				$scores[(int) $score->match_id][(int) $score->participant_id] = [
+					'value' => $score->numeric_value !== null ? self::formatNumericScore((string) $score->numeric_value) : $score->text_value,
+					'rank' => $score->result_rank === null ? null : (int) $score->result_rank,
+				];
 			}
 			$deciderRows = $db->setQuery(
 				$db->getQuery(true)
@@ -113,7 +129,7 @@ final class ProgrammeReader
 			)->loadObjectList();
 			foreach ($deciderRows as $row) {
 				$metadata = json_decode((string) ($row->metadata_json ?? ''), true);
-				if (!is_array($metadata) || ($metadata['decider'] ?? false) !== true) continue;
+				if (!MatchOutcomeResolver::isDecider((string) $row->level_code, $metadata)) continue;
 				$matchId = (int) $row->match_id;
 				$deciders[$matchId] ??= ['level_code' => (string) $row->level_code, 'values' => []];
 				$deciders[$matchId]['values'][(int) $row->participant_id] = $row->numeric_value !== null
@@ -129,7 +145,14 @@ final class ProgrammeReader
 				'entry_id' => (int) $participant->project_entry_id,
 				'slot' => (int) $participant->slot_number,
 				'name' => (string) $participant->display_name,
-				'score' => $scores[(int) $participant->match_id][(int) $participant->participant_id] ?? null,
+				'image' => $participant->image === null ? null : (string) $participant->image,
+				'entry_kind' => (string) $participant->entry_kind,
+				'team_logo' => $participant->team_logo,
+				'team_picture' => $participant->team_picture,
+				'person_picture' => $participant->person_picture,
+				'club_logo' => $participant->club_logo,
+				'score' => $scores[(int) $participant->match_id][(int) $participant->participant_id]['value'] ?? null,
+				'rank' => $scores[(int) $participant->match_id][(int) $participant->participant_id]['rank'] ?? null,
 			];
 		}
 
@@ -139,18 +162,26 @@ final class ProgrammeReader
 			'created' => $item->match_created,
 			'modified' => self::latestDateTime([$item->match_modified, $item->result_created, $item->result_modified, $item->finalized_at, $item->match_created]),
 			'project_id' => (int) $item->project_id,
+			'season_id' => (int) $item->season_id,
+			'sport_type_id' => (int) $item->sport_type_id,
 			'scheduled_start' => $item->scheduled_start,
 			'timezone' => $item->timezone,
 			'duration_minutes' => $item->duration_minutes === null ? null : (int) $item->duration_minutes,
 			'status_code' => (string) $item->status_code,
 			'contest_type' => (string) $item->contest_type,
 			'project_name' => (string) $item->project_name,
+			'competition_name' => (string) $item->competition_name,
+			'season_name' => (string) $item->season_name,
+			'sport_name' => (string) $item->sport_name,
+			'round_id' => (int) $item->round_id,
+			'stage_id' => (int) $item->stage_id,
+			'stage_name' => (string) $item->stage_name,
 			'round_name' => (string) $item->round_name,
 			'venue_name' => $item->venue_name,
 			'venue_id' => $item->venue_id === null ? null : (int) $item->venue_id,
 			'played' => $item->result_status === 'final',
 			'participants' => $participantsByEvent[(int) $item->id] ?? [],
-			'decider' => $deciders[(int) $item->id] ?? null,
+			'decider' => $item->status_code === 'cancelled' ? null : ($deciders[(int) $item->id] ?? null),
 		], $items);
 	}
 

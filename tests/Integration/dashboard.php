@@ -28,12 +28,16 @@ Factory::$application = $container->get(Joomla\Console\Application::class);
 
 $database = Factory::getContainer()->get(DatabaseInterface::class);
 $model = new DashboardModel(['dbo' => $database]);
+$installedVersion = $model->getInstalledVersion();
 $overview = $model->getOverview();
 $siteClub = $model->getSiteClub();
 $clubMatches = $model->getClubMatches(1);
 
 foreach (['competitions', 'projects', 'clubs', 'teams', 'persons', 'matches'] as $key) {
 	if (!isset($overview[$key]) || !is_int($overview[$key])) throw new RuntimeException('Dashboard overview is incomplete.');
+}
+if ($installedVersion === '') {
+	throw new RuntimeException('Dashboard installed version is missing.');
 }
 if (($siteClub !== null && (!isset($siteClub['id'], $siteClub['name']))) || !is_array($clubMatches)) {
 	throw new RuntimeException('Dashboard operational data is incomplete.');

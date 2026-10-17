@@ -49,7 +49,7 @@ final class StagesModel extends ListModel
 			else { $search = '%' . $search . '%'; $query->where('(a.name LIKE :name OR a.code LIKE :code OR a.stage_type LIKE :type)')->bind(':name', $search)->bind(':code', $search)->bind(':type', $search); }
 		}
 
-		$query->order($db->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . ($this->getState('list.direction') === 'desc' ? 'DESC' : 'ASC'));
+		$query->order($db->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC'));
 
 		return $query;
 	}

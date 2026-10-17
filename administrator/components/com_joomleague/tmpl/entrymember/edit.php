@@ -7,12 +7,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
 HTMLHelper::_('behavior.formvalidator');
-$this->getDocument()->getWebAssetManager()->registerAndUseScript(
-	'com_joomleague.entrymember',
-	'com_joomleague/js/entrymember.js',
-	[],
-	['defer' => true]
-);
+$this->getDocument()->getWebAssetManager()->useScript('com_joomleague.entrymember');
 $entryId = (int) $this->entry->id;
 ?>
 <form action="<?php echo Route::_('index.php?option=com_joomleague&layout=edit&id=' . (int) $this->item->id . '&entry_id=' . $entryId); ?>" method="post" name="adminForm" id="entrymember-form" class="form-validate">

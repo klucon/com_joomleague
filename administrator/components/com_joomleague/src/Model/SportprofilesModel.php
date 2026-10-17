@@ -24,7 +24,7 @@ final class SportprofilesModel extends BaseDatabaseModel
 			->select(['p.id', 'p.code', 'p.name_key', 'p.description_key', 'p.published'])
 			->select(['v.schema_version', 'v.profile_version', 'v.payload_json', 'v.payload_checksum', 'v.source', 'v.state'])
 			->from($this->getDatabase()->quoteName('#__joomleague_sport_profile', 'p'))
-			->leftJoin($this->getDatabase()->quoteName('#__joomleague_sport_profile_version', 'v') . ' ON v.profile_id = p.id')
+			->leftJoin($this->getDatabase()->quoteName('#__joomleague_sport_profile_version', 'v') . ' ON v.profile_id = p.id AND v.source <> ' . $this->getDatabase()->quote('variant'))
 			->order(['p.code ASC', 'v.profile_version DESC']);
 
 		$items = $this->getDatabase()->setQuery($query)->loadObjectList();
@@ -39,4 +39,23 @@ final class SportprofilesModel extends BaseDatabaseModel
 
 		return $items;
 	}
+
+	public function getCategories(): array
+	{
+		return (new \Joomleague\Component\Joomleague\Administrator\Service\SportCategoryService($this->getDatabase()))->categories();
+	}
+
+	public function getCategoryAssignments(): array
+	{
+		$query = $this->getDatabase()->getQuery(true)->select(['profile_id', 'category_id'])->from($this->getDatabase()->quoteName('#__joomleague_sport_profile_category'));
+		$result = [];
+		foreach ($this->getDatabase()->setQuery($query)->loadAssocList() as $row) $result[(int) $row['profile_id']][] = (int) $row['category_id'];
+		return $result;
+	}
+
+	public function assignCategories(array $profileIds, array $categoryIds): void
+	{
+		(new \Joomleague\Component\Joomleague\Administrator\Service\SportCategoryService($this->getDatabase()))->assign($profileIds, $categoryIds);
+	}
+
 }

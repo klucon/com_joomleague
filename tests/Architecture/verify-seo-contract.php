@@ -21,11 +21,27 @@ foreach ($services as $file => $needles) {
 	}
 }
 
-foreach (['project', 'club', 'team', 'person', 'venue', 'eventreport'] as $view) {
-	$source = (string) file_get_contents($site . '/src/View/' . ucfirst($view) . '/HtmlView.php');
-	foreach (['SeoMetadata', "Route::_('index.php?option=com_joomleague&view="] as $needle) {
-		if (!str_contains($source, $needle)) throw new RuntimeException(sprintf('%s view is missing %s.', $view, $needle));
+foreach (glob($site . '/src/View/*/HtmlView.php') ?: [] as $file) {
+	$view = strtolower(basename(dirname($file)));
+	$source = (string) file_get_contents($file);
+	if ($view === 'programitem' && str_contains($source, 'Eventreport\\HtmlView')) continue;
+	if (!str_contains($source, 'SeoMetadata')) {
+		throw new RuntimeException(sprintf('%s view is missing SeoMetadata.', $view));
 	}
 }
 
-printf("SEO contract OK: canonical/Open Graph metadata and universal structured data on 6 public details\n");
+$guardedViews = [
+	'bracket', 'club', 'clubpeople', 'clubplan', 'clubrivals', 'clubstaffhistory',
+	'comparison', 'eventranking', 'eventreport', 'nextmatch', 'participant', 'participants',
+	'participantstats', 'person', 'personnel', 'project', 'resultmatrix', 'results',
+	'standingprogression', 'standings', 'statisticsoverview', 'statranking', 'team',
+	'teamplan', 'venue',
+];
+foreach ($guardedViews as $view) {
+	$source = (string) file_get_contents($site . '/src/View/' . ucfirst($view) . '/HtmlView.php');
+	if (!str_contains($source, 'PublicViewGuard')) {
+		throw new RuntimeException(sprintf('%s view is missing the public entity guard.', $view));
+	}
+}
+
+printf("SEO contract OK: metadata on every public view and 404 guards on entity views\n");

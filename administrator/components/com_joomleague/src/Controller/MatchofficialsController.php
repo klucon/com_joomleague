@@ -36,6 +36,27 @@ final class MatchofficialsController extends BaseController
 		$this->redirectBack($matchId);
 	}
 
+	public function assignDirect(): void
+	{
+		$matchId = $this->input->getInt('match_id'); $this->authorize($matchId);
+		try {
+			$this->getModel('Matchofficials')->assignDirect($matchId, $this->input->getString('direct_actor'), $this->input->getCmd('direct_role_code'), $this->input->getCmd('delegation_status'), $this->input->getString('direct_notes'));
+			$this->app->enqueueMessage(Text::_('COM_JOOMLEAGUE_MATCHOFFICIALS_DIRECT_SUCCESS'), 'success');
+		} catch (\Throwable $error) { Log::add($error->getMessage(), Log::ERROR, 'com_joomleague.matchofficials'); $this->app->enqueueMessage(Text::_('COM_JOOMLEAGUE_MATCHOFFICIALS_DIRECT_FAILED'), 'error'); }
+		$this->redirectBack($matchId);
+	}
+
+	public function changeRole(): void
+	{
+		$matchId = $this->input->getInt('match_id'); $this->authorize($matchId); $outgoing = $this->input->getInt('outgoing_assignment_id');
+		try {
+			$phaseSequence = $this->input->getInt('phase_sequence');
+			$this->getModel('Matchofficials')->changeRole($matchId, $outgoing > 0 ? $outgoing : null, $this->input->getInt('incoming_assignment_id'), $this->input->getCmd('change_role_code'), $this->input->getCmd('reason_code'), $this->input->getCmd('phase_code'), $phaseSequence > 0 ? $phaseSequence : null, $this->input->getString('clock_value'), $this->input->getCmd('clock_unit'), $this->input->getString('change_notes'));
+			$this->app->enqueueMessage(Text::_('COM_JOOMLEAGUE_MATCHOFFICIALS_CHANGE_SUCCESS'), 'success');
+		} catch (\Throwable $error) { Log::add($error->getMessage(), Log::ERROR, 'com_joomleague.matchofficials'); $this->app->enqueueMessage(Text::_('COM_JOOMLEAGUE_MATCHOFFICIALS_CHANGE_FAILED'), 'error'); }
+		$this->redirectBack($matchId);
+	}
+
 	private function authorize(int $matchId): void
 	{
 		if (!Session::checkToken()) throw new \RuntimeException(Text::_('JINVALID_TOKEN'), 403);

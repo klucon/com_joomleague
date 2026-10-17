@@ -45,6 +45,7 @@ final class MatchResultEditorSchemaBuilder
 			'statuses' => $profile['match']['result_status_codes'],
 			'outcomes' => $profile['match']['outcome_codes'],
 			'participant_statuses' => $profile['match']['participant_status_codes'],
+			'encounter' => $profile['match']['encounter'] ?? null,
 		];
 	}
 

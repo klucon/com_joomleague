@@ -8,12 +8,14 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 
+Factory::getApplication()->getDocument()->getWebAssetManager()->useStyle('com_joomleague.admin-lists');
+
 HTMLHelper::_('behavior.multiselect');
 $user = Factory::getApplication()->getIdentity();
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
 ?>
-<form action="<?php echo Route::_('index.php?option=com_joomleague&view=projects'); ?>" method="post" name="adminForm" id="adminForm">
+<form action="<?php echo Route::_('index.php?option=com_joomleague&view=projects'); ?>" method="post" name="adminForm" id="adminForm" class="js-stools-form">
 	<?php echo LayoutHelper::render('joomla.searchtools.default', ['view' => $this]); ?>
 	<div class="table-responsive">
 		<table class="table table-striped" id="projectList">
@@ -21,12 +23,12 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 				<td class="w-1 text-center"><?php echo HTMLHelper::_('grid.checkall'); ?></td>
 				<th scope="col" class="w-1"><span class="visually-hidden"><?php echo Text::_('JACTION_EDIT'); ?></span></th>
 				<th scope="col"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_NAME_LABEL', 'a.name', $listDirn, $listOrder); ?></th>
-				<th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_FIELD_COMPETITION_LABEL'); ?></th>
-				<th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_FIELD_SEASON_LABEL'); ?></th>
-				<th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_FIELD_SPORT_PROFILE_LABEL'); ?></th>
-				<th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_FIELD_PROJECT_TYPE_LABEL'); ?></th>
-				<th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_FIELD_LIFECYCLE_STATE_LABEL'); ?></th>
-				<th scope="col" class="text-center"><?php echo Text::_('COM_JOOMLEAGUE_FIELD_OVERRIDES_LABEL'); ?></th>
+				<th scope="col"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_COMPETITION_LABEL', 'competition.name', $listDirn, $listOrder); ?></th>
+				<th scope="col"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_SEASON_LABEL', 'season.name', $listDirn, $listOrder); ?></th>
+				<th scope="col"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_SPORT_PROFILE_LABEL', 'sport_type.name', $listDirn, $listOrder); ?></th>
+				<th scope="col"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_PROJECT_TYPE_LABEL', 'a.project_type', $listDirn, $listOrder); ?></th>
+				<th scope="col"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_LIFECYCLE_STATE_LABEL', 'a.lifecycle_state', $listDirn, $listOrder); ?></th>
+				<th scope="col" class="text-center"><?php echo HTMLHelper::_('searchtools.sort', 'COM_JOOMLEAGUE_FIELD_OVERRIDES_LABEL', 'override_count', $listDirn, $listOrder); ?></th>
 				<th scope="col" class="w-5 text-center"><?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.published', $listDirn, $listOrder); ?></th>
 				<th scope="col" class="w-5 text-center"><?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?></th>
 			</tr></thead>
@@ -65,6 +67,6 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 	</div>
 	<?php echo $this->pagination->getListFooter(); ?>
 	<input type="hidden" name="task" value=""><input type="hidden" name="boxchecked" value="0">
-	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>"><input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>">
+	
 	<?php echo HTMLHelper::_('form.token'); ?>
 </form>

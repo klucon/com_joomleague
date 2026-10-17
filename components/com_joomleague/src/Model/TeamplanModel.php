@@ -66,6 +66,8 @@ final class TeamplanModel extends BaseDatabaseModel
             return ['error' => 'COM_JOOMLEAGUE_TEAMPLAN_UNAVAILABLE'];
         }
 
+		// PDO may normalize a bound integer to a string; preserve the domain ID for strict comparisons.
+		$entryQueryId = $entryId;
 		$entry = $database->setQuery(
 			$database->getQuery(true)
 				->select([
@@ -76,7 +78,7 @@ final class TeamplanModel extends BaseDatabaseModel
 				->leftJoin($database->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id')
 				->leftJoin($database->quoteName('#__joomleague_person', 'person') . ' ON person.id = entry.person_id')
 				->where('entry.id = :entryId')
-				->bind(':entryId', $entryId, ParameterType::INTEGER)
+				->bind(':entryId', $entryQueryId, ParameterType::INTEGER)
 		)->loadObject();
 		$events = (new ProgrammeReader($database))->forProject($projectId, $entryIds, $viewLevels);
 		$matches = [];
@@ -105,6 +107,7 @@ final class TeamplanModel extends BaseDatabaseModel
 				'own_score' => $own['score'],
 				'opponent_score' => $opponentScore,
 				'played' => (bool) $event['played'],
+				'status_code' => (string) $event['status_code'],
 			];
 		}
 		$projectName = $events === [] ? '' : (string) $events[0]['project_name'];
@@ -124,7 +127,7 @@ final class TeamplanModel extends BaseDatabaseModel
         // next match" on a 2026 page). "Played" stays purely score-based —
         // that fact is unambiguous regardless of date.
         $now = Factory::getDate()->toSql();
-        $isFuture = static fn (array $m): bool => !$m['played'] && $m['scheduled_start'] !== null && $m['scheduled_start'] >= $now;
+        $isFuture = static fn (array $m): bool => !$m['played'] && $m['status_code'] !== 'cancelled' && $m['scheduled_start'] !== null && $m['scheduled_start'] >= $now;
 
         // Resolved against the full, chronologically-ascending list — before
         // scope filtering or the display limit slice it below — since "the

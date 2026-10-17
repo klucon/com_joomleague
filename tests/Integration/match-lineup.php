@@ -6,6 +6,18 @@ define('_JEXEC', 1);
 define('JPATH_BASE', '/var/www/html');
 require_once JPATH_BASE . '/includes/defines.php';
 require_once JPATH_BASE . '/includes/framework.php';
+$_SERVER['HTTP_HOST'] ??= 'localhost';
+$_SERVER['REQUEST_URI'] ??= '/';
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+$bootstrap = Joomla\CMS\Factory::getContainer();
+$bootstrap->alias('session', 'session.cli')->alias(Joomla\Session\SessionInterface::class, 'session.cli');
+Joomla\CMS\Factory::$application = $bootstrap->get(Joomla\CMS\Application\SiteApplication::class);
+Joomla\CMS\Factory::getApplication()->createExtensionNamespaceMap();
+Joomla\CMS\Factory::getApplication()->bootComponent('com_joomleague');
+$configuration = Joomla\CMS\Factory::getApplication();
+if (!str_starts_with((string) getenv('JL_R1_DB_HOST'), 'jl-r1-') || $configuration->get('host') !== getenv('JL_R1_DB_HOST') || $configuration->get('db') !== 'r1_test' || $configuration->get('dbprefix') !== 'r1_') {
+    throw new RuntimeException('Disposable workflow database required.');
+}
 foreach (['UuidFactory.php', 'EntryModelValidator.php', 'MatchLineupRepository.php'] as $service) require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/' . $service;
 
 use Joomla\CMS\Factory;

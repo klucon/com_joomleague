@@ -8,7 +8,7 @@ defined('_JEXEC') or die;
 
 final class StandingsContractValidator
 {
-	private const OPERATIONS = ['count_matches', 'count_outcome', 'sum_root', 'sum_awards', 'difference', 'sum_segment_wins', 'sum_segment_values', 'sum_statistic', 'ratio', 'best_rank', 'status_order'];
+	private const OPERATIONS = ['count_matches', 'count_outcome', 'sum_root', 'sum_awards', 'difference', 'sum_segment_wins', 'sum_segment_values', 'sum_statistic', 'max_statistic', 'ratio', 'best_rank', 'status_order'];
 	private const DIRECTIONS = ['asc', 'desc'];
 
 	/** @param array<string,mixed> $contract */
@@ -21,6 +21,7 @@ final class StandingsContractValidator
 		$metrics = $this->metrics($contract['metrics'] ?? null);
 		$this->awards($contract['awards'] ?? null);
 		$this->ordering($contract['ordering'] ?? null, $metrics);
+		if (($contract['mode'] ?? null) !== 'head_to_head') foreach ($contract['ordering'] as $clause) if (($clause['scope'] ?? 'overall') === 'head_to_head') throw new \UnexpectedValueException('Head-to-head criteria require head-to-head contests.');
 		if (($contract['mode'] ?? null) === 'classification') $this->classification($contract['classification'] ?? null);
 	}
 
@@ -54,6 +55,8 @@ final class StandingsContractValidator
 			foreach (['segment_code', 'statistic_code', 'outcome'] as $field) if (isset($metric[$field])) $this->code($metric[$field], $field);
 			if (isset($metric['perspective']) && !in_array($metric['perspective'], ['own', 'opponent'], true)) throw new \UnexpectedValueException('Standings metric perspective is invalid.');
 			if (isset($metric['when'])) $this->condition($metric['when'], 0);
+			if (in_array($metric['operation'], ['difference', 'ratio'], true) && (!isset($metric['left_metric'], $metric['right_metric']))) throw new \UnexpectedValueException('Derived standings metrics require both references.');
+			if ($metric['operation'] === 'max_statistic' && !isset($metric['statistic_code'])) throw new \UnexpectedValueException('Maximum statistic requires a statistic code.');
 			if (($metric['operation'] ?? null) === 'status_order') $this->codes($metric['status_precedence'] ?? null, 'metric status precedence');
 			$known[$code] = true;
 		}
@@ -91,6 +94,7 @@ final class StandingsContractValidator
 		foreach ($ordering as $clause) {
 			if (!is_array($clause) || !isset($metrics[$clause['metric'] ?? ''])) throw new \UnexpectedValueException('Standings ordering references an unknown metric.');
 			if (!in_array($clause['direction'] ?? null, self::DIRECTIONS, true) || !in_array($clause['nulls'] ?? null, ['first', 'last'], true)) throw new \UnexpectedValueException('Standings ordering clause is invalid.');
+			if (!in_array($clause['scope'] ?? 'overall', ['overall', 'head_to_head'], true)) throw new \UnexpectedValueException('Standings ordering scope is invalid.');
 		}
 	}
 

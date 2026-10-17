@@ -65,7 +65,7 @@ final class MatchesModel extends ListModel
 			if (str_starts_with($search, 'id:')) { $id = (int) substr($search, 3); $query->where('a.id = :id')->bind(':id', $id, ParameterType::INTEGER); }
 			else { $search = '%' . $search . '%'; $query->where('(a.code LIKE :code OR a.match_number LIKE :number OR a.contest_type LIKE :contest)')->bind(':code', $search)->bind(':number', $search)->bind(':contest', $search); }
 		}
-		$query->order($db->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . ($this->getState('list.direction') === 'desc' ? 'DESC' : 'ASC'));
+		$query->order($db->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC'));
 		return $query;
 	}
 
@@ -77,11 +77,13 @@ final class MatchesModel extends ListModel
 		if (!is_array($items) || $items === []) return is_array($items) ? $items : [];
 
 		$ids = array_map(static fn (object $item): int => (int) $item->id, $items);
+		$locked = (new \Joomleague\Component\Joomleague\Administrator\Service\MatchCompetitionDataGuard($this->getDatabase()))->lockedMatchIds($ids);
 		$values = (new MatchResultSummaryProvider($this->getDatabase()))->loadRootValues($ids);
 		$participants = (new MatchParticipantSummaryProvider($this->getDatabase()))->loadDetails($ids);
 		$round = $this->getRound();
 
 		foreach ($items as $item) {
+			$item->participants_locked = isset($locked[(int) $item->id]);
 			$item->result_values = $values[(int) $item->id] ?? [];
 			$item->participant_details = $participants[(int) $item->id] ?? [];
 			$item->participant_names = array_column($item->participant_details, 'name');

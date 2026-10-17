@@ -45,8 +45,9 @@ final class BracketModel extends BaseDatabaseModel
 		$db = Factory::getContainer()->get(DatabaseInterface::class);
 		$project = $db->setQuery(
 			$db->getQuery(true)
-				->select(['project.id', 'project.name'])
+				->select(['project.id', 'project.name', 'version.payload_json AS profile_payload_json'])
 				->from($db->quoteName('#__joomleague_project', 'project'))
+				->innerJoin($db->quoteName('#__joomleague_sport_profile_version', 'version') . ' ON version.id = project.profile_version_id')
 				->innerJoin($db->quoteName('#__joomleague_competition', 'competition') . ' ON competition.id = project.competition_id AND competition.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_season', 'season') . ' ON season.id = project.season_id AND season.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_sport_type', 'sporttype') . ' ON sporttype.id = project.sport_type_id AND sporttype.published = 1')
@@ -85,7 +86,7 @@ final class BracketModel extends BaseDatabaseModel
 		$items = $db->setQuery(
 			$db->getQuery(true)->select(['item.id', 'item.round_id', 'result.status_code AS result_status'])
 				->from($db->quoteName('#__joomleague_project_match', 'item'))
-				->leftJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = item.id AND result.status_code = 'final'")
+				->leftJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = item.id AND result.status_code = 'final' AND item.status_code <> 'cancelled'")
 				->whereIn('item.round_id', $roundIds, ParameterType::INTEGER)->where('item.published = 1')
 				->order('item.round_id ASC, item.scheduled_start ASC, item.id ASC')
 		)->loadObjectList();
@@ -154,7 +155,7 @@ final class BracketModel extends BaseDatabaseModel
 			)->loadObjectList();
 			foreach ($deciderValues as $value) {
 				$metadata = json_decode((string) ($value->metadata_json ?? ''), true);
-				if (!is_array($metadata) || ($metadata['decider'] ?? false) !== true) {
+				if (!\Joomleague\Component\Joomleague\Domain\Service\MatchOutcomeResolver::isDecider((string) $value->level_code, $metadata)) {
 					continue;
 				}
 				$matchId = (int) $value->match_id;
@@ -164,6 +165,16 @@ final class BracketModel extends BaseDatabaseModel
 		}
 
 		$maxParticipants = max(1, ...array_map('count', $participantsByItem));
+		$profile = json_decode((string) $project->profile_payload_json, true, 512, JSON_THROW_ON_ERROR);
+		foreach ($finalItemIds as $matchId) {
+			$roots = [];
+			foreach ($participantsByItem[$matchId] ?? [] as $participant) {
+				if ($participant->value !== null) $roots[] = $participant->value;
+			}
+			$decider = array_values($decidersByItem[$matchId]->values ?? []);
+			$winners = \Joomleague\Component\Joomleague\Domain\Service\MatchOutcomeResolver::resolve($roots, $decider, ($profile['match']['score']['higher_is_better'] ?? true) !== false);
+			foreach ($participantsByItem[$matchId] ?? [] as $participant) $participant->winner = in_array((int) $participant->id, $winners, true);
+		}
 		$cardHeight = max(52, $maxParticipants * self::PARTICIPANT_HEIGHT + self::CARD_PADDING + ($decidersByItem === [] ? 0 : 18));
 		$rowHeight = $cardHeight + self::ROW_GAP;
 		$itemsByRound = [];
@@ -187,7 +198,7 @@ final class BracketModel extends BaseDatabaseModel
 					$source = $previousRoundEntries[$entryId] ?? null;
 					$participant->resolved = $roundIndex === 0
 						|| $source === null
-						|| ($source['status'] === 'final' && $source['participant']->winner);
+						|| ($source['status'] === 'final' && $source['participant']->resolved && $source['participant']->winner);
 					$currentRoundEntries[$entryId] = ['status' => $item->result_status, 'participant' => $participant];
 				}
 			}

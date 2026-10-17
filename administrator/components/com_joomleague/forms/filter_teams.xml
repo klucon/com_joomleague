@@ -8,6 +8,18 @@
 	<fields name="list">
 		<field name="fullordering" type="list" label="JGLOBAL_SORT_BY" onchange="this.form.submit();" default="a.id DESC">
 			<option value="">JGLOBAL_SORT_BY</option><option value="a.ordering ASC">JGRID_HEADING_ORDERING_ASC</option><option value="a.ordering DESC">JGRID_HEADING_ORDERING_DESC</option><option value="a.name ASC">JGLOBAL_TITLE_ASC</option><option value="a.name DESC">JGLOBAL_TITLE_DESC</option><option value="a.id ASC">JGRID_HEADING_ID_ASC</option><option value="a.id DESC">JGRID_HEADING_ID_DESC</option>
+		
+			<option value="a.middle_name ASC">COM_JOOMLEAGUE_SORT_A_MIDDLE_NAME_ASC</option>
+			<option value="a.middle_name DESC">COM_JOOMLEAGUE_SORT_A_MIDDLE_NAME_DESC</option>
+			<option value="a.short_name ASC">COM_JOOMLEAGUE_SORT_A_SHORT_NAME_ASC</option>
+			<option value="a.short_name DESC">COM_JOOMLEAGUE_SORT_A_SHORT_NAME_DESC</option>
+			<option value="club.name ASC">COM_JOOMLEAGUE_SORT_CLUB_NAME_ASC</option>
+			<option value="club.name DESC">COM_JOOMLEAGUE_SORT_CLUB_NAME_DESC</option>
+			<option value="a.published ASC">COM_JOOMLEAGUE_SORT_A_PUBLISHED_ASC</option>
+			<option value="a.published DESC">COM_JOOMLEAGUE_SORT_A_PUBLISHED_DESC</option>
+		
+			<option value="project_count ASC">COM_JOOMLEAGUE_SORT_PROJECT_COUNT_ASC</option>
+			<option value="project_count DESC">COM_JOOMLEAGUE_SORT_PROJECT_COUNT_DESC</option>
 		</field>
 		<field name="limit" type="limitbox" label="JGLOBAL_LIST_LIMIT" default="20" onchange="this.form.submit();" />
 	</fields>

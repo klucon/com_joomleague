@@ -5,7 +5,7 @@
 	<creationDate>2026-08</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.2.0-beta3</version>
+	<version>6.2.0-rc1</version>
 	<description>MOD_JOOMLEAGUE_STANDINGS_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Standings</namespace>
 	<files>
@@ -23,6 +23,15 @@
 	<config>
 		<fields name="params" addfieldpath="modules/mod_joomleague_standings/fields">
 			<fieldset name="basic">
+				<field name="scope" type="standingsscope" default="" label="MOD_JOOMLEAGUE_STANDINGS_SCOPE_LABEL" description="MOD_JOOMLEAGUE_STANDINGS_SCOPE_DESC"><option value="">MOD_JOOMLEAGUE_STANDINGS_INHERIT</option></field>
+				<field name="show_images" type="radio" default="0" layout="joomla.form.field.radio.switcher" label="MOD_JOOMLEAGUE_STANDINGS_SHOW_IMAGES_LABEL"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="image_size" type="list" default="32" showon="show_images:1" label="MOD_JOOMLEAGUE_STANDINGS_IMAGE_SIZE_LABEL"><option value="24">24 px</option><option value="32">32 px</option><option value="48">48 px</option><option value="64">64 px</option></field>
+				<field name="show_legend" type="radio" default="0" layout="joomla.form.field.radio.switcher" label="MOD_JOOMLEAGUE_STANDINGS_SHOW_LEGEND_LABEL"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="offset" type="number" default="0" min="0" max="10000" filter="integer" label="MOD_JOOMLEAGUE_STANDINGS_OFFSET_LABEL" description="MOD_JOOMLEAGUE_STANDINGS_OFFSET_DESC" />
+				<field name="density" type="list" default="compact" label="MOD_JOOMLEAGUE_STANDINGS_DENSITY_LABEL"><option value="compact">MOD_JOOMLEAGUE_STANDINGS_DENSITY_COMPACT</option><option value="standard">MOD_JOOMLEAGUE_STANDINGS_DENSITY_STANDARD</option></field>
+				<field name="show_stage_name" type="radio" default="0" layout="joomla.form.field.radio.switcher" label="MOD_JOOMLEAGUE_STANDINGS_SHOW_STAGE_LABEL"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="link_entry" type="radio" default="1" layout="joomla.form.field.radio.switcher" label="MOD_JOOMLEAGUE_STANDINGS_LINK_ENTRY_LABEL"><option value="0">JNO</option><option value="1">JYES</option></field>
+				<field name="show_empty" type="radio" default="1" layout="joomla.form.field.radio.switcher" label="MOD_JOOMLEAGUE_STANDINGS_SHOW_EMPTY_LABEL"><option value="0">JNO</option><option value="1">JYES</option></field>
 				<field
 					name="project_id"
 					type="sql"
@@ -35,11 +44,11 @@
 				/>
 				<field
 					name="stage_id"
-					type="number"
+					type="standingsstage"
 					default="0"
 					label="MOD_JOOMLEAGUE_STANDINGS_STAGE_LABEL"
 					description="MOD_JOOMLEAGUE_STANDINGS_STAGE_DESC"
-				/>
+				><option value="0">MOD_JOOMLEAGUE_STANDINGS_ALL_STAGES</option></field>
 				<field
 					name="highlight_entry_id"
 					type="entry"
@@ -272,7 +281,7 @@
 					type="list"
 					default="1"
 					label="COM_MODULES_FIELD_CACHING_LABEL"
-					filter="unset"
+					filter="integer"
 				>
 					<option value="1">JGLOBAL_USE_GLOBAL</option>
 					<option value="0">COM_MODULES_FIELD_VALUE_NOCACHING</option>

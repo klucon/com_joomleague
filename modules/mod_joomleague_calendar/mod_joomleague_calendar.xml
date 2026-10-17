@@ -5,7 +5,7 @@
 	<creationDate>2026-09</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.2.0-beta3</version>
+	<version>6.2.0-rc1</version>
 	<description>MOD_JOOMLEAGUE_CALENDAR_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Calendar</namespace>
 	<files><folder module="mod_joomleague_calendar">services</folder><folder>src</folder><folder>tmpl</folder></files>
@@ -14,6 +14,29 @@
 		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_calendar.ini</language><language tag="cs-CZ">language/cs-CZ/mod_joomleague_calendar.sys.ini</language>
 	</languages>
 	<config><fields name="params"><fieldset name="basic">
+		<field name="presentation" type="list" default="agenda" label="MOD_JOOMLEAGUE_CALENDAR_PRESENTATION"><option value="agenda">MOD_JOOMLEAGUE_CALENDAR_AGENDA</option><option value="list">MOD_JOOMLEAGUE_CALENDAR_LIST</option><option value="month">MOD_JOOMLEAGUE_CALENDAR_MONTH</option></field>
+		<field name="first_weekday" type="list" default="1" showon="presentation:month" label="MOD_JOOMLEAGUE_CALENDAR_FIRST_WEEKDAY"><option value="1">MOD_JOOMLEAGUE_CALENDAR_MONDAY</option><option value="0">MOD_JOOMLEAGUE_CALENDAR_SUNDAY</option></field>
+		<field name="initial_date" type="calendar" filter="raw" translateformat="true" showtime="false" showon="presentation:month" label="MOD_JOOMLEAGUE_CALENDAR_INITIAL_DATE" description="MOD_JOOMLEAGUE_CALENDAR_INITIAL_DATE_DESC" />
+		<field name="image_size" type="number" default="24" min="16" max="96" showon="show_images:1" label="MOD_JOOMLEAGUE_CALENDAR_IMAGE_SIZE" />
+		<field name="show_participants" type="radio" default="1" label="MOD_JOOMLEAGUE_CALENDAR_SHOW_PARTICIPANTS" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="show_images" type="radio" default="0" label="MOD_JOOMLEAGUE_CALENDAR_SHOW_IMAGES" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="show_status" type="radio" default="0" label="MOD_JOOMLEAGUE_CALENDAR_SHOW_STATUS" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="show_calendar" type="radio" default="0" label="MOD_JOOMLEAGUE_CALENDAR_SHOW_CALENDAR" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="project_id" type="sql" default="0" label="MOD_JOOMLEAGUE_CALENDAR_PROJECT_FILTER" query="SELECT id AS value, name AS text FROM #__joomleague_project WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text"><option value="0">JALL</option></field>
+		<field name="season_id" type="sql" default="0" label="MOD_JOOMLEAGUE_CALENDAR_SEASON_FILTER" query="SELECT id AS value, name AS text FROM #__joomleague_season WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text"><option value="0">JALL</option></field>
+		<field name="venue_id" type="sql" default="0" label="MOD_JOOMLEAGUE_CALENDAR_VENUE_FILTER" query="SELECT id AS value, name AS text FROM #__joomleague_venue WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text"><option value="0">JALL</option></field>
+		<field name="stage_id" type="sql" default="0" label="MOD_JOOMLEAGUE_CALENDAR_STAGE_FILTER" query="SELECT stage.id AS value, CONCAT(project.name, ' — ', stage.name) AS text FROM #__joomleague_project_stage AS stage INNER JOIN #__joomleague_project AS project ON project.id = stage.project_id WHERE stage.published = 1 AND project.published = 1 ORDER BY project.name, stage.ordering, stage.id" key_field="value" value_field="text"><option value="0">JALL</option></field>
+		<field name="entry_id" type="sql" default="0" label="MOD_JOOMLEAGUE_CALENDAR_ENTRY_FILTER" query="SELECT entry.id AS value, CONCAT(project.name, ' — ', COALESCE(NULLIF(entry.display_name, ''), team.name, CONCAT(person.first_name, ' ', person.last_name))) AS text FROM #__joomleague_project_entry AS entry INNER JOIN #__joomleague_project AS project ON project.id = entry.project_id LEFT JOIN #__joomleague_team AS team ON team.id = entry.team_id LEFT JOIN #__joomleague_person AS person ON person.id = entry.person_id WHERE entry.published = 1 AND project.published = 1 ORDER BY project.name, text" key_field="value" value_field="text"><option value="0">JALL</option></field>
+		<field name="mode" type="list" default="all" label="MOD_JOOMLEAGUE_CALENDAR_MODE"><option value="all">MOD_JOOMLEAGUE_CALENDAR_MODE_ALL</option><option value="completed">MOD_JOOMLEAGUE_CALENDAR_MODE_COMPLETED</option><option value="upcoming">MOD_JOOMLEAGUE_CALENDAR_MODE_UPCOMING</option></field>
+		<field name="direction" type="list" default="asc" label="MOD_JOOMLEAGUE_CALENDAR_DIRECTION"><option value="asc">MOD_JOOMLEAGUE_CALENDAR_ASC</option><option value="desc">MOD_JOOMLEAGUE_CALENDAR_DESC</option></field>
+		<field name="offset" type="number" default="0" min="0" max="10000" label="MOD_JOOMLEAGUE_CALENDAR_OFFSET" />
+		<field name="timezone" type="timezone" default="" label="MOD_JOOMLEAGUE_CALENDAR_TIMEZONE"><option value="">MOD_JOOMLEAGUE_CALENDAR_SITE_TIMEZONE</option></field>
+		<field name="date_format" type="list" default="full" label="MOD_JOOMLEAGUE_CALENDAR_DATE_FORMAT"><option value="full">MOD_JOOMLEAGUE_CALENDAR_DATE_FULL</option><option value="short">MOD_JOOMLEAGUE_CALENDAR_DATE_SHORT</option></field>
+		<field name="group_by_date" type="radio" default="1" label="MOD_JOOMLEAGUE_CALENDAR_GROUP_BY_DATE" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="show_date" type="radio" default="1" label="MOD_JOOMLEAGUE_CALENDAR_SHOW_DATE" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="show_time" type="radio" default="1" label="MOD_JOOMLEAGUE_CALENDAR_SHOW_TIME" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="show_stage" type="radio" default="0" label="MOD_JOOMLEAGUE_CALENDAR_SHOW_STAGE" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
+		<field name="show_empty" type="radio" default="1" label="MOD_JOOMLEAGUE_CALENDAR_SHOW_EMPTY" layout="joomla.form.field.radio.switcher"><option value="0">JNO</option><option value="1">JYES</option></field>
 		<field name="sport_type_id" type="sql" default="0" label="MOD_JOOMLEAGUE_CALENDAR_SPORT_LABEL" description="MOD_JOOMLEAGUE_CALENDAR_SPORT_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_sport_type WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text"><option value="0">MOD_JOOMLEAGUE_CALENDAR_ALL_SPORTS</option></field>
 		<field name="club_id" type="sql" default="0" label="MOD_JOOMLEAGUE_CALENDAR_CLUB_LABEL" description="MOD_JOOMLEAGUE_CALENDAR_CLUB_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text"><option value="0">MOD_JOOMLEAGUE_CALENDAR_ALL_CLUBS</option></field>
 		<field name="days_before" type="number" default="7" min="0" max="365" label="MOD_JOOMLEAGUE_CALENDAR_DAYS_BEFORE_LABEL" description="MOD_JOOMLEAGUE_CALENDAR_DAYS_BEFORE_DESC" />

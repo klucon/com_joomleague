@@ -60,7 +60,8 @@ final class EntrymemberModel extends AdminModel implements CurrentUserInterface
 
 	public function save($data): bool
 	{
-		$memberId = (int) ($data['id'] ?? 0);
+		$memberId = (int) ($data['id'] ?? $this->getState($this->getName() . '.id'));
+		$data['id'] = $memberId;
 
 		try {
 			$entryId = $memberId > 0 ? $this->loadStoredEntryId($memberId) : (int) ($data['entry_id'] ?? 0);
@@ -71,6 +72,10 @@ final class EntrymemberModel extends AdminModel implements CurrentUserInterface
 			return false;
 		}
 
+		if ((int) $entry->project_id < 1 || !$this->getCurrentUser()->authorise($memberId > 0 ? 'core.edit' : 'core.create', 'com_joomleague.project.' . (int) $entry->project_id)) {
+			$this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
+			return false;
+		}
 		$model = $entry->profile['entry_model'] ?? [];
 		$personType = strtolower(trim((string) ($data['member_person_type'] ?? '')));
 		$roleCode = trim((string) ($data['role_code'] ?? ''));
@@ -96,6 +101,12 @@ final class EntrymemberModel extends AdminModel implements CurrentUserInterface
 		return parent::save($data);
 	}
 
+	protected function getReorderConditions($table): array
+	{
+		$ownerId = (int) ($table->entry_id ?? 0);
+		return [$ownerId > 0 ? $this->getDatabase()->quoteName('entry_id') . ' = ' . $ownerId : '1 = 0'];
+	}
+
 	protected function canDelete($record): bool
 	{
 		return $this->canEditEntry((int) ($record->entry_id ?? 0), 'core.delete');
@@ -108,13 +119,18 @@ final class EntrymemberModel extends AdminModel implements CurrentUserInterface
 
 	private function canEditEntry(int $entryId, string $action): bool
 	{
+		if ($entryId < 1) {
+			return false;
+		}
+
 		try {
 			$entry = (new ProjectEntryContextRepository($this->getDatabase()))->get($entryId);
 		} catch (\Throwable) {
 			return false;
 		}
 
-		return $this->getCurrentUser()->authorise($action, 'com_joomleague.project.' . (int) $entry->project_id);
+		$projectId = (int) $entry->project_id;
+		return $projectId > 0 && $this->getCurrentUser()->authorise($action, 'com_joomleague.project.' . $projectId);
 	}
 
 	protected function prepareTable($table): void

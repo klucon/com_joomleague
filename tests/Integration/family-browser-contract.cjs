@@ -1,0 +1,1 @@
+module.exports={required:['tennis-save','tennis-reopen','tennis-correct','tennis-public','tennis-clean','running_race-save','running_race-reopen','running_race-correct','running_race-public','running_race-clean','mma_boxing-save','mma_boxing-reopen','mma_boxing-correct','mma_boxing-public','mma_boxing-clean']};

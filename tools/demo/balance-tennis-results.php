@@ -1,0 +1,35 @@
+<?php
+declare(strict_types=1);
+if (PHP_SAPI !== 'cli') exit(1);
+define('_JEXEC',1);
+define('JPATH_BASE','/var/www/html');
+require JPATH_BASE . '/includes/defines.php';
+require JPATH_BASE . '/includes/framework.php';
+$container=Joomla\CMS\Factory::getContainer();
+$container->alias('session','session.cli')->alias(Joomla\Session\SessionInterface::class,'session.cli');
+Joomla\CMS\Factory::$application=$container->get(Joomla\Console\Application::class);
+foreach(['UuidFactory','CanonicalJson','EntryModelValidator','MatchResultValidationException','MatchResultDecimal','MatchResultAggregationValidator','TeamEncounterScoreNormalizer','TeamEncounterRosterValidator','TeamEncounterRepository','MatchResultPayloadValidator','MatchResultRepository']as $service) require_once JPATH_ADMINISTRATOR.'/components/com_joomleague/src/Service/'.$service.'.php';
+$db=$container->get(Joomla\Database\DatabaseInterface::class);
+$name='Tennis team encounter demo 2026';
+$q=$db->getQuery(true)->select('m.id')->from('#__joomleague_project_match AS m')->join('INNER','#__joomleague_project AS p ON p.id=m.project_id')->where('p.name = :name')->bind(':name',$name);
+$ids=$db->setQuery($q)->loadColumn();
+if(count($ids)!==1)throw new RuntimeException('Expected one owned demo match.');
+$match=(int)$ids[0];
+$repo=new Joomleague\Component\Joomleague\Administrator\Service\MatchResultRepository($db);
+$encounter=new Joomleague\Component\Joomleague\Administrator\Service\TeamEncounterRepository($db);
+$payload=$repo->get($match);
+$payload['duels']=$encounter->get($match);
+$payload['encounter_revision']=$encounter->revision($match);
+$participants=$db->setQuery($db->getQuery(true)->select('id')->from('#__joomleague_match_participant')->where('match_id = '.$match)->order('slot_number'))->loadColumn();
+if(count($participants)!==2 || count($payload['duels'])!==5)throw new RuntimeException('Unexpected demo structure.');
+$values=static fn(int $a,int $b):array=>[['participant_id'=>(int)$participants[0],'numeric_value'=>(string)$a],['participant_id'=>(int)$participants[1],'numeric_value'=>(string)$b]];
+$scores=[[[6,4],[6,3]],[[3,6],[6,4],[4,6]],[[5,7],[2,6]],[[4,6],[6,3],[6,4]],[[6,7],[6,4],[7,5]]];
+foreach($payload['segments'][0]['children']as &$duel){
+    $index=$duel['sequence_number']-1;
+    $duel['values']=[];$duel['children']=[];
+    foreach($scores[$index]as $i=>[$a,$b])$duel['children'][]=['level_code'=>'set','sequence_number'=>$i+1,'values'=>$values($a,$b)];
+}unset($duel);
+$repo->replace($match,$payload,0);
+$stored=$repo->get($match);
+if(array_column($stored['segments'][0]['values'],'numeric_value')!==['3.000000000','2.000000000'])throw new RuntimeException('Wrong team result.');
+echo "Audited tennis results saved: 1:0, 1:1, 1:2, 2:2, 3:2.\n";

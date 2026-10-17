@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<form>
+<form addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS" addfieldprefix="Joomla\Component\Contact\Administrator\Field">
 		<field name="first_name" type="text" label="COM_JOOMLEAGUE_FIELD_FIRST_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_FIRST_NAME_DESC" maxlength="100" />
 		<field name="last_name" type="text" label="COM_JOOMLEAGUE_FIELD_LAST_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_LAST_NAME_DESC" maxlength="100" />
@@ -15,9 +15,11 @@
 	<fieldset name="biography" label="COM_JOOMLEAGUE_FIELDSET_BIOGRAPHY">
 		<field name="birth_date" type="calendar" label="COM_JOOMLEAGUE_FIELD_BIRTH_DATE_LABEL" description="COM_JOOMLEAGUE_FIELD_BIRTH_DATE_DESC" format="%Y-%m-%d" filter="user_utc" showtime="false" todaybutton="true" translateformat="true" />
 		<field name="death_date" type="calendar" label="COM_JOOMLEAGUE_FIELD_DEATH_DATE_LABEL" description="COM_JOOMLEAGUE_FIELD_DEATH_DATE_DESC" format="%Y-%m-%d" filter="user_utc" showtime="false" todaybutton="true" translateformat="true" />
+		<field name="height_cm" type="number" label="COM_JOOMLEAGUE_FIELD_PERSON_HEIGHT_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_HEIGHT_DESC" min="20" max="300" step="0.1" filter="raw" />
+		<field name="weight_kg" type="number" label="COM_JOOMLEAGUE_FIELD_PERSON_WEIGHT_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_WEIGHT_DESC" min="1" max="500" step="0.1" filter="raw" />
 	</fieldset>
 	<fieldset name="media" label="COM_JOOMLEAGUE_FIELDSET_MEDIA">
-		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_PERSON_PICTURE_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_PICTURE_DESC" types="images" directory="com_joomleague/persons" />
+		<field name="picture" type="Joomleaguemedia" label="COM_JOOMLEAGUE_FIELD_PERSON_PICTURE_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_PICTURE_DESC" types="images" directory="com_joomleague/persons" />
 	</fieldset>
 	<fieldset name="description" label="JGLOBAL_DESCRIPTION">
 		<field name="description" type="editor" label="JGLOBAL_DESCRIPTION" description="COM_JOOMLEAGUE_FIELD_PERSON_DESCRIPTION_DESC" filter="safehtml" buttons="true" />

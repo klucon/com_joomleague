@@ -10,7 +10,23 @@
 		<field name="published" type="status" label="JOPTION_SELECT_PUBLISHED" onchange="this.form.submit();"><option value="">JOPTION_SELECT_PUBLISHED</option></field>
 	</fields>
 	<fields name="list">
-		<field name="fullordering" type="list" label="JGLOBAL_SORT_BY" onchange="this.form.submit();" default="a.id DESC"><option value="">JGLOBAL_SORT_BY</option><option value="a.ordering ASC">JGRID_HEADING_ORDERING_ASC</option><option value="a.ordering DESC">JGRID_HEADING_ORDERING_DESC</option><option value="a.name ASC">JGLOBAL_TITLE_ASC</option><option value="a.name DESC">JGLOBAL_TITLE_DESC</option><option value="a.id ASC">JGRID_HEADING_ID_ASC</option><option value="a.id DESC">JGRID_HEADING_ID_DESC</option></field>
+		<field name="fullordering" type="list" label="JGLOBAL_SORT_BY" onchange="this.form.submit();" default="a.id DESC"><option value="">JGLOBAL_SORT_BY</option><option value="a.ordering ASC">JGRID_HEADING_ORDERING_ASC</option><option value="a.ordering DESC">JGRID_HEADING_ORDERING_DESC</option><option value="a.name ASC">JGLOBAL_TITLE_ASC</option><option value="a.name DESC">JGLOBAL_TITLE_DESC</option><option value="a.id ASC">JGRID_HEADING_ID_ASC</option><option value="a.id DESC">JGRID_HEADING_ID_DESC</option>
+			<option value="a.published ASC">COM_JOOMLEAGUE_SORT_A_PUBLISHED_ASC</option>
+			<option value="a.published DESC">COM_JOOMLEAGUE_SORT_A_PUBLISHED_DESC</option>
+		
+			<option value="competition.name ASC">COM_JOOMLEAGUE_SORT_COMPETITION_NAME_ASC</option>
+			<option value="competition.name DESC">COM_JOOMLEAGUE_SORT_COMPETITION_NAME_DESC</option>
+			<option value="season.name ASC">COM_JOOMLEAGUE_SORT_SEASON_NAME_ASC</option>
+			<option value="season.name DESC">COM_JOOMLEAGUE_SORT_SEASON_NAME_DESC</option>
+			<option value="sport_type.name ASC">COM_JOOMLEAGUE_SORT_SPORT_TYPE_NAME_ASC</option>
+			<option value="sport_type.name DESC">COM_JOOMLEAGUE_SORT_SPORT_TYPE_NAME_DESC</option>
+			<option value="a.project_type ASC">COM_JOOMLEAGUE_SORT_A_PROJECT_TYPE_ASC</option>
+			<option value="a.project_type DESC">COM_JOOMLEAGUE_SORT_A_PROJECT_TYPE_DESC</option>
+			<option value="a.lifecycle_state ASC">COM_JOOMLEAGUE_SORT_A_LIFECYCLE_STATE_ASC</option>
+			<option value="a.lifecycle_state DESC">COM_JOOMLEAGUE_SORT_A_LIFECYCLE_STATE_DESC</option>
+			<option value="override_count ASC">COM_JOOMLEAGUE_SORT_OVERRIDE_COUNT_ASC</option>
+			<option value="override_count DESC">COM_JOOMLEAGUE_SORT_OVERRIDE_COUNT_DESC</option>
+		</field>
 		<field name="limit" type="limitbox" label="JGLOBAL_LIST_LIMIT" default="20" onchange="this.form.submit();" />
 	</fields>
 </form>

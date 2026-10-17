@@ -24,6 +24,32 @@ use Joomleague\Component\Joomleague\Administrator\Service\MatchParticipantSummar
  */
 final class DashboardModel extends BaseDatabaseModel
 {
+	public function getInstalledVersion(): string
+	{
+		$database = $this->getDatabase();
+		$extensions = [
+			['type' => 'package', 'element' => 'pkg_joomleague'],
+			['type' => 'component', 'element' => 'com_joomleague'],
+		];
+
+		foreach ($extensions as $extension) {
+			$query = $database->getQuery(true)
+				->select($database->quoteName('manifest_cache'))
+				->from($database->quoteName('#__extensions'))
+				->where($database->quoteName('type') . ' = :type')
+				->where($database->quoteName('element') . ' = :element')
+				->bind(':type', $extension['type'])
+				->bind(':element', $extension['element']);
+			$manifest = json_decode((string) $database->setQuery($query)->loadResult(), true);
+
+			if (is_array($manifest) && isset($manifest['version']) && trim((string) $manifest['version']) !== '') {
+				return trim((string) $manifest['version']);
+			}
+		}
+
+		return '';
+	}
+
 	/** @return array<string,int> */
 	public function getOverview(): array
 	{

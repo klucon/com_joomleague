@@ -42,6 +42,7 @@ $data = $this->club;
 			<?php if (trim((string) $club->description) !== '') : ?><p class="mt-3 mb-0"><?php echo nl2br(htmlspecialchars((string) $club->description, ENT_QUOTES, 'UTF-8')); ?></p><?php endif; ?>
 		</header>
 		<?php echo LayoutHelper::render('joomleague.fields', ['context' => 'com_joomleague.club', 'item' => $club], JPATH_ROOT . '/components/com_joomleague/layouts'); ?>
+		<div class="d-flex flex-wrap gap-2 mb-4"><a class="btn btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=clubpeople&club_id=' . (int) $club->id); ?>"><span class="icon-users" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_CLUB_PEOPLE'); ?></a><a class="btn btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=clubstaffhistory&club_id=' . (int) $club->id); ?>"><span class="icon-address" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_CLUB_STAFF_HISTORY'); ?></a><a class="btn btn-outline-primary" href="<?php echo Route::_('index.php?option=com_joomleague&view=clubrivals&club_id=' . (int) $club->id); ?>"><span class="icon-shuffle" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_CLUB_RIVALS'); ?></a></div>
 
 		<h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_CLUB_TEAMS_TITLE'); ?></h2>
 		<?php if ($data['teams'] === []) : ?>

@@ -20,6 +20,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\Database\DatabaseInterface;
 use Joomleague\Component\Joomleague\Site\Service\ProjectSchemaBuilder;
 use Joomleague\Component\Joomleague\Site\Service\ProjectTemplateProvider;
+use Joomleague\Component\Joomleague\Site\Service\PublicViewGuard;
 use Joomleague\Component\Joomleague\Site\Service\SeoMetadata;
 
 final class HtmlView extends BaseHtmlView
@@ -32,6 +33,7 @@ final class HtmlView extends BaseHtmlView
 	public function display($tpl = null): void
 	{
 		$this->project = $this->getModel()->getProject();
+		PublicViewGuard::requireItem($this->project, 'project');
 		if (isset($this->project['project'])) {
 			$this->templateConfig = (new ProjectTemplateProvider(\Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class)))->resolve((int) $this->project['project']->id, 'project');
 		}
@@ -39,9 +41,11 @@ final class HtmlView extends BaseHtmlView
 			? (string) $this->project['project']->name
 			: Text::_('COM_JOOMLEAGUE_PROJECT_VIEW_TITLE');
 		if (isset($this->project['project'])) {
-			$url = Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $this->project['project']->id, true, Route::TLS_IGNORE, true);
+			$url = Route::_('index.php?option=com_joomleague&view=project&project_id=' . (int) $this->project['project']->id, false, Route::TLS_IGNORE, true);
 			$seo = new SeoMetadata();
-			$seo->apply($this->getDocument(), $title, $url, (string) $this->project['project']->description, (string) ($this->project['project']->picture ?? ''));
+			$description = trim((string) $this->project['project']->description) ?: Text::sprintf('COM_JOOMLEAGUE_SEO_PROJECT_DESCRIPTION', Text::_('COM_JOOMLEAGUE_PROJECT_VIEW_TITLE'), $title);
+			$image = \Joomleague\Component\Joomleague\Site\Service\MediaResolver::image('', $this->project['project']->picture ?? null);
+			$seo->apply($this->getDocument(), $title, $url, $description, $image);
 			$schema = (new ProjectSchemaBuilder())->build(
 				$this->project,
 				$url

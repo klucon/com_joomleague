@@ -31,7 +31,7 @@ $formatDefault = static function (mixed $value): string {
 				<tr>
 					<th scope="row"><div><?php echo $this->escape($rule['label']); ?></div><div class="small text-body-secondary"><?php echo $this->escape($rule['description']); ?></div></th>
 					<td><?php echo $this->escape($formatDefault($rule['default'])); ?></td>
-					<td class="text-center"><?php echo $rule['enabled_field']->input; ?><span class="visually-hidden"><?php echo $rule['enabled_field']->description; ?></span></td>
+					<td class="text-center"><?php echo $rule['enabled_field']->input; ?><span class="visually-hidden"><?php echo $this->escape(Text::_($rule['enabled_field']->description)); ?></span></td>
 					<td><?php echo $rule['value_field']->input; ?><div class="small text-body-secondary"><?php echo Text::_('COM_JOOMLEAGUE_PROJECTRULES_VALUE_HELP'); ?></div></td>
 				</tr>
 			<?php endforeach; ?>

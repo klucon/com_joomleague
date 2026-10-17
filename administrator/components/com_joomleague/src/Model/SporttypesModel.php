@@ -57,7 +57,7 @@ final class SporttypesModel extends ListModel
 				$query->where('(a.name LIKE :searchName OR a.code LIKE :searchCode)')->bind(':searchName', $search)->bind(':searchCode', $search);
 			}
 		}
-		$query->order($db->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . ($this->getState('list.direction') === 'desc' ? 'DESC' : 'ASC'));
+		$query->order($db->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC'));
 		return $query;
 	}
 }

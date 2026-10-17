@@ -21,6 +21,7 @@ final class HtmlView extends BaseHtmlView
 	public $state;
 	public $canDo;
 	public ?string $return = null;
+	public ?array $profileMigration = null;
 
 	public function display($tpl = null): void
 	{
@@ -28,6 +29,17 @@ final class HtmlView extends BaseHtmlView
 		$this->item = $this->get('Item');
 		$this->state = $this->get('State');
 		$this->canDo = ContentHelper::getActions('com_joomleague', 'project', (int) $this->item->id);
+		if ((int) $this->item->id > 0) {
+			$this->profileMigration = (new \Joomleague\Component\Joomleague\Administrator\Service\ProjectProfileMigrationService(
+				Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class)
+			))->inspect((int) $this->item->id);
+			$target = $this->profileMigration['variant_target'] ?? $this->profileMigration['target'];
+			if (Factory::getApplication()->getInput()->getBool('profile_check') && $target !== null) {
+				Factory::getApplication()->setUserState('com_joomleague.profile.review.' . (int) $this->item->id, [
+					'target' => (int) $target['id'], 'checksum' => $this->profileMigration['checksum'], 'kind' => isset($this->profileMigration['variant']) ? 'variant' : 'base',
+				]);
+			}
+		}
 		$return = Factory::getApplication()->getInput()->get('return', null, 'base64');
 		$decoded = is_string($return) ? base64_decode($return, true) : false;
 		if ($decoded !== false && Uri::isInternal($decoded)) {

@@ -1,0 +1,25 @@
+<?php
+declare(strict_types=1);
+define('_JEXEC', 1);
+require_once dirname(__DIR__, 2) . '/administrator/components/com_joomleague/src/Service/CaromEncounterSummary.php';
+use Joomleague\Component\Joomleague\Administrator\Service\CaromEncounterSummary;
+$segments = [];
+foreach (['completed', 'completed', 'walkover', 'cancelled'] as $i => $status) $segments[] = (object) ['id' => $i + 1, 'level_code' => 'duel', 'status_code' => $status];
+$value = static fn (string $score, int $innings, int $run): object => (object) ['numeric_value' => $score, 'metadata' => ['innings' => $innings, 'high_run' => $run]];
+$values = [1 => [10 => $value('40.000000000', 20, 9), 20 => $value('30', 20, 7)], 2 => [10 => $value('20', 40, 8), 20 => $value('40', 40, 10)], 3 => [10 => $value('999', 1, 999)], 4 => [10 => $value('999', 1, 999)]];
+$calculator = new CaromEncounterSummary();
+$summary = $calculator->summarize($segments, $values, [10, 20]);
+if ($summary[10]['caroms'] !== 60 || $summary[10]['innings'] !== 60 || $summary[10]['average'] != 1.0 || $summary[10]['high_run'] !== 9 || $summary[10]['games'] !== 2) throw new RuntimeException('Team summary uses incorrect aggregation.');
+if (abs($summary[20]['average'] - 70 / 60) > 0.000001) throw new RuntimeException('Opponent summary is incorrect.');
+unset($values[2][10]->metadata['innings']);
+if ($calculator->summarize($segments, $values, [10, 20])[10]['average'] !== null) throw new RuntimeException('Missing innings produced a misleading average.');
+if ($calculator->summarize([], [], [10])[10]['average'] !== null) throw new RuntimeException('Empty summary divided by zero.');
+echo "Carom summary OK: weighted average, totals, maximum run, exclusions and incomplete statistics.\n";
+$segments[0]->sequence_number = 1; $segments[1]->sequence_number = 2;
+$person = (object) ['person_id' => 7, 'first_name' => 'Alex', 'last_name' => 'River'];
+$private = (object) ['person_id' => null];
+$players = $calculator->players($segments, $values, [1 => [10 => [$person], 20 => [$private]], 2 => [10 => [$person]]]);
+if (array_keys($players) !== [7] || $players[7]['summary']['caroms'] !== 60 || $players[7]['summary']['games'] !== 2 || $players[7]['summary']['average'] !== null) throw new RuntimeException('Player statistics did not follow public nominations.');
+if ($calculator->players([$segments[0]], $values, [1 => [10 => [$person], 20 => [$person]]]) !== []) throw new RuntimeException('Ambiguous player attribution was accepted.');
+if ($calculator->players([$segments[0]], $values, [1 => [10 => [$person, $private]]]) !== []) throw new RuntimeException('Multiple nominations were attributed to one player.');
+echo "Carom player summary OK: nomination attribution, privacy and ambiguity exclusion.\n";

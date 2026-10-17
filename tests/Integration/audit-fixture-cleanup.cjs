@@ -1,0 +1,13 @@
+const fs = require('node:fs');
+const {execFileSync} = require('node:child_process');
+const backup = process.argv[2];
+if (!backup || !backup.startsWith('/mnt/disk-a/dev/backups/')) throw new Error('Verified local backup path required.');
+const sql = fs.readFileSync(backup + '/database.sql', 'utf8');
+const php = String.raw`define('_JEXEC',1);define('JPATH_BASE','/var/www/html');require JPATH_BASE.'/includes/defines.php';require JPATH_BASE.'/includes/framework.php';$db=Joomla\CMS\Factory::getContainer()->get(Joomla\Database\DatabaseInterface::class);$result=['profiles'=>$db->setQuery('SELECT code FROM #__joomleague_sport_profile')->loadColumn(),'fixtures'=>[]];foreach(['competition','season','sport_type','project','club','team'] as $table)$result['fixtures']=array_merge($result['fixtures'],$db->setQuery('SELECT name FROM #__joomleague_'.$table.' WHERE name LIKE '.$db->quote('%fixture%'))->loadColumn());echo json_encode($result);`;
+const data = JSON.parse(execFileSync('docker', ['exec', 'local-joomla62-app', 'php', '-r', php], {encoding: 'utf8'}));
+const profiles = data.profiles.filter(code => /^encounter_test_/.test(code));
+const newProfiles = profiles.filter(code => !sql.includes(code));
+const newFixtureNames = [...new Set(data.fixtures.filter(name => !sql.includes(name)))];
+const result = {existingEncounterProfiles: profiles.length, newRemainingProfiles: newProfiles.length, newRemainingFixtureNames: newFixtureNames};
+console.log(JSON.stringify(result, null, 2));
+if (newProfiles.length || newFixtureNames.length) process.exitCode = 1;

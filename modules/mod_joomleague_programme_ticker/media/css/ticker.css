@@ -1,0 +1,25 @@
+.mod-joomleague-programme-ticker .jl-ticker-viewport { max-width: 100%; overflow: visible; }
+.mod-joomleague-programme-ticker .jl-ticker-track { display: flex; flex-wrap: wrap; align-items: stretch; gap: 1rem; }
+.mod-joomleague-programme-ticker .jl-ticker-item { flex: 0 0 min(22rem, 100%); display: flex; flex-direction: column; gap: .5rem; padding: .75rem; border: 1px solid var(--border-color, #dfe3e7); border-radius: .25rem; background: var(--body-bg, #fff); }
+.mod-joomleague-programme-ticker .jl-ticker-context { display: flex; flex-wrap: wrap; gap: .25rem .75rem; }
+.mod-joomleague-programme-ticker .jl-ticker-participants { display: grid; gap: .25rem; }
+.mod-joomleague-programme-ticker .jl-ticker-participant { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.mod-joomleague-programme-ticker .jl-ticker-image { flex: none; }
+.mod-joomleague-programme-ticker .jl-ticker-separator { align-self: center; color: var(--secondary-color, #6c757d); }
+.mod-joomleague-programme-ticker[data-orientation=horizontal] { max-width: 100%; overflow: hidden; }
+.mod-joomleague-programme-ticker[data-density=compact] .jl-ticker-item { flex-basis: min(18rem, 100%); padding: .5rem; gap: .25rem; }
+.mod-joomleague-programme-ticker[data-density=detailed] .jl-ticker-item { flex-basis: min(26rem, 100%); padding: 1rem; }
+.mod-joomleague-programme-ticker[data-orientation=vertical] .jl-ticker-track { display: grid; }
+.mod-joomleague-programme-ticker[data-orientation=vertical] .jl-ticker-item { width: 100%; max-width: none; }
+.mod-joomleague-programme-ticker[data-orientation=vertical] .jl-ticker-separator { display: none; }
+.mod-joomleague-programme-ticker.is-enhanced[data-orientation=horizontal] .jl-ticker-viewport { width: 100%; min-width: 0; overflow: hidden; contain: layout paint; }
+.mod-joomleague-programme-ticker.is-enhanced[data-orientation=horizontal] .jl-ticker-track { width: max-content; flex-wrap: nowrap; animation: jl-ticker-scroll var(--jl-ticker-duration, 35s) linear infinite; will-change: transform; }
+.mod-joomleague-programme-ticker.is-enhanced[data-loop="0"] .jl-ticker-track { animation-iteration-count: 1; }
+.mod-joomleague-programme-ticker.is-enhanced[data-direction=right] .jl-ticker-track { animation-direction: reverse; }
+.mod-joomleague-programme-ticker.is-enhanced[data-pause="1"] .jl-ticker-viewport:hover .jl-ticker-track,
+.mod-joomleague-programme-ticker.is-enhanced[data-pause="1"] .jl-ticker-viewport:focus-within .jl-ticker-track { animation-play-state: paused; }
+@keyframes jl-ticker-scroll { to { transform: translateX(calc(-50% - .5rem)); } }
+@media (prefers-reduced-motion: reduce) {
+ .mod-joomleague-programme-ticker .jl-ticker-track { animation: none !important; transform: none !important; flex-wrap: wrap !important; width: auto !important; }
+ .mod-joomleague-programme-ticker .jl-ticker-viewport { overflow: visible !important; }
+}

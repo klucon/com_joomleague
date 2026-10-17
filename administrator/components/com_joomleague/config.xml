@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<config>
+<config addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field" addruleprefix="Joomleague\Component\Joomleague\Administrator\Rule">
 	<fieldset name="general" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_GENERAL_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_GENERAL_DESC">
 		<field name="organisation_name" type="text" label="COM_JOOMLEAGUE_CONFIG_ORGANISATION_NAME_LABEL" description="COM_JOOMLEAGUE_CONFIG_ORGANISATION_NAME_DESC" filter="string" />
 		<field name="site_club_id" type="sql" label="COM_JOOMLEAGUE_CONFIG_SITE_CLUB_LABEL" description="COM_JOOMLEAGUE_CONFIG_SITE_CLUB_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name" key_field="value" value_field="text" filter="integer" layout="joomla.form.field.list-fancy-select">
@@ -52,11 +52,11 @@
 	</fieldset>
 
 	<fieldset name="media" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_MEDIA_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_MEDIA_DESC">
-		<field name="images_base_path" type="text" label="COM_JOOMLEAGUE_CONFIG_IMAGES_BASE_PATH_LABEL" description="COM_JOOMLEAGUE_CONFIG_IMAGES_BASE_PATH_DESC" default="images/com_joomleague" filter="path" />
-		<field name="placeholder_club_logo" type="media" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_CLUB_LOGO_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_CLUB_LOGO_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
-		<field name="placeholder_person_picture" type="media" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PERSON_PICTURE_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PERSON_PICTURE_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
-		<field name="placeholder_venue_picture" type="media" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_VENUE_PICTURE_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_VENUE_PICTURE_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
-		<field name="placeholder_team_picture" type="media" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PICTURE_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PICTURE_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
+		<field name="images_base_path" type="text" label="COM_JOOMLEAGUE_CONFIG_IMAGES_BASE_PATH_LABEL" description="COM_JOOMLEAGUE_CONFIG_IMAGES_BASE_PATH_DESC" default="images/com_joomleague" filter="string" validate="Mediabasepath" message="COM_JOOMLEAGUE_MEDIA_DIRECTORY_INVALID" />
+		<field name="placeholder_club_logo" type="Joomleaguemedia" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_CLUB_LOGO_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_CLUB_LOGO_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
+		<field name="placeholder_person_picture" type="Joomleaguemedia" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PERSON_PICTURE_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_PERSON_PICTURE_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
+		<field name="placeholder_venue_picture" type="Joomleaguemedia" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_VENUE_PICTURE_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_VENUE_PICTURE_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
+		<field name="placeholder_team_picture" type="Joomleaguemedia" label="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PICTURE_LABEL" description="COM_JOOMLEAGUE_CONFIG_PLACEHOLDER_TEAM_PICTURE_DESC" directory="com_joomleague/placeholders" preview="tooltip" />
 	</fieldset>
 
 	<fieldset name="safety" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_SAFETY_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_SAFETY_DESC">

@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "basketball",
-    "version": "1.5.0",
+    "version": "1.7.0",
     "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL",
     "description_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_DESC",
     "scoring_model": "points",
@@ -60,6 +60,14 @@
                 "items": {
                     "type": "number"
                 }
+            },
+            "/lineup/players_on_field": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+            },
+            "/lineup/captain_supported": {
+                "type": "boolean"
             }
         }
     },
@@ -78,20 +86,26 @@
             "period_length_minutes": 5
         }
     },
-	"lineup": {
-		"substitutions": {
-			"supported": true,
-			"reentry_supported": true,
-			"limit_scope": "unlimited",
-			"maximum_per_scope": null
-		},
-		"preferred_order": [
+    "lineup": {
+        "substitutions": {
+            "supported": true,
+            "reentry_supported": true,
+            "limit_scope": "unlimited",
+            "maximum_per_scope": null
+        },
+        "preferred_order": [
             "point_guard",
+            "combo_guard",
             "shooting_guard",
+            "wing",
             "small_forward",
+            "combo_forward",
             "power_forward",
+            "big_man",
             "center"
-        ]
+        ],
+        "players_on_field": 5,
+        "captain_supported": true
     },
     "standings": {
         "points_regular": [
@@ -240,42 +254,174 @@
         {
             "code": "point_guard",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_POINT_GUARD"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_POINT_GUARD",
+            "role_domain": "participant"
         },
         {
             "code": "shooting_guard",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_SHOOTING_GUARD"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_SHOOTING_GUARD",
+            "role_domain": "participant"
         },
         {
             "code": "small_forward",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_SMALL_FORWARD"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_SMALL_FORWARD",
+            "role_domain": "participant"
         },
         {
             "code": "power_forward",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_POWER_FORWARD"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_POWER_FORWARD",
+            "role_domain": "participant"
         },
         {
             "code": "center",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_CENTER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_CENTER",
+            "role_domain": "participant"
         },
         {
             "code": "head_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_HEAD_COACH"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_HEAD_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "table_official",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_TABLE_OFFICIAL"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_TABLE_OFFICIAL",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
+        },
+        {
+            "code": "combo_guard",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_COMBO_GUARD",
+            "role_domain": "participant"
+        },
+        {
+            "code": "wing",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_WING",
+            "role_domain": "participant"
+        },
+        {
+            "code": "combo_forward",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_COMBO_FORWARD",
+            "role_domain": "participant"
+        },
+        {
+            "code": "big_man",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_BIG_MAN",
+            "role_domain": "participant"
+        },
+        {
+            "code": "assistant_coach",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_ASSISTANT_COACH",
+            "role_domain": "team_staff"
+        },
+        {
+            "code": "fitness_coach",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_FITNESS_COACH",
+            "role_domain": "team_staff"
+        },
+        {
+            "code": "team_manager",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_TEAM_MANAGER",
+            "role_domain": "team_staff"
+        },
+        {
+            "code": "physiotherapist",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_PHYSIOTHERAPIST",
+            "role_domain": "team_staff"
+        },
+        {
+            "code": "team_doctor",
+            "person_type": "staff",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_TEAM_DOCTOR",
+            "role_domain": "team_staff"
+        },
+        {
+            "code": "crew_chief",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_CREW_CHIEF",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
+        },
+        {
+            "code": "umpire",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_UMPIRE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
+        },
+        {
+            "code": "scorer",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_SCORER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
+        },
+        {
+            "code": "assistant_scorer",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_ASSISTANT_SCORER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
+        },
+        {
+            "code": "timer",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_TIMER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
+        },
+        {
+            "code": "shot_clock_operator",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_SHOT_CLOCK_OPERATOR",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
+        },
+        {
+            "code": "commissioner",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_POSITION_COMMISSIONER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -325,6 +471,253 @@
             "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_FOULED_OUT",
             "timeline": true,
             "direction": -1
+        },
+        {
+            "code": "free_throw_missed",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_FREE_THROW_MISSED",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "free_throws_missed"
+        },
+        {
+            "code": "two_points_missed",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_TWO_POINTS_MISSED",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "two_pointers_missed"
+        },
+        {
+            "code": "three_points_missed",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_THREE_POINTS_MISSED",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "three_pointers_missed"
+        },
+        {
+            "code": "offensive_rebound",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_OFFENSIVE_REBOUND",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "offensive_rebounds"
+        },
+        {
+            "code": "defensive_rebound",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_DEFENSIVE_REBOUND",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "defensive_rebounds"
+        },
+        {
+            "code": "assist",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_ASSIST",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "assists"
+        },
+        {
+            "code": "steal",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_STEAL",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "steals"
+        },
+        {
+            "code": "block",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_BLOCK",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "blocks"
+        },
+        {
+            "code": "blocked_shot_received",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_BLOCKED_SHOT_RECEIVED",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "blocked_shots_received"
+        },
+        {
+            "code": "turnover",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_TURNOVER",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "turnovers"
+        },
+        {
+            "code": "foul_drawn",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_FOUL_DRAWN",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "fouls_drawn"
+        },
+        {
+            "code": "unsportsmanlike_foul",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_UNSPORTSMANLIKE_FOUL",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "unsportsmanlike_fouls"
+        },
+        {
+            "code": "disqualifying_foul",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_DISQUALIFYING_FOUL",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "player",
+            "statistic_code": "disqualifying_fouls"
+        },
+        {
+            "code": "coach_technical_foul",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_COACH_TECHNICAL_FOUL",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "staff"
+        },
+        {
+            "code": "timeout",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_TIMEOUT",
+            "timeline": true,
+            "direction": 0,
+            "affects_score": false,
+            "statistic_code": "team_timeouts"
+        },
+        {
+            "code": "jump_ball",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_JUMP_BALL",
+            "timeline": true,
+            "direction": 0,
+            "affects_score": false
+        },
+        {
+            "code": "held_ball",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_HELD_BALL",
+            "timeline": true,
+            "direction": 0,
+            "affects_score": false
+        },
+        {
+            "code": "shot_clock_violation",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_SHOT_CLOCK_VIOLATION",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false
+        },
+        {
+            "code": "travelling",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_TRAVELLING",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "player"
+        },
+        {
+            "code": "double_dribble",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_DOUBLE_DRIBBLE",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "player"
+        },
+        {
+            "code": "backcourt_violation",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_BACKCOURT_VIOLATION",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false
+        },
+        {
+            "code": "three_second_violation",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_THREE_SECOND_VIOLATION",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "player"
+        },
+        {
+            "code": "five_second_violation",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_FIVE_SECOND_VIOLATION",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false
+        },
+        {
+            "code": "eight_second_violation",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_EIGHT_SECOND_VIOLATION",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false
+        },
+        {
+            "code": "goaltending",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_GOALTENDING",
+            "timeline": true,
+            "direction": 0,
+            "affects_score": false,
+            "person_type": "player"
+        },
+        {
+            "code": "basket_interference",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_BASKET_INTERFERENCE",
+            "timeline": true,
+            "direction": 0,
+            "affects_score": false,
+            "person_type": "player"
+        },
+        {
+            "code": "team_offensive_rebound",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_TEAM_OFFENSIVE_REBOUND",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": false,
+            "statistic_code": "team_offensive_rebounds"
+        },
+        {
+            "code": "team_defensive_rebound",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_TEAM_DEFENSIVE_REBOUND",
+            "timeline": true,
+            "direction": 1,
+            "affects_score": false,
+            "statistic_code": "team_defensive_rebounds"
+        },
+        {
+            "code": "team_turnover",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_TEAM_TURNOVER",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "statistic_code": "team_turnovers"
+        },
+        {
+            "code": "injury",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_EVENT_INJURY",
+            "timeline": true,
+            "direction": -1,
+            "affects_score": false,
+            "person_type": "player"
         }
     ],
     "statistics": [
@@ -402,10 +795,492 @@
             "event_codes": [
                 "technical_foul"
             ]
+        },
+        {
+            "code": "minutes_played",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_MINUTES_PLAYED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_MINUTES_PLAYED_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "duration"
+        },
+        {
+            "code": "free_throws_made",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FREE_THROWS_MADE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FREE_THROWS_MADE_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "free_throws_attempted",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FREE_THROWS_ATTEMPTED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FREE_THROWS_ATTEMPTED_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "free_throws_missed",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FREE_THROWS_MISSED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FREE_THROWS_MISSED_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "two_pointers_made",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TWO_POINTERS_MADE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TWO_POINTERS_MADE_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "two_pointers_attempted",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TWO_POINTERS_ATTEMPTED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TWO_POINTERS_ATTEMPTED_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "two_pointers_missed",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TWO_POINTERS_MISSED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TWO_POINTERS_MISSED_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "three_pointers_attempted",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_THREE_POINTERS_ATTEMPTED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_THREE_POINTERS_ATTEMPTED_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "three_pointers_missed",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_THREE_POINTERS_MISSED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_THREE_POINTERS_MISSED_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "field_goals_made",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FIELD_GOALS_MADE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FIELD_GOALS_MADE_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "field_goals_attempted",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FIELD_GOALS_ATTEMPTED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FIELD_GOALS_ATTEMPTED_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "field_goals_missed",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FIELD_GOALS_MISSED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FIELD_GOALS_MISSED_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "offensive_rebounds",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_OFFENSIVE_REBOUNDS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_OFFENSIVE_REBOUNDS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "defensive_rebounds",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_DEFENSIVE_REBOUNDS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_DEFENSIVE_REBOUNDS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "turnovers",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TURNOVERS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TURNOVERS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "blocked_shots_received",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_BLOCKED_SHOTS_RECEIVED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_BLOCKED_SHOTS_RECEIVED_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "fouls_drawn",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FOULS_DRAWN",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FOULS_DRAWN_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "unsportsmanlike_fouls",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_UNSPORTSMANLIKE_FOULS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_UNSPORTSMANLIKE_FOULS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "disqualifying_fouls",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_DISQUALIFYING_FOULS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_DISQUALIFYING_FOULS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "free_throw_percentage",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FREE_THROW_PERCENTAGE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FREE_THROW_PERCENTAGE_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "percentage"
+        },
+        {
+            "code": "two_point_percentage",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TWO_POINT_PERCENTAGE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TWO_POINT_PERCENTAGE_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "percentage"
+        },
+        {
+            "code": "three_point_percentage",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_THREE_POINT_PERCENTAGE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_THREE_POINT_PERCENTAGE_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "percentage"
+        },
+        {
+            "code": "field_goal_percentage",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FIELD_GOAL_PERCENTAGE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_FIELD_GOAL_PERCENTAGE_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "percentage"
+        },
+        {
+            "code": "effective_field_goal_percentage",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_EFFECTIVE_FIELD_GOAL_PERCENTAGE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_EFFECTIVE_FIELD_GOAL_PERCENTAGE_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "decimal"
+        },
+        {
+            "code": "true_shooting_percentage",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TRUE_SHOOTING_PERCENTAGE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TRUE_SHOOTING_PERCENTAGE_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "decimal"
+        },
+        {
+            "code": "efficiency",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_EFFICIENCY",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_EFFICIENCY_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "performance_index_rating",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_PERFORMANCE_INDEX_RATING",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_PERFORMANCE_INDEX_RATING_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "plus_minus",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_PLUS_MINUS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_PLUS_MINUS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_points",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_POINTS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_POINTS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_free_throws_made",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FREE_THROWS_MADE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FREE_THROWS_MADE_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_free_throws_attempted",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FREE_THROWS_ATTEMPTED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FREE_THROWS_ATTEMPTED_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_two_pointers_made",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_TWO_POINTERS_MADE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_TWO_POINTERS_MADE_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_two_pointers_attempted",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_TWO_POINTERS_ATTEMPTED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_TWO_POINTERS_ATTEMPTED_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_three_pointers_made",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_THREE_POINTERS_MADE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_THREE_POINTERS_MADE_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_three_pointers_attempted",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_THREE_POINTERS_ATTEMPTED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_THREE_POINTERS_ATTEMPTED_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_field_goals_made",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FIELD_GOALS_MADE",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FIELD_GOALS_MADE_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_field_goals_attempted",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FIELD_GOALS_ATTEMPTED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FIELD_GOALS_ATTEMPTED_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_offensive_rebounds",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_OFFENSIVE_REBOUNDS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_OFFENSIVE_REBOUNDS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_defensive_rebounds",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_DEFENSIVE_REBOUNDS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_DEFENSIVE_REBOUNDS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_rebounds",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_REBOUNDS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_REBOUNDS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_assists",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_ASSISTS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_ASSISTS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_steals",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_STEALS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_STEALS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_blocks",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_BLOCKS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_BLOCKS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_turnovers",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_TURNOVERS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_TURNOVERS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_fouls",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FOULS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FOULS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_timeouts",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_TIMEOUTS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_TIMEOUTS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_fast_break_points",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FAST_BREAK_POINTS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_FAST_BREAK_POINTS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_second_chance_points",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_SECOND_CHANCE_POINTS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_SECOND_CHANCE_POINTS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_points_off_turnovers",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_POINTS_OFF_TURNOVERS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_POINTS_OFF_TURNOVERS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_points_in_paint",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_POINTS_IN_PAINT",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_POINTS_IN_PAINT_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_bench_points",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_BENCH_POINTS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_BENCH_POINTS_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_largest_lead",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_LARGEST_LEAD",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_LARGEST_LEAD_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
+        },
+        {
+            "code": "team_longest_scoring_run",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_LONGEST_SCORING_RUN",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_BASKETBALL_STAT_TEAM_LONGEST_SCORING_RUN_ABBR",
+            "statistic_type": "basic",
+            "scope": "team",
+            "source": "manual_or_import",
+            "value_type": "integer"
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true
         },

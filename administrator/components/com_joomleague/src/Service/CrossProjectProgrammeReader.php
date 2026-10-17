@@ -17,7 +17,7 @@ final class CrossProjectProgrammeReader
 	 * @param list<int> $viewLevels
 	 * @return list<array<string,mixed>>
 	 */
-	public function between(array $viewLevels, int $fromUnix, int $toUnix, int $sportTypeId = 0, int $clubId = 0, int $projectId = 0): array
+	public function between(array $viewLevels, int $fromUnix, int $toUnix, int $sportTypeId = 0, int $clubId = 0, int $projectId = 0, int $seasonId = 0, int $stageId = 0, int $roundId = 0, int $entryId = 0, int $venueId = 0): array
 	{
 		$viewLevels = array_values(array_unique(array_filter(array_map('intval', $viewLevels), static fn(int $id): bool => $id > 0)));
 		$viewLevels = $viewLevels === [] ? [1] : $viewLevels;
@@ -38,6 +38,9 @@ final class CrossProjectProgrammeReader
 		if ($projectId > 0) {
 			$query->where('project.id = ' . $projectId);
 		}
+		if ($seasonId > 0) {
+			$query->where('project.season_id = ' . $seasonId);
+		}
 
 		$reader = new ProgrammeReader($db);
 		$scopeResolver = new ProgrammeScopeResolver($db);
@@ -51,8 +54,14 @@ final class CrossProjectProgrammeReader
 						continue;
 					}
 				}
+				if ($entryId > 0) {
+					$selectedEntryIds = $scopeResolver->resolve($projectId, 'entry', $entryId, $viewLevels);
+					if ($selectedEntryIds === []) continue;
+					$entryIds = $entryIds === null ? $selectedEntryIds : array_values(array_intersect($entryIds, $selectedEntryIds));
+					if ($entryIds === []) continue;
+				}
 
-				foreach ($reader->forProject($projectId, $entryIds, $viewLevels) as $item) {
+				foreach ($reader->forProject($projectId, $entryIds, $viewLevels, $venueId > 0 ? $venueId : null, $stageId > 0 ? $stageId : null, $roundId > 0 ? $roundId : null) as $item) {
 					if ($item['scheduled_start'] === null) {
 						continue;
 					}

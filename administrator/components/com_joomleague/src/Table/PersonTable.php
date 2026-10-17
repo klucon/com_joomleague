@@ -34,6 +34,10 @@ final class PersonTable extends Table
 		$this->country_code = strtoupper(StringHelper::trim((string) ($this->country_code ?? ''))) ?: null;
 		$this->birth_date = StringHelper::trim((string) ($this->birth_date ?? '')) ?: null;
 		$this->death_date = StringHelper::trim((string) ($this->death_date ?? '')) ?: null;
+		$height = $this->normaliseMeasurement($this->height_cm ?? null);
+		$weight = $this->normaliseMeasurement($this->weight_kg ?? null);
+		$this->height_cm = $height['value'];
+		$this->weight_kg = $weight['value'];
 		$this->picture = StringHelper::trim((string) ($this->picture ?? '')) ?: null;
 		$this->external_code = StringHelper::trim((string) ($this->external_code ?? '')) ?: null;
 
@@ -59,6 +63,14 @@ final class PersonTable extends Table
 			return false;
 		}
 
+		if (!$height['valid'] || !$weight['valid']
+			|| ($this->height_cm !== null && ((float) $this->height_cm < 20 || (float) $this->height_cm > 300))
+			|| ($this->weight_kg !== null && ((float) $this->weight_kg < 1 || (float) $this->weight_kg > 500))) {
+			$this->setError(Text::_('COM_JOOMLEAGUE_ERROR_PERSON_MEASUREMENTS_INVALID'));
+
+			return false;
+		}
+
 		if ($this->uuid !== '' && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', (string) $this->uuid) !== 1) {
 			$this->setError(Text::_('COM_JOOMLEAGUE_ERROR_UUID_INVALID'));
 
@@ -66,5 +78,21 @@ final class PersonTable extends Table
 		}
 
 		return parent::check();
+	}
+
+	/** @return array{valid: bool, value: ?string} */
+	private function normaliseMeasurement(mixed $value): array
+	{
+		$value = str_replace(',', '.', StringHelper::trim((string) ($value ?? '')));
+
+		if ($value === '') {
+			return ['valid' => true, 'value' => null];
+		}
+
+		if (!is_numeric($value) || !is_finite((float) $value)) {
+			return ['valid' => false, 'value' => null];
+		}
+
+		return ['valid' => true, 'value' => number_format((float) $value, 2, '.', '')];
 	}
 }

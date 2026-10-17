@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${ROOT}/build/package"
-DIST_DIR="${ROOT}/dist"
+DIST_DIR="${JOOMLEAGUE_DIST_DIR:-${ROOT}/dist}"
 "${ROOT}/tests/Architecture/verify-release.sh"
 VERSION="$(sed -n 's:.*<version>\([^<]*\)</version>.*:\1:p' "${ROOT}/build/pkg_joomleague.xml" | head -n 1)"
 PACKAGE="${DIST_DIR}/com_joomleague-${VERSION}.zip"

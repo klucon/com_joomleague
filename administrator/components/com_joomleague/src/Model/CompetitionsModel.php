@@ -13,7 +13,7 @@ final class CompetitionsModel extends ListModel
 {
 	public function __construct($config = [])
 	{
-		$config['filter_fields'] ??= ['id', 'a.id', 'name', 'a.name', 'code', 'a.code', 'organisation', 'a.organisation', 'published', 'a.published', 'ordering', 'a.ordering'];
+		$config['filter_fields'] ??= ['id', 'a.id', 'name', 'a.name', 'code', 'a.code', 'organisation', 'a.organisation', 'published', 'a.published', 'ordering', 'a.ordering', 'a.country_code', 'project_count'];
 		parent::__construct($config);
 	}
 
@@ -59,7 +59,7 @@ final class CompetitionsModel extends ListModel
 			}
 		}
 
-		$query->order($database->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . ($this->getState('list.direction') === 'desc' ? 'DESC' : 'ASC'));
+		$query->order($database->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC'));
 
 		return $query;
 	}

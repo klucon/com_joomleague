@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<form>
+<form addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS">
 		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_TEAM_NAME_DESC" required="true" maxlength="255" />
 		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_ALIAS_DESC" maxlength="255" />
@@ -12,8 +12,8 @@
 		<field name="external_code" type="text" label="COM_JOOMLEAGUE_FIELD_EXTERNAL_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_TEAM_EXTERNAL_CODE_DESC" maxlength="191" />
 	</fieldset>
 	<fieldset name="media" label="COM_JOOMLEAGUE_FIELDSET_MEDIA">
-		<field name="logo" type="media" label="COM_JOOMLEAGUE_FIELD_TEAM_LOGO_LABEL" description="COM_JOOMLEAGUE_FIELD_TEAM_LOGO_DESC" types="images" directory="com_joomleague/teams/logos" />
-		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_TEAM_PICTURE_LABEL" description="COM_JOOMLEAGUE_FIELD_TEAM_PICTURE_DESC" types="images" directory="com_joomleague/teams/photos" />
+		<field name="logo" type="Joomleaguemedia" label="COM_JOOMLEAGUE_FIELD_TEAM_LOGO_LABEL" description="COM_JOOMLEAGUE_FIELD_TEAM_LOGO_DESC" types="images" directory="com_joomleague/teams/logos" />
+		<field name="picture" type="Joomleaguemedia" label="COM_JOOMLEAGUE_FIELD_TEAM_PICTURE_LABEL" description="COM_JOOMLEAGUE_FIELD_TEAM_PICTURE_DESC" types="images" directory="com_joomleague/teams/photos" />
 		<field name="media_history" type="subform" label="COM_JOOMLEAGUE_FIELD_LOGO_HISTORY_LABEL" description="COM_JOOMLEAGUE_FIELD_LOGO_HISTORY_DESC" formsource="administrator/components/com_joomleague/forms/organization_media_history.xml" multiple="true" layout="joomla.form.field.subform.repeatable-table" buttons="add" />
 	</fieldset>
 	<fieldset name="history" label="COM_JOOMLEAGUE_FIELDSET_TEAM_HISTORY">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<form>
+<form addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS">
 		<field name="name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_NAME_DESC" required="true" maxlength="255" />
 		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_ALIAS_DESC" maxlength="255" />
@@ -23,7 +23,7 @@
 		<field name="website" type="url" label="COM_JOOMLEAGUE_FIELD_WEBSITE_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_WEBSITE_DESC" maxlength="2048" filter="url" />
 	</fieldset>
 	<fieldset name="media" label="COM_JOOMLEAGUE_FIELDSET_MEDIA">
-		<field name="picture" type="media" label="COM_JOOMLEAGUE_FIELD_VENUE_PICTURE_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_PICTURE_DESC" types="images" directory="com_joomleague/venues" />
+		<field name="picture" type="Joomleaguemedia" label="COM_JOOMLEAGUE_FIELD_VENUE_PICTURE_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_PICTURE_DESC" types="images" directory="com_joomleague/venues" />
 	</fieldset>
 	<fieldset name="description" label="JGLOBAL_DESCRIPTION">
 		<field name="description" type="editor" label="JGLOBAL_DESCRIPTION" description="COM_JOOMLEAGUE_FIELD_VENUE_DESCRIPTION_DESC" filter="safehtml" buttons="true" />

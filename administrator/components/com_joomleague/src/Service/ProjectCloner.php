@@ -83,7 +83,7 @@ final class ProjectCloner
 		$table->modified = null;
 		$table->modified_by = 0;
 
-		if (!$table->check() || !$table->store()) {
+		if (!$table->check() || !$table->storeCloneInTransaction()) {
 			throw new \RuntimeException($table->getError() ?: Text::_('COM_JOOMLEAGUE_ERROR_PROJECT_CLONE_FAILED'));
 		}
 

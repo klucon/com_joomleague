@@ -41,6 +41,13 @@ final class HtmlView extends BaseHtmlView
 			$this->locked = $context['locked'];
 			$this->assigned = $context['assigned'];
 			$this->available = $context['available'];
+		} catch (\UnexpectedValueException $exception) {
+			if ($exception->getMessage() !== Text::_('COM_JOOMLEAGUE_ERROR_MATCH_PARTICIPANTS_FIXED')) {
+				throw new GenericDataException($exception->getMessage(), 500);
+			}
+			$app->enqueueMessage($exception->getMessage(), 'info');
+			$app->redirect(Route::_('index.php?option=com_joomleague&view=match&layout=edit&id=' . $matchId, false));
+			return;
 		} catch (\Throwable $exception) {
 			throw new GenericDataException($exception->getMessage(), 500);
 		}

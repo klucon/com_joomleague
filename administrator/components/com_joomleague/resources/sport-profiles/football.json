@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "football",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL",
     "description_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_DESC",
     "scoring_model": "goals",
@@ -161,13 +161,13 @@
         "players_on_field": 11,
         "minimum_players_to_start": 7,
         "default_substitutes_allowed": 5,
-		"default_substitution_windows": 3,
-		"substitutions": {
-			"supported": true,
-			"reentry_supported": true,
-			"limit_scope": "match",
-			"maximum_per_scope": 5
-		},
+        "default_substitution_windows": 3,
+        "substitutions": {
+            "supported": true,
+            "reentry_supported": true,
+            "limit_scope": "match",
+            "maximum_per_scope": 5
+        },
         "allow_unused_substitutes": true,
         "allow_external_opponent_persons": true,
         "captain_supported": true,
@@ -384,7 +384,8 @@
             "lineup_group": "goalkeeper",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_GOALKEEPER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "right_back",
@@ -392,7 +393,8 @@
             "lineup_group": "defender",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_RIGHT_BACK",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "centre_back",
@@ -400,7 +402,8 @@
             "lineup_group": "defender",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_CENTRE_BACK",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "left_back",
@@ -408,7 +411,8 @@
             "lineup_group": "defender",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_LEFT_BACK",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "defender",
@@ -416,7 +420,8 @@
             "lineup_group": "defender",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_DEFENDER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "defensive_midfielder",
@@ -424,7 +429,8 @@
             "lineup_group": "midfielder",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_DEFENSIVE_MIDFIELDER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "central_midfielder",
@@ -432,7 +438,8 @@
             "lineup_group": "midfielder",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_CENTRAL_MIDFIELDER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "attacking_midfielder",
@@ -440,7 +447,8 @@
             "lineup_group": "midfielder",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_ATTACKING_MIDFIELDER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "midfielder",
@@ -448,7 +456,8 @@
             "lineup_group": "midfielder",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_MIDFIELDER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "right_winger",
@@ -456,7 +465,8 @@
             "lineup_group": "forward",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_RIGHT_WINGER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "left_winger",
@@ -464,7 +474,8 @@
             "lineup_group": "forward",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_LEFT_WINGER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "forward",
@@ -472,77 +483,114 @@
             "lineup_group": "forward",
             "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_FORWARD",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "head_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_HEAD_COACH"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_HEAD_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "assistant_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_ASSISTANT_COACH"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_ASSISTANT_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "goalkeeper_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_GOALKEEPER_COACH"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_GOALKEEPER_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "fitness_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_FITNESS_COACH"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_FITNESS_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "team_manager",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_TEAM_MANAGER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_TEAM_MANAGER",
+            "role_domain": "team_staff"
         },
         {
             "code": "physiotherapist",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_PHYSIOTHERAPIST"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_PHYSIOTHERAPIST",
+            "role_domain": "team_staff"
         },
         {
             "code": "doctor",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_DOCTOR"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_DOCTOR",
+            "role_domain": "team_staff"
         },
         {
             "code": "referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "assistant_referee_1",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_ASSISTANT_REFEREE_1"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_ASSISTANT_REFEREE_1",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "assistant_referee_2",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_ASSISTANT_REFEREE_2"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_ASSISTANT_REFEREE_2",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "fourth_official",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_FOURTH_OFFICIAL"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_FOURTH_OFFICIAL",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "var_referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_VAR_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_VAR_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "delegate",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_DELEGATE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_DELEGATE",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "observer",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_OBSERVER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FOOTBALL_POSITION_OBSERVER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -969,10 +1017,27 @@
             ]
         },
         "statistic_aliases": {
-            "goals": ["goals", "goal", "bramka", "bramki"],
-            "yellow_cards": ["yellow_cards", "yellow_card", "zolta_kartka"],
-            "second_yellow_cards": ["second_yellow_cards", "2_zolta_czerwona"],
-            "red_cards": ["red_cards", "red_card", "czerwona_karta", "czerwona_kartka"]
+            "goals": [
+                "goals",
+                "goal",
+                "bramka",
+                "bramki"
+            ],
+            "yellow_cards": [
+                "yellow_cards",
+                "yellow_card",
+                "zolta_kartka"
+            ],
+            "second_yellow_cards": [
+                "second_yellow_cards",
+                "2_zolta_czerwona"
+            ],
+            "red_cards": [
+                "red_cards",
+                "red_card",
+                "czerwona_karta",
+                "czerwona_kartka"
+            ]
         }
     },
     "sport_type_name_key": "COM_JOOMLEAGUE_ADMIN_SPORTTYPE_FOOTBALL_NAME",
@@ -1049,15 +1114,15 @@
                     "condition_code": "tied_after_extra_time"
                 }
             ],
-    "aggregation": {
-      "mode": "validate",
-      "from": [
-        "period",
-        "extra_time"
-      ],
-      "final_only": true,
-      "allow_legacy_aggregate_only": true
-    }
+            "aggregation": {
+                "mode": "validate",
+                "from": [
+                    "period",
+                    "extra_time"
+                ],
+                "final_only": true,
+                "allow_legacy_aggregate_only": true
+            }
         },
         "result_rules": {
             "supports_halftime_score": true,
@@ -1085,6 +1150,6 @@
             "substitute",
             "finished",
             "disqualified"
-    ]
-  }
+        ]
+    }
 }

@@ -68,7 +68,7 @@ final class ResultsModel extends BaseDatabaseModel
 			->innerJoin($db->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = item.stage_id AND stage.published = 1')
 			->innerJoin($db->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = item.round_id AND round.published = 1')
 				->leftJoin($db->quoteName('#__joomleague_venue', 'venue') . ' ON venue.id = item.venue_id AND venue.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'venue'))
-			->leftJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = item.id AND result.status_code = 'final'")
+			->leftJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = item.id AND result.status_code = 'final' AND item.status_code <> 'cancelled'")
 			->where('item.project_id = :projectId')->where('item.published = 1')
 			->bind(':projectId', $projectId, ParameterType::INTEGER)
 			->order('stage.sequence_number ASC, stage.id ASC, round.sequence_number ASC, round.id ASC, item.scheduled_start ASC, item.id ASC');

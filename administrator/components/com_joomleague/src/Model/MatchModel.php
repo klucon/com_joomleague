@@ -19,6 +19,7 @@ use Joomleague\Component\Joomleague\Administrator\Service\ProjectContextReposito
 use Joomleague\Component\Joomleague\Administrator\Service\MatchParticipantSummaryProvider;
 use Joomleague\Component\Joomleague\Administrator\Service\MatchScheduleEditor;
 use Joomleague\Component\Joomleague\Administrator\Service\StandingsCascadeTrigger;
+use Joomleague\Component\Joomleague\Administrator\Service\PostgresqlStatementGuard;
 
 final class MatchModel extends AdminModel implements CurrentUserInterface
 {
@@ -60,16 +61,53 @@ final class MatchModel extends AdminModel implements CurrentUserInterface
 			'match_number' => $data['match_number'] ?? '',
 			'attendance' => $data['attendance'] ?? '',
 		];
-		$id = (int) ($data['id'] ?? 0); $owner = $id > 0 ? $this->storedOwner($id) : $this->getRound((int) ($data['round_id'] ?? 0));
+		$id = (int) ($data['id'] ?? $this->getState($this->getName() . '.id'));
+		$data['id'] = $id;
+		$owner = $id > 0 ? $this->storedOwner($id) : $this->getRound((int) ($data['round_id'] ?? 0));
+		if ((int) $owner->project_id < 1 || !$this->canEditSchedule((int) $owner->project_id)) {
+			$this->setError(Text::_('JLIB_APPLICATION_ERROR_SAVE_NOT_PERMITTED'));
+			return false;
+		}
 		$oldPublished = $id > 0 ? (int) $owner->published : null;
+		$schedule['scheduled_time'] = MatchScheduleEditor::normalizeTime((string) $schedule['scheduled_time']);
+		$oldStatus = null;
 		$data['round_id'] = (int) ($owner->round_id ?? $owner->id); $data['stage_id'] = (int) $owner->stage_id; $data['project_id'] = (int) $owner->project_id;
 		$data['contest_type'] = $this->projectContestType((int) $owner->project_id);
 		if (($schedule['scheduled_date'] === '') !== ($schedule['scheduled_time'] === '')) throw new \UnexpectedValueException(Text::_('COM_JOOMLEAGUE_ERROR_MATCH_VALUES_INVALID'));
 		$data['scheduled_start'] = $schedule['scheduled_date'] !== '' ? Factory::getDate($schedule['scheduled_date'] . ' ' . $schedule['scheduled_time'] . ':00', $this->effectiveTimezone((string) ($data['timezone'] ?? ''), $owner))->setTimezone(new \DateTimeZone('UTC'))->toSql() : null;
-		if (!parent::save($data)) return false;
-		$savedId = $id > 0 ? $id : (int) $this->getState($this->getName() . '.id');
-		(new MatchScheduleEditor($this->getDatabase()))->save($savedId, (int) $data['round_id'], $schedule, (int) $this->getCurrentUser()->id);
-		if ($oldPublished !== null && array_key_exists('published', $data) && (int) $data['published'] !== $oldPublished) {
+		$db = $this->getDatabase();
+		$db->transactionStart(true);
+		$statementGuard = null;
+		try {
+			$statementGuard = PostgresqlStatementGuard::attach($db);
+			// Match-result writers use the same project -> match lock order.
+			$projectId = (int) $data['project_id'];
+			if (!$db->setQuery('SELECT id FROM ' . $db->quoteName('#__joomleague_project') . ' WHERE id = ' . $projectId . ' FOR UPDATE')->loadResult()) {
+				throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_MATCH_INVALID'));
+			}
+			if ($id > 0) {
+				$locked = $db->setQuery('SELECT published, status_code FROM ' . $db->quoteName('#__joomleague_project_match') . ' WHERE id = ' . $id . ' FOR UPDATE')->loadAssoc();
+				if (!$locked) throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_MATCH_INVALID'));
+				$oldPublished = (int) $locked['published'];
+				$oldStatus = (string) $locked['status_code'];
+			}
+			if (!parent::save($data)) {
+				$db->transactionRollback(true);
+				$this->setState($this->getName() . '.id', $id);
+				return false;
+			}
+			$savedId = $id > 0 ? $id : (int) $this->getState($this->getName() . '.id');
+			(new MatchScheduleEditor($db))->save($savedId, (int) $data['round_id'], $schedule, (int) $this->getCurrentUser()->id);
+			$db->transactionCommit(true);
+		} catch (\Throwable $error) {
+			$db->transactionRollback(true);
+			$this->setState($this->getName() . '.id', $id);
+			throw $error;
+		} finally {
+			$statementGuard?->detach($db);
+		}
+		if (($oldPublished !== null && array_key_exists('published', $data) && (int) $data['published'] !== $oldPublished)
+			|| ($oldStatus !== null && array_key_exists('status_code', $data) && (string) $data['status_code'] !== $oldStatus)) {
 			$this->refreshStandings([[(int) $data['project_id'], (int) $data['stage_id']]]);
 		}
 		return true;
@@ -88,6 +126,12 @@ final class MatchModel extends AdminModel implements CurrentUserInterface
 		if ($result) $this->refreshStandings($contexts);
 		return $result;
 	}
+	protected function getReorderConditions($table): array
+	{
+		$ownerId = (int) ($table->round_id ?? 0);
+		return [$ownerId > 0 ? $this->getDatabase()->quoteName('round_id') . ' = ' . $ownerId : '1 = 0'];
+	}
+
 	protected function canDelete($record): bool
 	{
 		return $this->canEditSchedule((int) ($record->project_id ?? 0));
@@ -98,7 +142,11 @@ final class MatchModel extends AdminModel implements CurrentUserInterface
 	}
 	private function canEditSchedule(int $projectId): bool
 	{
-		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		if ($projectId < 1) {
+			return false;
+		}
+
+		$asset = 'com_joomleague.project.' . $projectId;
 		return $this->getCurrentUser()->authorise('joomleague.project.edit.schedule', $asset);
 	}
 	protected function prepareTable($table): void

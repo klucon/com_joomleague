@@ -17,6 +17,8 @@ use Joomla\CMS\User\CurrentUserTrait;
 use Joomla\Database\ParameterType;
 use Joomleague\Component\Joomleague\Administrator\Service\ProjectContextRepository;
 use Joomleague\Component\Joomleague\Administrator\Service\StandingsCascadeTrigger;
+use Joomleague\Component\Joomleague\Administrator\Service\StageEncounterRules;
+use Joomleague\Component\Joomleague\Domain\Service\CanonicalJson;
 use Joomleague\Component\Joomleague\Domain\Service\UuidFactory;
 
 final class StageModel extends AdminModel implements CurrentUserInterface
@@ -44,6 +46,8 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 		}
 
 		$item = $this->getItem();
+		$metadata = empty($item->metadata_json) ? [] : json_decode($item->metadata_json, true, 512, JSON_THROW_ON_ERROR);
+		$item->encounter_decision_policy = $metadata['encounter_decision_policy'] ?? 'inherit';
 		if ((int) ($item->project_id ?? 0) < 1) $item->project_id = Factory::getApplication()->getInput()->getInt('project_id');
 
 		return $item;
@@ -59,7 +63,8 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 
 	public function save($data): bool
 	{
-		$id = (int) ($data['id'] ?? 0);
+		$id = (int) ($data['id'] ?? $this->getState($this->getName() . '.id'));
+		$data['id'] = $id;
 		$oldPublished = $id > 0 ? $this->storedPublished($id) : null;
 
 		try {
@@ -72,6 +77,31 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 		}
 
 		$data['project_id'] = $projectId;
+		if (!$this->canEditSchedule($projectId)) {
+			$this->setError(Text::_('JERROR_ALERTNOAUTHOR'));
+			return false;
+		}
+		try {
+			// Only the dedicated field is writable; preserve other server-owned metadata.
+			$item = $id > 0 ? $this->getItem($id) : null;
+			$metadata = empty($item->metadata_json) ? [] : json_decode($item->metadata_json, true, 512, JSON_THROW_ON_ERROR);
+			if (!is_array($metadata)) throw new \UnexpectedValueException('Stage metadata must be an object.');
+			$policy = StageEncounterRules::policy($data['encounter_decision_policy'] ?? ($metadata['encounter_decision_policy'] ?? 'inherit'));
+			if ($policy !== 'inherit') {
+				$query = $this->getDatabase()->getQuery(true)->select('version.payload_json')
+					->from($this->getDatabase()->quoteName('#__joomleague_project', 'project'))
+					->innerJoin($this->getDatabase()->quoteName('#__joomleague_sport_profile_version', 'version') . ' ON version.id = project.profile_version_id')
+					->where('project.id = :project')->bind(':project', $projectId, ParameterType::INTEGER);
+				$profile = json_decode((string) $this->getDatabase()->setQuery($query)->loadResult(), true, 512, JSON_THROW_ON_ERROR);
+				StageEncounterRules::apply($profile, ['encounter_decision_policy' => $policy]);
+			}
+			$metadata['encounter_decision_policy'] = $policy;
+			$data['metadata_json'] = CanonicalJson::encodeObject($metadata);
+			unset($data['encounter_decision_policy']);
+		} catch (\Throwable $exception) {
+			$this->setError(Text::_($exception->getMessage()));
+			return false;
+		}
 		if ($id === 0 && trim((string) ($data['code'] ?? '')) === '') {
 			$data['code'] = $this->availableCode($projectId, (string) ($data['name'] ?? 'stage'));
 		}
@@ -97,6 +127,12 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 		return $result;
 	}
 
+	protected function getReorderConditions($table): array
+	{
+		$ownerId = (int) ($table->project_id ?? 0);
+		return [$ownerId > 0 ? $this->getDatabase()->quoteName('project_id') . ' = ' . $ownerId : '1 = 0'];
+	}
+
 	protected function canDelete($record): bool
 	{
 		return $this->canEditSchedule((int) ($record->project_id ?? 0));
@@ -109,7 +145,8 @@ final class StageModel extends AdminModel implements CurrentUserInterface
 
 	private function canEditSchedule(int $projectId): bool
 	{
-		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		if ($projectId < 1) return false;
+		$asset = 'com_joomleague.project.' . $projectId;
 		return $this->getCurrentUser()->authorise('joomleague.project.edit.schedule', $asset);
 	}
 

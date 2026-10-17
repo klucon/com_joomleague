@@ -12,6 +12,7 @@ $event = $this->event;
 ?>
 <div class="com-joomleague-nextmatch">
 	<?php if (isset($event['error'])) : ?>
+		<h1 class="h3"><?php echo htmlspecialchars(Text::sprintf('COM_JOOMLEAGUE_NEXTMATCH_PAGE_TITLE', $event['project']->name), ENT_QUOTES, 'UTF-8'); ?></h1>
 		<div class="alert alert-info"><?php echo Text::_($event['error']); ?></div>
 	<?php else :
 		$item = $event['item'];

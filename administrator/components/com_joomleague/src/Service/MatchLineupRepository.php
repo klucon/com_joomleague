@@ -174,7 +174,13 @@ final class MatchLineupRepository
 
 	public function remove(int $matchId, int $participantId, int $lineupId): void
 	{
-		$this->participantContext($matchId, $participantId);
+		[$context] = $this->participantContext($matchId, $participantId);
+		$this->database->transactionStart();
+		try {
+		$projectId = (int) $context['match']->project_id;
+		$this->database->setQuery('SELECT id FROM ' . $this->database->quoteName('#__joomleague_project') . ' WHERE id = ' . $projectId . ' FOR UPDATE')->loadResult();
+		$q = $this->database->getQuery(true)->select('COUNT(*)')->from($this->database->quoteName('#__joomleague_match_duel_member'))->where('lineup_member_id = :lineup')->bind(':lineup', $lineupId, ParameterType::INTEGER);
+		if ((int) $this->database->setQuery($q)->loadResult() > 0) throw new MatchResultValidationException('COM_JOOMLEAGUE_ENCOUNTER_ERROR_REFERENCED');
 		$boundId = $lineupId; $boundMatchId = $matchId; $boundParticipantId = $participantId;
 		$query = $this->database->getQuery(true)->delete($this->database->quoteName('#__joomleague_match_lineup_member'))
 			->where('id = :id')->where('match_id = :matchId')->where('match_participant_id = :participantId')
@@ -182,6 +188,8 @@ final class MatchLineupRepository
 			->bind(':participantId', $boundParticipantId, ParameterType::INTEGER);
 		$this->database->setQuery($query)->execute();
 		if ($this->database->getAffectedRows() !== 1) throw new \InvalidArgumentException('The lineup row does not belong to this match participant.');
+		$this->database->transactionCommit();
+		} catch (\Throwable $error) { $this->database->transactionRollback(); throw $error; }
 	}
 
 	/** @return list<object> */

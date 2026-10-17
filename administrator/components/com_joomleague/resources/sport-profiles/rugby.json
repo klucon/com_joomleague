@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "rugby",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY",
     "description_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_DESC",
     "scoring_model": "points",
@@ -66,14 +66,14 @@
         "default_start_time": "15:00",
         "default_match_duration_minutes": 100
     },
-	"lineup": {
-		"substitutions": {
-			"supported": true,
-			"reentry_supported": false,
-			"limit_scope": "match",
-			"maximum_per_scope": 8
-		},
-		"preferred_order": [
+    "lineup": {
+        "substitutions": {
+            "supported": true,
+            "reentry_supported": false,
+            "limit_scope": "match",
+            "maximum_per_scope": 8
+        },
+        "preferred_order": [
             "prop",
             "hooker",
             "lock",
@@ -269,62 +269,81 @@
         {
             "code": "prop",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_PROP"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_PROP",
+            "role_domain": "participant"
         },
         {
             "code": "hooker",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_HOOKER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_HOOKER",
+            "role_domain": "participant"
         },
         {
             "code": "lock",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_LOCK"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_LOCK",
+            "role_domain": "participant"
         },
         {
             "code": "flanker",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_FLANKER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_FLANKER",
+            "role_domain": "participant"
         },
         {
             "code": "scrum_half",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_SCRUM_HALF"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_SCRUM_HALF",
+            "role_domain": "participant"
         },
         {
             "code": "fly_half",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_FLY_HALF"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_FLY_HALF",
+            "role_domain": "participant"
         },
         {
             "code": "centre",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_CENTRE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_CENTRE",
+            "role_domain": "participant"
         },
         {
             "code": "wing",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_WING"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_WING",
+            "role_domain": "participant"
         },
         {
             "code": "full_back",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_FULL_BACK"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_FULL_BACK",
+            "role_domain": "participant"
         },
         {
             "code": "head_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_HEAD_COACH"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_HEAD_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "touch_judge",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_TOUCH_JUDGE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_RUGBY_POSITION_TOUCH_JUDGE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -450,7 +469,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true
         },

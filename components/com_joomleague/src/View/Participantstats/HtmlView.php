@@ -8,6 +8,9 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Factory;
+use Joomleague\Component\Joomleague\Site\Service\PublicViewGuard;
+use Joomleague\Component\Joomleague\Site\Service\SeoMetadata;
 
 final class HtmlView extends BaseHtmlView
 {
@@ -16,9 +19,12 @@ final class HtmlView extends BaseHtmlView
 	public function display($tpl = null): void
 	{
 		$this->statistics = $this->getModel()->getStatistics();
-		$this->getDocument()->setTitle(isset($this->statistics['entry'])
+		PublicViewGuard::requireItem($this->statistics, 'entry');
+		$title = isset($this->statistics['entry'])
 			? Text::sprintf('COM_JOOMLEAGUE_PARTICIPANTSTATS_PAGE_TITLE', $this->statistics['entry']->display_name)
-			: Text::_('COM_JOOMLEAGUE_PARTICIPANTSTATS_VIEW_TITLE'));
+			: Text::_('COM_JOOMLEAGUE_PARTICIPANTSTATS_VIEW_TITLE');
+		$input = Factory::getApplication()->getInput();
+		(new SeoMetadata())->applyView($this->getDocument(), 'participantstats', ['entry_id' => (int) $this->statistics['entry']->id, 'project_id' => $input->getInt('project_id', 0)], $title, Text::sprintf('COM_JOOMLEAGUE_SEO_ENTITY_DESCRIPTION', Text::_('COM_JOOMLEAGUE_PARTICIPANTSTATS_VIEW_TITLE'), $this->statistics['entry']->display_name));
 		parent::display($tpl);
 	}
 }

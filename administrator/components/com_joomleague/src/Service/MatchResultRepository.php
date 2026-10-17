@@ -134,9 +134,23 @@ final class MatchResultRepository
 	public function replace(int $matchId, array $payload, int $actorId): int
 	{
 		if ($matchId < 1 || $actorId < 0) throw new \InvalidArgumentException('Match and actor identifiers are invalid.');
-		$context = $this->context($matchId); $participantIds = $this->participantIds($matchId); $result = $this->validator->validate($context['profile'], $participantIds, $payload);
+		$context = $this->context($matchId);
+		$participantIds = $this->participantIds($matchId); $result = $this->validator->validate($context['profile'], $participantIds, $payload);
 		$this->database->transactionStart();
 		try {
+			if (isset($context['profile']['match']['encounter'])) {
+				$project = (int) $this->database->setQuery('SELECT project_id FROM ' . $this->database->quoteName('#__joomleague_project_match') . ' WHERE id = ' . $matchId)->loadResult();
+				$this->database->setQuery('SELECT id FROM ' . $this->database->quoteName('#__joomleague_project') . ' WHERE id = ' . $project . ' FOR UPDATE')->loadResult();
+				$this->database->setQuery('SELECT id FROM ' . $this->database->quoteName('#__joomleague_project_match') . ' WHERE id = ' . $matchId . ' FOR UPDATE')->loadResult();
+				$context = $this->context($matchId);
+				$participantIds = $this->participantIds($matchId);
+				$result = $this->validator->validate($context['profile'], $participantIds, $payload);
+				(new TeamEncounterRepository($this->database))->replace($matchId, $participantIds, $context['profile']['match']['encounter'], $payload, $result, $actorId);
+				$query = $this->database->getQuery(true)->update($this->database->quoteName('#__joomleague_standing_freshness'))->set('is_dirty = 1')->where('project_id = :project')->bind(':project', $project, ParameterType::INTEGER);
+				$this->database->setQuery($query)->execute();
+				$query = $this->database->getQuery(true)->delete($this->database->quoteName('#__joomleague_standing_current'))->where('project_id = :project')->bind(':project', $project, ParameterType::INTEGER);
+				$this->database->setQuery($query)->execute();
+			}
 			$this->deleteCurrent($matchId);
 			$resultId = $this->insertResult($matchId, $result, $actorId);
 			foreach ($result['segments'] as $segment) $this->insertSegment($matchId, null, $segment, $actorId);
@@ -147,11 +161,13 @@ final class MatchResultRepository
 	/** @return array{profile:array<string,mixed>} */
 	private function context(int $matchId): array
 	{
-		$query = $this->database->getQuery(true)->select($this->database->quoteName('version.payload_json'))->from($this->database->quoteName('#__joomleague_project_match', 'match'))
+		$query = $this->database->getQuery(true)->select($this->database->quoteName(['version.payload_json', 'project.id', 'match.stage_id']))->from($this->database->quoteName('#__joomleague_project_match', 'match'))
 			->innerJoin($this->database->quoteName('#__joomleague_project', 'project') . ' ON project.id = match.project_id')->innerJoin($this->database->quoteName('#__joomleague_sport_profile_version', 'version') . ' ON version.id = project.profile_version_id')
 			->where('match.id = :matchId')->bind(':matchId', $matchId, ParameterType::INTEGER);
-		$payload = $this->database->setQuery($query)->loadResult(); if ($payload === null) throw new \RuntimeException('The selected match or profile does not exist.');
-		$profile = json_decode((string) $payload, true, 512, JSON_THROW_ON_ERROR); if (!is_array($profile)) throw new \UnexpectedValueException('Match profile payload is invalid.'); return ['profile' => $profile];
+		$row = $this->database->setQuery($query)->loadAssoc(); if (!$row) throw new \RuntimeException('The selected match or profile does not exist.');
+		$profile = json_decode((string) $row['payload_json'], true, 512, JSON_THROW_ON_ERROR); if (!is_array($profile)) throw new \UnexpectedValueException('Match profile payload is invalid.');
+		$profile = (new ProjectRuleConfigRepository($this->database))->resolve((int) $row['id'], $profile);
+		return ['profile' => (new StageEncounterRules($this->database))->resolve($profile, (int) $row['id'], $row['stage_id'] === null ? null : (int) $row['stage_id'])];
 	}
 
 	/** @return list<int> */

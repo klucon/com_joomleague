@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "floorball",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL",
     "description_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_DESC",
     "scoring_model": "goals",
@@ -94,14 +94,14 @@
             "initial_attempts_per_team": 3
         }
     },
-	"lineup": {
-		"substitutions": {
-			"supported": true,
-			"reentry_supported": true,
-			"limit_scope": "unlimited",
-			"maximum_per_scope": null
-		},
-		"preferred_order": [
+    "lineup": {
+        "substitutions": {
+            "supported": true,
+            "reentry_supported": true,
+            "limit_scope": "unlimited",
+            "maximum_per_scope": null
+        },
+        "preferred_order": [
             "goalkeeper",
             "defender",
             "center",
@@ -290,37 +290,51 @@
         {
             "code": "goalkeeper",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_GOALKEEPER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_GOALKEEPER",
+            "role_domain": "participant"
         },
         {
             "code": "defender",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_DEFENDER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_DEFENDER",
+            "role_domain": "participant"
         },
         {
             "code": "center",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_CENTER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_CENTER",
+            "role_domain": "participant"
         },
         {
             "code": "winger",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_WINGER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_WINGER",
+            "role_domain": "participant"
         },
         {
             "code": "head_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_HEAD_COACH"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_HEAD_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "delegate",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_DELEGATE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_FLOORBALL_POSITION_DELEGATE",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -423,7 +437,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true
         },

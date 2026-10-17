@@ -36,7 +36,7 @@ final class StatisticRankingReader
 			->select(['value.statistic_code', 'MAX(value.statistic_name_key) AS name_key', 'MAX(value.abbreviation_key) AS abbreviation_key', 'MAX(value.value_type) AS value_type', 'MAX(value.scope_code) AS scope_code', 'COUNT(value.id) AS value_count'])
 			->from($db->quoteName('#__joomleague_match_statistic_value', 'value'))
 			->innerJoin($db->quoteName('#__joomleague_project_match', 'match') . ' ON match.id = value.match_id AND match.published = 1')
-			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = match.id AND result.status_code = 'final'")
+			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = match.id AND result.status_code = 'final' AND match.status_code <> 'cancelled'")
 			->where('value.project_id = :project')->where('value.published = 1')->where('value.numeric_value IS NOT NULL')->where('value.segment_key = 0')
 			->group('value.statistic_code')->order('value.statistic_code ASC')
 			->bind(':project', $projectId, ParameterType::INTEGER))->loadObjectList();
@@ -53,7 +53,7 @@ final class StatisticRankingReader
 			])
 			->from($db->quoteName('#__joomleague_match_statistic_value', 'value'))
 			->innerJoin($db->quoteName('#__joomleague_project_match', 'match') . ' ON match.id = value.match_id AND match.published = 1')
-			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = match.id AND result.status_code = 'final'")
+			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = match.id AND result.status_code = 'final' AND match.status_code <> 'cancelled'")
 			->innerJoin($db->quoteName('#__joomleague_match_participant', 'participant') . ' ON participant.id = value.match_participant_id AND participant.published = 1')
 			->innerJoin($db->quoteName('#__joomleague_project_entry', 'entry') . ' ON entry.id = participant.project_entry_id AND entry.published = 1')
 			->leftJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.published = 1 AND team.access IN (' . $access . ')')

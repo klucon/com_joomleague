@@ -1,0 +1,1 @@
+module.exports.required = ['finder-pagination','finder-entities','finder-index','finder-access','finder-garbage','task-advertised','task-opt-out','task-unknown','console-help','console-disabled','console-force-required','console-data-preserved'];

@@ -16,6 +16,8 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Router\Route;
+use Joomleague\Component\Joomleague\Site\Service\SeoMetadata;
 
 final class HtmlView extends BaseHtmlView
 {
@@ -25,7 +27,7 @@ final class HtmlView extends BaseHtmlView
 	public function display($tpl = null): void
 	{
 		$this->projects = $this->getModel()->getProjects();
-		$this->getDocument()->setTitle(Text::_('COM_JOOMLEAGUE_PROJECTS_VIEW_TITLE'));
+		(new SeoMetadata())->apply($this->getDocument(), Text::_('COM_JOOMLEAGUE_PROJECTS_VIEW_TITLE'), Route::_('index.php?option=com_joomleague&view=projects', false, Route::TLS_IGNORE, true), Text::_('COM_JOOMLEAGUE_PROJECTS_META_DESCRIPTION'));
 		parent::display($tpl);
 	}
 }

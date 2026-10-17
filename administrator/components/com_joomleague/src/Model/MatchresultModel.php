@@ -94,7 +94,10 @@ final class MatchresultModel extends BaseDatabaseModel
 		$status = (string) ($payload['status_code'] ?? 'draft');
 		$payload['status_code'] = 'draft';
 		$participantIds = array_map(static fn (array $participant): int => (int) $participant['id'], $context['participants']);
+		$encounterDraft = isset($context['editor_schema']['encounter'])
+			? array_intersect_key($payload, ['duels' => true, 'encounter_revision' => true]) : [];
 		$payload = (new MatchResultPayloadValidator())->validate($context['profile_payload'], $participantIds, $payload);
+		$payload += $encounterDraft;
 
 		if (!in_array($status, $context['editor_schema']['statuses'], true)) throw new \InvalidArgumentException('Result status is not supported by the sport profile.');
 

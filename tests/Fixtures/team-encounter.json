@@ -1,0 +1,289 @@
+{
+    "schema_version": "1.5.0",
+    "code": "team_encounter",
+    "version": "1.0.0",
+    "name_key": "COM_JOOMLEAGUE_PROFILE_TEAM_ENCOUNTER",
+    "description_key": "COM_JOOMLEAGUE_PROFILE_TEAM_ENCOUNTER_DESC",
+    "scoring_model": "team_encounter",
+    "project_types": [
+        "cup",
+        "tournament",
+        "league",
+        "friendly",
+        "combined_stage"
+    ],
+    "entry_model": {
+        "allowed_kinds": [
+            "team"
+        ],
+        "default_kind": "team",
+        "members_supported": true,
+        "member_person_types": [
+            "player",
+            "staff"
+        ]
+    },
+    "project_rule_schema": {
+        "schema_version": "1.0.0",
+        "fields": {},
+        "constraints": []
+    },
+    "match_structure": {
+        "type": "team_encounter",
+        "default_start_time": "10:00"
+    },
+    "lineup": {
+        "preferred_order": [
+            "singles_player",
+            "doubles_player"
+        ]
+    },
+    "standings": {
+        "sort_order": [
+            "wins",
+            "score_difference",
+            "score_for",
+            "name"
+        ],
+        "columns": [
+            "rank",
+            "team",
+            "played",
+            "wins",
+            "draws",
+            "losses",
+            "score_for",
+            "score_against"
+        ],
+        "type": "team_table",
+        "calculation": {
+            "mode": "head_to_head",
+            "outcome_source": "root_numeric",
+            "included_result_statuses": [
+                "final"
+            ],
+            "metrics": [
+                {
+                    "code": "played",
+                    "operation": "count_matches",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "wins",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "win"
+                },
+                {
+                    "code": "draws",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "draw"
+                },
+                {
+                    "code": "losses",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "loss"
+                },
+                {
+                    "code": "score_for",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "own"
+                },
+                {
+                    "code": "score_against",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "score_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "score_for",
+                    "right_metric": "score_against"
+                }
+            ],
+            "awards": {
+                "mode": "none",
+                "rule_strategy": "first_match",
+                "rules": [],
+                "bonus_rules": []
+            },
+            "ordering": [
+                {
+                    "metric": "wins",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "score_difference",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "score_for",
+                    "direction": "desc",
+                    "nulls": "last"
+                }
+            ],
+            "scopes": [
+                {
+                    "code": "total",
+                    "filter": {
+                        "type": "always"
+                    }
+                }
+            ]
+        }
+    },
+    "result_rules": {
+        "supports_forfeit": true,
+        "supports_postponed": true,
+        "supports_cancelled": true,
+        "supports_abandoned": true
+    },
+    "positions": [
+        {
+            "code": "singles_player",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_SINGLES_PLAYER",
+            "role_domain": "participant"
+        },
+        {
+            "code": "doubles_player",
+            "person_type": "player",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_DOUBLES_PLAYER",
+            "role_domain": "participant"
+        },
+        {
+            "code": "captain",
+            "person_type": "staff",
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_CAPTAIN",
+            "role_domain": "team_staff"
+        },
+        {
+            "code": "chair_umpire",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_CHAIR_UMPIRE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
+        },
+        {
+            "code": "line_umpire",
+            "person_type": "official",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_TENNIS_POSITION_LINE_UMPIRE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
+        }
+    ],
+    "event_types": [],
+    "statistics": [],
+    "template_defaults": {
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
+        "results": {
+            "group_by_round": true
+        },
+        "ranking": {
+            "favorite_highlight_mode": "row"
+        },
+        "eventreport": {
+            "section_order": "standard",
+            "show_lineups": true,
+            "show_officials": true,
+            "show_timeline": true
+        }
+    },
+    "migration": {
+        "joomleague3_sport_keys": []
+    },
+    "sport_type_name_key": "COM_JOOMLEAGUE_PROFILE_TEAM_ENCOUNTER",
+    "contest": {
+        "type": "head_to_head"
+    },
+    "match": {
+        "structure": {
+            "type": "team_encounter",
+            "default_start_time": "10:00"
+        },
+        "score": {
+            "type": "nested_score",
+            "unit": "duel_wins",
+            "value_type": "integer",
+            "editor_control": "number",
+            "higher_is_better": true,
+            "segment_types": [
+                {
+                    "code": "duel",
+                    "parent_code": null,
+                    "ordinal": 10,
+                    "unit": "score",
+                    "value_type": "integer",
+                    "editor_control": "number",
+                    "repeatable": true,
+                    "maximum_count": 128,
+                    "name_key": "COM_JOOMLEAGUE_ENCOUNTER_DUEL"
+                },
+                {
+                    "code": "set",
+                    "parent_code": "duel",
+                    "ordinal": 10,
+                    "unit": "score",
+                    "value_type": "integer",
+                    "editor_control": "number",
+                    "repeatable": true,
+                    "maximum_count": 128,
+                    "name_key": "COM_JOOMLEAGUE_ENCOUNTER_SET"
+                }
+            ],
+            "aggregation": {
+                "mode": "none",
+                "from": [],
+                "final_only": false
+            }
+        },
+        "result_rules": {
+            "supports_forfeit": true,
+            "supports_postponed": true,
+            "supports_cancelled": true,
+            "supports_abandoned": true
+        },
+        "result_status_codes": [
+            "draft",
+            "in_progress",
+            "final"
+        ],
+        "outcome_codes": [
+            "completed"
+        ],
+        "participant_status_codes": [
+            "eligible",
+            "started",
+            "substitute",
+            "finished",
+            "disqualified"
+        ],
+        "encounter": {
+            "aggregation": "duel_wins",
+            "formats": {
+                "singles": 1,
+                "doubles": 2
+            },
+            "member_person_types": [
+                "player"
+            ]
+        }
+    }
+}

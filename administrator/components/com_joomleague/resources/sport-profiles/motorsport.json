@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "motorsport",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT",
     "description_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_DESC",
     "scoring_model": "time_points",
@@ -180,32 +180,48 @@
         {
             "code": "driver",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_DRIVER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_DRIVER",
+            "role_domain": "participant"
         },
         {
             "code": "co_driver",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_CO_DRIVER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_CO_DRIVER",
+            "role_domain": "participant"
         },
         {
             "code": "team_principal",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_TEAM_PRINCIPAL"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_TEAM_PRINCIPAL",
+            "role_domain": "team_staff"
         },
         {
             "code": "race_director",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_RACE_DIRECTOR"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_RACE_DIRECTOR",
+            "role_domain": "event_staff",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "steward",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_STEWARD"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_STEWARD",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "marshal",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_MARSHAL"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_MOTORSPORT_POSITION_MARSHAL",
+            "role_domain": "event_staff",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -314,7 +330,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true
         },

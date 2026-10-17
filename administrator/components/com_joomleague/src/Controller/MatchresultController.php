@@ -40,7 +40,7 @@ final class MatchresultController extends BaseController
 		$this->assertEditPermission($matchId);
 		$data = $this->input->get('jform', [], 'array');
 		$locator = $this->input->getString('segment_locator');
-		$segmentCode = $this->input->getCmd('segment_code');
+		$segmentCode = $this->input->getCmd('segment_code', '');
 
 		try {
 			$this->getModel('Matchresult')->mutateResult($matchId, is_array($data) ? $data : [], $operation, $locator, $segmentCode);
@@ -76,7 +76,7 @@ final class MatchresultController extends BaseController
 			} catch (\Throwable $preserveException) {
 				Log::add($preserveException->getMessage(), Log::ERROR, 'com_joomleague');
 			}
-			$this->app->enqueueMessage(Text::_('COM_JOOMLEAGUE_MATCHRESULT_SAVE_FAILED'), 'error');
+			$this->app->enqueueMessage(Text::_($exception instanceof MatchResultValidationException ? $exception->getLanguageKey() : 'COM_JOOMLEAGUE_MATCHRESULT_SAVE_FAILED'), 'error');
 			$this->setRedirect(Route::_('index.php?option=com_joomleague&view=matchresult&match_id=' . $matchId, false));
 			return;
 		}

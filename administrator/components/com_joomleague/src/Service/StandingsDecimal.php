@@ -37,6 +37,28 @@ final class StandingsDecimal
 		return $leftNegative ? -$result : $result;
 	}
 
+	/** Compare fractions exactly, without rounding or overflowing integer products. */
+	public static function compareRatios(string $leftNumerator, string $leftDenominator, string $rightNumerator, string $rightDenominator): int
+	{
+		$a = self::scaled($leftNumerator); $b = self::scaled($leftDenominator);
+		$c = self::scaled($rightNumerator); $d = self::scaled($rightDenominator);
+		if ($b === '0' || $d === '0') throw new \InvalidArgumentException('Cannot compare a ratio with zero denominator.');
+		$leftNegative = $a !== '0' && (str_starts_with($a, '-') !== str_starts_with($b, '-'));
+		$rightNegative = $c !== '0' && (str_starts_with($c, '-') !== str_starts_with($d, '-'));
+		if ($leftNegative !== $rightNegative) return $leftNegative ? -1 : 1;
+		$a = ltrim($a, '-'); $b = ltrim($b, '-'); $c = ltrim($c, '-'); $d = ltrim($d, '-');
+		$direction = $leftNegative ? -1 : 1;
+		while (true) {
+			[$left, $leftRemainder] = self::divideAbs($a, $b);
+			[$right, $rightRemainder] = self::divideAbs($c, $d);
+			$comparison = self::compareAbs($left, $right);
+			if ($comparison !== 0) return $direction * $comparison;
+			if ($leftRemainder === '0' || $rightRemainder === '0') return $direction * (($leftRemainder !== '0') <=> ($rightRemainder !== '0'));
+			[$a, $b, $c, $d] = [$b, $leftRemainder, $d, $rightRemainder];
+			$direction = -$direction;
+		}
+	}
+
 	public static function divide(string|int $numerator, string|int $denominator, int $scale = 9): ?string
 	{
 		if ($scale < 0 || $scale > 9) throw new \InvalidArgumentException('Standings decimal scale is invalid.');

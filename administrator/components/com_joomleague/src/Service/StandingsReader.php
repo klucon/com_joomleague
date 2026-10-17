@@ -62,7 +62,12 @@ final class StandingsReader
 			if (!$stage) throw new \InvalidArgumentException('Standings stage does not belong to the project.');
 		}
 		$canonicalStageId = $stage === null ? null : (int) $stage->id;
-		$profile = json_decode((string) $project->payload_json, true, 512, JSON_THROW_ON_ERROR); $standings = $profile['standings'] ?? null;
+		$profile = json_decode((string) $project->payload_json, true, 512, JSON_THROW_ON_ERROR);
+		if (($profile['code'] ?? '') === 'carom' && isset($profile['standings']['tie_breaks'])) {
+			$profile = (new \Joomleague\Component\Joomleague\Administrator\Service\ProjectRuleConfigRepository($this->database))->resolve((int) $projectId, $profile);
+			$profile['standings']['calculation'] = (new CaromStandingsContract())->resolve($profile);
+		}
+		$standings = $profile['standings'] ?? null;
 		if (!is_array($standings)) throw new \UnexpectedValueException('Project profile has no standings contract.');
 		if (!is_array($standings['calculation'] ?? null)) {
 			$query = $this->database->getQuery(true)->select('payload_json')->from($this->database->quoteName('#__joomleague_sport_profile_version'))->where('profile_id = :profile')->where('state = ' . $this->database->quote('active'))->bind(':profile', $project->profile_id, ParameterType::INTEGER)->order('id DESC');
@@ -122,6 +127,7 @@ final class StandingsReader
 			->where('round.published = 1')
 			->where('stage.published = 1')
 			->whereIn($this->database->quoteName('result.status_code'), $includedStatuses, ParameterType::STRING)
+			->where("match.status_code <> 'cancelled'")
 			->order('match.scheduled_start DESC')
 			->bind(':project', $projectId, ParameterType::INTEGER);
 

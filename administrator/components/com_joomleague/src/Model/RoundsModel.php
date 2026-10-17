@@ -41,6 +41,6 @@ final class RoundsModel extends ListModel
 		$lifecycle = trim((string) $this->getState('filter.lifecycle_state')); if ($lifecycle !== '') $query->where('a.lifecycle_state = :lifecycle')->bind(':lifecycle', $lifecycle);
 		$search = trim((string) $this->getState('filter.search'));
 		if ($search !== '') { if (str_starts_with($search, 'id:')) { $id = (int) substr($search, 3); $query->where('a.id = :id')->bind(':id', $id, ParameterType::INTEGER); } else { $search = '%' . $search . '%'; $query->where('(a.name LIKE :name OR a.code LIKE :code OR a.round_type LIKE :type)')->bind(':name', $search)->bind(':code', $search)->bind(':type', $search); } }
-		$query->order($db->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . ($this->getState('list.direction') === 'desc' ? 'DESC' : 'ASC')); return $query;
+		$query->order($db->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC')); return $query;
 	}
 }

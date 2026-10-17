@@ -6,6 +6,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
+use Joomleague\Component\Joomleague\Domain\Service\DecimalDisplayFormatter;
 
 defined('_JEXEC') or die;
 
@@ -13,7 +14,7 @@ defined('_JEXEC') or die;
 $plan = $this->plan;
 $locale = str_replace('-', '_', Factory::getLanguage()->getTag());
 $formatter = new IntlDateFormatter($locale, IntlDateFormatter::LONG, IntlDateFormatter::SHORT);
-$formatScore = static fn ($value): string => $value === null ? '' : rtrim(rtrim((string) $value, '0'), '.');
+$formatScore = static fn ($value): string => $value === null ? '' : DecimalDisplayFormatter::format($value);
 ?>
 <div class="com-joomleague-clubplan">
 	<?php if (isset($plan['error'])) : ?>

@@ -22,7 +22,7 @@ final class Dispatcher extends AbstractModuleDispatcher implements HelperFactory
 		}
 
 		$data = parent::getLayoutData();
-		$data['calendar'] = $this->getHelperFactory()->getHelper('CalendarHelper')->getCalendar($data['params']);
+		$data['calendar'] = $this->getHelperFactory()->getHelper('CalendarHelper')->getCalendar($data['params'], (int) $this->module->id);
 
 		return $data;
 	}

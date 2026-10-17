@@ -33,7 +33,7 @@ final class NavigationHelper
 				$projectId,
 				$app->getIdentity()->getAuthorisedViewLevels()
 			);
-		} catch (\Throwable) {
+		} catch (\Throwable $moduleFailure) { \Joomla\CMS\Log\Log::add('mod_joomleague_navigation failure: ' . get_debug_type($moduleFailure), \Joomla\CMS\Log\Log::WARNING, 'com_joomleague.modules');
 			return ['error' => 'MOD_JOOMLEAGUE_NAVIGATION_UNAVAILABLE'];
 		}
 

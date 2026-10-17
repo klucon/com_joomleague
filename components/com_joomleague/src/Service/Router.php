@@ -11,7 +11,6 @@ use Joomla\CMS\Categories\CategoryFactoryInterface;
 use Joomla\CMS\Component\Router\RouterView;
 use Joomla\CMS\Component\Router\RouterViewConfiguration;
 use Joomla\CMS\Component\Router\Rules\MenuRules;
-use Joomla\CMS\Component\Router\Rules\NomenuRules;
 use Joomla\CMS\Component\Router\Rules\StandardRules;
 use Joomla\CMS\Menu\AbstractMenu;
 use Joomla\CMS\Filter\OutputFilter;
@@ -28,7 +27,7 @@ final class Router extends RouterView
 		private readonly DatabaseInterface $database
 	)
 	{
-		foreach (['projects', 'clubs', 'venues', 'participants', 'about'] as $view) {
+		foreach (['projects', 'clubs', 'venues', 'participants', 'aboutjoomleague'] as $view) {
 			$this->registerView(new RouterViewConfiguration($view));
 		}
 
@@ -42,7 +41,7 @@ final class Router extends RouterView
 			'standingprogression' => 'project_id',
 			'statisticsoverview' => 'project_id',
 			'team' => 'team_id', 'club' => 'club_id', 'person' => 'person_id', 'venue' => 'venue_id',
-			'eventreport' => 'event_id', 'programitem' => 'match_id', 'participant' => 'entry_id', 'teamplan' => 'entry_id', 'clubplan' => 'club_id', 'nextmatch' => 'project_id',
+			'eventreport' => 'event_id', 'programitem' => 'match_id', 'participant' => 'entry_id', 'teamplan' => 'entry_id', 'clubplan' => 'club_id', 'clubrivals' => 'club_id', 'clubpeople' => 'club_id', 'clubstaffhistory' => 'club_id', 'nextmatch' => 'project_id',
 		] as $view => $key) {
 			$this->registerView((new RouterViewConfiguration($view))->setKey($key));
 		}
@@ -50,7 +49,10 @@ final class Router extends RouterView
 		parent::__construct($app, $menu);
 		$this->attachRule(new MenuRules($this));
 		$this->attachRule(new StandardRules($this));
-		$this->attachRule(new NomenuRules($this));
+		$this->attachRule(new LocalizedNomenuRules($this, new RouteAliasRegistry(
+			$app->getLanguage()->getTag(),
+			(bool) $app->get('unicodeslugs', false)
+		)));
 	}
 
 	public function getProjectSegment($id): array { return $this->entitySegment('#__joomleague_project', (int) $id); }
@@ -81,6 +83,10 @@ final class Router extends RouterView
 	public function getTeamId($segment): int { return $this->segmentId((string) $segment); }
 	public function getClubSegment($id): array { return $this->entitySegment('#__joomleague_club', (int) $id); }
 	public function getClubId($segment): int { return $this->segmentId((string) $segment); }
+	public function getClubpeopleSegment($id): array { return $this->getClubSegment($id); }
+	public function getClubpeopleId($segment): int { return $this->getClubId($segment); }
+	public function getClubstaffhistorySegment($id): array { return $this->getClubSegment($id); }
+	public function getClubstaffhistoryId($segment): int { return $this->getClubId($segment); }
 	public function getPersonSegment($id): array { return $this->entitySegment('#__joomleague_person', (int) $id); }
 	public function getPersonId($segment): int { return $this->segmentId((string) $segment); }
 	public function getVenueSegment($id): array { return $this->entitySegment('#__joomleague_venue', (int) $id); }
@@ -112,6 +118,8 @@ final class Router extends RouterView
 	public function getTeamplanId($segment): int { return $this->segmentId((string) $segment); }
 	public function getClubplanSegment($id): array { return $this->getClubSegment($id); }
 	public function getClubplanId($segment): int { return $this->segmentId((string) $segment); }
+	public function getClubrivalsSegment($id): array { return $this->getClubSegment($id); }
+	public function getClubrivalsId($segment): int { return $this->segmentId((string) $segment); }
 	public function getNextmatchSegment($id): array { return $this->getProjectSegment($id); }
 	public function getNextmatchId($segment): int { return $this->segmentId((string) $segment); }
 

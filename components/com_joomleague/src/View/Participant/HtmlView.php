@@ -19,6 +19,8 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomleague\Component\Joomleague\Site\Service\ProjectTemplateProvider;
+use Joomleague\Component\Joomleague\Site\Service\PublicViewGuard;
+use Joomleague\Component\Joomleague\Site\Service\SeoMetadata;
 
 final class HtmlView extends BaseHtmlView
 {
@@ -30,7 +32,11 @@ final class HtmlView extends BaseHtmlView
 	public function display($tpl = null): void
 	{
 		$this->participant = $this->getModel()->getParticipant();
+		PublicViewGuard::requireItem($this->participant, 'participant');
 		if (isset($this->participant['participant'])) {
+			$item = $this->participant['participant'];
+			\Joomleague\Component\Joomleague\Site\Service\MediaResolver::participant($item);
+			foreach ($this->participant['members'] as $member) $member->picture = \Joomleague\Component\Joomleague\Site\Service\MediaResolver::image('person', $member->picture);
 			$provider = new ProjectTemplateProvider(Factory::getContainer()->get(DatabaseInterface::class));
 			$projectId = (int) $this->participant['participant']->project_id;
 			$this->templateConfig = $provider->supports($projectId, 'participant') ? $provider->resolve($projectId, 'participant') : [];
@@ -38,7 +44,11 @@ final class HtmlView extends BaseHtmlView
 		$title = isset($this->participant['participant'])
 			? (string) $this->participant['participant']->display_name
 			: Text::_('COM_JOOMLEAGUE_PARTICIPANT_VIEW_TITLE');
-		$this->getDocument()->setTitle($title);
+		$item = $this->participant['participant'];
+		(new SeoMetadata())->applyView($this->getDocument(), 'participant', [
+			'project_id' => (int) $item->project_id,
+			'entry_id' => (int) $item->id,
+		], $title, Text::sprintf('COM_JOOMLEAGUE_SEO_ENTITY_DESCRIPTION', Text::_('COM_JOOMLEAGUE_PARTICIPANT_VIEW_TITLE'), $title));
 		parent::display($tpl);
 	}
 }

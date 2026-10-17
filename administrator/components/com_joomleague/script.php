@@ -11,6 +11,7 @@ use Joomla\Filesystem\File;
 use Joomleague\Component\Joomleague\Administrator\Service\ExactDecimal;
 use Joomleague\Component\Joomleague\Administrator\Service\ProjectRuleValidator;
 use Joomleague\Component\Joomleague\Administrator\Service\EntryModelValidator;
+use Joomleague\Component\Joomleague\Administrator\Service\RoleDomain;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsContractValidator;
 use Joomleague\Component\Joomleague\Administrator\Service\SportProfileSchemaValidator;
 
@@ -18,16 +19,16 @@ defined('_JEXEC') or die;
 
 final class Com_JoomleagueInstallerScript
 {
-	private const DEVELOPMENT_PROFILE_SYNC = true;
 
 	private const SCHEMA_TABLES = [
-		'sport_profile', 'sport_profile_version', 'sport_type', 'sport_position', 'event_type', 'statistic',
+		'sport_profile', 'sport_profile_version', 'sport_category', 'sport_category_lock', 'sport_profile_category', 'sport_variant', 'sport_variant_version', 'sport_type', 'sport_position', 'event_type', 'statistic',
 		'position_event_type', 'position_statistic', 'profile_template_config', 'competition', 'season', 'project',
-		'project_stage', 'project_round', 'project_rule_config', 'project_template_config', 'club', 'venue', 'team',
+		'project_stage', 'project_round', 'project_rule_config', 'project_template_config', 'project_profile_migration', 'club', 'venue', 'team',
 		'organization_name_history', 'organization_media_history', 'person', 'project_entry', 'stage_entry',
 		'project_match', 'match_participant', 'match_result', 'match_score_segment', 'match_score_value',
 		'project_entry_member', 'match_lineup_member', 'match_lineup_change', 'project_actor_role',
-		'match_actor_role', 'match_event', 'match_statistic_value', 'standing_adjustment', 'standing_snapshot',
+		'match_duel', 'match_duel_member', 'match_encounter_revision',
+		'match_actor_role', 'match_actor_role_change', 'match_event', 'match_statistic_value', 'standing_adjustment', 'standing_snapshot',
 		'standing_snapshot_row', 'standing_current', 'standing_freshness', 'stage_transition', 'stage_transition_run',
 		'stage_transition_assignment', 'schedule_generation', 'schedule_generation_match', 'migration_batch',
 		'migration_record', 'migration_issue',
@@ -42,6 +43,13 @@ final class Com_JoomleagueInstallerScript
 
 	private const OBSOLETE_MEDIA_FILES = [
 		'joomleague.joomla.asset.json',
+	];
+
+	private const OBSOLETE_SITE_FILES = [
+		'src/Model/AboutModel.php',
+		'src/View/About/HtmlView.php',
+		'tmpl/about/default.php',
+		'tmpl/about/default.xml',
 	];
 
 	public function preflight(string $type, ComponentAdapter $adapter): bool
@@ -101,6 +109,7 @@ final class Com_JoomleagueInstallerScript
 		$nonEmpty = [];
 
 		foreach ($existing as $table) {
+			if ($table === $database->replacePrefix('#__joomleague_sport_category_lock')) continue;
 			$count = (int) $database->setQuery(
 				'SELECT COUNT(*) FROM ' . $database->quoteName($table)
 			)->loadResult();
@@ -148,12 +157,14 @@ final class Com_JoomleagueInstallerScript
 
 	public function postflight(string $type, ComponentAdapter $adapter): bool
 	{
+		Factory::getApplication()->getLanguage()->load('com_joomleague', JPATH_ADMINISTRATOR, null, true);
 		if (!in_array($type, ['install', 'update'], true)) {
 			return true;
 		}
 
 		$this->removeObsoleteFiles();
 		try {
+			$this->ensureMediaDirectories();
 			$this->synchroniseBundledProfiles();
 			$this->synchroniseGuidedTours();
 		} catch (Throwable $exception) {
@@ -163,6 +174,19 @@ final class Com_JoomleagueInstallerScript
 		}
 
 		return true;
+	}
+
+	private function ensureMediaDirectories(): void
+	{
+		require_once (defined('JPATH_ADMINISTRATOR') ? JPATH_ADMINISTRATOR . '/components/com_joomleague' : __DIR__) . '/src/Service/MediaPathResolver.php';
+		$base = (string) \Joomla\CMS\Component\ComponentHelper::getParams('com_joomleague')->get('images_base_path', 'images/com_joomleague');
+		try {
+			\Joomleague\Component\Joomleague\Domain\Service\MediaPathResolver::ensureDirectories(JPATH_ROOT, $base);
+		} catch (InvalidArgumentException $exception) {
+			throw new RuntimeException(Text::_('COM_JOOMLEAGUE_MEDIA_DIRECTORY_INVALID'), 0, $exception);
+		} catch (RuntimeException $exception) {
+			throw new RuntimeException(Text::sprintf('COM_JOOMLEAGUE_MEDIA_DIRECTORY_CREATE_FAILED', $base), 0, $exception);
+		}
 	}
 
 	private function synchroniseGuidedTours(): void
@@ -336,6 +360,7 @@ final class Com_JoomleagueInstallerScript
 			ExactDecimal::class => 'ExactDecimal.php',
 			ProjectRuleValidator::class => 'ProjectRuleValidator.php',
 			EntryModelValidator::class => 'EntryModelValidator.php',
+			RoleDomain::class => 'RoleDomain.php',
 			StandingsContractValidator::class => 'StandingsContractValidator.php',
 			SportProfileSchemaValidator::class => 'SportProfileSchemaValidator.php',
 		];
@@ -362,6 +387,7 @@ final class Com_JoomleagueInstallerScript
 	{
 		$groups = [
 			JPATH_ADMINISTRATOR . '/components/com_joomleague/' => self::OBSOLETE_ADMIN_FILES,
+			JPATH_ROOT . '/components/com_joomleague/' => self::OBSOLETE_SITE_FILES,
 			JPATH_ROOT . '/media/com_joomleague/' => self::OBSOLETE_MEDIA_FILES,
 		];
 
@@ -466,14 +492,11 @@ final class Com_JoomleagueInstallerScript
 
 		if ($existingChecksum !== null) {
 			if (!hash_equals($existingChecksum, $profile['checksum'])) {
-				if (!self::DEVELOPMENT_PROFILE_SYNC) throw new RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_PROFILE_VERSION_IMMUTABLE'));
-				if (!$this->updateDevelopmentProfileVersion($database, (int) $profileId, $profile)) throw new RuntimeException(Text::_('COM_JOOMLEAGUE_ERROR_PROFILE_VERSION_IMMUTABLE'));
+				throw new RuntimeException(Text::sprintf('COM_JOOMLEAGUE_ERROR_PROFILE_VERSION_CONFLICT', $data['code'], $data['version']));
 			}
 
 			return;
 		}
-
-		if (self::DEVELOPMENT_PROFILE_SYNC && $this->updateDevelopmentProfileVersion($database, (int) $profileId, $profile)) return;
 
 		$superseded = 'superseded';
 		$query = $database->getQuery(true)
@@ -502,37 +525,6 @@ final class Com_JoomleagueInstallerScript
 			->bind(':source', $source)
 			->bind(':state', $state);
 		$database->setQuery($query)->execute();
-	}
-
-	/** @param array{data: array<string, mixed>, payload: string, checksum: string, file: string} $profile */
-	private function updateDevelopmentProfileVersion(DatabaseInterface $database, int $profileId, array $profile): bool
-	{
-		$query = $database->getQuery(true)
-			->select($database->quoteName('id'))
-			->from($database->quoteName('#__joomleague_sport_profile_version'))
-			->where($database->quoteName('profile_id') . ' = :profile_id')
-			->where($database->quoteName('source') . ' = ' . $database->quote('bundled'))
-			->where($database->quoteName('state') . ' = ' . $database->quote('active'))
-			->bind(':profile_id', $profileId);
-		$versionId = $database->setQuery($query)->loadResult();
-
-		if ($versionId === null) return false;
-		$data = $profile['data'];
-		$query = $database->getQuery(true)
-			->update($database->quoteName('#__joomleague_sport_profile_version'))
-			->set($database->quoteName('schema_version') . ' = :schema_version')
-			->set($database->quoteName('profile_version') . ' = :profile_version')
-			->set($database->quoteName('payload_json') . ' = :payload_json')
-			->set($database->quoteName('payload_checksum') . ' = :payload_checksum')
-			->where($database->quoteName('id') . ' = :id')
-			->bind(':schema_version', $data['schema_version'])
-			->bind(':profile_version', $data['version'])
-			->bind(':payload_json', $profile['payload'])
-			->bind(':payload_checksum', $profile['checksum'])
-			->bind(':id', $versionId);
-		$database->setQuery($query)->execute();
-
-		return true;
 	}
 
 	private function findProfileId(DatabaseInterface $database, string $code): ?int

@@ -26,6 +26,6 @@ foreach (glob($directory . '/*.json') ?: [] as $file) {
 	$expectedTypes[$type]++;
 }
 
-if ($expectedTypes !== ['numeric_score' => 8, 'nested_score' => 4, 'time_result' => 2, 'decision_result' => 1]) throw new RuntimeException('Editor schema coverage does not match all profiles.');
+if ($expectedTypes !== ['numeric_score' => 8, 'nested_score' => 6, 'time_result' => 2, 'decision_result' => 1]) throw new RuntimeException('Editor schema coverage does not match all profiles.');
 
 echo 'Match result editor schemas OK: ' . json_encode($expectedTypes, JSON_THROW_ON_ERROR) . "\n";

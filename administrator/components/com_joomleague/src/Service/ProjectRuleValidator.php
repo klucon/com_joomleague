@@ -27,6 +27,9 @@ final class ProjectRuleValidator
 			}
 
 			$type = $definition['type'] ?? null;
+			if (isset($definition['name_key']) && (!is_string($definition['name_key']) || preg_match('/^COM_JOOMLEAGUE_[A-Z0-9_]+$/D', $definition['name_key']) !== 1)) {
+				throw new \UnexpectedValueException('Project-rule label must be a JoomLeague language key.');
+			}
 
 			if (!in_array($type, ['boolean', 'integer', 'number', 'string', 'array'], true)) {
 				throw new \UnexpectedValueException(sprintf('Project-rule field "%s" has an unsupported type.', $pointer));
@@ -47,6 +50,7 @@ final class ProjectRuleValidator
 			}
 
 			if (isset($definition['enum'])) {
+				if (isset($definition['enum_label_prefix']) && (!is_string($definition['enum_label_prefix']) || preg_match('/^COM_JOOMLEAGUE_[A-Z0-9_]+_$/D', $definition['enum_label_prefix']) !== 1)) throw new \UnexpectedValueException('Invalid project-rule enum label prefix.');
 				foreach ($definition['enum'] as $enumValue) {
 					$enumTypeValid = match ($type) {
 						'integer' => is_int($enumValue),

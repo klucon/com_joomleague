@@ -42,6 +42,7 @@ final class TeamModel extends BaseDatabaseModel
 					'team.id', 'team.name', 'team.middle_name', 'team.short_name', 'team.website',
 					'team.logo', 'team.picture', 'team.description',
 					$db->quoteName('club.id', 'club_id'), $db->quoteName('club.name', 'club_name'),
+					$db->quoteName('club.logo', 'club_logo'),
 				])
 				->from($db->quoteName('#__joomleague_team', 'team'))
 				->leftJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = team.club_id AND club.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'club'))
@@ -54,6 +55,9 @@ final class TeamModel extends BaseDatabaseModel
 		if (!$team) {
 			return ['error' => 'COM_JOOMLEAGUE_TEAM_UNAVAILABLE'];
 		}
+
+		$team->logo = \Joomleague\Component\Joomleague\Site\Service\MediaResolver::image('team', $team->logo, $team->club_logo, $team->picture);
+		$team->picture = \Joomleague\Component\Joomleague\Site\Service\MediaResolver::image('', $team->picture);
 
 		$projects = $db->setQuery(
 			$db->getQuery(true)

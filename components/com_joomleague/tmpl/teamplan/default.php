@@ -14,6 +14,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
+use Joomleague\Component\Joomleague\Domain\Service\DecimalDisplayFormatter;
 
 defined('_JEXEC') or die;
 
@@ -24,8 +25,7 @@ $formatScore = static function ($own, $opponent): string {
     if ($own === null || $opponent === null) {
         return Text::_('JNONE');
     }
-    $format = static fn ($value): string => rtrim(rtrim((string) $value, '0'), '.');
-    return $format($own) . ':' . $format($opponent);
+    return DecimalDisplayFormatter::format($own) . ':' . DecimalDisplayFormatter::format($opponent);
 };
 
 // win/draw/loss from the entry's own point of view — used purely to colour

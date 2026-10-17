@@ -7,27 +7,27 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
+use Joomleague\Component\Joomleague\Domain\Service\PublicHtmlSanitizer;
 
 defined('_JEXEC') or die;
 
 /** @var Joomleague\Component\Joomleague\Site\View\Eventreport\HtmlView $this */
 $data = $this->programItem;
 $config = $this->templateConfig;
+$valueTypes = ['result' => ''];
+$profile = json_decode((string) ($data['item']->profile_payload_json ?? '{}'), true) ?: [];
+$valueTypes['result'] = (string) ($profile['match']['score']['value_type'] ?? '');
+foreach ($profile['match']['score']['segment_types'] ?? [] as $type) $valueTypes[$type['code']] = (string) ($type['value_type'] ?? '');
+$formatNumber = static fn ($value): string => \Joomleague\Component\Joomleague\Domain\Service\DecimalDisplayFormatter::format($value);
 
-$formatNumber = static function ($value): string {
-	return rtrim(rtrim(number_format((float) $value, 9, '.', ''), '0'), '.');
-};
-
-$formatValue = static function (object $value) use ($formatNumber): string {
+$formatValue = static function (object $value, string $level = 'result') use ($formatNumber, $valueTypes): string {
 	if ($value->numeric_value !== null) {
-		return $formatNumber($value->numeric_value);
+		return ($valueTypes[$level] ?? '') === 'duration'
+			? \Joomleague\Component\Joomleague\Administrator\Service\MatchResultDuration::format((string) $value->numeric_value)
+			: $formatNumber($value->numeric_value);
 	}
-	if ($value->text_value !== null && $value->text_value !== '') {
-		return (string) $value->text_value;
-	}
-	if ($value->status_code !== null && $value->status_code !== '') {
-		return (string) $value->status_code;
-	}
+	if ($value->text_value !== null && $value->text_value !== '') return (string) $value->text_value;
+	if ($value->status_code !== null && $value->status_code !== '') return Text::_('COM_JOOMLEAGUE_RESULT_CODE_' . strtoupper((string) $value->status_code));
 	return $value->result_rank !== null ? '#' . (int) $value->result_rank : Text::_('JNONE');
 };
 
@@ -35,7 +35,7 @@ $statusLabel = static function (?string $status): string {
 	$key = match ($status) {
 		'scheduled' => 'COM_JOOMLEAGUE_EVENTREPORT_STATUS_SCHEDULED',
 		'in_progress' => 'COM_JOOMLEAGUE_EVENTREPORT_STATUS_IN_PROGRESS',
-		'finished', 'final' => 'COM_JOOMLEAGUE_EVENTREPORT_STATUS_FINISHED',
+		'finished', 'final', 'completed' => 'COM_JOOMLEAGUE_EVENTREPORT_STATUS_FINISHED',
 		'postponed' => 'COM_JOOMLEAGUE_EVENTREPORT_STATUS_POSTPONED',
 		'cancelled' => 'COM_JOOMLEAGUE_EVENTREPORT_STATUS_CANCELLED',
 		'abandoned' => 'COM_JOOMLEAGUE_EVENTREPORT_STATUS_ABANDONED',
@@ -80,14 +80,17 @@ $sectionOrder = $sectionOrders[$sectionOrderCode] ?? $sectionOrders['standard'];
 			}
 		}
 		$lineupByParticipant = [];
+		$visibleLineupCount = 0;
 		foreach ($data['lineup'] as $member) {
-			if (($member->member_person_type === 'staff' && !($config['show_staff'] ?? true))
-				|| ($member->member_person_type !== 'staff' && !($config['show_lineups'] ?? true))) {
+			$group = $member->member_person_type === 'staff' ? 'staff' : 'players';
+			if (($group === 'staff' && !($config['show_staff'] ?? true))
+				|| ($group === 'players' && !($config['show_lineups'] ?? true))) {
 				continue;
 			}
-			$lineupByParticipant[(int) $member->match_participant_id][] = $member;
+			$lineupByParticipant[(int) $member->match_participant_id][$group][] = $member;
+			$visibleLineupCount++;
 		}
-		if ($lineupByParticipant === []) {
+		if ($visibleLineupCount === 0) {
 			$data['lineup'] = [];
 		}
 		$changesByParticipant = [];
@@ -160,7 +163,7 @@ $sectionOrder = $sectionOrders[$sectionOrderCode] ?? $sectionOrders['standard'];
 						$resultValue = $rootSegment ? ($data['valuesBySegment'][(int) $rootSegment->id][(int) $participant->id] ?? null) : null;
 					?>
 						<div class="col"><div class="card h-100"><div class="card-body d-flex align-items-center justify-content-between gap-3">
-							<div><span class="badge text-bg-light border me-2"><?php echo (int) $participant->slot_number; ?></span><a class="fw-semibold" href="<?php echo Route::_('index.php?option=com_joomleague&view=participant&project_id=' . (int) $item->project_id . '&entry_id=' . (int) $participant->entry_id); ?>"><?php echo htmlspecialchars((string) $participant->name, ENT_QUOTES, 'UTF-8'); ?></a><?php if ($participant->result_status) : ?><div class="small text-body-secondary mt-1"><?php echo htmlspecialchars((string) $participant->result_status, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?></div>
+							<div><a class="fw-semibold" href="<?php echo Route::_('index.php?option=com_joomleague&view=participant&project_id=' . (int) $item->project_id . '&entry_id=' . (int) $participant->entry_id); ?>"><?php echo htmlspecialchars((string) $participant->name, ENT_QUOTES, 'UTF-8'); ?></a><?php if ($participant->result_status) : ?><div class="small text-body-secondary mt-1"><?php echo htmlspecialchars((string) $participant->result_status, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?></div>
 							<div class="text-end"><?php if ($resultValue) : ?><div class="fs-3 fw-bold"><?php echo htmlspecialchars($formatValue($resultValue), ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?><?php if ($participant->result_rank) : ?><span class="badge text-bg-primary">#<?php echo (int) $participant->result_rank; ?></span><?php endif; ?></div>
 						</div></div></div>
 					<?php endforeach; ?>
@@ -168,11 +171,32 @@ $sectionOrder = $sectionOrders[$sectionOrderCode] ?? $sectionOrders['standard'];
 			<?php endif; ?>
 		</section>
 
-		<?php if ($data['segments'] !== []) : ?><section class="mb-4"><h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_RESULT'); ?></h2><div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_SEGMENT'); ?></th><?php foreach ($participants as $participant) : ?><th scope="col" class="text-end"><?php echo htmlspecialchars((string) $participant->name, ENT_QUOTES, 'UTF-8'); ?></th><?php endforeach; ?></tr></thead><tbody><?php foreach ($data['segments'] as $segment) : ?><tr><th scope="row"><?php echo htmlspecialchars($segmentLabel($segment), ENT_QUOTES, 'UTF-8'); ?><?php if ($segment->parent_id !== null) : ?> <?php echo (int) $segment->sequence_number; ?><?php endif; ?></th><?php foreach ($participants as $participant) : $value = $data['valuesBySegment'][(int) $segment->id][(int) $participant->id] ?? null; ?><td class="text-end fw-semibold"><?php echo $value ? htmlspecialchars($formatValue($value), ENT_QUOTES, 'UTF-8') : Text::_('JNONE'); ?></td><?php endforeach; ?></tr><?php endforeach; ?></tbody></table></div><?php if ($item->result_notes) : ?><p class="text-body-secondary"><?php echo nl2br(htmlspecialchars((string) $item->result_notes, ENT_QUOTES, 'UTF-8')); ?></p><?php endif; ?></section><?php endif; ?>
+		<?php if ($data['segments'] !== []) : ?><section class="mb-4"><h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_RESULT'); ?></h2><?php if (($data['isTeamEncounter'] ?? false) && count($participants) === 2) : require __DIR__ . '/encounter.php'; else : ?><div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th scope="col"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_SEGMENT'); ?></th><?php foreach ($participants as $participant) : ?><th scope="col" class="text-end"><?php echo htmlspecialchars((string) $participant->name, ENT_QUOTES, 'UTF-8'); ?></th><?php endforeach; ?></tr></thead><tbody><?php foreach ($data['segments'] as $segment) : ?><tr><th scope="row"><?php echo htmlspecialchars($segmentLabel($segment), ENT_QUOTES, 'UTF-8'); ?><?php if ($segment->parent_id !== null) : ?> <?php echo (int) $segment->sequence_number; ?><?php endif; ?></th><?php foreach ($participants as $participant) : $value = $data['valuesBySegment'][(int) $segment->id][(int) $participant->id] ?? null; ?><td class="text-end fw-semibold"><?php echo $value ? htmlspecialchars($formatValue($value, (string) $segment->level_code), ENT_QUOTES, 'UTF-8') : Text::_('JNONE'); ?><?php if ($segment->level_code === 'duel') : ?><div class="fw-normal"><?php foreach ($data['encounterMembers'][(int) $segment->sequence_number][(int) $participant->id] ?? [] as $member) : ?><?php if ($member->person_id) : ?><div><a href="<?php echo Route::_('index.php?option=com_joomleague&view=person&person_id=' . (int) $member->person_id); ?>"><?php echo htmlspecialchars(trim($member->first_name . ' ' . $member->last_name), ENT_QUOTES, 'UTF-8'); ?></a></div><?php else : ?><div><?php echo Text::_('COM_JOOMLEAGUE_ENCOUNTER_PRIVATE_PLAYER'); ?></div><?php endif; ?><?php endforeach; ?></div><?php endif; ?></td><?php endforeach; ?></tr><?php endforeach; ?></tbody></table></div><?php endif; ?><?php if ($item->result_notes) : ?><p class="text-body-secondary"><?php echo nl2br(htmlspecialchars((string) $item->result_notes, ENT_QUOTES, 'UTF-8')); ?></p><?php endif; ?></section><?php endif; ?>
 
 		<div class="d-flex flex-column">
 		<?php if ($data['lineup'] !== []) : ?>
-		<section class="mb-4 order-<?php echo (int) $sectionOrder['lineup']; ?>"><h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_LINEUP'); ?></h2><div class="row row-cols-1 row-cols-lg-2 g-3"><?php foreach ($participants as $participant) : if (($lineupByParticipant[(int) $participant->id] ?? []) === []) continue; ?><div class="col"><div class="card h-100"><div class="card-header fw-semibold"><?php echo htmlspecialchars((string) $participant->name, ENT_QUOTES, 'UTF-8'); ?></div><ul class="list-group list-group-flush"><?php foreach ($lineupByParticipant[(int) $participant->id] as $member) : ?><li class="list-group-item d-flex justify-content-between gap-3"><span><?php if ($member->shirt_number) : ?><span class="badge text-bg-light border me-2"><?php echo htmlspecialchars((string) $member->shirt_number, ENT_QUOTES, 'UTF-8'); ?></span><?php endif; ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=person&person_id=' . (int) $member->person_id); ?>"><?php echo htmlspecialchars((string) $member->name, ENT_QUOTES, 'UTF-8'); ?></a><?php if ($member->is_captain) : ?> <span class="badge text-bg-secondary"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_CAPTAIN'); ?></span><?php endif; ?></span><small class="text-body-secondary"><?php echo htmlspecialchars((string) ($member->role_code ?: $member->lineup_status), ENT_QUOTES, 'UTF-8'); ?></small></li><?php endforeach; ?></ul></div></div><?php endforeach; ?></div></section><?php endif; ?>
+		<section class="mb-4 order-<?php echo (int) $sectionOrder['lineup']; ?>">
+			<h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_LINEUP'); ?></h2>
+			<div class="row row-cols-1 row-cols-lg-2 g-3">
+				<?php foreach ($participants as $participant) :
+					$participantLineup = $lineupByParticipant[(int) $participant->id] ?? [];
+					if ($participantLineup === []) continue;
+				?>
+					<div class="col"><div class="card h-100">
+						<div class="card-header fw-semibold"><?php echo htmlspecialchars((string) $participant->name, ENT_QUOTES, 'UTF-8'); ?></div>
+						<?php foreach (['players' => 'COM_JOOMLEAGUE_EVENTREPORT_LINEUP_PLAYERS', 'staff' => 'COM_JOOMLEAGUE_EVENTREPORT_LINEUP_STAFF'] as $group => $groupLabel) :
+							$members = $participantLineup[$group] ?? [];
+							if ($members === []) continue;
+						?>
+							<div class="px-3 pt-3 pb-2 small fw-semibold text-body-secondary text-uppercase<?php echo $group === 'staff' ? ' border-top' : ''; ?>"><?php echo Text::_($groupLabel); ?></div>
+							<ul class="list-group list-group-flush">
+								<?php foreach ($members as $member) : ?><li class="list-group-item d-flex justify-content-between align-items-center gap-3"><span class="d-flex align-items-center flex-grow-1 min-width-0"><?php if ($group === 'players') : ?><span class="jl-lineup-shirt-number badge text-bg-light border me-2 d-inline-flex align-items-center justify-content-end flex-shrink-0" style="width: 2.75rem"><?php echo $member->shirt_number ? htmlspecialchars((string) $member->shirt_number, ENT_QUOTES, 'UTF-8') : '&nbsp;'; ?></span><?php endif; ?><span><a href="<?php echo Route::_('index.php?option=com_joomleague&view=person&person_id=' . (int) $member->person_id); ?>"><?php echo htmlspecialchars((string) $member->name, ENT_QUOTES, 'UTF-8'); ?></a><?php if ($member->is_captain) : ?> <span class="badge text-bg-secondary"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_CAPTAIN'); ?></span><?php endif; ?></span></span><small class="text-body-secondary text-end"><?php echo htmlspecialchars((string) ($member->role_name_key ? Text::_((string) $member->role_name_key) : ($member->role_name ?: $member->role_code ?: $member->lineup_status)), ENT_QUOTES, 'UTF-8'); ?></small></li><?php endforeach; ?>
+							</ul>
+						<?php endforeach; ?>
+					</div></div>
+				<?php endforeach; ?>
+			</div>
+		</section><?php endif; ?>
 
 		<?php if ($data['substitutions'] !== []) : ?><section class="mb-4 order-<?php echo (int) $sectionOrder['substitutions']; ?>"><h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_CHANGES'); ?></h2><div class="list-group"><?php foreach ($participants as $participant) : foreach ($changesByParticipant[(int) $participant->id] ?? [] as $change) : ?><div class="list-group-item"><div class="d-flex flex-wrap justify-content-between gap-2"><strong><?php echo htmlspecialchars((string) $participant->name, ENT_QUOTES, 'UTF-8'); ?></strong><?php if ($change->clock_value !== null) : ?><span class="badge text-bg-light border"><?php echo htmlspecialchars($formatNumber($change->clock_value) . ' ' . (string) $change->clock_unit, ENT_QUOTES, 'UTF-8'); ?></span><?php endif; ?></div><div class="mt-1"><span class="text-danger"><span class="icon-arrow-down" aria-hidden="true"></span> <?php echo htmlspecialchars((string) $change->outgoing_name, ENT_QUOTES, 'UTF-8'); ?></span><span class="mx-2" aria-hidden="true">/</span><span class="text-success"><span class="icon-arrow-up" aria-hidden="true"></span> <?php echo htmlspecialchars((string) $change->incoming_name, ENT_QUOTES, 'UTF-8'); ?></span></div><?php if ($change->notes) : ?><small class="text-body-secondary"><?php echo htmlspecialchars((string) $change->notes, ENT_QUOTES, 'UTF-8'); ?></small><?php endif; ?></div><?php endforeach; endforeach; ?></div></section><?php endif; ?>
 
@@ -195,11 +219,11 @@ $sectionOrder = $sectionOrders[$sectionOrderCode] ?? $sectionOrders['standard'];
 			</section>
 		<?php endif; ?>
 
-		<?php if ($data['officials'] !== [] && ($config['show_officials'] ?? true)) : ?><section class="mb-4 order-<?php echo (int) $sectionOrder['officials']; ?>"><h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_OFFICIALS'); ?></h2><dl class="row"><?php foreach ($data['officials'] as $official) : ?><dt class="col-sm-4"><?php echo htmlspecialchars((string) $official->role_code, ENT_QUOTES, 'UTF-8'); ?></dt><dd class="col-sm-8"><?php echo htmlspecialchars((string) $official->display_name_snapshot, ENT_QUOTES, 'UTF-8'); ?></dd><?php endforeach; ?></dl></section><?php endif; ?>
+		<?php if ($data['officials'] !== [] && ($config['show_officials'] ?? true)) : ?><section class="mb-4 order-<?php echo (int) $sectionOrder['officials']; ?>"><h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_OFFICIALS'); ?></h2><dl class="row"><?php foreach ($data['officials'] as $official) : ?><dt class="col-sm-4"><?php echo htmlspecialchars($official->role_name_key ? Text::_((string) $official->role_name_key) : (string) $official->role_code, ENT_QUOTES, 'UTF-8'); ?></dt><dd class="col-sm-8"><?php if ((string) $official->actor_kind === 'person' && (int) $official->person_id > 0) : ?><a href="<?php echo Route::_('index.php?option=com_joomleague&view=person&person_id=' . (int) $official->person_id); ?>"><?php echo htmlspecialchars((string) $official->display_name_snapshot, ENT_QUOTES, 'UTF-8'); ?></a><?php else : ?><?php echo htmlspecialchars((string) $official->display_name_snapshot, ENT_QUOTES, 'UTF-8'); ?><?php endif; ?><?php if ($official->delegation_status === 'non_delegated') : ?> <span class="badge text-bg-warning"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_NON_DELEGATED'); ?></span><?php endif; ?></dd><?php endforeach; ?></dl></section><?php endif; ?>
 
 		</div>
 
-		<?php if ($item->description) : ?><section><h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_DESCRIPTION'); ?></h2><div><?php echo nl2br(htmlspecialchars((string) $item->description, ENT_QUOTES, 'UTF-8')); ?></div></section><?php endif; ?>
+		<?php if ($item->description) : ?><section><h2 class="h4"><?php echo Text::_('COM_JOOMLEAGUE_EVENTREPORT_DESCRIPTION'); ?></h2><div><?php echo PublicHtmlSanitizer::clean($item->description); ?></div></section><?php endif; ?>
 
 		<?php
 		$calendarPath = 'index.php?option=com_joomleague&task=ical.download&project_id=' . (int) $item->project_id . '&scope=event&event_id=' . (int) $item->id;

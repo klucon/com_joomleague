@@ -6,6 +6,11 @@
 		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_STAGE_ALIAS_DESC" maxlength="255" />
 		<field name="code" type="hidden" filter="cmd" />
 		<field name="stage_type" type="text" label="COM_JOOMLEAGUE_FIELD_STAGE_TYPE_LABEL" description="COM_JOOMLEAGUE_FIELD_STAGE_TYPE_DESC" required="true" maxlength="100" filter="cmd" />
+		<field name="encounter_decision_policy" type="list" label="COM_JOOMLEAGUE_STAGE_DECISION_LABEL" description="COM_JOOMLEAGUE_STAGE_DECISION_DESC" default="inherit" filter="cmd" validate="options">
+			<option value="inherit">COM_JOOMLEAGUE_STAGE_DECISION_INHERIT</option>
+			<option value="allow_draw">COM_JOOMLEAGUE_STAGE_DECISION_ALLOW_DRAW</option>
+			<option value="require_penalties">COM_JOOMLEAGUE_STAGE_DECISION_REQUIRE_PENALTIES</option>
+		</field>
 		<field name="sequence_number" type="number" label="COM_JOOMLEAGUE_FIELD_SEQUENCE_NUMBER_LABEL" description="COM_JOOMLEAGUE_FIELD_SEQUENCE_NUMBER_DESC" min="1" filter="integer" />
 		<field name="parent_id" type="stageparent" label="COM_JOOMLEAGUE_FIELD_PARENT_STAGE_LABEL" description="COM_JOOMLEAGUE_FIELD_PARENT_STAGE_DESC" filter="integer" />
 		<field name="start_date" type="calendar" label="COM_JOOMLEAGUE_FIELD_START_DATE_LABEL" description="COM_JOOMLEAGUE_FIELD_STAGE_START_DATE_DESC" format="%Y-%m-%d" filter="string" showtime="false" todaybutton="true" filltable="false" />

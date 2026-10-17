@@ -1,0 +1,530 @@
+{
+    "schema_version": "1.5.0",
+    "code": "carom",
+    "version": "1.6.0",
+    "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM",
+    "description_key": "COM_JOOMLEAGUE_PROFILE_CAROM_DESC",
+    "scoring_model": "team_encounter",
+    "project_types": [
+        "cup",
+        "tournament",
+        "league",
+        "friendly",
+        "combined_stage"
+    ],
+    "entry_model": {
+        "allowed_kinds": [
+            "team"
+        ],
+        "default_kind": "team",
+        "members_supported": true,
+        "member_person_types": [
+            "player",
+            "staff"
+        ]
+    },
+    "project_rule_schema": {
+        "schema_version": "1.0.0",
+        "fields": {
+            "/match/encounter/penalty_series/resolution": {"type": "string", "enum": ["sudden_death", "team_cycle"], "name_key": "COM_JOOMLEAGUE_CAROM_RULE_PENALTY_RESOLUTION", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_PENALTY_MODE_"},
+            "/match/encounter/penalty_series/cycle_length": {"type": "integer", "minimum": 1, "maximum": 64, "name_key": "COM_JOOMLEAGUE_CAROM_RULE_PENALTY_CYCLE"},
+            "/match/encounter/penalty_series/player_order": {"type": "string", "enum": ["manual", "ascending", "descending", "descending_last"], "name_key": "COM_JOOMLEAGUE_CAROM_RULE_PENALTY_ORDER", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_PENALTY_ORDER_"},
+            "/match/encounter/penalty_series/required": {
+                "type": "boolean",
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_PENALTY_REQUIRED"
+            },
+            "/match/encounter/penalty_series/maximum_points": {
+                "type": "integer", "minimum": 1, "maximum": 100000,
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_PENALTY_MAXIMUM"
+            },
+            "/standings/tie_breaks/first": {
+                "type": "string",
+                "enum": ["score_for", "score_difference", "caroms", "average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TIE_FIRST", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_CRITERION_"
+            },
+            "/standings/tie_breaks/second": {
+                "type": "string",
+                "enum": ["score_for", "score_difference", "caroms", "average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TIE_SECOND", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_CRITERION_"
+            },
+            "/standings/tie_breaks/third": {
+                "type": "string",
+                "enum": ["score_for", "score_difference", "caroms", "average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TIE_THIRD", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_CRITERION_"
+            },
+            "/standings/tie_breaks/fourth": {
+                "type": "string",
+                "enum": ["score_for", "score_difference", "caroms", "average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TIE_FOURTH", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_CRITERION_"
+            },
+            "/standings/tie_breaks/fifth": {
+                "type": "string",
+                "enum": ["score_for", "score_difference", "caroms", "average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TIE_FIFTH", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_CRITERION_"
+            },
+            "/standings/team_points/win": {
+                "type": "integer", "minimum": 0, "maximum": 1000,
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TEAM_WIN"
+            },
+            "/standings/team_points/draw": {
+                "type": "integer", "minimum": 0, "maximum": 1000,
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TEAM_DRAW"
+            },
+            "/standings/team_points/loss": {
+                "type": "integer", "minimum": 0, "maximum": 1000,
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TEAM_LOSS"
+            },
+            "/match/encounter/duel_points/win": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000,
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_GAME_WIN"
+            },
+            "/match/encounter/duel_points/draw": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000,
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_GAME_DRAW"
+            },
+            "/match/encounter/duel_points/loss": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000,
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_GAME_LOSS"
+            },
+            "/match/encounter/draw_supported": {
+                "type": "boolean",
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_DRAW_SUPPORTED"
+            },
+            "/match/encounter/game_rules/games_per_encounter": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 128,
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_GAMES_PER_ENCOUNTER"
+            },
+            "/match/encounter/game_rules/target_score": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000,
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TARGET_SCORE"
+            },
+            "/match/encounter/game_rules/inning_limit": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100000,
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_INNING_LIMIT"
+            },
+            "/match/encounter/game_rules/equal_innings": {
+                "type": "boolean",
+                "name_key": "COM_JOOMLEAGUE_CAROM_RULE_EQUAL_INNINGS"
+            }
+        },
+        "constraints": [
+            {
+                "code": "win_exceeds_loss",
+                "operator": "gte",
+                "left": {
+                    "terms": [
+                        {
+                            "path": "/match/encounter/duel_points/win"
+                        }
+                    ]
+                },
+                "right": {
+                    "terms": [
+                        {
+                            "path": "/match/encounter/duel_points/loss"
+                        }
+                    ],
+                    "constant": 1
+                }
+            },
+            {
+                "code": "draw_at_least_loss",
+                "operator": "gte",
+                "left": {
+                    "terms": [
+                        {
+                            "path": "/match/encounter/duel_points/draw"
+                        }
+                    ]
+                },
+                "right": {
+                    "terms": [
+                        {
+                            "path": "/match/encounter/duel_points/loss"
+                        }
+                    ]
+                }
+            },
+            {
+                "code": "draw_at_most_win",
+                "operator": "lte",
+                "left": {
+                    "terms": [
+                        {
+                            "path": "/match/encounter/duel_points/draw"
+                        }
+                    ]
+                },
+                "right": {
+                    "terms": [
+                        {
+                            "path": "/match/encounter/duel_points/win"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "match_structure": {
+        "type": "team_encounter",
+        "default_start_time": "10:00"
+    },
+    "lineup": {
+        "preferred_order": [
+            "player"
+        ]
+    },
+    "standings": {
+        "team_points": {"win": 3, "draw": 2, "loss": 1},
+        "tie_breaks": {
+            "first": "score_for", "second": "score_difference", "third": "average", "fourth": "caroms", "fifth": "high_run"
+        },
+        "sort_order": [
+            "points",
+            "score_for",
+            "score_difference",
+            "name"
+        ],
+        "columns": [
+            "rank",
+            "team",
+            "played",
+            "wins",
+            "draws",
+            "losses",
+            "points",
+            "score_for",
+            "score_against",
+            "caroms",
+            "innings",
+            "average",
+            "high_run"
+        ],
+        "type": "team_table",
+        "calculation": {
+            "mode": "head_to_head",
+            "outcome_source": "root_numeric",
+            "included_result_statuses": [
+                "final"
+            ],
+            "metrics": [
+                {
+                    "code": "points",
+                    "operation": "sum_awards",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "played",
+                    "operation": "count_matches",
+                    "value_type": "decimal"
+                },
+                {
+                    "code": "wins",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "win"
+                },
+                {
+                    "code": "draws",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "draw"
+                },
+                {
+                    "code": "losses",
+                    "operation": "count_outcome",
+                    "value_type": "decimal",
+                    "outcome": "loss"
+                },
+                {
+                    "code": "score_for",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "own"
+                },
+                {
+                    "code": "score_against",
+                    "operation": "sum_root",
+                    "value_type": "decimal",
+                    "perspective": "opponent"
+                },
+                {
+                    "code": "score_difference",
+                    "operation": "difference",
+                    "value_type": "decimal",
+                    "left_metric": "score_for",
+                    "right_metric": "score_against"
+                },
+                {
+                    "code": "caroms", "operation": "sum_statistic", "value_type": "decimal", "statistic_code": "caroms"
+                },
+                {
+                    "code": "innings", "operation": "sum_statistic", "value_type": "decimal", "statistic_code": "innings"
+                },
+                {
+                    "code": "average", "operation": "ratio", "value_type": "decimal", "left_metric": "caroms", "right_metric": "innings"
+                },
+                {
+                    "code": "high_run", "operation": "max_statistic", "value_type": "decimal", "statistic_code": "high_run"
+                }
+            ],
+            "awards": {
+                "mode": "outcome_rules",
+                "rule_strategy": "first_match",
+                "rules": [
+                    {
+                        "when": {
+                            "type": "always"
+                        },
+                        "values": {
+                            "winner": 3,
+                            "draw": 2,
+                            "loser": 1
+                        }
+                    }
+                ],
+                "bonus_rules": []
+            },
+            "ordering": [
+                {
+                    "metric": "points",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "score_for",
+                    "direction": "desc",
+                    "nulls": "last"
+                },
+                {
+                    "metric": "score_difference",
+                    "direction": "desc",
+                    "nulls": "last"
+                }
+            ],
+            "scopes": [
+                {
+                    "code": "total",
+                    "filter": {
+                        "type": "always"
+                    }
+                }
+            ]
+        }
+    },
+    "result_rules": {
+        "supports_forfeit": true,
+        "supports_postponed": true,
+        "supports_cancelled": true,
+        "supports_abandoned": true
+    },
+    "positions": [
+        {
+            "code": "player",
+            "person_type": "player",
+            "role_domain": "participant",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM_POSITION_PLAYER"
+        },
+        {
+            "code": "head_coach",
+            "person_type": "staff",
+            "role_domain": "team_staff",
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM_POSITION_HEAD_COACH"
+        },
+        {
+            "code": "referee",
+            "person_type": "official",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ],
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM_POSITION_REFEREE"
+        }
+    ],
+    "event_types": [],
+    "statistics": [
+        {
+            "code": "caroms",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_CAROMS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_CAROMS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "value_type": "integer",
+            "source": "manual_or_import"
+        },
+        {
+            "code": "innings",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_INNINGS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_INNINGS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "value_type": "integer",
+            "source": "manual_or_import"
+        },
+        {
+            "code": "high_run",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_HIGH_RUN",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_HIGH_RUN_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "value_type": "integer",
+            "source": "manual_or_import"
+        },
+        {
+            "code": "timeouts_used",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_TIMEOUTS_USED",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_TIMEOUTS_USED_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "value_type": "integer",
+            "source": "manual_or_import"
+        },
+        {
+            "code": "fouls",
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_FOULS",
+            "abbreviation_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_FOULS_ABBR",
+            "statistic_type": "basic",
+            "scope": "player",
+            "value_type": "integer",
+            "source": "manual_or_import"
+        }
+    ],
+    "template_defaults": {
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
+        "results": {
+            "group_by_round": true
+        },
+        "ranking": {
+            "favorite_highlight_mode": "row"
+        },
+        "eventreport": {
+            "section_order": "standard",
+            "show_lineups": true,
+            "show_officials": true,
+            "show_timeline": false
+        }
+    },
+    "migration": {
+        "joomleague3_sport_keys": []
+    },
+    "sport_type_name_key": "COM_JOOMLEAGUE_PROFILE_CAROM",
+    "contest": {
+        "type": "head_to_head"
+    },
+    "match": {
+        "structure": {
+            "type": "team_encounter",
+            "default_start_time": "10:00"
+        },
+        "score": {
+            "type": "nested_score",
+            "unit": "game_points",
+            "value_type": "integer",
+            "editor_control": "number",
+            "higher_is_better": true,
+            "segment_types": [
+                {
+                    "code": "penalty_round", "parent_code": null, "ordinal": 20,
+                    "unit": "caroms", "value_type": "integer", "editor_control": "number",
+                    "repeatable": true, "maximum_count": 128,
+                    "name_key": "COM_JOOMLEAGUE_CAROM_PENALTY_ROUND",
+                    "value_fields": {
+                        "lineup_member_id": {"name_key": "COM_JOOMLEAGUE_CAROM_PENALTY_PLAYER", "minimum": 1, "maximum": 1000000000, "reference": "encounter_lineup"}
+                    }
+                },
+                {
+                    "code": "duel",
+                    "parent_code": null,
+                    "ordinal": 10,
+                    "unit": "score",
+                    "value_type": "integer",
+                    "editor_control": "number",
+                    "repeatable": true,
+                    "maximum_count": 128,
+                    "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM_GAME",
+                    "value_fields": {
+                        "innings": {
+                            "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_INNINGS",
+                            "minimum": 1,
+                            "maximum": 100000
+                        },
+                        "high_run": {
+                            "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM_STAT_HIGH_RUN",
+                            "minimum": 0,
+                            "maximum": 100000,
+                            "bounded_by_score": true
+                        }
+                    }
+                }
+            ],
+            "aggregation": {
+                "mode": "none",
+                "from": [],
+                "final_only": false
+            }
+        },
+        "result_rules": {
+            "supports_forfeit": true,
+            "supports_postponed": true,
+            "supports_cancelled": true,
+            "supports_abandoned": true
+        },
+        "result_status_codes": [
+            "draft",
+            "in_progress",
+            "final"
+        ],
+        "outcome_codes": [
+            "completed"
+        ],
+        "participant_status_codes": [
+            "winner",
+            "loser",
+            "eligible",
+            "started",
+            "substitute",
+            "finished",
+            "disqualified"
+        ],
+        "encounter": {
+            "penalty_series": {"enabled": true, "required": false, "maximum_points": 100000, "nominations": "optional_single", "resolution": "sudden_death", "cycle_length": 4, "player_order": "manual"},
+            "aggregation": "duel_wins",
+            "formats": {
+                "singles": 1
+            },
+            "member_person_types": [
+                "player"
+            ],
+            "duel_points": {
+                "win": 2,
+                "draw": 1,
+                "loss": 0
+            },
+            "draw_supported": true,
+            "game_rules": {
+                "games_per_encounter": 4,
+                "target_score": 40,
+                "inning_limit": 0,
+                "equal_innings": true
+            }
+        }
+    }
+}

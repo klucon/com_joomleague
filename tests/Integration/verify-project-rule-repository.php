@@ -19,7 +19,7 @@ $container->alias('session', 'session.cli')
 	->alias(Joomla\Session\SessionInterface::class, 'session.cli');
 Factory::$application = $container->get(Joomla\Console\Application::class);
 
-foreach (['CanonicalJson', 'ProjectRuleValidator', 'ProjectRuleConfigRepository'] as $service) {
+foreach (['CanonicalJson', 'ExactDecimal', 'ProjectRuleValidator', 'ProjectRuleConfigRepository'] as $service) {
 	require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/' . $service . '.php';
 }
 

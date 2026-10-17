@@ -13,6 +13,14 @@ final class ProjectRuleConfigRepository
 {
 	private const MAX_PAYLOAD_BYTES = 65535;
 
+	/** Resolve validated project overrides without modifying the pinned profile. */
+	public function resolve(int $projectId, array $profile): array
+	{
+		$resolved = $this->validator->resolve($profile, $this->get($projectId));
+		(new SportProfileSchemaValidator())->validate($resolved);
+		return $resolved;
+	}
+
 	public function __construct(
 		private readonly DatabaseInterface $database,
 		private readonly ProjectRuleValidator $validator = new ProjectRuleValidator()
@@ -93,6 +101,7 @@ final class ProjectRuleConfigRepository
 
 			if ($overrides === []) {
 				$this->delete($projectId);
+				$this->invalidateStandings($projectId);
 				$this->database->transactionCommit();
 
 				return null;
@@ -117,6 +126,7 @@ final class ProjectRuleConfigRepository
 				$this->update($existingId, $actorId, $record);
 			}
 
+			$this->invalidateStandings($projectId);
 			$this->database->transactionCommit();
 
 			return $record;
@@ -125,6 +135,15 @@ final class ProjectRuleConfigRepository
 
 			throw $exception;
 		}
+	}
+
+	private function invalidateStandings(int $projectId): void
+	{
+		$query = $this->database->getQuery(true)->update($this->database->quoteName('#__joomleague_standing_freshness'))
+			->set($this->database->quoteName('is_dirty') . ' = 1')
+			->where($this->database->quoteName('project_id') . ' = :project')
+			->bind(':project', $projectId);
+		$this->database->setQuery($query)->execute();
 	}
 
 	private function lockProject(int $projectId): void

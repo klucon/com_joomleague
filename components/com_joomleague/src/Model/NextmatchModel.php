@@ -9,6 +9,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use Joomleague\Component\Joomleague\Domain\Service\ProgrammeReader;
 use Joomleague\Component\Joomleague\Site\Service\PublicAccess;
 
@@ -32,6 +33,16 @@ final class NextmatchModel extends BaseDatabaseModel
 		if (!PublicAccess::projectAllowed($db, $projectId)) {
 			return ['error' => 'COM_JOOMLEAGUE_NEXTMATCH_UNAVAILABLE'];
 		}
+		$project = $db->setQuery(
+			$db->getQuery(true)
+				->select(['id', 'name'])
+				->from($db->quoteName('#__joomleague_project'))
+				->where('id = :id')
+				->bind(':id', $projectId, ParameterType::INTEGER)
+		)->loadObject();
+		if (!$project) {
+			return ['error' => 'COM_JOOMLEAGUE_NEXTMATCH_UNAVAILABLE'];
+		}
 
 		Factory::getApplication()->bootComponent('com_joomleague');
 		$viewLevels = Factory::getApplication()->getIdentity()->getAuthorisedViewLevels();
@@ -47,10 +58,10 @@ final class NextmatchModel extends BaseDatabaseModel
 		}
 
 		if (!$item) {
-			return ['error' => 'COM_JOOMLEAGUE_NEXTMATCH_EMPTY'];
+			return ['project' => $project, 'error' => 'COM_JOOMLEAGUE_NEXTMATCH_EMPTY'];
 		}
 
-		return ['item' => (object) $item, 'participants' => array_map(static fn (array $participant): object => (object) [
+		return ['project' => $project, 'item' => (object) $item, 'participants' => array_map(static fn (array $participant): object => (object) [
 			'slot_number' => $participant['slot'],
 			'display_name' => $participant['name'],
 		], $item['participants'])];

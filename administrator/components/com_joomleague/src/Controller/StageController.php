@@ -19,18 +19,17 @@ final class StageController extends FormController
 	protected function allowAdd($data = []): bool
 	{
 		$projectId = (int) ($data['project_id'] ?? $this->input->getInt('project_id', 0));
-		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		if ($projectId < 1) return false;
+		$asset = 'com_joomleague.project.' . $projectId;
 		return $this->app->getIdentity()->authorise('joomleague.project.edit.schedule', $asset);
 	}
 
 	protected function allowEdit($data = [], $key = 'id'): bool
 	{
-		$projectId = (int) ($data['project_id'] ?? 0);
-		if ($projectId < 1) {
-			$id = (int) ($data[$key] ?? 0);
-			$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectIdFromStage($id);
-		}
-		$asset = $projectId > 0 ? 'com_joomleague.project.' . $projectId : 'com_joomleague';
+		$id = (int) ($data[$key] ?? 0);
+		$projectId = (new MatchProjectResolver(Factory::getContainer()->get(DatabaseInterface::class)))->resolveProjectIdFromStage($id);
+		if ($projectId < 1) return false;
+		$asset = 'com_joomleague.project.' . $projectId;
 		return $this->app->getIdentity()->authorise('joomleague.project.edit.schedule', $asset);
 	}
 

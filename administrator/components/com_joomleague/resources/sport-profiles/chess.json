@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "chess",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_CHESS",
     "description_key": "COM_JOOMLEAGUE_PROFILE_CHESS_DESC",
     "scoring_model": "points_ratio",
@@ -208,22 +208,33 @@
         {
             "code": "player",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_CHESS_POSITION_PLAYER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CHESS_POSITION_PLAYER",
+            "role_domain": "participant"
         },
         {
             "code": "captain",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_CHESS_POSITION_CAPTAIN"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CHESS_POSITION_CAPTAIN",
+            "role_domain": "team_staff"
         },
         {
             "code": "arbiter",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_CHESS_POSITION_ARBITER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CHESS_POSITION_ARBITER",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "chief_arbiter",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_CHESS_POSITION_CHIEF_ARBITER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_CHESS_POSITION_CHIEF_ARBITER",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -335,7 +346,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true
         },

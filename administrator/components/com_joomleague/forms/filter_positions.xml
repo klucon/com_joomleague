@@ -10,6 +10,14 @@
 			<option value="official">COM_JOOMLEAGUE_PERSON_TYPE_OFFICIAL</option>
 			<option value="participant">COM_JOOMLEAGUE_PERSON_TYPE_PARTICIPANT</option>
 		</field>
+		<field name="role_domain" type="list" label="COM_JOOMLEAGUE_FIELD_POSITION_ROLE_DOMAIN_LABEL" onchange="this.form.submit();">
+			<option value="">COM_JOOMLEAGUE_OPTION_SELECT_ROLE_DOMAIN</option>
+			<option value="participant">COM_JOOMLEAGUE_ROLE_DOMAIN_PARTICIPANT</option>
+			<option value="team_staff">COM_JOOMLEAGUE_ROLE_DOMAIN_TEAM_STAFF</option>
+			<option value="adjudicator">COM_JOOMLEAGUE_ROLE_DOMAIN_ADJUDICATOR</option>
+			<option value="competition_official">COM_JOOMLEAGUE_ROLE_DOMAIN_COMPETITION_OFFICIAL</option>
+			<option value="event_staff">COM_JOOMLEAGUE_ROLE_DOMAIN_EVENT_STAFF</option>
+		</field>
 		<field name="published" type="status" label="JOPTION_SELECT_PUBLISHED" onchange="this.form.submit();"><option value="">JOPTION_SELECT_PUBLISHED</option></field>
 	</fields>
 	<fields name="list">
@@ -23,6 +31,21 @@
 			<option value="code DESC">COM_JOOMLEAGUE_POSITION_SORT_CODE_DESC</option>
 			<option value="person_type ASC">COM_JOOMLEAGUE_POSITION_SORT_PERSON_TYPE_ASC</option>
 			<option value="person_type DESC">COM_JOOMLEAGUE_POSITION_SORT_PERSON_TYPE_DESC</option>
+			<option value="role_domain ASC">COM_JOOMLEAGUE_POSITION_SORT_ROLE_DOMAIN_ASC</option>
+			<option value="role_domain DESC">COM_JOOMLEAGUE_POSITION_SORT_ROLE_DOMAIN_DESC</option>
+		
+			<option value="position.name ASC">COM_JOOMLEAGUE_SORT_POSITION_NAME_ASC</option>
+			<option value="position.name DESC">COM_JOOMLEAGUE_SORT_POSITION_NAME_DESC</option>
+			<option value="position.code ASC">COM_JOOMLEAGUE_SORT_POSITION_CODE_ASC</option>
+			<option value="position.code DESC">COM_JOOMLEAGUE_SORT_POSITION_CODE_DESC</option>
+			<option value="position.person_type ASC">COM_JOOMLEAGUE_SORT_POSITION_PERSON_TYPE_ASC</option>
+			<option value="position.person_type DESC">COM_JOOMLEAGUE_SORT_POSITION_PERSON_TYPE_DESC</option>
+			<option value="position.role_domain ASC">COM_JOOMLEAGUE_SORT_POSITION_ROLE_DOMAIN_ASC</option>
+			<option value="position.role_domain DESC">COM_JOOMLEAGUE_SORT_POSITION_ROLE_DOMAIN_DESC</option>
+			<option value="position.published ASC">COM_JOOMLEAGUE_SORT_POSITION_PUBLISHED_ASC</option>
+			<option value="position.published DESC">COM_JOOMLEAGUE_SORT_POSITION_PUBLISHED_DESC</option>
+			<option value="position.id ASC">COM_JOOMLEAGUE_SORT_POSITION_ID_ASC</option>
+			<option value="position.id DESC">COM_JOOMLEAGUE_SORT_POSITION_ID_DESC</option>
 		</field>
 		<field name="limit" type="limitbox" label="JGLOBAL_LIST_LIMIT" labelclass="visually-hidden" default="20" onchange="this.form.submit();" />
 	</fields>

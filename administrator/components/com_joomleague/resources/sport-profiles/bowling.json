@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "bowling",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING",
     "description_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_DESC",
     "scoring_model": "pins",
@@ -177,27 +177,39 @@
         {
             "code": "player",
             "person_type": "player",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_PLAYER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_PLAYER",
+            "role_domain": "participant"
         },
         {
             "code": "captain",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_CAPTAIN"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_CAPTAIN",
+            "role_domain": "team_staff"
         },
         {
             "code": "coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_COACH"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "lane_official",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_LANE_OFFICIAL"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_BOWLING_POSITION_LANE_OFFICIAL",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -305,7 +317,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true
         },

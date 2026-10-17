@@ -10,7 +10,7 @@ use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\CMS\Language\Text;
 use Joomleague\Component\Joomleague\Domain\Service\CanonicalJson;
-use Joomleague\Component\Joomleague\Domain\Service\StandingsDecimal;
+use Joomleague\Component\Joomleague\Domain\Service\MatchOutcomeResolver;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsReader;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsRecalculator;
 use Joomleague\Component\Joomleague\Domain\Service\UuidFactory;
@@ -181,7 +181,7 @@ final class StageProgressionService
 		$profile = json_decode((string) $transition->profile_payload_json, true, 512, JSON_THROW_ON_ERROR);
 		$eligibleStatuses = array_values(array_filter($profile['standings']['calculation']['included_result_statuses'] ?? ['final'], static fn(mixed $status): bool => is_string($status) && preg_match('/^[a-z][a-z0-9_]*$/', $status) === 1));
 		if ($eligibleStatuses === []) throw new \UnexpectedValueException('The project profile has no eligible progression result status.');
-		$query = $this->database->getQuery(true)->select(['match.id AS match_id','entry.id','entry.display_name','entry.entry_kind','entry.seed_number AS seed','team.name AS team_name','person.first_name','person.last_name','value.numeric_value','value.result_rank','value.status_code'])
+		$query = $this->database->getQuery(true)->select(['match.id AS match_id','entry.id','entry.display_name','entry.entry_kind','entry.seed_number AS seed','team.name AS team_name','person.first_name','person.last_name','participant.id AS participant_id','value.numeric_value','value.result_rank','value.status_code'])
 			->from($this->database->quoteName('#__joomleague_project_match','match'))
 			->innerJoin($this->database->quoteName('#__joomleague_match_result','result') . ' ON result.match_id = match.id')
 			->innerJoin($this->database->quoteName('#__joomleague_match_participant','participant') . ' ON participant.match_id = match.id')
@@ -191,23 +191,29 @@ final class StageProgressionService
 			->leftJoin($this->database->quoteName('#__joomleague_team','team') . ' ON team.id = entry.team_id')->leftJoin($this->database->quoteName('#__joomleague_person','person') . ' ON person.id = entry.person_id')
 			->where('match.stage_id = :stage')->whereIn('result.status_code', $eligibleStatuses, ParameterType::STRING)->bind(':stage', $transition->source_stage_id, ParameterType::INTEGER)->order(['match.id ASC','participant.slot_number ASC']);
 		if (isset($config['round_id'])) $query->where('match.round_id = :round')->bind(':round', $config['round_id'], ParameterType::INTEGER);
+		$query->where("match.status_code <> 'cancelled'");
 		$rows = $this->database->setQuery($query)->loadObjectList(); $grouped = [];
 		foreach ($rows as $row) $grouped[(int) $row->match_id][] = $row;
 		$selected = [];
 		$higherIsBetter = ($profile['match']['score']['higher_is_better'] ?? true) !== false;
-		foreach ($grouped as $participants) {
-			$resolved = [];
-			foreach ($participants as $row) {
-				$status = (string) ($row->status_code ?? ''); $rank = $row->result_rank === null ? null : (int) $row->result_rank;
-				$wanted = $config['outcome'] === 'winner' ? ($status === 'winner' || $rank === 1) : ($status === 'loser' || ($rank !== null && $rank > 1));
-				if ($wanted) $resolved[] = $row;
+		$deciders = [];
+		if ($grouped !== []) {
+			$query = $this->database->getQuery(true)->select(['segment.match_id', 'segment.id AS segment_id', 'segment.level_code', 'segment.metadata_json', 'value.participant_id', 'value.numeric_value', 'value.status_code', 'value.result_rank'])
+				->from($this->database->quoteName('#__joomleague_match_score_segment', 'segment'))
+				->innerJoin($this->database->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id = segment.id AND value.match_id = segment.match_id')
+				->whereIn('segment.match_id', array_keys($grouped), ParameterType::INTEGER)
+				->where('segment.parent_id IS NOT NULL');
+			foreach ($this->database->setQuery($query)->loadObjectList() as $value) {
+				if (MatchOutcomeResolver::isDecider((string) $value->level_code, json_decode((string) $value->metadata_json, true))) {
+					$deciders[(int) $value->match_id][(int) $value->segment_id][] = $value;
+				}
 			}
-			if ($resolved === [] && count($participants) >= 2 && !in_array(null, array_column($participants, 'numeric_value'), true)) {
-				usort($participants, static function (object $left, object $right) use ($higherIsBetter): int { $comparison = StandingsDecimal::compare((string) $left->numeric_value, (string) $right->numeric_value); return $higherIsBetter ? -$comparison : $comparison; });
-				$first = reset($participants); $last = end($participants);
-				if (StandingsDecimal::compare((string) $first->numeric_value, (string) $last->numeric_value) !== 0) $resolved[] = $config['outcome'] === 'winner' ? $first : $last;
-			}
-			foreach ($resolved as $row) $selected[(int) $row->id] = $row;
+		}
+		foreach ($grouped as $matchId => $participants) {
+			$segments = $deciders[$matchId] ?? [];
+			$decider = count($segments) === 1 ? reset($segments) : [];
+			$ids = MatchOutcomeResolver::resolve($participants, $decider, $higherIsBetter, $config['outcome']);
+			foreach ($participants as $row) if (in_array((int) $row->participant_id, $ids, true)) $selected[(int) $row->id] = $row;
 		}
 		return $this->mapEntries(array_values($selected));
 	}

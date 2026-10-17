@@ -26,7 +26,7 @@ final class SpotlightReader
 				->where('entity.death_date IS NULL')
 				->where("(entity.first_name <> '' OR entity.last_name <> '')");
 		} elseif ($kind === 'team') {
-			$query->select(['entity.id', 'entity.name', 'entity.middle_name', 'entity.short_name', "COALESCE(NULLIF(entity.logo, ''), entity.picture) AS image", 'entity.description', 'club.name AS context_name'])
+			$query->select(['entity.id', 'entity.name', 'entity.middle_name', 'entity.short_name', "COALESCE(NULLIF(entity.logo, ''), entity.picture) AS image", 'entity.logo AS team_logo', 'entity.picture AS team_picture', 'club.logo AS club_logo', 'entity.description', 'club.name AS context_name'])
 				->from($this->database->quoteName('#__joomleague_team', 'entity'))
 				->leftJoin($this->database->quoteName('#__joomleague_club', 'club') . ' ON club.id = entity.club_id AND club.published = 1 AND club.access IN (' . implode(',', $levels) . ')');
 		} else {

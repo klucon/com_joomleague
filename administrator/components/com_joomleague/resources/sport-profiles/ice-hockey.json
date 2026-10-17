@@ -1,7 +1,7 @@
 {
-    "schema_version": "1.4.0",
+    "schema_version": "1.5.0",
     "code": "ice_hockey",
-    "version": "1.5.0",
+    "version": "1.6.1",
     "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY",
     "description_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_DESC",
     "scoring_model": "goals",
@@ -175,14 +175,14 @@
         "default_start_time": "18:00",
         "default_match_duration_minutes": 140
     },
-	"lineup": {
-		"substitutions": {
-			"supported": true,
-			"reentry_supported": true,
-			"limit_scope": "unlimited",
-			"maximum_per_scope": null
-		},
-		"players_on_ice": 6,
+    "lineup": {
+        "substitutions": {
+            "supported": true,
+            "reentry_supported": true,
+            "limit_scope": "unlimited",
+            "maximum_per_scope": null
+        },
+        "players_on_ice": 6,
         "skaters_on_ice": 5,
         "goalkeepers_on_ice": 1,
         "minimum_players_to_start": 6,
@@ -494,7 +494,8 @@
             "lineup_group": "goalkeeper",
             "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_GOALKEEPER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "left_defender",
@@ -502,7 +503,8 @@
             "lineup_group": "defender",
             "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_LEFT_DEFENDER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "right_defender",
@@ -510,7 +512,8 @@
             "lineup_group": "defender",
             "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_RIGHT_DEFENDER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "defender",
@@ -518,7 +521,8 @@
             "lineup_group": "defender",
             "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_DEFENDER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "center",
@@ -526,7 +530,8 @@
             "lineup_group": "forward",
             "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_CENTER",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "left_wing",
@@ -534,7 +539,8 @@
             "lineup_group": "forward",
             "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_LEFT_WING",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "right_wing",
@@ -542,7 +548,8 @@
             "lineup_group": "forward",
             "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_RIGHT_WING",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "forward",
@@ -550,67 +557,99 @@
             "lineup_group": "forward",
             "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_FORWARD",
             "has_statistics": 1,
-            "has_events": 1
+            "has_events": 1,
+            "role_domain": "participant"
         },
         {
             "code": "head_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_HEAD_COACH"
+            "tracks_team_record": true,
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_HEAD_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "assistant_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_ASSISTANT_COACH"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_ASSISTANT_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "goalkeeper_coach",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_GOALKEEPER_COACH"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_GOALKEEPER_COACH",
+            "role_domain": "team_staff"
         },
         {
             "code": "team_manager",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_TEAM_MANAGER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_TEAM_MANAGER",
+            "role_domain": "team_staff"
         },
         {
             "code": "physiotherapist",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_PHYSIOTHERAPIST"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_PHYSIOTHERAPIST",
+            "role_domain": "team_staff"
         },
         {
             "code": "doctor",
             "person_type": "staff",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_DOCTOR"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_DOCTOR",
+            "role_domain": "team_staff"
         },
         {
             "code": "referee",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_REFEREE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_REFEREE",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "linesman_1",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_LINESMAN_1"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_LINESMAN_1",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "linesman_2",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_LINESMAN_2"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_LINESMAN_2",
+            "role_domain": "adjudicator",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "video_goal_judge",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_VIDEO_GOAL_JUDGE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_VIDEO_GOAL_JUDGE",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "delegate",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_DELEGATE"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_DELEGATE",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         },
         {
             "code": "observer",
             "person_type": "official",
-            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_OBSERVER"
+            "name_key": "COM_JOOMLEAGUE_PROFILE_ICE_HOCKEY_POSITION_OBSERVER",
+            "role_domain": "competition_official",
+            "actor_kinds": [
+                "person"
+            ]
         }
     ],
     "event_types": [
@@ -819,7 +858,12 @@
         }
     ],
     "template_defaults": {
-        "project": { "show_hero": true, "show_sport": true, "show_season": true, "show_competition_info": true },
+        "project": {
+            "show_hero": true,
+            "show_sport": true,
+            "show_season": true,
+            "show_competition_info": true
+        },
         "results": {
             "group_by_round": true,
             "show_period_scores": true

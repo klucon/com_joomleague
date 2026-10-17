@@ -32,6 +32,43 @@ final class ProjectTable extends Table
 		return parent::bind($array, $ignore);
 	}
 
+	/** Store a new clone inside the caller's PostgreSQL transaction, including its asset. */
+	public function storeCloneInTransaction(): bool
+	{
+		$db = $this->getDatabase();
+		if ($db->getServerType() !== 'postgresql') {
+			return $this->store();
+		}
+		if (!empty($this->id) || !empty($this->asset_id)) {
+			throw new \LogicException('Transactional clone storage requires a new project.');
+		}
+
+		$this->_trackAssets = false;
+		try {
+			if (!parent::store()) {
+				return false;
+			}
+		} finally {
+			$this->_trackAssets = true;
+		}
+
+		$asset = new TransactionalAssetTable($db, $this->getDispatcher());
+		$parentId = $this->_getAssetParentId();
+		$asset->setLocation($parentId, 'last-child');
+		$asset->parent_id = $parentId;
+		$asset->name = $this->_getAssetName();
+		$asset->title = StringHelper::substr($this->_getAssetTitle(), 0, 100);
+		$asset->rules = '{}';
+		if (!$asset->check() || !$asset->store()) {
+			$this->setError($asset->getError());
+			return false;
+		}
+		$this->asset_id = (int) $asset->id;
+		$row = (object) ['id' => (int) $this->id, 'asset_id' => $this->asset_id];
+		$db->updateObject($this->_tbl, $row, 'id');
+		return true;
+	}
+
 	public function check(): bool
 	{
 		foreach (['name', 'alias', 'code', 'external_code', 'project_type', 'timezone', 'default_start_time', 'lifecycle_state'] as $field) {
