@@ -24,6 +24,7 @@ final class ClubPersonHistoryReader
 		$club = $db->setQuery($db->getQuery(true)->select(['id', 'name', 'short_name', 'logo'])->from($db->quoteName('#__joomleague_club'))->where('id = ' . $clubId)->where('published = 1')->where('access IN (' . $access . ')'))->loadObject();
 		if (!$club) return ['error' => 'club_unavailable'];
 		$normalized = [
+			'team_id' => max(0, (int) ($filters['team_id'] ?? 0)),
 			'project_id' => max(0, (int) ($filters['project_id'] ?? 0)),
 			'season_id' => max(0, (int) ($filters['season_id'] ?? 0)),
 			'project_type' => trim((string) ($filters['project_type'] ?? '')),
@@ -47,9 +48,10 @@ final class ClubPersonHistoryReader
 			. ' events AS (' . $events . ')';
 		$metricLabels = [];
 		$metricMetadata = [];
+		$staff = !empty($filters['staff_only']);
 		$requestedSort = (string) ($filters['sort'] ?? 'name');
 		$metric = str_starts_with($requestedSort, 'metric_') ? substr($requestedSort, 7) : '';
-		foreach ($db->setQuery($with . ' SELECT DISTINCT e.profile_metadata_json,e.event_name_key FROM events e INNER JOIN people p ON p.person_id=e.person_id')->getIterator() as $definition) {
+		foreach ($staff ? [] : $db->setQuery($with . ' SELECT DISTINCT e.profile_metadata_json,e.event_name_key FROM events e INNER JOIN people p ON p.person_id=e.person_id')->getIterator() as $definition) {
 			$code = $this->metricCode((string) $definition->profile_metadata_json);
 			if ($code === '') continue;
 			$metricLabels[$code] ??= (string) $definition->event_name_key;
@@ -77,16 +79,26 @@ final class ClubPersonHistoryReader
 		$direction = $lowerWins === [] ? '1' : '(CASE WHEN profile_version_id IN (' . implode(',', $lowerWins) . ') THEN -1 ELSE 1 END)';
 		$outcome = 'CASE WHEN own_rank IS NOT NULL AND opponent_rank IS NOT NULL THEN CASE WHEN own_rank=opponent_rank THEN 0 WHEN own_rank<opponent_rank THEN 1 ELSE -1 END'
 			. ' WHEN own_value IS NULL OR opponent_value IS NULL THEN NULL WHEN own_value=opponent_value THEN 0 WHEN own_value>opponent_value THEN ' . $direction . ' ELSE -1*' . $direction . ' END';
+		// Rank counted events by date, not membership dates or insertion IDs; undated events stay in totals only.
 		$with .= ', manager_raw AS (' . $this->sql($manager) . '), manager_matches AS (SELECT manager_raw.*,' . $outcome . ' AS outcome FROM manager_raw WHERE ambiguity_count=1),'
+			. ' manager_ordered AS (SELECT manager_matches.*,'
+			. ' ROW_NUMBER() OVER (PARTITION BY person_id ORDER BY CASE WHEN scheduled_start IS NULL THEN 1 ELSE 0 END,scheduled_start,match_id) AS first_position,'
+			. ' ROW_NUMBER() OVER (PARTITION BY person_id ORDER BY CASE WHEN scheduled_start IS NULL THEN 1 ELSE 0 END,scheduled_start DESC,match_id DESC) AS last_position'
+			. ' FROM manager_matches WHERE outcome IS NOT NULL),'
 			. ' records AS (SELECT person_id,COUNT(*) AS played,SUM(CASE WHEN outcome=1 THEN 1 ELSE 0 END) AS wins,'
 			. ' SUM(CASE WHEN outcome=0 THEN 1 ELSE 0 END) AS draws,SUM(CASE WHEN outcome=-1 THEN 1 ELSE 0 END) AS losses,'
 			. ' SUM(CASE WHEN own_value IS NOT NULL AND opponent_value IS NOT NULL THEN own_value ELSE 0 END) AS scored,'
-			. ' SUM(CASE WHEN own_value IS NOT NULL AND opponent_value IS NOT NULL THEN opponent_value ELSE 0 END) AS conceded'
-			. ' FROM manager_matches WHERE outcome IS NOT NULL GROUP BY person_id)';
+			. ' SUM(CASE WHEN own_value IS NOT NULL AND opponent_value IS NOT NULL THEN opponent_value ELSE 0 END) AS conceded,'
+			. ' MAX(CASE WHEN first_position=1 AND scheduled_start IS NOT NULL THEN match_id END) AS first_match_id,'
+			. ' MAX(CASE WHEN first_position=1 THEN scheduled_start END) AS first_match_date,'
+			. ' MAX(CASE WHEN first_position=1 THEN timezone END) AS first_match_timezone,'
+			. ' MAX(CASE WHEN last_position=1 AND scheduled_start IS NOT NULL THEN match_id END) AS last_match_id,'
+			. ' MAX(CASE WHEN last_position=1 THEN scheduled_start END) AS last_match_date,'
+			. ' MAX(CASE WHEN last_position=1 THEN timezone END) AS last_match_timezone'
+			. ' FROM manager_ordered GROUP BY person_id)';
 		$metricSort = $metricMetadata === [] ? '0' : '(SELECT COUNT(*) FROM events e WHERE e.person_id=p.person_id AND e.profile_metadata_json IN (' . implode(',', $db->quote(array_keys($metricMetadata))) . '))';
-		$staff = !empty($filters['staff_only']);
 		$columns = $staff
-			? ['name' => 'name', 'played' => 'COALESCE(r.played,0)', 'wins' => 'COALESCE(r.wins,0)', 'draws' => 'COALESCE(r.draws,0)', 'losses' => 'COALESCE(r.losses,0)', 'score' => '(COALESCE(r.scored,0)-COALESCE(r.conceded,0))', 'period' => "COALESCE(CAST(p.first_date AS CHAR(10)),'')"]
+			? ['name' => 'name', 'played' => 'COALESCE(r.played,0)', 'wins' => 'COALESCE(r.wins,0)', 'draws' => 'COALESCE(r.draws,0)', 'losses' => 'COALESCE(r.losses,0)', 'score' => '(COALESCE(r.scored,0)-COALESCE(r.conceded,0))', 'period' => "COALESCE(CAST(r.first_match_date AS CHAR(30)),'')"]
 			: ['name' => 'name', 'type' => 'p.type_sort', 'appearances' => 'p.appearance_count', 'manager_record' => 'COALESCE(r.played,-1)', 'period' => "COALESCE(CAST(p.first_date AS CHAR(10)),'')"];
 		if ($metric !== '' && isset($metricLabels[$metric]) && !$staff) $columns[$requestedSort] = $metricSort;
 		$sort = isset($columns[$requestedSort]) ? $requestedSort : 'name';
@@ -106,7 +118,7 @@ final class ClubPersonHistoryReader
 		$nameOrder = 'LOWER(p.last_name),LOWER(p.first_name),p.person_id';
 		$order = $sort === 'name' ? 'LOWER(p.last_name) ' . $sortDirection . ',LOWER(p.first_name) ' . $sortDirection . ',p.person_id'
 			: $columns[$sort] . ' ' . $sortDirection . ',' . $nameOrder;
-		$rows = $db->setQuery($with . ' SELECT p.*,r.played,r.wins,r.draws,r.losses,r.scored,r.conceded' . $from . ' ORDER BY ' . $order, $start, $limit)->loadObjectList();
+		$rows = $db->setQuery($with . ' SELECT p.*,r.played,r.wins,r.draws,r.losses,r.scored,r.conceded,r.first_match_id,r.first_match_date,r.first_match_timezone,r.last_match_id,r.last_match_date,r.last_match_timezone' . $from . ' ORDER BY ' . $order, $start, $limit)->loadObjectList();
 		$people = [];
 		foreach ($rows as $row) {
 			$person =& $this->person($people, $row);
@@ -115,6 +127,7 @@ final class ClubPersonHistoryReader
 			$person['last_date'] = $row->last_date;
 			if ($row->played !== null) {
 				$person['manager_record'] = ['played'=>(int)$row->played,'wins'=>(int)$row->wins,'draws'=>(int)$row->draws,'losses'=>(int)$row->losses,'scored'=>StandingsDecimal::normalize((string)$row->scored),'conceded'=>StandingsDecimal::normalize((string)$row->conceded),'matches'=>[]];
+				foreach (['first_match_id', 'first_match_date', 'first_match_timezone', 'last_match_id', 'last_match_date', 'last_match_timezone'] as $key) $person['manager_record'][$key] = $row->{$key};
 			}
 			unset($person);
 		}
@@ -130,7 +143,7 @@ final class ClubPersonHistoryReader
 				$person['seasons'][(int)$row->season_id] = (string)$row->season_name;
 				unset($person);
 			}
-			foreach ($db->setQuery($with . ' SELECT person_id,profile_metadata_json,COUNT(*) AS event_count FROM events WHERE person_id IN (' . implode(',', $ids) . ') GROUP BY person_id,profile_metadata_json')->getIterator() as $row) {
+			foreach ($staff ? [] : $db->setQuery($with . ' SELECT person_id,profile_metadata_json,COUNT(*) AS event_count FROM events WHERE person_id IN (' . implode(',', $ids) . ') GROUP BY person_id,profile_metadata_json')->getIterator() as $row) {
 				$code = $this->metricCode((string)$row->profile_metadata_json);
 				if ($code !== '') $people[(int)$row->person_id]['metrics'][$code] = ($people[(int)$row->person_id]['metrics'][$code] ?? 0) + (int)$row->event_count;
 			}
@@ -203,6 +216,8 @@ final class ClubPersonHistoryReader
 			->innerJoin($db->quoteName('#__joomleague_project_entry', 'entry') . " ON entry.id = participant.project_entry_id AND entry.entry_kind = 'team' AND entry.published = 1")
 			->innerJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.club_id = :lineupClub AND team.published = 1 AND team.access IN (' . $access . ')')
 			->innerJoin($db->quoteName('#__joomleague_project_match', 'match') . ' ON match.id = lineup.match_id AND match.published = 1')
+			->innerJoin($db->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = match.stage_id AND stage.project_id = match.project_id AND stage.published = 1')
+			->innerJoin($db->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = match.round_id AND round.stage_id = stage.id AND round.project_id = match.project_id AND round.published = 1')
 			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = match.id AND result.status_code = 'final' AND match.status_code <> 'cancelled'")
 			->innerJoin($db->quoteName('#__joomleague_project', 'project') . ' ON project.id = match.project_id AND project.published = 1 AND project.access IN (' . $access . ')')
 			->innerJoin($db->quoteName('#__joomleague_competition', 'competition') . ' ON competition.id = project.competition_id AND competition.published = 1 AND competition.access IN (' . $access . ')')
@@ -221,6 +236,8 @@ final class ClubPersonHistoryReader
 			->innerJoin($db->quoteName('#__joomleague_project_entry', 'entry') . " ON entry.id = participant.project_entry_id AND entry.entry_kind = 'team' AND entry.published = 1")
 			->innerJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.club_id = :eventClub AND team.published = 1 AND team.access IN (' . $access . ')')
 			->innerJoin($db->quoteName('#__joomleague_project_match', 'match') . ' ON match.id = event.match_id AND match.published = 1')
+			->innerJoin($db->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = match.stage_id AND stage.project_id = match.project_id AND stage.published = 1')
+			->innerJoin($db->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = match.round_id AND round.stage_id = stage.id AND round.project_id = match.project_id AND round.published = 1')
 			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = match.id AND result.status_code = 'final' AND match.status_code <> 'cancelled'")
 			->innerJoin($db->quoteName('#__joomleague_project', 'project') . ' ON project.id = match.project_id AND project.published = 1 AND project.access IN (' . $access . ')')
 			->innerJoin($db->quoteName('#__joomleague_competition', 'competition') . ' ON competition.id = project.competition_id AND competition.published = 1 AND competition.access IN (' . $access . ')')
@@ -241,6 +258,8 @@ final class ClubPersonHistoryReader
 			->innerJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.club_id = :managerClub AND team.published = 1 AND team.access IN (' . $access . ')')
 			->innerJoin($db->quoteName('#__joomleague_team', 'own_team') . ' ON own_team.id = entry.team_id')
 			->innerJoin($db->quoteName('#__joomleague_project_match', 'match') . ' ON match.id = lineup.match_id AND match.published = 1')
+			->innerJoin($db->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = match.stage_id AND stage.project_id = match.project_id AND stage.published = 1')
+			->innerJoin($db->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = match.round_id AND round.stage_id = stage.id AND round.project_id = match.project_id AND round.published = 1')
 			->innerJoin($db->quoteName('#__joomleague_match_result', 'result') . " ON result.match_id = match.id AND result.status_code = 'final' AND match.status_code <> 'cancelled'")
 			->innerJoin($db->quoteName('#__joomleague_project', 'project') . ' ON project.id = match.project_id AND project.published = 1 AND project.access IN (' . $access . ')')
 			->innerJoin($db->quoteName('#__joomleague_sport_profile_version', 'profile') . ' ON profile.id = project.profile_version_id')
@@ -249,6 +268,8 @@ final class ClubPersonHistoryReader
 			->innerJoin($db->quoteName('#__joomleague_match_participant', 'opponent') . ' ON opponent.match_id = match.id AND opponent.id <> participant.id AND opponent.published = 1')
 			->innerJoin($db->quoteName('#__joomleague_project_entry', 'opponent_entry') . " ON opponent_entry.id = opponent.project_entry_id AND opponent_entry.entry_kind = 'team' AND opponent_entry.published = 1")
 			->innerJoin($db->quoteName('#__joomleague_team', 'opponent_team') . ' ON opponent_team.id = opponent_entry.team_id AND opponent_team.published = 1 AND opponent_team.access IN (' . $access . ')')
+			->leftJoin($db->quoteName('#__joomleague_club', 'opponent_club') . ' ON opponent_club.id = opponent_team.club_id')
+			->where('(opponent_team.club_id IS NULL OR (opponent_club.published = 1 AND opponent_club.access IN (' . $access . ')))')
 			->innerJoin($db->quoteName('#__joomleague_match_score_segment', 'root_segment') . ' ON root_segment.match_id = match.id AND root_segment.parent_id IS NULL')
 			->innerJoin($db->quoteName('#__joomleague_match_score_value', 'own_value') . ' ON own_value.segment_id = root_segment.id AND own_value.participant_id = participant.id')
 			->innerJoin($db->quoteName('#__joomleague_match_score_value', 'opponent_value') . ' ON opponent_value.segment_id = root_segment.id AND opponent_value.participant_id = opponent.id')
@@ -258,6 +279,7 @@ final class ClubPersonHistoryReader
 
 	private function filters(object $query, array $filters, string $personTypeColumn): object
 	{
+		if (($filters['team_id'] ?? 0) > 0) $query->where('team.id=:historyTeam')->bind(':historyTeam', $filters['team_id'], ParameterType::INTEGER);
 		foreach (['project_id' => 'project.id', 'season_id' => 'season.id'] as $key => $column) if ($filters[$key] > 0) $query->where($column . ' = :' . $key)->bind(':' . $key, $filters[$key], ParameterType::INTEGER);
 		if ($filters['project_type'] !== '') $query->where('project.project_type = :projectType')->bind(':projectType', $filters['project_type']);
 		if ($filters['person_type'] !== '') $query->where($personTypeColumn . ' = :personType')->bind(':personType', $filters['person_type']);
@@ -268,6 +290,7 @@ final class ClubPersonHistoryReader
 	private function options(int $clubId, string $access): array
 	{
 		$options = ['projects'=>[], 'seasons'=>[], 'project_types'=>[], 'person_types'=>[]];
+		$options['teams'] = ClubHistoryTeamOptions::load($this->database, $clubId, array_map('intval', explode(',', $access)));
 		$filters = ['project_id'=>0,'season_id'=>0,'project_type'=>'','person_type'=>''];
 		foreach (['membershipQuery'=>'member.member_person_type','lineupQuery'=>'lineup.member_person_type'] as $method=>$typeColumn) {
 			$query = $this->{$method}($clubId,$access,$filters)->clear('select')->select(['DISTINCT project.id AS project_id','project.name AS project_name','season.id AS season_id','season.name AS season_name','project.project_type',$typeColumn . ' AS member_person_type']);

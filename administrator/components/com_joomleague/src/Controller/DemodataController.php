@@ -41,9 +41,10 @@ final class DemodataController extends BaseController
 			throw new \RuntimeException(Text::_('COM_JOOMLEAGUE_DEMODATA_ERROR_DISABLED'), 403);
 		}
 
-		$confirmation = $this->input->post->getString('confirmation');
+		// Compare the literal submitted text; string filtering would strip HTML first.
+		$confirmation = $this->input->post->get('confirmation', null, 'raw');
 
-		if (!hash_equals(RuntimeDataResetter::CONFIRMATION, $confirmation)) {
+		if (!is_string($confirmation) || !hash_equals(RuntimeDataResetter::CONFIRMATION, $confirmation)) {
 			$this->app->enqueueMessage(Text::_('COM_JOOMLEAGUE_DEMODATA_ERROR_CONFIRMATION'), 'error');
 			$this->setRedirect(Route::_('index.php?option=com_joomleague&view=demodata', false));
 

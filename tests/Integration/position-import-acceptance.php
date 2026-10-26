@@ -1,0 +1,32 @@
+<?php
+declare(strict_types=1);
+if(PHP_SAPI!=='cli'||!str_starts_with((string)getenv('JL_R1_DB_HOST'),'jl-r1-'))throw new RuntimeException('Disposable target required.');
+define('_JEXEC',1);define('JPATH_BASE','/var/www/html');
+$_SERVER['HTTP_HOST']='localhost';$_SERVER['REQUEST_URI']='/administrator/index.php';$_SERVER['SCRIPT_NAME']='/administrator/index.php';
+require JPATH_BASE.'/includes/defines.php';require JPATH_BASE.'/includes/framework.php';
+$c=Joomla\CMS\Factory::getContainer();$c->alias('session','session.cli')->alias(Joomla\Session\SessionInterface::class,'session.cli');
+$app=$c->get(Joomla\CMS\Application\AdministratorApplication::class);Joomla\CMS\Factory::$application=$app;
+if($app->get('host')!==getenv('JL_R1_DB_HOST')||$app->get('db')!=='r1_test'||$app->get('dbprefix')!=='r1_')throw new RuntimeException('Unsafe database.');
+$app->createExtensionNamespaceMap();$app->loadLanguage(Joomla\CMS\Language\Language::getInstance('en-GB'));
+$factory=$app->bootComponent('com_joomleague')->getMVCFactory();$db=$c->get(Joomla\Database\DatabaseInterface::class);
+// Fresh-install onboarding redirects are unrelated to the imported catalogue.
+$db->setQuery("UPDATE #__extensions SET enabled=0 WHERE type='plugin' AND folder='system' AND element='guidedtours'")->execute();
+$admin=(int)$db->setQuery("SELECT id FROM #__users WHERE username='admin'")->loadResult();
+$app->loadIdentity($c->get(Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($admin));
+$sql=file_get_contents('/opt/position-catalogue.sql');
+$service=new Joomleague\Component\Joomleague\Administrator\Service\SqlDataExchangeService($db,JPATH_ADMINISTRATOR.'/components/com_joomleague');
+require __DIR__.'/position-import-conflicts.php';
+$service->import($sql);
+$snapshot=static fn():array=>$db->setQuery('SELECT id,uuid,sport_type_id,code,name,person_type,role_domain,source,published FROM #__joomleague_sport_position ORDER BY id')->loadAssocList();
+$rows=$snapshot();$profile=array_values(array_filter($rows,static fn($r)=>$r['source']==='profile'));$custom=array_values(array_filter($rows,static fn($r)=>$r['source']==='local'));
+if(count($rows)!==29||count($profile)!==26||count($custom)!==3)throw new RuntimeException('Imported catalogue incomplete: '.json_encode(array_count_values(array_column($rows,'source'))));
+if(count(array_unique(array_column($rows,'code')))!==29)throw new RuntimeException('Duplicate role codes.');
+foreach(['goalkeeper','defender','midfielder','forward','head_coach','referee','analityk'] as $code)if(!in_array($code,array_column($rows,'code'),true))throw new RuntimeException('Missing expected role: '.$code);
+$service->import($sql);if($snapshot()!==$rows)throw new RuntimeException('Repeat import changed catalogue.');
+$model=$factory->createModel('Positions','Administrator',['ignore_request'=>true]);
+foreach(['search','sport_type_id','person_type','role_domain','published'] as $key)$model->setState('filter.'.$key,'');
+$model->setState('list.limit',100);$model->setState('list.start',0);$model->setState('list.ordering','position.id');$model->setState('list.direction','ASC');
+if(count($model->getItems())!==29||$model->getTotal()!==29||$model->getSummary()['positions']!==29)throw new RuntimeException('Native administrator list hides positions.');
+$report=['passed'=>true,'total'=>count($rows),'custom'=>count($custom),'profile'=>count($profile),'version'=>(string)simplexml_load_file(JPATH_ADMINISTRATOR.'/components/com_joomleague/joomleague.xml')->version,'roles'=>array_column($rows,'code'),'retry_unchanged'=>true,'native_list_total'=>$model->getTotal(),'conflict_cases'=>$collisionCases];
+file_put_contents('/tmp/jl-position-import.json',json_encode($report,JSON_THROW_ON_ERROR));
+echo 'PASS: '.json_encode($report,JSON_THROW_ON_ERROR)."\n";

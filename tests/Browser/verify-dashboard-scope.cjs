@@ -1,0 +1,97 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const {execFileSync} = require('node:child_process');
+const {firefox} = require('/home/ondrej/.npm-global/lib/node_modules/playwright');
+(async () => {
+    const base = process.env.JL_R1_BASE;
+    const app = process.env.JL_R1_APP;
+    assert.match(base, /^http:\/\/127\.0\.0\.1:\d+$/);
+    assert.match(app, /^jl-r1-[a-z0-9]+-(mysqli|pgsql)-app$/);
+    const fixture = JSON.parse(process.env.JL_DASHBOARD_FIXTURE);
+    const read = () => JSON.parse(execFileSync('docker', ['exec', app, 'php', '/opt/r1-tests/dashboard-scope-acceptance.php', 'read'], {encoding:'utf8'}));
+    const browser = await firefox.launch({executablePath:'/opt/playwright/firefox-1532/firefox/firefox',headless:true});
+    const errors = [];
+    const evidence = [];
+    const admin = base + '/administrator/index.php';
+    const config = admin + '?option=com_config&view=component&component=com_joomleague';
+    try {
+        const context = await browser.newContext({viewport:{width:1440,height:1000}});
+        const page = await context.newPage();
+        page.on('pageerror', error => errors.push(error.message));
+        const login = async (tab, username) => {
+            await tab.goto(base+'/administrator/', {waitUntil:'networkidle'});
+            await tab.locator('#mod-login-username').fill(username);
+            await tab.locator('#mod-login-password').fill(process.env.JL_R1_PASSWORD);
+            await Promise.all([tab.waitForNavigation({waitUntil:'networkidle'}),tab.locator('#form-login button[type=submit]').click()]);
+            assert.equal(await tab.locator('#mod-login-username').count(),0);
+        };
+        await login(page,'admin');
+        const dashboard = async expected => {
+            const response = await page.goto(admin+'?option=com_joomleague&view=dashboard',{waitUntil:'networkidle'});
+            assert.equal(response.status(),200);
+            const schedule = page.locator('[data-club-schedule]');
+            assert.deepEqual(await schedule.locator('[data-club-match-id]').evaluateAll(els=>els.map(el=>Number(el.dataset.clubMatchId))),expected);
+            assert.equal(await schedule.locator('img').count(),0,'Club name injected markup');
+            assert.match(await schedule.locator('h2').innerText(),/<img src=x onerror=alert\(1\)>/);
+            assert.doesNotMatch(await schedule.innerText(),/COM_JOOMLEAGUE_/);
+        };
+        await dashboard(fixture.all);
+        evidence.push('default-date-scope-and-escaped-club-name');
+        const fields = async () => page.locator('#component-form').evaluate(form=>[...new FormData(form)].filter(([,v])=>typeof v==='string'));
+        await page.goto(config,{waitUntil:'networkidle'});
+        const initialFields = await fields();
+        const token = initialFields.find(([key,value])=>/^[a-f0-9]{32}$/.test(key)&&value==='1');
+        assert(token,'Native configuration CSRF token missing');
+        const projectName = await page.locator('select[name*="dashboard_project_ids"]').getAttribute('name');
+        const lookbackName = await page.locator('input[name*="dashboard_result_lookback_days"]').getAttribute('name');
+        const post = async (request, pairs) => request.post(admin+'?option=com_config',{data:new URLSearchParams(pairs).toString(),headers:{'content-type':'application/x-www-form-urlencoded'},maxRedirects:0});
+        const change = (pairs, projects, lookback) => [...pairs.filter(([key])=>![projectName,lookbackName,'task'].includes(key)), ...projects.map(id=>[projectName,String(id)]),[lookbackName,String(lookback)],['task','component.apply']];
+        const before = read();
+        await post(context.request,change(initialFields,[fixture.a],0).filter(([key])=>key!==token[0]));
+        assert.deepEqual(read(),before,'Missing CSRF changed settings');
+        const guest = await browser.newContext();
+        await post(guest.request,change(initialFields,[fixture.a],0));
+        assert.deepEqual(read(),before,'Guest changed settings');
+        await guest.close();
+        const restricted = await browser.newContext();
+        const restrictedPage = await restricted.newPage();
+        await login(restrictedPage,'r1.editor.a');
+        const r1Fixture = JSON.parse(execFileSync('docker',['exec',app,'cat','/tmp/jl-r1-fixture.json'],{encoding:'utf8'}));
+        await restrictedPage.goto(admin+'?option=com_joomleague&task=person.edit&id='+r1Fixture.person,{waitUntil:'networkidle'});
+        const restrictedToken = await restrictedPage.locator('#person-form input[type=hidden]').evaluateAll(els=>els.map(el=>[el.name,el.value]).find(([name,value])=>/^[a-f0-9]{32}$/.test(name)&&value==='1'));
+        assert(restrictedToken,'Scoped user CSRF token missing');
+        await post(restricted.request,[...change(initialFields,[fixture.a],0).filter(([key])=>key!==token[0]),restrictedToken]);
+        assert.deepEqual(read(),before,'Scoped editor changed global settings');
+        await restricted.close();
+        evidence.push('csrf-guest-and-global-options-acl');
+        const save = async (projects,lookback) => {
+            await page.goto(config,{waitUntil:'networkidle'});
+            const pairs = await fields();
+            const response = await post(context.request,change(pairs,projects,lookback));
+            assert([302,303].includes(response.status()),'Native configuration save failed');
+            const state = read();
+            assert.deepEqual((state.params.dashboard_project_ids||[]).map(Number),projects);
+            assert.equal(Number(state.params.dashboard_result_lookback_days),lookback);
+            await page.goto(config,{waitUntil:'networkidle'});
+            assert.deepEqual(await page.locator('select[name*="dashboard_project_ids"]').evaluate(el=>[...el.selectedOptions].map(option=>Number(option.value))),projects);
+        };
+        await save([fixture.a],30);
+        await dashboard(fixture.selected);
+        await save([fixture.a],0);
+        await dashboard(fixture.upcoming);
+        for (const width of [1440,390]) {
+            await page.setViewportSize({width,height:1000});
+            await dashboard(fixture.upcoming);
+            assert(await page.locator('[data-club-schedule]').evaluate(el=>el.getBoundingClientRect().right<=innerWidth+1),'Schedule overflows');
+            await page.screenshot({path:path.join(process.env.JL_R1_ARTIFACTS,process.env.JL_R1_DRIVER+'-dashboard-'+width+'.png'),fullPage:true});
+        }
+        await save([],30);
+        await dashboard(fixture.all);
+        evidence.push('native-save-reopen-project-scope-lookback-empty-reset-desktop-mobile');
+        assert.deepEqual(errors,[]);
+        fs.writeFileSync(path.join(process.env.JL_R1_ARTIFACTS,process.env.JL_R1_DRIVER+'-dashboard-http.json'),JSON.stringify(evidence,null,2));
+        console.log('PASS: dashboard browser scope, native configuration persistence, CSRF, ACL, escaping and desktop/mobile.');
+        await context.close();
+    } finally { await browser.close(); }
+})().catch(error=>{console.error(error);process.exit(1);});

@@ -23,6 +23,22 @@ final class MatchresultController extends BaseController
 	public function addSegment(): void { $this->mutateResult('add'); }
 	public function removeSegment(): void { $this->mutateResult('remove'); }
 
+	public function quickSave(): void
+	{
+		try {
+			if (!Session::checkToken('post')) throw new \RuntimeException(Text::_('JINVALID_TOKEN'), 403);
+			$matchId = $this->input->post->getInt('match_id');
+			$this->assertEditPermission($matchId);
+			$revision = $this->getModel('Matchresult')->saveQuickResult($matchId, $this->input->post->getInt('round_id'), $this->input->post->get('scores', [], 'array'), $this->input->post->getString('revision'));
+			echo new \Joomla\CMS\Response\JsonResponse(['revision' => $revision], Text::_('COM_JOOMLEAGUE_MATCHRESULT_SAVE_SUCCESS'));
+		} catch (\Throwable $exception) {
+			Log::add(get_debug_type($exception), Log::WARNING, 'com_joomleague');
+			$message = $exception instanceof MatchResultValidationException ? Text::_($exception->getLanguageKey()) : Text::_('COM_JOOMLEAGUE_MATCHRESULT_SAVE_FAILED');
+			echo new \Joomla\CMS\Response\JsonResponse(null, $message, true);
+		}
+		$this->app->close();
+	}
+
 	public function cancel(): void
 	{
 		if (!Session::checkToken()) throw new \RuntimeException(Text::_('JINVALID_TOKEN'), 403);

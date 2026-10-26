@@ -18,6 +18,16 @@ $app->loadLanguage(Joomla\CMS\Language\Language::getInstance('en-GB'));
 $app->loadIdentity(new Joomla\CMS\User\User());
 foreach (['com_joomleague','com_finder','com_scheduler'] as $component) $app->bootComponent($component);
 $db = $container->get(Joomla\Database\DatabaseInterface::class);
+if (($argv[1] ?? '') === 'scheduler-contender') {
+    $taskId = filter_var($argv[2] ?? '', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+    if (!$taskId) throw new RuntimeException('Task ID required');
+    $owned = $db->setQuery('SELECT title FROM #__scheduler_tasks WHERE id=' . $taskId)->loadResult();
+    if ($owned !== 'JoomLeague isolated lifecycle acceptance') throw new RuntimeException('Owned fixture required');
+    $scheduler = new Joomla\Component\Scheduler\Administrator\Scheduler\Scheduler();
+    $task = $scheduler->getTask(['id' => $taskId, 'allowConcurrent' => false, 'bypassScheduling' => false]);
+    echo $task === null ? 'LOCK_REJECTED' : 'LOCK_ACQUIRED';
+    exit($task === null ? 0 : 1);
+}
 if (($argv[1] ?? '') === 'snapshot') {
     $snapshot=[];
     foreach ($db->getTableList() as $table) {
@@ -44,6 +54,14 @@ $check = static function (string $id, bool $ok) use (&$observations): void {
     echo 'PASS: ' . $id . "\n";
 };
 $finder = $app->bootPlugin('joomleague', 'finder');
+$search=[];
+foreach(['public'=>[1,1],'private'=>[2,1],'hidden'=>[1,0]] as $kind=>[$access,$published]){
+    $token='Jlsearch'.$kind.'needle';
+    $row=(object)['uuid'=>Joomleague\Component\Joomleague\Domain\Service\UuidFactory::v4(),'first_name'=>$token,'last_name'=>'Acceptance','published'=>$published,'access'=>$access];
+    $db->insertObject('#__joomleague_person',$row,'id');
+    $search[$kind]=['id'=>(int)$row->id,'token'=>$token,'name'=>$token.' Acceptance'];
+}
+file_put_contents('/tmp/jl-finder-fixture.json',json_encode($search,JSON_THROW_ON_ERROR));
 foreach (['club','venue'] as $kind) {
     $row=(object)['uuid'=>Joomla\CMS\User\UserHelper::genRandomPassword(36),'name'=>'Audit '.$kind,'alias'=>'audit-'.$kind];
     $db->insertObject('#__joomleague_'.$kind,$row);

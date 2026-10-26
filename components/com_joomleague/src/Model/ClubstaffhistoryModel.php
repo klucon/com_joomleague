@@ -12,7 +12,6 @@ use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Pagination\Pagination;
 use Joomla\Database\DatabaseInterface;
 use Joomleague\Component\Joomleague\Domain\Service\ClubPersonHistoryReader;
-use Joomleague\Component\Joomleague\Domain\Service\StandingsDecimal;
 
 final class ClubstaffhistoryModel extends BaseDatabaseModel
 {
@@ -20,6 +19,7 @@ final class ClubstaffhistoryModel extends BaseDatabaseModel
 	{
 		$input = Factory::getApplication()->getInput();
 		$this->setState('club_id', $input->getInt('club_id', 0));
+		$this->setState('team_id', $input->getInt('filter_team_id', $input->getInt('team_id', 0)));
 		foreach (['project_id', 'season_id'] as $key) $this->setState($key, $input->getInt('filter_' . $key, 0));
 		$this->setState('project_type', $input->getCmd('filter_project_type', ''));
 		$this->setState('filter_search', trim($input->getString('filter_search', '')));
@@ -39,12 +39,19 @@ final class ClubstaffhistoryModel extends BaseDatabaseModel
 		if ($clubId < 1) $clubId = (int) ComponentHelper::getParams('com_joomleague')->get('site_club_id', 0);
 		if ($clubId < 1) return ['error' => 'COM_JOOMLEAGUE_CLUBSTAFFHISTORY_NO_CLUB'];
 		$app->bootComponent('com_joomleague');
-		$sortingEnabled = (bool) $app->getParams()->get('enable_column_sorting', 1);
-		$data = (new ClubPersonHistoryReader(Factory::getContainer()->get(DatabaseInterface::class)))->read($clubId, [
+		$menuParams = $app->getParams();
+		$sortingEnabled = (bool) $menuParams->get('enable_column_sorting', 1);
+		$visibleColumns = [];
+		foreach (['played', 'wins', 'draws', 'losses', 'score', 'period'] as $column) {
+			$visibleColumns[$column] = (bool) $menuParams->get('show_' . $column, 1);
+		}
+		$requestedSort = (string) $this->getState('list.ordering');
+		if (isset($visibleColumns[$requestedSort]) && !$visibleColumns[$requestedSort]) $requestedSort = 'name';
+		$data = (new ClubPersonHistoryReader(Factory::getContainer()->get(DatabaseInterface::class)))->read($clubId, ['team_id' => (int) $this->getState('team_id'),
 			'project_id'=>(int)$this->getState('project_id'), 'season_id'=>(int)$this->getState('season_id'),
 			'project_type'=>(string)$this->getState('project_type'), 'person_type'=>'staff',
 			'search'=>(string)$this->getState('filter_search'), 'limit'=>(int)$this->getState('list.limit'), 'start'=>(int)$this->getState('list.start'),
-			'sort'=>$sortingEnabled ? (string)$this->getState('list.ordering') : 'name',
+			'sort'=>$sortingEnabled ? $requestedSort : 'name',
 			'direction'=>$sortingEnabled ? (string)$this->getState('list.direction') : 'asc',
 			'staff_only'=>true, 'manager_id'=>(int)$this->getState('manager_id'), 'detail_start'=>max(0,$app->getInput()->getInt('detail_limitstart',0)),
 		], $app->getIdentity()->getAuthorisedViewLevels());
@@ -53,12 +60,16 @@ final class ClubstaffhistoryModel extends BaseDatabaseModel
 			return $data;
 		}
 		$data['managers'] = $data['people'];
+		$data['visible_columns'] = $visibleColumns;
+		$data['show_boundary_matches'] = (bool) $menuParams->get('show_boundary_matches', 1);
+		$data['menu_id'] = max(0, $app->getInput()->getInt('Itemid', 0));
 		$state = $data['pagination_state'];
 		$pagination = new Pagination($state['total'],$state['start'],$state['limit']);
 		$params = ['option'=>'com_joomleague','view'=>'clubstaffhistory','club_id'=>$clubId,
-			'filter_project_id'=>(int)$this->getState('project_id'),'filter_season_id'=>(int)$this->getState('season_id'),
+			'filter_team_id'=>(int)$this->getState('team_id'),'filter_project_id'=>(int)$this->getState('project_id'),'filter_season_id'=>(int)$this->getState('season_id'),
 			'filter_project_type'=>(string)$this->getState('project_type'),
 			'filter_search'=>$state['search'],'limit'=>$state['requested_limit'],'sort'=>$data['sorting']['column'],'direction'=>$data['sorting']['direction']];
+		if ($data['menu_id'] > 0) $params['Itemid'] = $data['menu_id'];
 		foreach ($params as $key=>$value) $pagination->setAdditionalUrlParam($key,$value);
 		$data['pagination'] = $pagination;
 		$data['sorting']['enabled'] = $sortingEnabled;

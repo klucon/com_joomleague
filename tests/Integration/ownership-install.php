@@ -58,6 +58,9 @@ $adminId = (int) $db->setQuery('SELECT id FROM #__users WHERE username=' . $db->
 $app->loadIdentity($container->get(Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($adminId));
 $installer = new Joomla\CMS\Installer\Installer();
 $installer->setDatabase($db);
+if (getenv('FCR_FLAGS_TEST') === '1') {
+    Joomla\CMS\Log\Log::addLogger(['text_file'=>'flags-install.php'], Joomla\CMS\Log\Log::ALL, ['jerror', 'installer']);
+}
 ob_start();
 $package = $argv[1] ?? '/opt/candidate';
 if (!in_array($package, ['/opt/candidate', '/opt/legacy', '/opt/suite', '/opt/legacy-suite'], true) && !preg_match('#^/opt/candidate/modules/mod_joomleague_[a-z_]+$#D',$package) && !preg_match('#^/opt/candidate/plugins/(content|quickicon|finder|console|task)/joomleague$#D',$package)) throw new RuntimeException('Unknown disposable installation source.');

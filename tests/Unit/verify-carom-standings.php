@@ -10,7 +10,7 @@ $game = static fn (string $status, int $a, int $b, ?int $innings): array => ['co
 $match = ['status' => 'final', 'participants' => [['entry_id' => 1, 'root_value' => '6'], ['entry_id' => 2, 'root_value' => '2']], 'segments' => [$game('completed', 40, 30, 20), $game('completed', 20, 25, 40), $game('walkover', 40, 0, 1), $game('cancelled', 40, 0, 1)]];
 $facts = new CaromStandingsFacts();
 $match['statistics'] = $facts->forMatch($match);
-if ($match['statistics'][1] !== ['caroms' => '60', 'innings' => '60', 'high_run' => '7']) throw new RuntimeException('Awards-only / cancelled boards entered playing statistics.');
+if ($match['statistics'][1] !== ['caroms' => '60', 'innings' => '60', 'high_run' => '7', 'best_average_caroms' => '40', 'best_average_innings' => '20']) throw new RuntimeException('Awards-only / cancelled boards entered playing statistics.');
 $metric = static fn (string $code, string $operation, array $extra = []): array => ['code' => $code, 'operation' => $operation, 'value_type' => 'decimal', ...$extra];
 $contract = ['mode' => 'head_to_head', 'included_result_statuses' => ['final'], 'scopes' => [['code' => 'total', 'filter' => ['type' => 'always']]], 'metrics' => [$metric('caroms', 'sum_statistic', ['statistic_code' => 'caroms']), $metric('innings', 'sum_statistic', ['statistic_code' => 'innings']), $metric('high_run', 'max_statistic', ['statistic_code' => 'high_run']), $metric('average', 'ratio', ['left_metric' => 'caroms', 'right_metric' => 'innings'])], 'awards' => ['mode' => 'none', 'rules' => []], 'ordering' => [['metric' => 'average', 'direction' => 'desc', 'nulls' => 'last']]];
 $calculator = new StandingsCalculator();

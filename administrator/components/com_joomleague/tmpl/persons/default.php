@@ -46,7 +46,7 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 					<td class="d-none d-md-table-cell"><?php echo $this->escape((string) $item->first_name); ?></td>
 					<td class="d-none d-md-table-cell"><?php echo $this->escape((string) $item->nickname); ?></td>
 					<td class="d-none d-lg-table-cell"><?php echo $this->escape((string) $item->country_code); ?></td>
-					<td class="d-none d-lg-table-cell text-center"><?php echo (int) $item->project_count + (int) $item->membership_count; ?></td>
+						<td class="d-none d-lg-table-cell text-center"><span tabindex="0" title="<?php echo $this->escape(Text::_('COM_JOOMLEAGUE_PERSON_ASSIGNMENT_COUNT_DESC')); ?>"><?php echo (int) $item->assignment_count; ?></span></td>
 					<td class="text-center"><?php echo HTMLHelper::_('jgrid.published', $item->published, $i, 'persons.', $canChange, 'cb'); ?></td>
 					<td class="d-none d-lg-table-cell text-center"><?php echo (int) $item->id; ?></td>
 				</tr>

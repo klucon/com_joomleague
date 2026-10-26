@@ -3,10 +3,10 @@
 	<fieldset name="details" label="COM_JOOMLEAGUE_FIELDSET_DETAILS" addfieldprefix="Joomleague\Component\Joomleague\Administrator\Field">
 		<field name="project_id" type="hidden" filter="uint" required="true" />
 		<field name="entry_kind" type="Projectentrykind" label="COM_JOOMLEAGUE_PROJECTENTRIES_COLUMN_KIND" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_KIND_DESC" required="true" />
-		<field name="team_id" type="sql" label="COM_JOOMLEAGUE_FIELD_TEAM_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_TEAM_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_team WHERE published = 1 ORDER BY name" key_field="value" value_field="text" showon="entry_kind:team" default="0" validate="options">
+		<field name="team_id" type="sql" layout="joomla.form.field.list-fancy-select" label="COM_JOOMLEAGUE_FIELD_TEAM_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_TEAM_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_team WHERE published = 1 ORDER BY name" key_field="value" value_field="text" showon="entry_kind:team" default="0" validate="options">
 			<option value="0">COM_JOOMLEAGUE_OPTION_SELECT_TEAM</option>
 		</field>
-		<field name="person_id" type="sql" label="COM_JOOMLEAGUE_FIELD_PERSON_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_PERSON_DESC" query="SELECT id AS value, CONCAT(last_name, ', ', first_name) AS text FROM #__joomleague_person WHERE published = 1 ORDER BY last_name, first_name" key_field="value" value_field="text" showon="entry_kind:person" default="0" validate="options">
+		<field name="person_id" type="sql" layout="joomla.form.field.list-fancy-select" label="COM_JOOMLEAGUE_FIELD_PERSON_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_PERSON_DESC" query="SELECT id AS value, CONCAT(last_name, ', ', first_name) AS text FROM #__joomleague_person WHERE published = 1 ORDER BY last_name, first_name" key_field="value" value_field="text" showon="entry_kind:person" default="0" validate="options">
 			<option value="0">COM_JOOMLEAGUE_OPTION_SELECT_PERSON</option>
 		</field>
 		<field name="display_name" type="text" label="COM_JOOMLEAGUE_FIELD_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_PROJECTENTRY_GROUP_NAME_DESC" maxlength="255" showon="entry_kind:group" />

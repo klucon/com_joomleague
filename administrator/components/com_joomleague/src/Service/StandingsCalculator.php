@@ -20,6 +20,15 @@ final class StandingsCalculator
 	 */
 	public function calculate(array $contract, array $entries, array $matches, ?string $scope = null, array $adjustments = []): array
 	{
+		$rows = $this->calculateRows($contract, $entries, $matches, $scope, $adjustments);
+		foreach ($rows as &$row) unset($row['_ratios']);
+		unset($row);
+		return $rows;
+	}
+
+	/** Keep exact maximum-ratio operands through overall and mini-table comparisons. */
+	private function calculateRows(array $contract, array $entries, array $matches, ?string $scope = null, array $adjustments = []): array
+	{
 		$this->validator->validate($contract);
 		$scopeDefinition = $this->scope($contract['scopes'], $scope);
 		if (count($entries) > 10000 || count($matches) > 100000) throw new \LengthException('Standings input exceeds the calculation limit.');
@@ -29,8 +38,8 @@ final class StandingsCalculator
 			$id = filter_var($entry['id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 			if ($id === false || isset($rows[$id]) || !is_string($entry['name'] ?? null)) throw new \InvalidArgumentException('Standings entry is invalid.');
 			if (($entry['included'] ?? true) !== true) continue;
-			$initial = []; foreach ($metricDefinitions as $code => $definition) $initial[$code] = in_array($definition['operation'], ['best_rank', 'status_order', 'max_statistic'], true) ? null : '0';
-			$rows[$id] = ['id' => $id, 'name' => trim($entry['name']), 'rank' => 0, 'metrics' => $initial];
+			$initial = []; foreach ($metricDefinitions as $code => $definition) $initial[$code] = in_array($definition['operation'], ['best_rank', 'status_order', 'max_statistic', 'max_ratio'], true) ? null : '0';
+			$rows[$id] = ['id' => $id, 'name' => trim($entry['name']), 'rank' => 0, 'metrics' => $initial, '_ratios' => []];
 		}
 		$eligibleStatuses = array_fill_keys($contract['included_result_statuses'], true);
 		foreach ($matches as $match) {
@@ -49,14 +58,14 @@ final class StandingsCalculator
 				$facts = $this->facts($entryId, $participant, is_array($opponent) ? $opponent : null, $outcomes[$entryId] ?? null, $match);
 				if (!$this->scopeIncludes($scopeDefinition['filter'], $facts)) continue;
 				$award = $this->award($contract['awards'], $facts);
-				foreach ($metricDefinitions as $code => $definition) $this->accumulate($rows[$entryId]['metrics'], $code, $definition, $facts, $award);
+				foreach ($metricDefinitions as $code => $definition) $this->accumulate($rows[$entryId]['metrics'], $code, $definition, $facts, $award, $rows[$entryId]['_ratios']);
 			}
 		}
 		foreach ($adjustments as $adjustment) {
 			$entryId = filter_var($adjustment['entry_id'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 			$metricCode = $adjustment['metric'] ?? null;
 			if ($entryId === false || !isset($rows[$entryId]) || !is_string($metricCode) || !isset($metricDefinitions[$metricCode])) throw new \InvalidArgumentException('Standings adjustment target is invalid.');
-			if (in_array($metricDefinitions[$metricCode]['operation'], ['difference', 'ratio'], true)) throw new \InvalidArgumentException('Derived standings metrics cannot be adjusted directly.');
+			if (in_array($metricDefinitions[$metricCode]['operation'], ['difference', 'ratio', 'max_ratio'], true)) throw new \InvalidArgumentException('Derived standings metrics cannot be adjusted directly.');
 			$value = StandingsDecimal::normalize((string) ($adjustment['value'] ?? ''));
 			$rows[$entryId]['metrics'][$metricCode] = StandingsDecimal::add($rows[$entryId]['metrics'][$metricCode] ?? '0', $value);
 		}
@@ -103,7 +112,7 @@ final class StandingsCalculator
 				}
 				$miniContract = $contract;
 				$miniContract['ordering'] = [['metric' => $clause['metric'], 'direction' => $clause['direction'], 'nulls' => $clause['nulls']]];
-				$miniRows = array_column($this->calculate($miniContract, $rows, $miniMatches, $scope), null, 'id');
+				$miniRows = array_column($this->calculateRows($miniContract, $rows, $miniMatches, $scope), null, 'id');
 			}
 			$comparisonRows = $miniRows;
 		} else {
@@ -190,11 +199,25 @@ final class StandingsCalculator
 	}
 
 	/** @param array<string,?string> $metrics @param array<string,mixed> $definition @param array<string,mixed> $facts */
-	private function accumulate(array &$metrics, string $code, array $definition, array $facts, string $award): void
+	private function accumulate(array &$metrics, string $code, array $definition, array $facts, string $award, array &$ratios): void
 	{
 		$operation = $definition['operation'];
 		if (in_array($operation, ['difference', 'ratio'], true)) return;
 		if (isset($definition['when']) && !$this->condition($definition['when'], $facts)) return;
+		if ($operation === 'max_ratio') {
+			$left = $definition['numerator_statistic']; $right = $definition['denominator_statistic'];
+			if (!array_key_exists($left, $facts['statistics']) && !array_key_exists($right, $facts['statistics'])) return;
+			$numerator = $facts['statistics'][$left] ?? null; $denominator = $facts['statistics'][$right] ?? null;
+			if ($numerator === null || $denominator === null) { $ratios[$code] = null; $metrics[$code] = null; return; }
+			$numerator = StandingsDecimal::normalize((string) $numerator); $denominator = StandingsDecimal::normalize((string) $denominator);
+			if (StandingsDecimal::compare($denominator, '0') <= 0) throw new \UnexpectedValueException('Maximum ratio requires a positive denominator.');
+			if (array_key_exists($code, $ratios) && $ratios[$code] === null) return;
+			if (!isset($ratios[$code]) || StandingsDecimal::compareRatios($numerator, $denominator, $ratios[$code][0], $ratios[$code][1]) > 0) {
+				$ratios[$code] = [$numerator, $denominator];
+				$metrics[$code] = StandingsDecimal::divide($numerator, $denominator);
+			}
+			return;
+		}
 		if (in_array($operation, ['sum_statistic', 'max_statistic'], true)) {
 			$statistic = $definition['statistic_code'] ?? '';
 			if (!array_key_exists($statistic, $facts['statistics'])) return;
@@ -286,9 +309,11 @@ final class StandingsCalculator
 			}
 			else {
 				$definition = $metricDefinitions[$clause['metric']];
-				$result = $definition['operation'] === 'ratio'
+				$result = $definition['operation'] === 'max_ratio'
+					? StandingsDecimal::compareRatios($left['_ratios'][$clause['metric']][0], $left['_ratios'][$clause['metric']][1], $right['_ratios'][$clause['metric']][0], $right['_ratios'][$clause['metric']][1])
+					: ($definition['operation'] === 'ratio'
 					? StandingsDecimal::compareRatios($left['metrics'][$definition['left_metric']], $left['metrics'][$definition['right_metric']], $right['metrics'][$definition['left_metric']], $right['metrics'][$definition['right_metric']])
-					: StandingsDecimal::compare($leftValue, $rightValue);
+					: StandingsDecimal::compare($leftValue, $rightValue));
 			}
 			if ($result !== 0) return $clause['direction'] === 'desc' ? -$result : $result;
 		}

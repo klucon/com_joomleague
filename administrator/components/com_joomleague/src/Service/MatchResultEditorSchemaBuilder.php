@@ -42,6 +42,10 @@ final class MatchResultEditorSchemaBuilder
 			'levels' => array_merge([['code' => 'result', 'unit' => (string) ($score['unit'] ?? ''), 'parent_code' => null, 'ordinal' => 0]], $segmentTypes),
 			'segment_types' => $segmentTypes,
 			'aggregation' => $score['aggregation'],
+			'allow_aggregate_only' => $type === 'numeric_score'
+				&& ($score['aggregation']['mode'] ?? null) === 'validate'
+				&& in_array($valueType, ['integer', 'decimal'], true)
+				&& !isset($profile['match']['encounter']),
 			'statuses' => $profile['match']['result_status_codes'],
 			'outcomes' => $profile['match']['outcome_codes'],
 			'participant_statuses' => $profile['match']['participant_status_codes'],

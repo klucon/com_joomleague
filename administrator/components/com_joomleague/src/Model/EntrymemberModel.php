@@ -92,7 +92,7 @@ final class EntrymemberModel extends AdminModel implements CurrentUserInterface
 		$data['member_person_type'] = $personType;
 		$data['role_code'] = $roleCode !== '' ? $roleCode : null;
 
-		if (!$this->personExists((int) ($data['person_id'] ?? 0))) {
+		if (!$this->personExists((int) ($data['person_id'] ?? 0), $memberId)) {
 			$this->setError(Text::_('COM_JOOMLEAGUE_ERROR_ENTRYMEMBER_PERSON_INVALID'));
 
 			return false;
@@ -165,7 +165,7 @@ final class EntrymemberModel extends AdminModel implements CurrentUserInterface
 		return $entryId;
 	}
 
-	private function personExists(int $personId): bool
+	private function personExists(int $personId, int $memberId): bool
 	{
 		if ($personId < 1) {
 			return false;
@@ -176,6 +176,12 @@ final class EntrymemberModel extends AdminModel implements CurrentUserInterface
 			->from($this->getDatabase()->quoteName('#__joomleague_person'))
 			->where($this->getDatabase()->quoteName('id') . ' = :personId')
 			->bind(':personId', $personId, ParameterType::INTEGER);
+		$levels = array_values(array_filter(array_map('intval', $this->getCurrentUser()->getAuthorisedViewLevels()), static fn($id) => $id > 0));
+		if (!$levels) return false;
+		$query->where('access IN (' . implode(',', $levels) . ')');
+		$query->where('(published = 1 OR EXISTS (SELECT 1 FROM ' . $this->getDatabase()->quoteName('#__joomleague_project_entry_member', 'stored')
+			. ' WHERE stored.id = :memberId AND stored.person_id = :storedPerson))')
+			->bind(':memberId', $memberId, ParameterType::INTEGER)->bind(':storedPerson', $personId, ParameterType::INTEGER);
 
 		return (int) $this->getDatabase()->setQuery($query)->loadResult() === 1;
 	}

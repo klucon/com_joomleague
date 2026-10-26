@@ -21,7 +21,7 @@ $state = $builder->build($schema, $participants, null);
 $root = $state['segments'][0];
 
 if (array_column($root['children'], 'level_code') !== ['period', 'period', 'extra_time', 'extra_time', 'shootout']) throw new RuntimeException('Football form-state segments are incomplete or incorrectly ordered.');
-if (!$root['children'][0]['required'] || $root['children'][2]['required'] || $root['children'][2]['included']) throw new RuntimeException('Required and optional segment state is invalid.');
+if ($root['children'][0]['required'] || $root['children'][0]['included'] || $root['children'][2]['required'] || $root['children'][2]['included']) throw new RuntimeException('Aggregate-capable parts must start optional and empty.');
 
 $state['status_code'] = 'final';
 $state['outcome_code'] = 'completed';

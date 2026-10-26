@@ -23,7 +23,14 @@ const {summarize,runtimeFailurePattern}=require('./audit-result.cjs');
                 const url=base+'/administrator/index.php?'+new URLSearchParams({option:'com_joomleague',view:'matchresult',match_id:fixture.match});
                 const open=async()=>{const r=await page.goto(url,{waitUntil:'networkidle'});assert.equal(r.status(),200);await page.locator('#jform_status_code').waitFor();const script=page.locator('script[src*="matchresult.js"]');assert.equal(await script.count(),1);assert.equal((await context.request.get(new URL(await script.getAttribute('src'),base).href)).status(),200);};
                 const save=async()=>{await Promise.all([page.waitForNavigation({waitUntil:'networkidle'}),page.locator('#toolbar-apply button').click()]);const body=await page.locator('body').innerText();if(!/saved/i.test(body)){fs.writeFileSync(path.join(directory,driver+'-'+code+'-editor-error.txt'),body);await page.screenshot({path:path.join(directory,driver+'-'+code+'-editor-error.png'),fullPage:true});}assert.match(body,/saved/i);};
-                await open();const initial=native('family-state-'+code);await save();const saved=native('family-state-'+code);assert(saved.finalized_at);assert.deepEqual({...saved,finalized_at:initial.finalized_at},initial);await record(code+'-save');
+                await open();const initial=native('family-state-'+code);
+                const quickData=await page.locator('#adminForm').evaluate(form=>Object.fromEntries(new FormData(form)));
+                const token=Object.keys(quickData).find(key=>/^[a-f0-9]{32}$/.test(key)&&quickData[key]==='1');
+                assert(token);
+                const denied=await context.request.post(base+'/administrator/index.php',{form:{option:'com_joomleague',task:'matchresult.quickSave',format:'json',match_id:String(fixture.match),round_id:quickData.round_id,revision:'0'.repeat(64),[token]:'1','scores[1]':'3','scores[2]':'1'}});
+                const rejected=await denied.json();assert.equal(rejected.success,false);assert.match(rejected.message,/full result editor/);
+                assert.deepEqual(native('family-state-'+code),initial,'Unsupported quick editor changed family data');
+                await save();const saved=native('family-state-'+code);assert(saved.finalized_at);assert.deepEqual({...saved,finalized_at:initial.finalized_at},initial);await record(code+'-save');
                 await open();
                 if(code==='tennis'){
                     const sets=()=>page.locator('input[name$="[level_code]"][value="set"]');assert.equal(await sets().count(),3);

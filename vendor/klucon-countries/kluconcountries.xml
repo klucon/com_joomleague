@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" method="upgrade">
+ <name>COM_KLUCONCOUNTRIES</name><author>KLUCON</author><version>0.1.0-dev</version><creationDate>2026-10</creationDate>
+ <description>COM_KLUCONCOUNTRIES_DESCRIPTION</description><namespace path="src">Klucon\Component\Kluconcountries</namespace>
+ <scriptfile>script.php</scriptfile>
+ <administration>
+  <menu link="option=com_kluconcountries&amp;view=territories&amp;filter[mode]=tree&amp;filter[depth]=1&amp;filter[parent]=&amp;filter[search]=&amp;filter[kind]=&amp;filter[state]=&amp;filter[continent]=&amp;filter[validity]=">COM_KLUCONCOUNTRIES</menu>
+  <files folder="admin"><folder>src</folder><folder>services</folder><folder>tmpl</folder><folder>forms</folder><folder>data</folder><filename>access.xml</filename><filename>config.xml</filename></files>
+  <languages folder="admin/language">
+   <language tag="en-GB">en-GB/com_kluconcountries.ini</language><language tag="en-GB">en-GB/com_kluconcountries.sys.ini</language>
+   <language tag="en-GB">en-GB/com_kluconcountries.units.ini</language>
+   <language tag="en-GB">en-GB/com_kluconcountries.countries.ini</language>
+   <language tag="en-GB">en-GB/com_kluconcountries.continents.ini</language>
+   <language tag="en-GB">en-GB/com_kluconcountries.facts.ini</language>
+  </languages>
+ </administration>
+ <media destination="com_kluconcountries" folder="media"><folder>images</folder></media>
+</extension>

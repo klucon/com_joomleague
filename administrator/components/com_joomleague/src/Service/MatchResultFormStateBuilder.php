@@ -22,7 +22,7 @@ final class MatchResultFormStateBuilder
 
 		$types = $this->typesByParent($schema['segment_types'] ?? []);
 		$root = $this->emptySegment('result', 0, 1, $schema['value_type'] ?? 'integer', $schema['editor_control'] ?? 'number', $participants, true);
-		$root['children'] = $this->children('result', $types, $participants);
+		$root['children'] = $this->children('result', $types, $participants, ($schema['allow_aggregate_only'] ?? false) === true);
 
 		return [
 			'result_type' => (string) ($schema['result_type'] ?? ''),
@@ -48,17 +48,17 @@ final class MatchResultFormStateBuilder
 	}
 
 	/** @param array<string,list<array<string,mixed>>> $types @param list<array<string,mixed>> $participants @return list<array<string,mixed>> */
-	private function children(string $parent, array $types, array $participants): array
+	private function children(string $parent, array $types, array $participants, bool $allowAggregateOnly = false): array
 	{
 		$children = [];
 		foreach ($types[$parent] ?? [] as $type) {
-			$required = isset($type['expected_count']) && !isset($type['condition_code']);
+			$required = !$allowAggregateOnly && isset($type['expected_count']) && !isset($type['condition_code']);
 			$count = max(1, (int) ($type['expected_count'] ?? 1));
 			for ($sequence = 1; $sequence <= $count; $sequence++) {
 				$segment = $this->emptySegment((string) $type['code'], (int) $type['ordinal'], $sequence, (string) $type['value_type'], $this->editorControl($type), $participants, $required);
 				$segment['name_key'] = (string) $type['name_key'];
 				$segment['condition_code'] = $type['condition_code'] ?? null;
-				$segment['children'] = $this->children((string) $type['code'], $types, $participants);
+				$segment['children'] = $this->children((string) $type['code'], $types, $participants, $allowAggregateOnly);
 				$children[] = $segment;
 			}
 		}
@@ -93,7 +93,7 @@ final class MatchResultFormStateBuilder
 			$segment['editor_control'] = $editorControl;
 			$segment['name_key'] = $type['name_key'] ?? null;
 			$segment['condition_code'] = $type['condition_code'] ?? null;
-			$segment['required'] = isset($type['expected_count']) && !isset($type['condition_code']);
+			$segment['required'] = ($schema['allow_aggregate_only'] ?? false) !== true && isset($type['expected_count']) && !isset($type['condition_code']);
 			$segment['included'] = true;
 			$segment['values'] = $values;
 			$segment['children'] = array_map($decorate, $segment['children'] ?? []);

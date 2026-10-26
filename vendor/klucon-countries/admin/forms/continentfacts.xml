@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form><fields name="facts">
+ <fieldset name="facts_area" label="COM_KLUCONCOUNTRIES_FACT_GROUP_AREA">
+  <field name="area_km2" type="number" label="COM_KLUCONCOUNTRIES_FACT_FIELD_AREA_KM2" filter="raw" min="0.001" max="200000000" step="0.001"/>
+  <field name="area_scope" type="textarea" label="COM_KLUCONCOUNTRIES_FACT_FIELD_AREA_SCOPE" filter="raw" maxlength="2000" rows="3"/>
+  <field name="area_source" type="url" label="COM_KLUCONCOUNTRIES_FACT_FIELD_AREA_SOURCE" filter="raw" maxlength="2000"/>
+ </fieldset>
+ <fieldset name="facts_population" label="COM_KLUCONCOUNTRIES_FACT_GROUP_POPULATION">
+  <field name="population" type="number" label="COM_KLUCONCOUNTRIES_FACT_FIELD_POPULATION" filter="raw" min="0" max="100000000000" step="1"/>
+  <field name="population_year" type="number" label="COM_KLUCONCOUNTRIES_FACT_FIELD_POPULATION_YEAR" filter="raw" min="1800" max="2200" step="1"/>
+  <field name="population_status" type="list" label="COM_KLUCONCOUNTRIES_FACT_FIELD_POPULATION_STATUS"><option value=""></option><option value="estimate">COM_KLUCONCOUNTRIES_FACT_ESTIMATE</option><option value="projection">COM_KLUCONCOUNTRIES_FACT_PROJECTION</option><option value="no_permanent_population">COM_KLUCONCOUNTRIES_FACT_NO_PERMANENT_POPULATION</option></field>
+  <field name="population_min" type="number" label="COM_KLUCONCOUNTRIES_FACT_FIELD_POPULATION_MIN" filter="raw" min="0" max="100000000000" step="1" showon="population_status:no_permanent_population"/>
+  <field name="population_max" type="number" label="COM_KLUCONCOUNTRIES_FACT_FIELD_POPULATION_MAX" filter="raw" min="0" max="100000000000" step="1" showon="population_status:no_permanent_population"/>
+  <field name="population_scope" type="textarea" label="COM_KLUCONCOUNTRIES_FACT_FIELD_POPULATION_SCOPE" filter="raw" maxlength="2000" rows="3"/>
+  <field name="population_source" type="url" label="COM_KLUCONCOUNTRIES_FACT_FIELD_POPULATION_SOURCE" filter="raw" maxlength="2000"/>
+ </fieldset>
+ <fieldset name="facts_highest" label="COM_KLUCONCOUNTRIES_FACT_GROUP_HIGHEST">
+  <field name="highest_name" type="text" label="COM_KLUCONCOUNTRIES_FACT_FIELD_HIGHEST_NAME" filter="raw" maxlength="2000"/>
+  <field name="highest_elevation_m" type="number" label="COM_KLUCONCOUNTRIES_FACT_FIELD_HIGHEST_ELEVATION_M" filter="raw" min="-500" max="10000" step="0.001"/>
+  <field name="highest_scope" type="textarea" label="COM_KLUCONCOUNTRIES_FACT_FIELD_HIGHEST_SCOPE" filter="raw" maxlength="2000" rows="3"/>
+  <field name="highest_source" type="url" label="COM_KLUCONCOUNTRIES_FACT_FIELD_HIGHEST_SOURCE" filter="raw" maxlength="2000"/>
+ </fieldset>
+ <fieldset name="facts_lowest" label="COM_KLUCONCOUNTRIES_FACT_GROUP_LOWEST">
+  <field name="lowest_name" type="text" label="COM_KLUCONCOUNTRIES_FACT_FIELD_LOWEST_NAME" filter="raw" maxlength="2000"/>
+  <field name="lowest_elevation_m" type="number" label="COM_KLUCONCOUNTRIES_FACT_FIELD_LOWEST_ELEVATION_M" filter="raw" min="-12000" max="10000" step="0.001"/>
+  <field name="lowest_year" type="number" label="COM_KLUCONCOUNTRIES_FACT_FIELD_LOWEST_YEAR" filter="raw" min="1800" max="2200" step="1"/>
+  <field name="lowest_scope" type="textarea" label="COM_KLUCONCOUNTRIES_FACT_FIELD_LOWEST_SCOPE" filter="raw" maxlength="2000" rows="3"/>
+  <field name="lowest_source" type="url" label="COM_KLUCONCOUNTRIES_FACT_FIELD_LOWEST_SOURCE" filter="raw" maxlength="2000"/>
+ </fieldset>
+ <fieldset name="facts_river" label="COM_KLUCONCOUNTRIES_FACT_GROUP_RIVER">
+  <field name="river_name" type="text" label="COM_KLUCONCOUNTRIES_FACT_FIELD_RIVER_NAME" filter="raw" maxlength="2000"/>
+  <field name="river_length_km" type="number" label="COM_KLUCONCOUNTRIES_FACT_FIELD_RIVER_LENGTH_KM" filter="raw" min="0.001" max="20000" step="0.001"/>
+  <field name="river_scope" type="textarea" label="COM_KLUCONCOUNTRIES_FACT_FIELD_RIVER_SCOPE" filter="raw" maxlength="2000" rows="3"/>
+  <field name="river_source" type="url" label="COM_KLUCONCOUNTRIES_FACT_FIELD_RIVER_SOURCE" filter="raw" maxlength="2000"/>
+ </fieldset>
+ <fieldset name="facts_lake" label="COM_KLUCONCOUNTRIES_FACT_GROUP_LAKE">
+  <field name="lake_name" type="text" label="COM_KLUCONCOUNTRIES_FACT_FIELD_LAKE_NAME" filter="raw" maxlength="2000"/>
+  <field name="lake_area_km2" type="number" label="COM_KLUCONCOUNTRIES_FACT_FIELD_LAKE_AREA_KM2" filter="raw" min="0.001" max="1000000" step="0.001"/>
+  <field name="lake_scope" type="textarea" label="COM_KLUCONCOUNTRIES_FACT_FIELD_LAKE_SCOPE" filter="raw" maxlength="2000" rows="3"/>
+  <field name="lake_source" type="url" label="COM_KLUCONCOUNTRIES_FACT_FIELD_LAKE_SOURCE" filter="raw" maxlength="2000"/>
+ </fieldset>
+</fields></form>

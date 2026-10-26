@@ -31,7 +31,23 @@ const {firefox} = require('/home/ondrej/.npm-global/lib/node_modules/playwright'
         await page.locator('#mod-login-password').fill(process.env.JL_R1_PASSWORD);
         await Promise.all([page.waitForNavigation(),page.locator('#form-login button[type=submit]').click()]);
         assert.equal(await page.locator('#mod-login-username').count(),0,'Restricted login failed.');
+        await page.goto(admin+'?option=com_joomleague&view=persons&filter[search]=id:'+fixture.person,{waitUntil:'networkidle'});
+        const assignmentHelp=page.locator('#personList span[title*="Number of direct project-participant records"]');
+        assert.equal(await assignmentHelp.count(),1,'Person assignment explanation missing.');
+        assert.equal((await assignmentHelp.innerText()).trim(),'2','Person assignment total is inconsistent.');
+        await page.goto(admin+'?option=com_joomleague&task=person.edit&id='+fixture.person,{waitUntil:'networkidle'});
+        assert.match(await page.locator('#person-role-context').innerText(),/Positions and roles belong to a person's assignments/);
+        assert.equal(await page.locator('[name="jform[role_code]"], [name="jform[position_id]"]').count(),0);
+        await page.screenshot({path:path.join(process.env.JL_R1_ARTIFACTS,process.env.JL_R1_DRIVER+'-person-context.png'),fullPage:true});
+        await page.setViewportSize({width:390,height:844});
+        assert(await page.locator('#person-role-context').isVisible(),'Person role guidance missing on mobile.');
+        assert(await page.locator('#person-role-context').evaluate(el=>el.getBoundingClientRect().right<=innerWidth),'Role guidance overflows the mobile viewport.');
+        await page.screenshot({path:path.join(process.env.JL_R1_ARTIFACTS,process.env.JL_R1_DRIVER+'-person-context-mobile.png'),fullPage:true});
+        await page.setViewportSize({width:1440,height:1000});
+        await page.locator('[name="task"]').evaluate(el=>el.value='person.cancel');
+        await Promise.all([page.waitForNavigation({waitUntil:'networkidle'}),page.locator('#person-form').evaluate(el=>el.submit())]);
         const params=(name,project) => ({project_id:project.id, ...(name==='Round'?{stage_id:project.stage}:{}),...(name==='Match'?{round_id:project.round}:{}),...(name==='Entrymember'?{entry_id:project.entries[0]}:{})});
+        await require('./verify-member-selectors.cjs')(context,page,base,fixture);
         const edit=async(name,project,id,target=page)=>{
             const query=new URLSearchParams({option:'com_joomleague',task:name.toLowerCase()+'.edit',id,...params(name,project)});
             const response=await target.goto(admin+'?'+query,{waitUntil:'networkidle'});

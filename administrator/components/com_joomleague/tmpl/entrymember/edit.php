@@ -7,8 +7,14 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
 HTMLHelper::_('behavior.formvalidator');
+HTMLHelper::_('form.csrf');
 $this->getDocument()->getWebAssetManager()->useScript('com_joomleague.entrymember');
 $entryId = (int) $this->entry->id;
+Text::script('COM_JOOMLEAGUE_ENTRYMEMBER_SEARCH_HELP');
+Text::script('COM_JOOMLEAGUE_ENTRYMEMBER_SEARCH_FAILED');
+$this->getDocument()->addScriptOptions('com_joomleague.entrymember', [
+	'entryId' => $entryId, 'memberId' => (int) $this->item->id,
+]);
 ?>
 <form action="<?php echo Route::_('index.php?option=com_joomleague&layout=edit&id=' . (int) $this->item->id . '&entry_id=' . $entryId); ?>" method="post" name="adminForm" id="entrymember-form" class="form-validate">
 	<div class="alert alert-info" role="status"><strong><?php echo $this->escape($this->entry->resolved_name); ?></strong><span class="ms-2"><?php echo $this->escape($this->entry->project_name); ?></span></div>

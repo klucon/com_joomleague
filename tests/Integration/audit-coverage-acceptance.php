@@ -11,6 +11,7 @@ require JPATH_BASE.'/includes/defines.php';require JPATH_BASE.'/includes/framewo
 $container=Joomla\CMS\Factory::getContainer();
 $container->alias('session','session.cli')->alias(Joomla\Session\SessionInterface::class,'session.cli');
 $app=$container->get(Joomla\CMS\Application\SiteApplication::class);Joomla\CMS\Factory::$application=$app;
+$app->input->set('option','com_joomleague');
 if ($app->get('host')!==getenv('JL_R1_DB_HOST') || $app->get('db')!=='r1_test' || $app->get('dbprefix')!=='r1_') throw new RuntimeException('Unsafe target');
 $app->createExtensionNamespaceMap();$app->loadLanguage(Joomla\CMS\Language\Language::getInstance('en-GB'));
 $app->bootComponent('com_joomleague');

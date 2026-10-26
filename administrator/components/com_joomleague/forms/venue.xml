@@ -5,7 +5,7 @@
 		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_ALIAS_DESC" maxlength="255" />
 		<field name="short_name" type="text" label="COM_JOOMLEAGUE_FIELD_SHORT_NAME_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_SHORT_NAME_DESC" maxlength="100" />
 		<field name="nickname" type="text" label="COM_JOOMLEAGUE_FIELD_NICKNAME_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_NICKNAME_DESC" maxlength="100" />
-		<field name="owner_club_id" type="sql" label="COM_JOOMLEAGUE_FIELD_VENUE_OWNER_CLUB_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_OWNER_CLUB_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name" key_field="value" value_field="text" default="0"><option value="0">COM_JOOMLEAGUE_OPTION_NO_OWNER_CLUB</option></field>
+		<field name="owner_club_id" type="sql" layout="joomla.form.field.list-fancy-select" label="COM_JOOMLEAGUE_FIELD_VENUE_OWNER_CLUB_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_OWNER_CLUB_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name" key_field="value" value_field="text" default="0"><option value="0">COM_JOOMLEAGUE_OPTION_NO_OWNER_CLUB</option></field>
 		<field name="external_code" type="text" label="COM_JOOMLEAGUE_FIELD_EXTERNAL_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_VENUE_EXTERNAL_CODE_DESC" maxlength="191" />
 	</fieldset>
 	<fieldset name="location" label="COM_JOOMLEAGUE_FIELDSET_LOCATION">

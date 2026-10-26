@@ -5,7 +5,7 @@
 	<creationDate>August 2026</creationDate>
 	<copyright>Copyright (C) 2026 KLUCON. All rights reserved.</copyright>
 	<license>GNU General Public License version 2 or later</license>
-	<version>6.2.0-rc1</version>
+	<version>6.2.0-rc2</version>
 	<description>PLG_CONSOLE_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Plugin\Console\Joomleague</namespace>
 	<files>
@@ -13,4 +13,10 @@
 		<folder>src</folder>
 		<folder>language</folder>
 	</files>
+	<languages>
+		<language tag="en-GB">language/en-GB/plg_console_joomleague.ini</language>
+		<language tag="en-GB">language/en-GB/plg_console_joomleague.sys.ini</language>
+		
+		
+	</languages>
 </extension>

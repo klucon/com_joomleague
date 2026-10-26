@@ -1,1 +1,2 @@
 module.exports.required = ['finder-pagination','finder-entities','finder-index','finder-access','finder-garbage','task-advertised','task-opt-out','task-unknown','console-help','console-disabled','console-force-required','console-data-preserved'];
+module.exports.browserRequired = ['finder-public-desktop','finder-public-mobile','finder-private-guest','finder-unpublished-guest','finder-registered-private','finder-unpublished-registered','finder-link-public','finder-link-registered'];

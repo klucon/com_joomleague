@@ -16,6 +16,7 @@ use Joomla\CMS\Uri\Uri;
 
 final class HtmlView extends BaseHtmlView
 {
+	public bool $canEditResults = false;
 	public array $items = []; public $pagination; public $state; public $filterForm; public array $activeFilters = []; public object $round; public array $entryOptions = []; public string $contestType = 'head_to_head'; public array $venueOptions = []; public bool $canEditSchedule = false;
 	public function display($tpl = null): void
 	{
@@ -31,10 +32,12 @@ final class HtmlView extends BaseHtmlView
 		$this->getDocument()->getWebAssetManager()->useScript('bootstrap.modal');
 		$this->getDocument()->addScript(Uri::root(true) . '/media/com_joomleague/js/matches-autosave.js', ['version' => 'auto'], ['defer' => true]);
 		$this->getDocument()->addScript(Uri::root(true) . '/media/com_joomleague/js/matches-batch.js', ['version' => 'auto'], ['defer' => true]);
+		$this->getDocument()->addScript(Uri::root(true) . '/media/com_joomleague/js/matches-quick-results.js', ['version' => 'auto'], ['defer' => true]);
 		if ($errors = $this->get('Errors')) throw new GenericDataException(implode("\n", $errors), 500);
 		$user = Factory::getApplication()->getIdentity(); ToolbarHelper::title(Text::sprintf('COM_JOOMLEAGUE_MATCHES_TITLE_ROUND', $this->round->name), 'play');
 		$asset = 'com_joomleague.project.' . (int) ($this->round->project_id ?? 0);
 		$this->canEditSchedule = $user->authorise('joomleague.project.edit.schedule', $asset);
+		$this->canEditResults = $user->authorise('joomleague.project.edit.results', $asset);
 		if ($this->canEditSchedule) ToolbarHelper::addNew('match.add');
 		if ($this->items !== [] && $this->canEditSchedule) { ToolbarHelper::editList('match.edit'); ToolbarHelper::modal('matches-batch-modal', 'icon-copy', 'COM_JOOMLEAGUE_MATCHES_BATCH_BUTTON'); ToolbarHelper::publish('matches.publish', 'JTOOLBAR_PUBLISH', true); ToolbarHelper::unpublish('matches.unpublish', 'JTOOLBAR_UNPUBLISH', true); ToolbarHelper::checkin('matches.checkin'); ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'matches.delete'); }
 		ToolbarHelper::link('index.php?option=com_joomleague&view=rounds&stage_id=' . (int) $this->round->stage_id, 'JTOOLBAR_CLOSE', 'cancel'); parent::display($tpl);

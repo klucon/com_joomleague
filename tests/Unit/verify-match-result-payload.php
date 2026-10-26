@@ -15,3 +15,12 @@ if ($legacyResult['segments'][0]['values'][0]['numeric_value'] !== '3') throw ne
 $legacyPayload['metadata'] = [];
 try { $validator->validate($legacyProfile, [10, 20], $legacyPayload); throw new RuntimeException('Aggregate-only score without migration marker was accepted.'); } catch (MatchResultValidationException) {}
 echo "Match result payload validator OK\n";
+$integerProfile = $legacyProfile;
+$integerProfile['match']['score']['value_type'] = 'integer';
+$legacyPayload['metadata'] = ['legacy_aggregate_only' => true];
+$legacyPayload['segments'][0]['values'][0]['numeric_value'] = '3.000000000';
+$validator->validate($integerProfile, [10,20], $legacyPayload);
+$legacyPayload['segments'][0]['values'][0]['numeric_value'] = '3.5';
+try { $validator->validate($integerProfile, [10,20], $legacyPayload); throw new RuntimeException('Fractional integer-profile root accepted'); }
+catch (MatchResultValidationException $error) { if ($error->getLanguageKey() !== 'COM_JOOMLEAGUE_MATCHRESULT_ERROR_INTEGER_VALUE') throw $error; }
+echo "Integer-profile final scores reject fractions while preserving database decimal-zero representations.\n";

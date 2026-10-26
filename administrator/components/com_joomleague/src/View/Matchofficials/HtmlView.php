@@ -29,6 +29,7 @@ final class HtmlView extends BaseHtmlView
 		catch (\Throwable $error) { throw new GenericDataException($error->getMessage(), 500); }
 		$projectAsset = 'com_joomleague.project.' . (int) ($this->project->id ?? 0);
 		$this->canEdit = Factory::getApplication()->getIdentity()->authorise('joomleague.project.manage.officials', $projectAsset);
+		$this->getDocument()->addScript(\Joomla\CMS\Uri\Uri::root(true) . '/media/com_joomleague/js/matchofficials-actions.js', ['version' => 'auto'], ['defer' => true]);
 		ToolbarHelper::title(Text::_('COM_JOOMLEAGUE_MATCHOFFICIALS_TITLE'), 'user-secret');
 		ToolbarHelper::link('index.php?option=com_joomleague&view=matches&round_id=' . (int) $this->match->round_id, 'JTOOLBAR_CLOSE', 'cancel');
 		parent::display($tpl);

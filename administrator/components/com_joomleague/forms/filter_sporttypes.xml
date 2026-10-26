@@ -2,7 +2,7 @@
 <form>
 	<fields name="filter">
 		<field name="search" type="text" label="COM_JOOMLEAGUE_FILTER_SEARCH_LABEL" description="COM_JOOMLEAGUE_FILTER_SPORTTYPES_SEARCH_DESC" hint="JSEARCH_FILTER" />
-		<field name="profile_id" type="sql" label="COM_JOOMLEAGUE_FIELD_PROFILE" description="COM_JOOMLEAGUE_FILTER_SPORTTYPE_PROFILE_DESC" query="SELECT id AS value, name_key AS text FROM #__joomleague_sport_profile ORDER BY code" key_field="value" value_field="text" translate="true" onchange="this.form.submit();"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_PROFILE</option></field>
+		<field name="profile_id" type="sql" layout="joomla.form.field.list-fancy-select" label="COM_JOOMLEAGUE_FIELD_PROFILE" description="COM_JOOMLEAGUE_FILTER_SPORTTYPE_PROFILE_DESC" query="SELECT id AS value, name_key AS text FROM #__joomleague_sport_profile ORDER BY code" key_field="value" value_field="text" translate="true" onchange="this.form.submit();"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_PROFILE</option></field>
 		<field name="published" type="status" label="JOPTION_SELECT_PUBLISHED" onchange="this.form.submit();"><option value="">JOPTION_SELECT_PUBLISHED</option></field>
 	</fields>
 	<fields name="list">

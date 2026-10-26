@@ -175,7 +175,7 @@ final class MatchLineupRepository
 	public function remove(int $matchId, int $participantId, int $lineupId): void
 	{
 		[$context] = $this->participantContext($matchId, $participantId);
-		$this->database->transactionStart();
+		$this->database->transactionStart(true);
 		try {
 		$projectId = (int) $context['match']->project_id;
 		$this->database->setQuery('SELECT id FROM ' . $this->database->quoteName('#__joomleague_project') . ' WHERE id = ' . $projectId . ' FOR UPDATE')->loadResult();
@@ -188,8 +188,8 @@ final class MatchLineupRepository
 			->bind(':participantId', $boundParticipantId, ParameterType::INTEGER);
 		$this->database->setQuery($query)->execute();
 		if ($this->database->getAffectedRows() !== 1) throw new \InvalidArgumentException('The lineup row does not belong to this match participant.');
-		$this->database->transactionCommit();
-		} catch (\Throwable $error) { $this->database->transactionRollback(); throw $error; }
+		$this->database->transactionCommit(true);
+		} catch (\Throwable $error) { $this->database->transactionRollback(true); throw $error; }
 	}
 
 	/** @return list<object> */

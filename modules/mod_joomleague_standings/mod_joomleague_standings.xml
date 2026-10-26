@@ -5,7 +5,7 @@
 	<creationDate>2026-08</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka (https://klucon.cz).</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.2.0-rc1</version>
+	<version>6.2.0-rc2</version>
 	<description>MOD_JOOMLEAGUE_STANDINGS_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\Standings</namespace>
 	<files>
@@ -17,8 +17,8 @@
 	<languages>
 		<language tag="en-GB">language/en-GB/mod_joomleague_standings.ini</language>
 		<language tag="en-GB">language/en-GB/mod_joomleague_standings.sys.ini</language>
-		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_standings.ini</language>
-		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_standings.sys.ini</language>
+		
+		
 	</languages>
 	<config>
 		<fields name="params" addfieldpath="modules/mod_joomleague_standings/fields">

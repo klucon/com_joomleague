@@ -1,137 +1,224 @@
 # JoomLeague 6.2
 
-JoomLeague 6.2 is a new, sport-independent competition management system for
-Joomla 6.1 and 6.2. The current release is **6.2.0 Release Candidate 1**,
-intended for testing and feedback before the stable release. The `6.2-dev`
-branch remains available for further development.
+**Open-source sports competition management for Joomla.**
 
-## Compatibility warning
+Manage competitions, clubs, teams, people, fixtures, results and statistics in
+one Joomla installation. Publish schedules, standings, match reports and career
+histories through the component and its frontend modules.
 
-**JoomLeague 6.2 is not compatible with JoomLeague 6.1.x.**
+JoomLeague 6.2 is a redesigned, sport-independent generation of the project.
+Football is one supported sport, not the system's hardcoded data model.
 
-The 6.2 line uses a new database schema, versioned sport profiles and different
-runtime contracts. Therefore:
+[Download](https://downloads.joomleague.eu/) |
+[Documentation](https://docs.joomleague.eu/) |
+[Live Demo](https://demo.joomleague.eu/) |
+[Support](https://support.joomleague.eu/) |
+[Translations](https://translate.joomleague.eu/)
 
-- do not install a 6.2 package over JoomLeague 6.1.x;
-- do not copy 6.1.x files into a 6.2 installation;
-- do not import a 6.1.x database or SQL export directly into 6.2;
-- do not use a 6.1.x update package as a route to 6.2.
+> **Release status:** this source tree targets **6.2.0 Release Candidate 2**.
+> Use the download portal to identify the latest published package. Release
+> candidates are intended for testing and feedback, not a stable-release guarantee.
 
-JoomLeague 6.2 must be installed as a **clean installation**.
+## What You Can Manage
 
-### Data conversion is not an upgrade
+- **Competitions:** seasons, projects, stages, rounds, entries and schedules.
+- **Sports data:** results, match events, lineups, officials and profile-driven
+  statistics and standings.
+- **Club directories:** clubs, teams, venues, people and contextual sporting roles.
+- **Historical records:** player careers, coaching and referee records, team
+  rivalries and previous seasons.
+- **Public presentation:** competition and team pages, match reports and sixteen
+  frontend modules for programmes, results, rankings and club information.
+- **Joomla integration:** native permissions, menus, forms, Smart Search,
+  content integration, scheduled tasks and console commands.
 
-Existing data can only be transferred through the dedicated conversion service
-at **[migrate.joomleague.eu](https://migrate.joomleague.eu/)**. The service reads
-a supported legacy SQL dump and creates a new migration package for the 6.2
-schema. This is an external extract-transform-load process, not compatibility
-between 6.1 and 6.2 and not an in-place update.
+### Sport Profiles, Not Football-Only Rules
 
-Always import the generated package into a separate clean 6.2 test installation
-and review its migration report before using the converted data anywhere that
-matters. A successful conversion does not make 6.1 extensions, templates or
-database tables compatible with 6.2.
+Versioned sport profiles define roles, events, statistics and competition rules.
+The repository includes seventeen profiles covering football, futsal,
+basketball, volleyball, ice hockey, floorball, rugby, tennis, carom billiards,
+bowling, darts, chess, esports, motorsport, running races, combat sports and
+team encounters.
 
-## Current release candidate
+A bundled profile is not a promise that every rule or competition format used
+by every federation is implemented. Verify the required format and scoring
+rules in a test installation before using them for a real competition.
 
-- Version: `6.2.0-rc1` (Release Candidate 1)
-- Joomla: 6.1.x or 6.2.x
-- PHP: 8.3 or newer
-- Databases: MySQL 8.0+, MariaDB 10.6+ or PostgreSQL 14+
-- Source language: `en-GB`
-- Included translation: current `cs-CZ` development translation
+One person can participate in several sports. Positions belong to the relevant
+sport and assignment context; they are not a single global label on the person.
 
-The installable package contains:
+## Requirements
 
-- `com_joomleague` - administrator and frontend component;
-- `mod_joomleague_standings`, `mod_joomleague_program`, `mod_joomleague_next_event`,
-  `mod_joomleague_calendar`, `mod_joomleague_programme_ticker`, `mod_joomleague_latest_results`, `mod_joomleague_birthdays`, `mod_joomleague_spotlight`, `mod_joomleague_navigation`, `mod_joomleague_participant`,
-  `mod_joomleague_club`, `mod_joomleague_personnel`, `mod_joomleague_venue_program`,
-  `mod_joomleague_competitions`, `mod_joomleague_statranking` and
-  `mod_joomleague_eventranking` - sport-neutral frontend modules;
-- `plg_quickicon_joomleague` - administrator quick icon;
-- `plg_console_joomleague` - Joomla console integration;
-- `plg_task_joomleague` - Joomla Scheduler integration.
-- `plg_finder_joomleague` - Joomla Smart Search integration;
-- `plg_content_joomleague` - JoomLeague content integration.
+| Component | Requirement |
+| --- | --- |
+| Joomla | 6.1.x or 6.2.x |
+| PHP | 8.3 or newer, subject to the installed Joomla version's requirements |
+| Database | MySQL 8.0+, MariaDB 10.6+ or PostgreSQL 14+ |
+| Base language | English (`en-GB`) |
 
-No other historical JoomLeague modules or plugins are part of the current 6.2
-package unless they are explicitly listed above.
+The hosting environment must also meet Joomla's requirements and provide a
+writable temporary directory and sufficient upload/extraction limits for the
+full package. Use maintained, security-patched software versions.
 
-## Architecture
+## Choose the Correct Installation Path
 
-The 6.2 foundation is built around these rules:
+### New Installation
 
-1. Sport behavior is defined by versioned JSON sport profiles, not hardcoded
-   football rules.
-2. MariaDB/MySQL and PostgreSQL must provide equivalent schema and behavior.
-3. Joomla core MVC, forms, ACL, Scheduler, update sites and administrator styles
-   are used wherever Joomla already provides the required functionality.
-4. Imported legacy values retain auditable provenance, but legacy tables are not
-   the runtime model.
-5. `en-GB` is the canonical language source.
+1. Download the **full JoomLeague package** (`pkg_joomleague-*.zip`) from the
+   [official download portal](https://downloads.joomleague.eu/).
+2. Install it through **System -> Install -> Extensions** in Joomla.
+3. Open **Components -> JoomLeague** and create a sport type from an appropriate
+   sport profile.
+4. Configure your clubs, teams, people, competition and participants before
+   generating fixtures or entering results.
+5. Create Joomla menu items and publish the modules needed by your website.
 
-The current bundle provides 17 sport profiles, universal competition stages,
-entries, schedules, participants, results and standings, and versioned template
-definitions.
+Use the installable ZIP, not GitHub's automatically generated **Source code**
+archives. The source repository is not the assembled installation package.
 
-## Clean installation
+### Updating an Existing 6.2 Installation
 
-1. Download `pkg_joomleague-*.zip` from
-   [downloads.joomleague.eu](https://downloads.joomleague.eu/).
-2. Install it through **System -> Install -> Extensions** in a clean Joomla 6.1 or 6.2
-   installation.
-3. Open **Components -> JoomLeague** and create a sport type from a bundled
-   profile or define your own catalogs.
+Back up both files and the database, then test the update on a copy of the site.
+Use the full compatible package or Joomla's registered extension update channel;
+do not manually copy source files over an installed component.
 
-Do not perform these steps on a Joomla site containing JoomLeague 6.1.x.
+> **RC1 -> RC2 result correction:** RC2 automatically corrects supported migrated
+> football results using their preserved original data. This can overwrite manual
+> changes to affected results. Incomplete or contradictory source results require
+> review rather than an invented score. Keep a full pre-update backup and inspect
+> the installation messages and result-repair log.
 
-## Development updates
+An update does not automatically reconstruct catalogue records missing after an
+earlier failed import. Conflicting identities, sport owners or profile bindings
+must be reviewed before attempting another import.
 
-The package registers the official Joomla update feed:
+### Moving From JoomLeague 6.1.x or Older
 
-`https://downloads.joomleague.eu/update.xml`
+**JoomLeague 6.2 is not compatible with the JoomLeague 6.1.x database schema or
+extension files. It is not an in-place upgrade from that generation.**
 
-Release Candidate packages are tagged as `rc`. Test installations must set
-**System -> Update -> Extensions -> Options -> Minimum Extension Stability** to
-**Release Candidate** or a less restrictive value. Stable sites should retain Joomla's default
-**Stable** value.
+Do not install 6.2 over an older JoomLeague installation, copy legacy extension
+files into it or import an unconverted legacy SQL dump directly.
 
-Each published package is checked with SHA-256, SHA-384 and SHA-512 hashes. The
-feed and changelog remain publicly accessible so Joomla can update without an
-interactive login.
+Use [migrate.joomleague.eu](https://migrate.joomleague.eu/) to convert a supported
+legacy dump. Import the generated migration package into a **separate, clean 6.2
+test installation**, review the conversion report and verify the resulting data.
 
-## Building and verification
+Data conversion does not make old templates, modules, plugins or database tables
+compatible with the new runtime. Never post database dumps publicly: they may
+contain personal data or credentials.
 
-Build the complete package with:
+## Languages and Translation Packages
 
-```bash
-./build/build-package.sh
+**Starting with RC2, the base package contains English (`en-GB`) only.**
+Czech, German, Polish and other translations are maintained separately in
+[JoomLeague Weblate](https://translate.joomleague.eu/).
+
+- Obtain available language packages from the
+  [download portal](https://downloads.joomleague.eu/).
+- Translation packages have their own update channel, separate from the main
+  component package.
+- Existing installed translations and Joomla language overrides are preserved by
+  the RC2 update; independently installed translations should also be kept current.
+- Contribute corrections through Weblate rather than editing bundled English files.
+
+Joomla's own interface language pack and the JoomLeague translation package are
+separate installations. See the
+[language distribution contract](docs/LANGUAGE-DISTRIBUTION-CONTRACT.md).
+
+## Country Flags
+
+The RC2 full package includes the **Klucon Countries** component dependency and
+its JoomLeague connector. They provide shared country data and flag assets
+instead of maintaining a separate copy of flags in every extension.
+
+Flag rendering depends on the installed and enabled integration. Without it,
+JoomLeague retains its textual country fallback rather than requiring flag
+images to render the rest of the page. Installing only the standalone JoomLeague
+component is not equivalent to installing the full integration package.
+
+## Included Extensions
+
+| Area | Included functionality |
+| --- | --- |
+| Main component | `com_joomleague`: administration and public sports views |
+| Programme modules | Programme, Latest Results, Next Programme Event, Programme Ticker, Calendar, Venue Programme |
+| Ranking modules | Standings, Event Ranking, Statistic Ranking |
+| Directory modules | Club, Competitions, Participant, Personnel |
+| Other modules | Birthdays, Navigation, Spotlight |
+| Joomla plugins | Administrator Quick Icon, Console, Scheduler, Smart Search, Content |
+| Countries integration | Klucon Countries dependency and JoomLeague connector |
+
+Historical JoomLeague extensions are not automatically supported or included.
+The presence of a module does not imply that every proposed configuration
+enhancement is part of RC2.
+
+## Updates and Release Channels
+
+The full package registers the official Joomla update feed:
+
+```text
+https://downloads.joomleague.eu/update.xml
 ```
 
-The build validates the release contract before creating ZIP files. The main
-checks can also be run separately:
+To receive RC packages on a test site, set **Minimum Extension Stability** to
+**Release Candidate** in Joomla's extension-update options. Sites that should
+receive only stable releases should retain **Stable**.
+
+Use the download portal for published versions, version history and package
+checksums. A development manifest or an internal build is not proof that a
+release has been published or approved.
+
+## Support and Contributions
+
+Ask questions and report reproducible problems on the
+[support forum](https://support.joomleague.eu/). Include:
+
+- JoomLeague, Joomla, PHP and database versions;
+- the relevant sport profile and competition format;
+- steps to reproduce, expected behaviour and the actual result;
+- screenshots or a minimal, sanitised example where useful.
+
+Do not publish passwords, session tokens, private player data or complete
+database backups. Arrange private transfer with the maintainer when sensitive
+diagnostic material is necessary. Report suspected security vulnerabilities
+privately rather than publishing exploit details in a public topic.
+
+Translation contributions belong in [Weblate](https://translate.joomleague.eu/).
+Code contributions should preserve the sport-independent architecture, Joomla
+ACL and request protections, and equivalent MariaDB/MySQL and PostgreSQL behaviour.
+
+## Development
+
+Sport rules live in versioned JSON profiles. Joomla provides the surrounding
+MVC, forms, permissions and extension lifecycle. Converted legacy values retain
+provenance, but legacy tables are not the runtime data model.
+
+Build the installable package from the repository root:
+
+```bash
+bash build/build-package.sh
+```
+
+Run the architecture and PHP unit checks:
 
 ```bash
 php tests/Architecture/verify-foundation.php
-./tests/Architecture/verify-release.sh
+bash tests/Architecture/verify-release.sh
 
-for test in tests/Unit/*.php; do
-    php "$test"
+for test in tests/Unit/verify-*.php; do
+    php "$test" || exit 1
 done
 ```
 
-Integration and browser tests run against both JoomLeague test installations,
-one backed by MariaDB and one by PostgreSQL.
+Integration and browser harnesses are in `tests/Integration` and `tests/Browser`.
+They require their documented local dependencies and isolated test environments.
+Do not point destructive acceptance fixtures at a live website.
 
-## Services
-
-- Project hub: [joomleague.eu](https://joomleague.eu/)
-- Downloads and updates: [downloads.joomleague.eu](https://downloads.joomleague.eu/)
-- Documentation: [docs.joomleague.eu](https://docs.joomleague.eu/)
-- Data conversion: [migrate.joomleague.eu](https://migrate.joomleague.eu/)
-- Support: [support.joomleague.eu](https://support.joomleague.eu/)
+Passing a build is not release approval. Installation, upgrade, data-integrity,
+permission and browser checks must cover the exact candidate being published.
 
 ## License
 
-JoomLeague is released under the GNU General Public License version 2 or later.
+JoomLeague is free and open-source software released under the
+**GNU General Public License, version 2 or later**.

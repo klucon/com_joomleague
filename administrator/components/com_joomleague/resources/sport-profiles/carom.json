@@ -1,7 +1,7 @@
 {
     "schema_version": "1.5.0",
     "code": "carom",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "name_key": "COM_JOOMLEAGUE_PROFILE_CAROM",
     "description_key": "COM_JOOMLEAGUE_PROFILE_CAROM_DESC",
     "scoring_model": "team_encounter",
@@ -39,27 +39,27 @@
             },
             "/standings/tie_breaks/first": {
                 "type": "string",
-                "enum": ["score_for", "score_difference", "caroms", "average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
+                "enum": ["score_for", "score_difference", "caroms", "average", "best_average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
                 "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TIE_FIRST", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_CRITERION_"
             },
             "/standings/tie_breaks/second": {
                 "type": "string",
-                "enum": ["score_for", "score_difference", "caroms", "average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
+                "enum": ["score_for", "score_difference", "caroms", "average", "best_average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
                 "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TIE_SECOND", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_CRITERION_"
             },
             "/standings/tie_breaks/third": {
                 "type": "string",
-                "enum": ["score_for", "score_difference", "caroms", "average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
+                "enum": ["score_for", "score_difference", "caroms", "average", "best_average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
                 "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TIE_THIRD", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_CRITERION_"
             },
             "/standings/tie_breaks/fourth": {
                 "type": "string",
-                "enum": ["score_for", "score_difference", "caroms", "average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
+                "enum": ["score_for", "score_difference", "caroms", "average", "best_average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
                 "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TIE_FOURTH", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_CRITERION_"
             },
             "/standings/tie_breaks/fifth": {
                 "type": "string",
-                "enum": ["score_for", "score_difference", "caroms", "average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
+                "enum": ["score_for", "score_difference", "caroms", "average", "best_average", "high_run", "wins", "head_to_head_points", "head_to_head_average", "head_to_head_caroms", "none"],
                 "name_key": "COM_JOOMLEAGUE_CAROM_RULE_TIE_FIFTH", "enum_label_prefix": "COM_JOOMLEAGUE_CAROM_CRITERION_"
             },
             "/standings/team_points/win": {
@@ -210,6 +210,7 @@
             "caroms",
             "innings",
             "average",
+            "best_average",
             "high_run"
         ],
         "type": "team_table",
@@ -275,6 +276,9 @@
                 },
                 {
                     "code": "average", "operation": "ratio", "value_type": "decimal", "left_metric": "caroms", "right_metric": "innings"
+                },
+                {
+                    "code": "best_average", "operation": "max_ratio", "value_type": "decimal", "numerator_statistic": "best_average_caroms", "denominator_statistic": "best_average_innings"
                 },
                 {
                     "code": "high_run", "operation": "max_statistic", "value_type": "decimal", "statistic_code": "high_run"

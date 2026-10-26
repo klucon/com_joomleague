@@ -13,7 +13,7 @@ $data = $this->venue;
 ?>
 <div class="com-joomleague-venue">
 	<?php if (isset($data['error'])) : ?><div class="alert alert-warning"><?php echo Text::_($data['error']); ?></div><?php else : ?>
-		<?php $venue = $data['venue']; $location = array_filter([(string) $venue->address, trim((string) $venue->postal_code . ' ' . (string) $venue->city), (string) $venue->region, (string) $venue->country_code]); ?>
+		<?php $venue = $data['venue']; $location = array_filter([(string) $venue->address, trim((string) $venue->postal_code . ' ' . (string) $venue->city), (string) $venue->region, \Joomleague\Component\Joomleague\Domain\Service\CountryPresentation::name((string) $venue->country_code)]); ?>
 		<header class="border-bottom pb-3 mb-4">
 			<?php if ($venue->picture) : ?><img src="<?php echo htmlspecialchars((string) $venue->picture, ENT_QUOTES, 'UTF-8'); ?>" alt="" class="img-fluid mb-3" loading="lazy"><?php endif; ?>
 			<h1 class="mb-1"><?php echo htmlspecialchars((string) $venue->name, ENT_QUOTES, 'UTF-8'); ?></h1>

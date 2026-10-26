@@ -104,6 +104,19 @@ try {
         $publishedStandings = $standingReader->current($project, $stage, 'total');
         $publishedContract = json_decode((string) $publishedStandings['snapshot']->contract_json, true, 512, JSON_THROW_ON_ERROR);
         if ((int) $publishedStandings['snapshot']->id !== $snapshotId || $publishedContract['ordering'][1]['scope'] !== 'head_to_head' || $publishedStandings['rows'][0]->metrics['points'] !== '2' || $publishedStandings['rows'][1]->metrics['points'] !== '2' || (int) $publishedStandings['rows'][0]->entry_id_snapshot !== $standingInput['entries'][0]['id']) throw new RuntimeException('Published snapshot lost head-to-head order or overall totals.');
+        $pinnedChecksum = (string) $db->setQuery($db->getQuery(true)->select('payload_checksum')->from($db->quoteName('#__joomleague_sport_profile_version'))->where('id=' . (int) $version))->loadResult();
+        (new Joomleague\Component\Joomleague\Administrator\Service\ProjectRuleConfigRepository($db))->save($project, ['match' => ['encounter' => ['duel_points' => ['win' => 3]]], 'standings' => ['team_points' => ['win' => 2, 'draw' => 1, 'loss' => 0], 'tie_breaks' => ['first' => 'best_average', 'second' => 'none', 'third' => 'none', 'fourth' => 'none', 'fifth' => 'none']]], 0);
+        if ((int) $db->setQuery('SELECT is_dirty FROM ' . $db->quoteName('#__joomleague_standing_freshness') . ' WHERE project_id=' . $project . ' AND stage_key=' . $stage)->loadResult() !== 1) throw new RuntimeException('Best-average rule did not invalidate standings.');
+        $bestSnapshotId = $standingRecalculator->recalculate($project, $stage, 'total', 0);
+        $bestStandings = $standingReader->current($project, $stage, 'total');
+        $bestContract = json_decode((string) $bestStandings['snapshot']->contract_json, true, 512, JSON_THROW_ON_ERROR);
+        if ((int) $bestStandings['snapshot']->id !== $bestSnapshotId || $bestContract['ordering'][1]['metric'] !== 'best_average' || $bestStandings['rows'][0]->metrics['best_average'] !== '0.930232558' || (int) $bestStandings['rows'][0]->entry_id_snapshot !== $standingInput['entries'][0]['id']) throw new RuntimeException('Persisted best individual average was not used in the points tie.');
+        if ((string) $db->setQuery($db->getQuery(true)->select('payload_checksum')->from($db->quoteName('#__joomleague_sport_profile_version'))->where('id=' . (int) $version))->loadResult() !== $pinnedChecksum) throw new RuntimeException('Rule selection mutated the pinned profile.');
+        echo "Best individual average OK: metadata persistence, points tie, snapshot publication, invalidation and immutable profile.\n";
+        require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Table/StandingadjustmentTable.php';
+        $forgedAverage = new Joomleague\Component\Joomleague\Administrator\Table\StandingadjustmentTable($db);
+        $forgedAverage->bind(['project_id' => $project, 'project_entry_id' => $standingInput['entries'][0]['id'], 'scope_code' => 'total', 'metric_code' => 'best_average', 'adjustment_value' => '999', 'reason' => 'Synthetic forbidden derived-metric adjustment']);
+        if ($forgedAverage->check() || $forgedAverage->getError() !== Joomla\CMS\Language\Text::_('COM_JOOMLEAGUE_ERROR_STANDING_ADJUSTMENT_CONTRACT_INVALID')) throw new RuntimeException('Table validation accepted a forged best-average correction.');
         foreach (['CaromEncounterSummary', 'CaromPlayerSummary', 'ParticipantStatisticReader'] as $service) require_once JPATH_ADMINISTRATOR . '/components/com_joomleague/src/Service/' . $service . '.php';
         require_once JPATH_ROOT . '/components/com_joomleague/src/Service/CaromPlayerHistoryReader.php';
         $summary = (new Joomleague\Component\Joomleague\Domain\Service\ParticipantStatisticReader($db))->forEntry($project, (int) $db->setQuery('SELECT project_entry_id FROM ' . $db->quoteName('#__joomleague_match_participant') . ' WHERE id=' . $participants[0])->loadResult(), [1])['carom_summary'];
@@ -145,6 +158,9 @@ try {
     if ($carom) {
         $correctedPlayer = $historyReader->forPerson($people[0], [1])['projects'][0];
         if ($correctedPlayer['wins'] !== 2 || $correctedPlayer['losses'] !== 2 || $correctedPlayer['caroms'] !== 89 || $correctedPlayer['average'] !== null) throw new RuntimeException('Correction did not update player summary / missing innings.');
+        $correctedInput = $standingRecalculator->inputForCalculation($standingReader->context($project, $stage, 'total'), 'total');
+        $correctedRows = array_column((new Joomleague\Component\Joomleague\Domain\Service\StandingsCalculator())->calculate($bestContract, $correctedInput['entries'], $correctedInput['matches']), null, 'id');
+        if ($correctedRows[$standingInput['entries'][0]['id']]['metrics']['best_average'] !== null) throw new RuntimeException('Persisted missing innings produced an invented best average.');
     }
     if ((int) $db->setQuery('SELECT is_dirty FROM ' . $db->quoteName('#__joomleague_standing_freshness') . ' WHERE project_id = ' . $project)->loadResult() !== 1) throw new RuntimeException('Correction did not atomically invalidate standings.');
     $count = (int) $db->setQuery('SELECT COUNT(*) FROM ' . $db->quoteName('#__joomleague_match_encounter_revision') . ' WHERE match_id = ' . $match)->loadResult();
@@ -238,6 +254,15 @@ try {
             foreach ([1, 0, 1, 0, 0, 0, 0] as $index => $slot) foreach ($participants as $side => $participant) if ((int) $stored['segments'][0]['children'][$index + 4]['values'][$side]['metadata']['lineup_member_id'] !== $members[$participant][$slot]) throw new RuntimeException('Portuguese last-board continuation was not persisted.');
             echo ($pg ? 'PostgreSQL' : 'MariaDB') . " Portuguese penalties OK: reverse first pass, repeated board one, unchanged 4:4 and decided winner.\n";
         }
+    }
+    if ($carom && $keep && !$penalties && in_array('--browser-complete', $argv, true)) {
+        // Missing-data behavior was checked above; publish a complete synthetic example for UI verification.
+        $payload['encounter_revision'] = $encounter->revision($match);
+        foreach ($payload['segments'][0]['children'][0]['values'] as &$value) $value['metadata'] = ['innings' => 43, 'high_run' => 1];
+        unset($value);
+        $repo->replace($match, $payload, 0);
+        $standingRecalculator->recalculate($project, null, 'total', 0);
+        $standingRecalculator->recalculate($project, $stage, 'total', 0);
     }
     if ($keep) echo json_encode(['match' => $match, 'project' => $project, 'round' => $round], JSON_THROW_ON_ERROR) . "\n";
 } finally {

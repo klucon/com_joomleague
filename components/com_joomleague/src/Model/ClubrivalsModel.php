@@ -20,14 +20,16 @@ final class ClubrivalsModel extends BaseDatabaseModel
 	{
 		$input = Factory::getApplication()->getInput();
 		$this->setState('club_id', $input->getInt('club_id', 0));
+		$this->setState('team_id', $input->getInt('filter_team_id', $input->getInt('team_id', 0)));
 		foreach (['project_id', 'season_id', 'opponent_club_id'] as $key) $this->setState($key, $input->getInt('filter_' . $key, 0));
+		$this->setState('opponent_team_id', $input->getInt('filter_opponent_team_id', 0));
 		$this->setState('project_type', $input->getCmd('filter_project_type', ''));
 		$this->setState('filter_search', trim($input->getString('filter_search', '')));
 		$this->setState('list.ordering', $input->getCmd('sort', 'opponent'));
 		$this->setState('list.direction', strtolower($input->getCmd('direction', 'asc')) === 'desc' ? 'desc' : 'asc');
 		$limit = $input->getInt('limit', 25);
 		$this->setState('list.limit', in_array($limit, [0, 10, 25, 50, 100], true) ? $limit : 25);
-		$this->setState('list.start', max(0, $input->getInt('start', 0)));
+		$this->setState('list.start', max(0, $input->getInt('limitstart', $input->getInt('start', 0))));
 	}
 
 	/** @return array<string,mixed> */
@@ -38,14 +40,17 @@ final class ClubrivalsModel extends BaseDatabaseModel
 		if ($clubId < 1) $clubId = (int) ComponentHelper::getParams('com_joomleague')->get('site_club_id', 0);
 		if ($clubId < 1) return ['error' => 'COM_JOOMLEAGUE_CLUBRIVALS_NO_CLUB'];
 		$app->bootComponent('com_joomleague');
-		$data = (new ClubRivalHistoryReader(Factory::getContainer()->get(DatabaseInterface::class)))->read($clubId, [
-			'project_id' => (int) $this->getState('project_id'), 'season_id' => (int) $this->getState('season_id'),
+		$menuParams = $app->getParams();
+		$data = (new ClubRivalHistoryReader(Factory::getContainer()->get(DatabaseInterface::class)))->read($clubId, ['team_id' => (int) $this->getState('team_id'),
+			'grouping' => $menuParams->get('rival_grouping', 'team'),
+			'detail_start' => max(0, $app->getInput()->getInt('detail_limitstart', 0)),
+			'opponent_team_id' => (int) $this->getState('opponent_team_id'), 'project_id' => (int) $this->getState('project_id'), 'season_id' => (int) $this->getState('season_id'),
 			'project_type' => (string) $this->getState('project_type'), 'opponent_club_id' => (int) $this->getState('opponent_club_id'),
 		], $app->getIdentity()->getAuthorisedViewLevels());
 		if (isset($data['error'])) $data['error'] = $data['error'] === 'club_required' ? 'COM_JOOMLEAGUE_CLUBRIVALS_NO_CLUB' : 'COM_JOOMLEAGUE_CLUBRIVALS_UNAVAILABLE';
 		if (isset($data['error'])) return $data;
 		$search = (string) $this->getState('filter_search');
-		if ($search !== '') $data['opponents'] = array_values(array_filter($data['opponents'], static fn (array $row): bool => mb_stripos((string) $row['club_name'], $search) !== false));
+		if ($search !== '') $data['opponents'] = array_values(array_filter($data['opponents'], static fn (array $row): bool => mb_stripos(implode(' ', [$row['club_name'], $row['opponent_name'], $row['own_team_name']]), $search) !== false));
 		$sortingEnabled = (bool) $app->getParams()->get('enable_column_sorting', 1);
 		$sort = $sortingEnabled ? (string) $this->getState('list.ordering') : 'opponent';
 		$direction = $sortingEnabled ? (string) $this->getState('list.direction') : 'asc';
@@ -57,10 +62,20 @@ final class ClubrivalsModel extends BaseDatabaseModel
 		$start = min((int) $this->getState('list.start'), max(0, (int) (floor(max(0, $total - 1) / $limit) * $limit)));
 		$data['opponents'] = array_slice($data['opponents'], $start, $limit);
 		$pagination = new Pagination($total, $start, $limit);
-		foreach (['option' => 'com_joomleague', 'view' => 'clubrivals', 'club_id' => $clubId, 'filter_project_id' => (int) $this->getState('project_id'), 'filter_season_id' => (int) $this->getState('season_id'), 'filter_project_type' => (string) $this->getState('project_type'), 'filter_search' => $search, 'limit' => $requestedLimit, 'sort' => $sort, 'direction' => $direction] as $key => $value) $pagination->setAdditionalUrlParam($key, $value);
+		$data['menu_id'] = max(0, $app->getInput()->getInt('Itemid', 0));
+		$params = ['option' => 'com_joomleague', 'view' => 'clubrivals', 'club_id' => $clubId, 'filter_team_id' => (int) $this->getState('team_id'), 'filter_opponent_team_id' => (int) $this->getState('opponent_team_id'), 'filter_opponent_club_id' => (int) $this->getState('opponent_club_id'), 'filter_project_id' => (int) $this->getState('project_id'), 'filter_season_id' => (int) $this->getState('season_id'), 'filter_project_type' => (string) $this->getState('project_type'), 'filter_search' => $search, 'limit' => $requestedLimit, 'sort' => $sort, 'direction' => $direction];
+		if ($data['menu_id'] > 0) $params['Itemid'] = $data['menu_id'];
+		foreach ($params as $key => $value) $pagination->setAdditionalUrlParam($key, $value);
 		$data['pagination'] = $pagination;
 		$data['pagination_state'] = ['total' => $total, 'start' => $start, 'limit' => $limit, 'requested_limit' => $requestedLimit, 'search' => $search, 'all_capped' => $requestedLimit === 0 && $total > 1000];
 		$data['sorting'] = ['enabled' => $sortingEnabled, 'column' => $sort, 'direction' => $direction];
+		$dateFormats = ['compact' => 'd.m.Y', 'iso' => 'Y-m-d', 'locale' => ''];
+		$dateMode = (string) $menuParams->get('rival_date_format', 'compact');
+		$data['date_format'] = $dateFormats[$dateMode] ?? $dateFormats['compact'];
+		$data['show_breakdowns'] = (bool) $menuParams->get('show_rival_breakdowns', 1);
+		$detail = $data['detail_state'];
+		$data['detail_pagination'] = new Pagination($detail['total'], $detail['start'], $detail['limit'], 'detail_');
+		foreach ($params + ['start' => $start] as $key => $value) $data['detail_pagination']->setAdditionalUrlParam($key, $value);
 		return $data;
 	}
 
@@ -72,10 +87,13 @@ final class ClubrivalsModel extends BaseDatabaseModel
 				'played', 'wins', 'draws', 'losses' => (int) $left[$sort] <=> (int) $right[$sort],
 				'score' => StandingsDecimal::compare(StandingsDecimal::subtract((string) $left['scored'], (string) $left['conceded']), StandingsDecimal::subtract((string) $right['scored'], (string) $right['conceded'])),
 				'period' => strcmp((string) ($left['first_match'] ?? ''), (string) ($right['first_match'] ?? '')),
-				default => strnatcasecmp((string) $left['club_name'], (string) $right['club_name']),
+				default => strnatcasecmp((string) ($left['opponent_name'] ?? $left['club_name']), (string) ($right['opponent_name'] ?? $right['club_name'])),
 			};
 			if ($direction === 'desc') $comparison *= -1;
-			return $comparison ?: strnatcasecmp((string) $left['club_name'], (string) $right['club_name']);
+			return $comparison ?: strnatcasecmp((string) ($left['opponent_name'] ?? $left['club_name']), (string) ($right['opponent_name'] ?? $right['club_name']))
+				?: ((int) $left['team_id'] <=> (int) $right['team_id'])
+				?: ((int) $left['opponent_team_id'] <=> (int) $right['opponent_team_id'])
+				?: ((int) $left['club_id'] <=> (int) $right['club_id']);
 		});
 	}
 }

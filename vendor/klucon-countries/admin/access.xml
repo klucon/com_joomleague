@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<access component="com_kluconcountries"><section name="component">
+ <action name="core.admin" title="JACTION_ADMIN"/><action name="core.manage" title="JACTION_MANAGE"/>
+ <action name="core.edit" title="JACTION_EDIT"/>
+ <action name="core.create" title="JACTION_CREATE"/><action name="core.edit.state" title="JACTION_EDITSTATE"/>
+ <action name="core.delete" title="JACTION_DELETE"/><action name="core.options" title="JACTION_OPTIONS"/>
+ <action name="countries.upload" title="COM_KLUCONCOUNTRIES_ACL_UPLOAD"/>
+ <action name="countries.import" title="COM_KLUCONCOUNTRIES_ACL_IMPORT"/>
+ <action name="countries.export" title="COM_KLUCONCOUNTRIES_ACL_EXPORT"/>
+ <action name="countries.history" title="COM_KLUCONCOUNTRIES_ACL_HISTORY"/>
+ <action name="countries.restore" title="COM_KLUCONCOUNTRIES_ACL_RESTORE"/>
+</section></access>

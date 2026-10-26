@@ -49,6 +49,7 @@ final class MatchesModel extends ListModel
 	{
 		$db = $this->getDatabase(); $roundId = (int) $this->getState('round_id'); $query = $db->getQuery(true)->select('a.*')->select($db->quoteName('editor.name', 'editor_name'))
 			->select([
+				$db->quoteName('result.id', 'result_record_id'),
 				$db->quoteName('result.result_type'),
 				$db->quoteName('result.status_code', 'result_status_code'),
 				$db->quoteName('result.outcome_code', 'result_outcome_code'),
@@ -81,11 +82,36 @@ final class MatchesModel extends ListModel
 		$values = (new MatchResultSummaryProvider($this->getDatabase()))->loadRootValues($ids);
 		$participants = (new MatchParticipantSummaryProvider($this->getDatabase()))->loadDetails($ids);
 		$round = $this->getRound();
+		$profile = (new ProjectContextRepository($this->getDatabase()))->get((int) $round->project_id)->profile;
+		$profile = (new \Joomleague\Component\Joomleague\Administrator\Service\ProjectRuleConfigRepository($this->getDatabase()))->resolve((int) $round->project_id, $profile);
+		$profile = (new \Joomleague\Component\Joomleague\Administrator\Service\StageEncounterRules($this->getDatabase()))->resolve($profile, (int) $round->project_id, (int) $round->stage_id);
+		$quickSupported = \Joomleague\Component\Joomleague\Administrator\Service\MatchQuickResultEditor::supports($profile);
+		$childMatches = [];
+		$childQuery = $this->getDatabase()->getQuery(true)->select('match_id')->from($this->getDatabase()->quoteName('#__joomleague_match_score_segment'))->where('parent_id IS NOT NULL')->whereIn('match_id', $ids, ParameterType::INTEGER)->group('match_id');
+		foreach ($this->getDatabase()->setQuery($childQuery)->loadColumn() as $childMatch) $childMatches[(int) $childMatch] = true;
+		$counts = [];
+		$db = $this->getDatabase();
+		foreach (['match_lineup_member' => 'lineup', 'match_actor_role' => 'officials', 'match_event' => 'events', 'match_statistic_value' => 'statistics'] as $table => $key) {
+			$query = $db->getQuery(true)->select(['match_id', 'COUNT(*) AS item_count'])
+				->from($db->quoteName('#__joomleague_' . $table))->where('published=1')->whereIn('match_id', $ids, ParameterType::INTEGER)->group('match_id');
+			foreach ($db->setQuery($query)->loadObjectList() as $count) $counts[(int) $count->match_id][$key] = (int) $count->item_count;
+		}
 
 		foreach ($items as $item) {
 			$item->participants_locked = isset($locked[(int) $item->id]);
+			$item->assignment_counts = $counts[(int) $item->id] ?? [];
 			$item->result_values = $values[(int) $item->id] ?? [];
 			$item->participant_details = $participants[(int) $item->id] ?? [];
+			$quickParticipants = array_values(array_filter($item->participant_details, static fn (array $participant): bool => $participant['published'] === 1));
+			$item->quick_result = $quickSupported && count($quickParticipants) === 2 && array_column($quickParticipants, 'slot_number') === [1, 2]
+				&& !isset($childMatches[(int) $item->id]) && ($item->result_record_id === null || ($item->result_status_code === 'final' && $item->result_outcome_code === 'completed'));
+			if ($item->result_record_id !== null && count($item->result_values) !== 2) $item->quick_result = false;
+			foreach ($item->result_values as $value) {
+				if ($value['numeric_value'] === null || $value['text_value'] !== null || $value['status_code'] !== null || $value['result_rank'] !== null) $item->quick_result = false;
+			}
+			$item->quick_participants = $quickParticipants;
+			$item->quick_step = ($profile['match']['score']['value_type'] ?? '') === 'integer' ? '1' : 'any';
+			$item->quick_revision = $item->quick_result ? \Joomleague\Component\Joomleague\Administrator\Service\MatchQuickResultEditor::revision((int) $item->id, (int) $round->id, $profile, array_column($quickParticipants, 'participant_id'), (string) $item->result_record_id) : '';
 			$item->participant_names = array_column($item->participant_details, 'name');
 			$item->participant_entries = [];
 			foreach ($item->participant_details as $participant) $item->participant_entries[(int) $participant['slot_number']] = (int) $participant['entry_id'];

@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+if (PHP_SAPI !== 'cli' || !str_starts_with((string) getenv('JL_R1_DB_HOST'), 'jl-r1-')) {
+	throw new RuntimeException('Disposable lifecycle target required.');
+}
+
 define('_JEXEC', 1);
 define('JPATH_BASE', '/var/www/html');
 
@@ -37,6 +41,9 @@ $container->alias('session', 'session.cli')
 Factory::$application = $container->get(Joomla\Console\Application::class);
 
 $database = $container->get(DatabaseInterface::class);
+if (Factory::$application->get('host') !== getenv('JL_R1_DB_HOST') || Factory::$application->get('db') !== 'r1_test' || Factory::$application->get('dbprefix') !== 'r1_') {
+	throw new RuntimeException('Refusing reset on a non-disposable database.');
+}
 $resetter = new RuntimeDataResetter($database);
 $generator = new DemoDataGenerator($database);
 $resetter->reset();

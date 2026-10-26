@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form><field name="scheme" type="text" label="COM_KLUCONCOUNTRIES_CODE_SCHEME" hint="iso3166-1-alpha2" maxlength="64" required="true"/><field name="code" type="text" label="COM_KLUCONCOUNTRIES_CODE_VALUE" maxlength="100" required="true"/></form>

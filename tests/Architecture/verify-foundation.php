@@ -96,29 +96,18 @@ $localizedExtensionRoots = array_merge(
 foreach ($localizedExtensionRoots as $extensionRoot) {
 	$languageRoot = $extensionRoot . '/language';
 	$sourceRoot = $languageRoot . '/en-GB';
-	$translationRoot = $languageRoot . '/cs-CZ';
 
 	if (!is_dir($sourceRoot)) {
 		continue;
 	}
 
-	if (!is_dir($translationRoot)) {
-		throw new RuntimeException(sprintf('Bundled extension %s is missing its cs-CZ language directory.', basename($extensionRoot)));
-	}
-
 	$sourceFiles = array_map('basename', glob($sourceRoot . '/*.ini') ?: []);
-	$translationFiles = array_map('basename', glob($translationRoot . '/*.ini') ?: []);
 	sort($sourceFiles);
-	sort($translationFiles);
-
-	if ($sourceFiles !== $translationFiles) {
-		throw new RuntimeException(sprintf('Bundled extension %s has different en-GB and cs-CZ language files.', basename($extensionRoot)));
-	}
 
 	foreach ($sourceFiles as $languageFilename) {
 		$keySets = [];
 
-		foreach (['en-GB' => $sourceRoot, 'cs-CZ' => $translationRoot] as $languageTag => $directory) {
+		foreach (['en-GB' => $sourceRoot] as $languageTag => $directory) {
 			$contents = (string) file_get_contents($directory . '/' . $languageFilename);
 			preg_match_all('/^([A-Z][A-Z0-9_]+)=/m', $contents, $matches);
 			$keySets[$languageTag] = $matches[1] ?? [];
@@ -128,9 +117,6 @@ foreach ($localizedExtensionRoots as $extensionRoot) {
 			}
 		}
 
-		if ($keySets['en-GB'] !== $keySets['cs-CZ']) {
-			throw new RuntimeException(sprintf('The cs-CZ key order must match en-GB in %s/%s.', basename($extensionRoot), $languageFilename));
-		}
 	}
 }
 
@@ -285,7 +271,7 @@ $tickerCss = (string) file_get_contents($programmeTickerModule . '/media/css/tic
 $tickerJs = (string) file_get_contents($programmeTickerModule . '/media/js/ticker.js');
 foreach (['prefers-reduced-motion: reduce', 'animation-play-state: paused', 'data-orientation=vertical', 'data-loop="0"'] as $motionContract) if (!str_contains($tickerCss, $motionContract)) throw new RuntimeException(sprintf('Programme ticker CSS is missing %s.', $motionContract));
 foreach (['matchMedia', "dataset.clone='1'", "aria-hidden", "tabindex"] as $motionContract) if (!str_contains($tickerJs, $motionContract)) throw new RuntimeException(sprintf('Programme ticker enhancement is missing %s.', $motionContract));
-foreach (['en-GB', 'cs-CZ'] as $languageTag) {
+foreach (['en-GB'] as $languageTag) {
 	$languageSource = (string) file_get_contents($programmeTickerModule . '/language/' . $languageTag . '/mod_joomleague_programme_ticker.ini');
 	foreach (['FIELDSET_SOURCE', 'FIELDSET_CONTENT', 'FIELDSET_MOTION', 'FIELDSET_DISPLAY', 'FIELDSET_LINKS', 'ORIENTATION_LABEL', 'ORIENTATION_HORIZONTAL', 'ORIENTATION_VERTICAL', 'DIRECTION_LABEL', 'SPEED_LABEL', 'ACCESSIBLE_LABEL'] as $languageContract) {
 		if (!str_contains($languageSource, 'MOD_JOOMLEAGUE_PROGRAMME_TICKER_' . $languageContract . '=')) {
@@ -332,7 +318,7 @@ foreach (['name="orientation"', 'value="horizontal"', 'value="vertical"', 'name=
 foreach (['row-cols-lg-2', 'data-orientation', 'data-density', 'justify-content-between', 'text-bg-dark', 'htmlspecialchars', 'Route::_'] as $displayContract) {
 	if (!str_contains($latestResultsTemplate, $displayContract)) throw new RuntimeException(sprintf('Latest results display is missing %s.', $displayContract));
 }
-foreach (['en-GB', 'cs-CZ'] as $languageTag) {
+foreach (['en-GB'] as $languageTag) {
 	$languageSource = (string) file_get_contents($latestResultsModule . '/language/' . $languageTag . '/mod_joomleague_latest_results.ini');
 	foreach (['ORIENTATION_LABEL', 'ORIENTATION_HORIZONTAL', 'ORIENTATION_VERTICAL', 'DENSITY_LABEL', 'GROUP_LABEL', 'STATUS_FILTER_LABEL', 'SHOW_TIME_LABEL', 'TIME_FORMAT_LABEL', 'WINNER_LABEL', 'UNAVAILABLE'] as $languageContract) {
 		if (!str_contains($languageSource, 'MOD_JOOMLEAGUE_LATEST_RESULTS_' . $languageContract . '=')) throw new RuntimeException(sprintf('Latest results %s translation is missing %s.', $languageTag, $languageContract));
@@ -357,7 +343,7 @@ foreach (['name="sport_type_id"', 'name="stage_id"', 'name="venue_id"', 'name="p
 foreach (['data-orientation', 'data-density', 'row-cols-lg-2', 'htmlspecialchars', 'Route::_', 'participant_count'] as $nextEventDisplay) {
 	if (!str_contains($nextEventTemplate, $nextEventDisplay)) throw new RuntimeException(sprintf('Next programme event display is missing %s.', $nextEventDisplay));
 }
-foreach (['en-GB', 'cs-CZ'] as $languageTag) {
+foreach (['en-GB'] as $languageTag) {
 	$languageSource = (string) file_get_contents($nextEventModule . '/language/' . $languageTag . '/mod_joomleague_next_event.ini');
 	foreach (['FIELDSET_SOURCE', 'PREVIOUS_DAYS_LABEL', 'FUTURE_DAYS_LABEL', 'UNSCHEDULED_MODE_LABEL', 'DENSITY_LABEL', 'GROUP_LABEL', 'SHOW_EMPTY_LABEL'] as $languageContract) {
 		if (!str_contains($languageSource, 'MOD_JOOMLEAGUE_NEXT_EVENT_' . $languageContract . '=')) throw new RuntimeException(sprintf('Next programme event %s translation is missing %s.', $languageTag, $languageContract));
@@ -492,7 +478,7 @@ foreach ([
 	}
 }
 
-foreach (['en-GB', 'cs-CZ'] as $packageLanguage) {
+foreach (['en-GB'] as $packageLanguage) {
 	foreach (['pkg_joomleague.ini', 'pkg_joomleague.sys.ini'] as $packageLanguageFile) {
 		$languagePath = $root . '/build/language/' . $packageLanguage . '/' . $packageLanguageFile;
 
@@ -542,7 +528,7 @@ foreach (['projects', 'project', 'participants', 'participant', 'person', 'clubs
 	}
 }
 
-foreach (['en-GB', 'cs-CZ'] as $siteLanguageTag) {
+foreach (['en-GB'] as $siteLanguageTag) {
 	$siteLanguage = (string) file_get_contents($site . '/language/' . $siteLanguageTag . '/com_joomleague.ini');
 	$adminSystemLanguage = (string) file_get_contents($admin . '/language/' . $siteLanguageTag . '/com_joomleague.sys.ini');
 
@@ -630,7 +616,7 @@ foreach (['com_joomleague.getting-started', 'com_joomleague.create-competition',
 	}
 }
 
-foreach (['en-GB', 'cs-CZ'] as $languageTag) {
+foreach (['en-GB'] as $languageTag) {
 	foreach (['com_joomleague.getting_started.ini', 'com_joomleague.getting_started_steps.ini', 'com_joomleague.create_competition.ini', 'com_joomleague.create_competition_steps.ini'] as $tourLanguageFile) {
 		if (!is_file($admin . '/language/' . $languageTag . '/' . $tourLanguageFile)) {
 			throw new RuntimeException(sprintf('Guided tour language file %s/%s is missing.', $languageTag, $tourLanguageFile));
@@ -771,10 +757,14 @@ foreach (['RuntimeResetConfiguration', "addOption('force'", 'RuntimeDataResetter
 	}
 }
 
-foreach (['REMOVE AND CLEAN DEMO DATA', '#__joomleague_sport_type', 'RESTART IDENTITY CASCADE', 'FOREIGN_KEY_CHECKS'] as $resetServiceGuard) {
+foreach (['REMOVE AND CLEAN DEMO DATA', '#__joomleague_sport_type', 'RESTART IDENTITY', 'FOREIGN_KEY_CHECKS', 'assertNoExternalReferences()'] as $resetServiceGuard) {
 	if (!str_contains($resetServiceSource, $resetServiceGuard)) {
 		throw new RuntimeException(sprintf('Demo reset service is missing required guard or driver behavior: %s.', $resetServiceGuard));
 	}
+}
+
+if (str_contains($resetServiceSource, 'RESTART IDENTITY CASCADE')) {
+	throw new RuntimeException('Runtime reset must not cascade into tables owned by other extensions.');
 }
 
 $demoControllerSource = (string) file_get_contents($admin . '/src/Controller/DemodataController.php');
@@ -1219,26 +1209,17 @@ $languageDirectories = array_map('basename', glob($admin . '/language/*', GLOB_O
 
 sort($languageDirectories);
 
-if ($languageDirectories !== ['cs-CZ', 'en-GB']) {
-	throw new RuntimeException('The component package must contain exactly the canonical en-GB source and bundled cs-CZ translation.');
+if (!in_array('en-GB', $languageDirectories, true)) {
+	throw new RuntimeException('Canonical en-GB source directory is required.');
+}
+foreach ($languageDirectories as $languageDirectory) {
+	if (preg_match('/^[a-z]{2,3}-[A-Z]{2}$/D', $languageDirectory) !== 1) {
+		throw new RuntimeException('Invalid source language directory: ' . $languageDirectory);
+	}
 }
 
 $languageFilenames = array_map('basename', $languageFiles);
 sort($languageFilenames);
-
-foreach ($languageFilenames as $languageFilename) {
-	$keySets = [];
-
-	foreach (['en-GB', 'cs-CZ'] as $languageTag) {
-		$contents = (string) file_get_contents($admin . '/language/' . $languageTag . '/' . $languageFilename);
-		preg_match_all('/^(COM_JOOMLEAGUE_[A-Z0-9_]+)=/m', $contents, $matches);
-		$keySets[$languageTag] = $matches[1] ?? [];
-	}
-
-	if ($keySets['en-GB'] !== $keySets['cs-CZ']) {
-		throw new RuntimeException(sprintf('The cs-CZ key order must match en-GB in %s.', $languageFilename));
-	}
-}
 
 foreach ($languageFiles as $languageFile) {
 	$lines = file($languageFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
@@ -1361,7 +1342,7 @@ foreach ($profiles as $profile) {
 	}
 }
 
-foreach (['en-GB', 'cs-CZ'] as $siteLanguageTag) {
+foreach (['en-GB'] as $siteLanguageTag) {
 	$siteLanguage = (string) file_get_contents($site . '/language/' . $siteLanguageTag . '/com_joomleague.ini');
 	preg_match_all('/^([A-Z0-9_]+)=/m', $siteLanguage, $matches);
 	$definedSiteKeys = array_fill_keys($matches[1] ?? [], true);
@@ -1827,10 +1808,15 @@ foreach ($modelIterator as $modelFile) {
 	if (preg_match('/->bind\([^;\n]*->getState\(/', $modelSource) === 1) {
 		throw new RuntimeException(sprintf('%s passes a temporary getState() value to reference-based DatabaseQuery::bind().', $modelFile->getFilename()));
 	}
-	// ProjectscheduleModel is a deliberate exception: it is a cross-round calendar
-	// view, so it defaults to chronological order (scheduled_start ASC) instead of
-	// newest-ID-first like every other admin list.
-	if ($modelFile->getFilename() !== 'ProjectscheduleModel.php'
+	$namedLists = ['ClubsModel.php' => 'a.name', 'TeamsModel.php' => 'a.name', 'PersonsModel.php' => 'a.last_name'];
+	if (isset($namedLists[$modelFile->getFilename()])) {
+		$signature = "populateState(\$ordering = '" . $namedLists[$modelFile->getFilename()] . "', \$direction = 'asc')";
+		if (!str_contains($modelSource, $signature) || !str_contains($modelSource, "->order('a.id ASC')") && !str_contains($modelSource, "->order('a.first_name ASC, a.id ASC')")) {
+			throw new RuntimeException('Named directories require alphabetical defaults and deterministic ties.');
+		}
+	}
+	// Named directories are alphabetical; cross-round schedules are chronological.
+	if ($modelFile->getFilename() !== 'ProjectscheduleModel.php' && !isset($namedLists[$modelFile->getFilename()])
 		&& str_contains($modelSource, 'extends ListModel')
 		&& preg_match("/populateState\(\\\$ordering = '[a-z_]+\\.id', \\\$direction = 'desc'\)/", $modelSource) !== 1) {
 		throw new RuntimeException(sprintf('%s must default to newest ID first.', $modelFile->getFilename()));
@@ -1841,7 +1827,9 @@ foreach (glob($admin . '/forms/filter_*.xml') ?: [] as $filterForm) {
 	$filterSource = (string) file_get_contents($filterForm);
 	// filter_projectschedule.xml is the deliberate exception paired with
 	// ProjectscheduleModel above: a cross-round calendar defaults to chronological order.
-	if (basename($filterForm) !== 'filter_projectschedule.xml'
+	$namedForms = ['filter_clubs.xml' => 'a.name ASC', 'filter_teams.xml' => 'a.name ASC', 'filter_persons.xml' => 'a.last_name ASC'];
+	if (isset($namedForms[basename($filterForm)]) && !str_contains($filterSource, 'default="' . $namedForms[basename($filterForm)] . '"')) throw new RuntimeException('Named directory filter must match its model order.');
+	if (basename($filterForm) !== 'filter_projectschedule.xml' && !isset($namedForms[basename($filterForm)])
 		&& str_contains($filterSource, 'name="fullordering"')
 		&& preg_match('/<field\b(?=[^>]*\bname="fullordering")(?=[^>]*\bdefault="[a-z_]+\.id DESC")[^>]*>/', $filterSource) !== 1) {
 		throw new RuntimeException(sprintf('%s must default to newest ID first.', basename($filterForm)));
@@ -1948,7 +1936,7 @@ foreach (['stage_id', 'round_id', 'venue_id', 'status_codes', 'days_before', 'da
 foreach (['ProgramConfiguration::fromRegistry', "['stage_id']", "['round_id']", "['venue_id']", "['status_codes']", 'usort'] as $programBehaviour) {
 	if (!str_contains($programModuleHelper, $programBehaviour)) throw new RuntimeException(sprintf('Programme helper is missing behaviour %s.', $programBehaviour));
 }
-foreach (['en-GB', 'cs-CZ'] as $languageTag) {
+foreach (['en-GB'] as $languageTag) {
 	$languageSource = (string) file_get_contents($programModule . '/language/' . $languageTag . '/mod_joomleague_program.ini');
 	foreach (['ORIENTATION_LABEL', 'ORIENTATION_HORIZONTAL', 'ORIENTATION_VERTICAL', 'FIELDSET_FILTERS', 'SORT_BY_LABEL', 'DENSITY_LABEL', 'GROUP_LABEL', 'SHOW_EMPTY_LABEL'] as $languageContract) {
 		if (!str_contains($languageSource, 'MOD_JOOMLEAGUE_PROGRAM_' . $languageContract . '=')) throw new RuntimeException(sprintf('Programme %s translation is missing %s.', $languageTag, $languageContract));

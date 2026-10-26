@@ -167,6 +167,9 @@ final class Com_JoomleagueInstallerScript
 			$this->ensureMediaDirectories();
 			$this->synchroniseBundledProfiles();
 			$this->synchroniseGuidedTours();
+			if ($type === 'update') {
+				$this->repairLegacyFootballResults();
+			}
 		} catch (Throwable $exception) {
 			Factory::getApplication()->enqueueMessage($exception->getMessage(), 'error');
 
@@ -174,6 +177,20 @@ final class Com_JoomleagueInstallerScript
 		}
 
 		return true;
+	}
+
+	private function repairLegacyFootballResults(): void
+	{
+		$app = Factory::getApplication();
+		$app->bootComponent('com_joomleague');
+		$report = (new \Joomleague\Component\Joomleague\Administrator\Service\LegacyFootballResultRepair(
+			Factory::getContainer()->get(DatabaseInterface::class)
+		))->repairImportedResults($app->getIdentity());
+		if ($report['repaired'] !== [] || $report['skipped'] !== []) {
+			$app->enqueueMessage(Text::sprintf('COM_JOOMLEAGUE_INSTALL_LEGACY_RESULTS_REPAIRED', count($report['repaired']), count($report['skipped'])), $report['skipped'] === [] ? 'message' : 'warning');
+			\Joomla\CMS\Log\Log::addLogger(['text_file' => 'joomleague-result-repair.php'], \Joomla\CMS\Log\Log::ALL, ['com_joomleague.result_repair']);
+			\Joomla\CMS\Log\Log::add(json_encode($report, JSON_THROW_ON_ERROR), \Joomla\CMS\Log\Log::INFO, 'com_joomleague.result_repair');
+		}
 	}
 
 	private function ensureMediaDirectories(): void

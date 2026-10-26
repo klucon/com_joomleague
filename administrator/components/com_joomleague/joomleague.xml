@@ -7,7 +7,7 @@
 	<license>GNU General Public License version 2 or later</license>
 	<authorEmail>info@klucon.cz</authorEmail>
 	<authorUrl>https://joomleague.eu</authorUrl>
-	<version>6.2.0-rc1</version>
+	<version>6.2.0-rc2</version>
 	<description>COM_JOOMLEAGUE_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Component\Joomleague</namespace>
 	<scriptfile>script.php</scriptfile>
@@ -31,7 +31,7 @@
 	</files>
 	<languages folder="site">
 		<language tag="en-GB">language/en-GB/com_joomleague.ini</language>
-		<language tag="cs-CZ">language/cs-CZ/com_joomleague.ini</language>
+		
 	</languages>
 	<media destination="com_joomleague" folder="media">
 		<filename>joomla.asset.json</filename>
@@ -72,12 +72,12 @@
 			<language tag="en-GB">language/en-GB/com_joomleague.create_competition_steps.ini</language>
 			<language tag="en-GB">language/en-GB/com_joomleague.getting_started.ini</language>
 			<language tag="en-GB">language/en-GB/com_joomleague.getting_started_steps.ini</language>
-			<language tag="cs-CZ">language/cs-CZ/com_joomleague.ini</language>
-			<language tag="cs-CZ">language/cs-CZ/com_joomleague.sys.ini</language>
-			<language tag="cs-CZ">language/cs-CZ/com_joomleague.create_competition.ini</language>
-			<language tag="cs-CZ">language/cs-CZ/com_joomleague.create_competition_steps.ini</language>
-			<language tag="cs-CZ">language/cs-CZ/com_joomleague.getting_started.ini</language>
-			<language tag="cs-CZ">language/cs-CZ/com_joomleague.getting_started_steps.ini</language>
+			
+			
+			
+			
+			
+			
 		</languages>
 	</administration>
 </extension>

@@ -17,6 +17,7 @@ final class SqlDataExchangeService
 	private ?array $trustedImportDdl = null;
 	private ?array $trustedImportTables = null;
 	private array $importColumns = [];
+	private array $importProfileVersions = [];
 	public function __construct(private readonly DatabaseInterface $database, private readonly string $componentRoot)
 	{
 	}
@@ -62,6 +63,7 @@ final class SqlDataExchangeService
 	public function import(string $sql): array
 	{
 		$this->importColumns = [];
+		$this->importProfileVersions = [];
 		if (strlen($sql) > (int) Utility::getMaxUploadSize()) {
 			throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_SIZE');
 		}
@@ -82,15 +84,12 @@ final class SqlDataExchangeService
 		// Joomla SQL exports escape backslashes on both supported database drivers.
 		$preparedInserts = array_map(fn (string $statement): array => (new SqlInsertDataParser())->parse($statement), $inserts);
 		$preparedInserts = $this->orderInserts($preparedInserts);
-		$profileCodes = [];
-		foreach ($preparedInserts as $insert) foreach ($insert['rows'] as $row) foreach ($row as $value) {
-			if (is_array($value)) $profileCodes[$value['profile']] = true;
-		}
 		$executed = 0;
 		$skipped = 0;
 		$createdTables = [];
 		$createdIndexes = [];
 		$transactionStarted = false;
+		$statementGuard = null;
 		$this->acquireImportLock();
 
 		try {
@@ -115,14 +114,34 @@ final class SqlDataExchangeService
 
 			$this->database->transactionStart();
 			$transactionStarted = true;
+			$statementGuard = PostgresqlStatementGuard::attach($this->database);
 			$this->lockPostgreSqlTables();
-			foreach ($preparedInserts as $insert) {
-				$query = $this->boundInsert($insert);
+			$catalogue = new ImportCatalogueGuard($this->database);
+			$bindings = [];
+			$catalogueSkips = [];
+			// Resolve identities before any data INSERT. The same source may be
+			// imported again, but it must never silently inherit another owner.
+			foreach ($preparedInserts as $index => $insert) {
+				if (!ImportCatalogueGuard::protects($insert['table'])) continue;
+				foreach ($insert['rows'] as $offset => $values) {
+					$row = array_combine($insert['columns'], array_map(fn($value) => is_array($value) ? $this->activeProfileVersionId($value['profile']) : $value, $values));
+					if ($catalogue->existing($insert['table'], $row)) $catalogueSkips[$index][$offset] = true;
+					if ($insert['table'] === '#__joomleague_sport_type' && isset($row['code'], $row['profile_version_id'])) $bindings[] = ['code'=>(string)$row['code'], 'version'=>(int)$row['profile_version_id'], 'id'=>isset($row['id'])?(int)$row['id']:null];
+				}
+			}
+			foreach ($preparedInserts as $index => $insert) {
+				$protected = ImportCatalogueGuard::protects($insert['table']);
+				if ($protected) {
+					$skipped += count($catalogueSkips[$index] ?? []);
+					$insert['rows'] = array_values(array_filter($insert['rows'], static fn($offset) => !isset($catalogueSkips[$index][$offset]), ARRAY_FILTER_USE_KEY));
+					if ($insert['rows'] === []) continue;
+				}
+				$query = $this->boundInsert($insert, !$protected);
 				$this->database->setQuery($query)->execute();
 				if ($this->database->getAffectedRows() === 0) $skipped++; else $executed++;
 			}
 			if ($isCanonicalMigration) {
-				$executed += $this->materializeImportedSportTypes(array_keys($profileCodes));
+				$executed += $this->materializeImportedSportTypes($bindings);
 			}
 			$this->synchronizePostgreSqlIdentitySequences();
 			// Imported rows bypass model cascade hooks. Removing these cheap
@@ -156,6 +175,7 @@ final class SqlDataExchangeService
 
 			throw $error;
 		} finally {
+			$statementGuard?->detach($this->database);
 			$this->releaseImportLock();
 		}
 
@@ -321,12 +341,12 @@ final class SqlDataExchangeService
 		if ($tables !== []) $this->database->setQuery('LOCK TABLE ' . implode(', ', $this->database->quoteName($tables)) . ' IN SHARE ROW EXCLUSIVE MODE')->execute();
 	}
 
-	/** @param list<string> $profileCodes */
-	private function materializeImportedSportTypes(array $profileCodes): int
+	/** @param list<array{code:string,version:int,id:?int}> $bindings */
+	private function materializeImportedSportTypes(array $bindings): int
 	{
 		$created = 0;
 
-		foreach ($profileCodes as $profileCode) {
+		foreach ($bindings as $binding) {
 			$query = $this->database->getQuery(true)
 				->select([
 					$this->database->quoteName('sport_type.id'),
@@ -335,8 +355,9 @@ final class SqlDataExchangeService
 				->from($this->database->quoteName('#__joomleague_sport_type', 'sport_type'))
 				->innerJoin($this->database->quoteName('#__joomleague_sport_profile_version', 'version') . ' ON version.id = sport_type.profile_version_id')
 				->innerJoin($this->database->quoteName('#__joomleague_sport_profile', 'profile') . ' ON profile.id = version.profile_id')
-				->where($this->database->quoteName('profile.code') . ' = :profileCode')
-				->bind(':profileCode', $profileCode);
+				->where($this->database->quoteName('sport_type.code') . ' = ' . $this->database->quote($binding['code']))
+				->where('sport_type.profile_version_id=' . $binding['version']);
+			if ($binding['id'] !== null) $query->where('sport_type.id=' . $binding['id']);
 
 			foreach ($this->database->setQuery($query)->loadObjectList() as $sportType) {
 				$counts = (new SportTypeProfileMaterializer($this->database))->materialize(
@@ -459,7 +480,7 @@ final class SqlDataExchangeService
 		return $result;
 	}
 
-	private function boundInsert(array $insert): \Joomla\Database\DatabaseQuery
+	private function boundInsert(array $insert, bool $allowDuplicateSkip = true): \Joomla\Database\DatabaseQuery
 	{
 		if (!isset($this->importColumns[$insert['table']])) {
 			if (!$this->tableExists($insert['table'])) throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT');
@@ -480,7 +501,7 @@ final class SqlDataExchangeService
 			$rows[] = '(' . implode(',', $holders) . ')';
 		}
 		$sql = 'INSERT INTO ' . $this->database->quoteName($insert['table']) . ' (' . implode(',', $this->database->quoteName($insert['columns'])) . ') VALUES ' . implode(',', $rows);
-		$sql .= $this->database->getName() === 'pgsql' ? ' ON CONFLICT DO NOTHING' : ' ON DUPLICATE KEY UPDATE ' . $this->database->quoteName($insert['columns'][0]) . '=' . $this->database->quoteName($insert['columns'][0]);
+		if ($allowDuplicateSkip) $sql .= $this->database->getName() === 'pgsql' ? ' ON CONFLICT DO NOTHING' : ' ON DUPLICATE KEY UPDATE ' . $this->database->quoteName($insert['columns'][0]) . '=' . $this->database->quoteName($insert['columns'][0]);
 		$query->setQuery($sql);
 		foreach ($values as $key => &$value) $query->bind($key, $value, $value === null ? ParameterType::NULL : ParameterType::STRING);
 		return $query;
@@ -505,6 +526,7 @@ final class SqlDataExchangeService
 
 	private function activeProfileVersionId(string $code): int
 	{
+		if (isset($this->importProfileVersions[$code])) return $this->importProfileVersions[$code];
 		$query = $this->database->getQuery(true)
 			->select($this->database->quoteName('version.id'))
 			->from($this->database->quoteName('#__joomleague_sport_profile_version', 'version'))
@@ -515,6 +537,6 @@ final class SqlDataExchangeService
 			->order($this->database->quoteName('version.id') . ' DESC');
 		$id = (int) $this->database->setQuery($query, 0, 1)->loadResult();
 		if ($id < 1) throw new RuntimeException('COM_JOOMLEAGUE_DATAIMPORT_ERROR_PROFILE');
-		return $id;
+		return $this->importProfileVersions[$code] = $id;
 	}
 }

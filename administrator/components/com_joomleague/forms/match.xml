@@ -12,7 +12,7 @@
 		<field name="scheduled_time" type="time" label="COM_JOOMLEAGUE_MATCH_COLUMN_TIME" description="COM_JOOMLEAGUE_FIELD_MATCH_TIME_DESC" filter="string" />
 		<field name="timezone" type="timezone" label="COM_JOOMLEAGUE_FIELD_MATCH_TIMEZONE_LABEL" description="COM_JOOMLEAGUE_FIELD_MATCH_TIMEZONE_DESC"><option value="">COM_JOOMLEAGUE_OPTION_USE_PROJECT_SYSTEM_TIMEZONE</option></field>
 		<field name="duration_minutes" type="number" label="COM_JOOMLEAGUE_FIELD_DURATION_MINUTES_LABEL" description="COM_JOOMLEAGUE_FIELD_DURATION_MINUTES_DESC" min="1" filter="uint" />
-		<field name="venue_id" type="sql" label="COM_JOOMLEAGUE_FIELD_VENUE_LABEL" description="COM_JOOMLEAGUE_FIELD_MATCH_VENUE_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_venue WHERE published = 1 ORDER BY name" key_field="value" value_field="text"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_VENUE</option></field>
+		<field name="venue_id" type="sql" layout="joomla.form.field.list-fancy-select" label="COM_JOOMLEAGUE_FIELD_VENUE_LABEL" description="COM_JOOMLEAGUE_FIELD_MATCH_VENUE_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_venue WHERE published = 1 ORDER BY name" key_field="value" value_field="text"><option value="">COM_JOOMLEAGUE_OPTION_SELECT_VENUE</option></field>
 		<field name="attendance" type="number" label="COM_JOOMLEAGUE_FIELD_ATTENDANCE_LABEL" description="COM_JOOMLEAGUE_FIELD_ATTENDANCE_DESC" min="0" filter="uint" />
 		<field name="status_code" type="text" label="COM_JOOMLEAGUE_FIELD_MATCH_STATUS_LABEL" description="COM_JOOMLEAGUE_FIELD_MATCH_STATUS_DESC" required="true" default="scheduled" maxlength="100" filter="cmd" />
 		<field name="scheduled_start" type="hidden" filter="string" />

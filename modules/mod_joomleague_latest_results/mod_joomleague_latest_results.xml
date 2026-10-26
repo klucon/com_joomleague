@@ -5,13 +5,13 @@
 	<creationDate>2026-09</creationDate>
 	<copyright>(C) 2026 Ondřej Klučka.</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
-	<version>6.2.0-rc1</version>
+	<version>6.2.0-rc2</version>
 	<description>MOD_JOOMLEAGUE_LATEST_RESULTS_XML_DESCRIPTION</description>
 	<namespace path="src">Joomleague\Module\LatestResults</namespace>
 	<files><folder module="mod_joomleague_latest_results">services</folder><folder>src</folder><folder>tmpl</folder></files>
 	<languages>
 		<language tag="en-GB">language/en-GB/mod_joomleague_latest_results.ini</language><language tag="en-GB">language/en-GB/mod_joomleague_latest_results.sys.ini</language>
-		<language tag="cs-CZ">language/cs-CZ/mod_joomleague_latest_results.ini</language><language tag="cs-CZ">language/cs-CZ/mod_joomleague_latest_results.sys.ini</language>
+		
 	</languages>
 	<config><fields name="params">
 		<fieldset name="basic" label="MOD_JOOMLEAGUE_LATEST_RESULTS_FIELDSET_SOURCE">

@@ -7,11 +7,26 @@ require JPATH_BASE.'/includes/defines.php';require JPATH_BASE.'/includes/framewo
 $container=Joomla\CMS\Factory::getContainer();
 $container->alias('session','session.cli')->alias(Joomla\Session\SessionInterface::class,'session.cli');
 $app=$container->get(Joomla\CMS\Application\SiteApplication::class);Joomla\CMS\Factory::$application=$app;
+$app->input->set('option','com_joomleague');
 if($app->get('host')!==getenv('JL_R1_DB_HOST')||$app->get('db')!=='r1_test'||$app->get('dbprefix')!=='r1_')throw new RuntimeException('Unsafe target');
 $app->createExtensionNamespaceMap();$app->bootComponent('com_joomleague');
 $fixture=json_decode(file_get_contents('/tmp/jl-r1-fixture.json'),true,512,JSON_THROW_ON_ERROR);
 $db=$container->get(Joomla\Database\DatabaseInterface::class);
 $action=$argv[1]??'state';
+if ($action === 'quick-checkout' || $action === 'quick-checkin') {
+    $match = (int) $fixture['projects']['a']['records']['Match'];
+    $row = (object) ['id' => $match, 'checked_out' => $action === 'quick-checkout' ? (int) $fixture['users']['b'] : 0];
+    $db->updateObject('#__joomleague_project_match', $row, 'id');
+    echo json_encode(['updated' => true]); exit;
+}
+if ($action === 'timeline-fixture') {
+    $a = $fixture['projects']['a']; $match = (int) $a['records']['Match'];
+    $participant = (int) $db->setQuery('SELECT id FROM #__joomleague_match_participant WHERE match_id=' . $match . ' ORDER BY slot_number',0,1)->loadResult();
+    $row = (object) ['uuid' => Joomleague\Component\Joomleague\Domain\Service\UuidFactory::v4(), 'project_id' => $a['id'], 'match_id' => $match, 'match_participant_id' => $participant, 'event_code' => 'goal', 'event_name_key' => 'S101 timeline', 'sequence_number' => 1, 'numeric_value' => '2.000000000', 'clock_value' => '51.000000000', 'clock_unit' => 'minute', 'primary_name_snapshot' => '<b>S101 actor</b>', 'profile_metadata_json' => '{}'];
+    $row->primary_person_id = (int) $fixture['person'];
+    $db->insertObject('#__joomleague_match_event', $row, 'id');
+    echo json_encode(['created' => true]); exit;
+}
 if($action==='assets-fixture'){
     $db->setQuery($db->getQuery(true)->update($db->quoteName('#__extensions'))->set('enabled = 1')->where("type = 'plugin'")->where("element = 'joomleague'")->whereIn('folder',['content','quickicon'],Joomla\Database\ParameterType::STRING))->execute();
     $a=$fixture['projects']['a'];$project=(int)$a['id'];

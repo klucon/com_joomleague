@@ -1,0 +1,1666 @@
+{
+    "schema_version": 1,
+    "sources": [
+        {
+            "url": "https://services.cuzk.cz/sestavy/cis/UI_VUSC.zip",
+            "file": "sources/cz/UI_VUSC.csv",
+            "sha256": "68156494490867fed4c307608e35051c20923e03cfd7c616aa88f0235c16f007"
+        },
+        {
+            "url": "https://services.cuzk.cz/sestavy/cis/UI_OKRES.zip",
+            "file": "sources/cz/UI_OKRES.csv",
+            "sha256": "75e11a18157092f76584d8455c52b9cbe43799bca1580c0198d2b95cdbfe3254"
+        }
+    ],
+    "continents": [
+        {
+            "uuid": "b5ce3b19-eb35-5b20-87e5-e74d75de285c",
+            "code": "europe",
+            "ordering": 1,
+            "names": {
+                "en-GB": "Europe"
+            },
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_B5CE3B19_EB35_5B20_87E5_E74D75DE285C"
+        },
+        {
+            "uuid": "de3e96fe-0e16-5f97-b2dd-85951599f22b",
+            "code": "africa",
+            "ordering": 2,
+            "names": {
+                "en-GB": "Africa"
+            },
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_DE3E96FE_0E16_5F97_B2DD_85951599F22B"
+        },
+        {
+            "uuid": "85043750-a054-5670-a4f7-5386b01015b6",
+            "code": "asia",
+            "ordering": 3,
+            "names": {
+                "en-GB": "Asia"
+            },
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_85043750_A054_5670_A4F7_5386B01015B6"
+        },
+        {
+            "uuid": "0ba62b32-529c-5926-8c88-9d8e139132fa",
+            "code": "north-america",
+            "ordering": 4,
+            "names": {
+                "en-GB": "North America"
+            },
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_0BA62B32_529C_5926_8C88_9D8E139132FA"
+        },
+        {
+            "uuid": "c9913e75-013f-5718-a6db-ee0f04107f14",
+            "code": "south-america",
+            "ordering": 5,
+            "names": {
+                "en-GB": "South America"
+            },
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_C9913E75_013F_5718_A6DB_EE0F04107F14"
+        },
+        {
+            "uuid": "e1aa7aaf-666b-5626-ab65-da80e6d3115c",
+            "code": "oceania",
+            "ordering": 6,
+            "names": {
+                "en-GB": "Oceania"
+            },
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_E1AA7AAF_666B_5626_AB65_DA80E6D3115C"
+        },
+        {
+            "uuid": "f1c87144-3271-5a57-9d80-7c421e49231d",
+            "code": "antarctica",
+            "ordering": 7,
+            "names": {
+                "en-GB": "Antarctica"
+            },
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_F1C87144_3271_5A57_9D80_7C421E49231D"
+        }
+    ],
+    "units": [
+        {
+            "uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "parent_uuid": null,
+            "type": "country",
+            "names": {
+                "en-GB": "Czechia"
+            },
+            "identifiers": {
+                "iso3166-1-alpha2": "CZ",
+                "iso3166-1-alpha3": "CZE",
+                "iso3166-1-numeric": "203"
+            },
+            "continent_uuids": [
+                "b5ce3b19-eb35-5b20-87e5-e74d75de285c"
+            ],
+            "valid_from": "1993-01-01",
+            "valid_to": null,
+            "flag": "images/countries/flags/supplied/cz.svg",
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_C42D6209_E17B_545D_AE31_785E8815EAA1"
+        },
+        {
+            "uuid": "78a2bffb-363d-5b2e-b86a-ccb7e08afd0a",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Prague, the Capital City"
+            },
+            "identifiers": {
+                "ruian-vusc": "19",
+                "nuts": "CZ010"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2016-11-23",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_78A2BFFB_363D_5B2E_B86A_CCB7E08AFD0A"
+        },
+        {
+            "uuid": "b2b8ac1b-d4f5-5b39-af01-b3a45d2eda2a",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "South Moravian Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "116",
+                "nuts": "CZ064"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2025-12-11",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_B2B8AC1B_D4F5_5B39_AF01_B3A45D2EDA2A"
+        },
+        {
+            "uuid": "69df0aaa-ac9c-50fe-aa67-edd023de7546",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "South Bohemian Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "35",
+                "nuts": "CZ031"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2026-07-13",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_69DF0AAA_AC9C_50FE_AA67_EDD023DE7546"
+        },
+        {
+            "uuid": "6ff092f6-ea84-5964-8683-bc86839b8a4f",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Karlovy Vary Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "51",
+                "nuts": "CZ041"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2023-06-21",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_6FF092F6_EA84_5964_8683_BC86839B8A4F"
+        },
+        {
+            "uuid": "52c7a322-8750-5119-82e6-60514ca38767",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Vysočina Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "108",
+                "nuts": "CZ063"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2026-07-13",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_52C7A322_8750_5119_82E6_60514CA38767"
+        },
+        {
+            "uuid": "5ba660ea-5bc0-536c-b531-62e11f94bc3a",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Hradec Králové Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "86",
+                "nuts": "CZ052"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2025-05-19",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_5BA660EA_5BC0_536C_B531_62E11F94BC3A"
+        },
+        {
+            "uuid": "670c9b21-ba13-5bff-a97d-66edba520807",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Liberec Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "78",
+                "nuts": "CZ051"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2026-09-07",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_670C9B21_BA13_5BFF_A97D_66EDBA520807"
+        },
+        {
+            "uuid": "d64d99dc-bd5b-55e0-ae43-7d19326248bc",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Moravian-Silesian Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "132",
+                "nuts": "CZ080"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2026-09-04",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_D64D99DC_BD5B_55E0_AE43_7D19326248BC"
+        },
+        {
+            "uuid": "71546279-cdb5-57d6-bc17-283210822398",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Olomouc Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "124",
+                "nuts": "CZ071"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2026-09-04",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_71546279_CDB5_57D6_BC17_283210822398"
+        },
+        {
+            "uuid": "f8312799-16d6-55f6-9c35-214fe3123720",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Pardubice Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "94",
+                "nuts": "CZ053"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2025-07-03",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_F8312799_16D6_55F6_9C35_214FE3123720"
+        },
+        {
+            "uuid": "de0198d6-a14c-5880-b834-9a04b897914f",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Plzeň Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "43",
+                "nuts": "CZ032"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2026-09-15",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_DE0198D6_A14C_5880_B834_9A04B897914F"
+        },
+        {
+            "uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Central Bohemian Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "27",
+                "nuts": "CZ020"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2026-09-15",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_CC718A1E_EAD8_5F41_9AD7_99C74663E6B7"
+        },
+        {
+            "uuid": "0cd8be4c-c1f0-5f6e-8967-dedb8102d4a9",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Zlín Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "141",
+                "nuts": "CZ072"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2026-06-27",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_0CD8BE4C_C1F0_5F6E_8967_DEDB8102D4A9"
+        },
+        {
+            "uuid": "0c3e6ff1-9750-5300-961a-aae9b1974953",
+            "parent_uuid": "c42d6209-e17b-545d-ae31-785e8815eaa1",
+            "type": "region",
+            "names": {
+                "en-GB": "Ústí nad Labem Region"
+            },
+            "identifiers": {
+                "ruian-vusc": "60",
+                "nuts": "CZ042"
+            },
+            "valid_from": "2000-01-01",
+            "valid_to": null,
+            "source_updated_at": "2026-08-07",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_0C3E6FF1_9750_5300_961A_AAE9B1974953"
+        },
+        {
+            "uuid": "26a8c3c9-0486-5723-a8a2-94c5a29903bc",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Benešov District"
+            },
+            "identifiers": {
+                "ruian-okres": "3201",
+                "ruian-nuts-lau": "CZ0201"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-07-29",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_26A8C3C9_0486_5723_A8A2_94C5A29903BC"
+        },
+        {
+            "uuid": "2a1355a0-339a-5370-b614-28e0c22d6218",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Beroun District"
+            },
+            "identifiers": {
+                "ruian-okres": "3202",
+                "ruian-nuts-lau": "CZ0202"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-07-22",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_2A1355A0_339A_5370_B614_28E0C22D6218"
+        },
+        {
+            "uuid": "54cf78f4-d1e6-5e5b-b63a-5557c3275139",
+            "parent_uuid": "b2b8ac1b-d4f5-5b39-af01-b3a45d2eda2a",
+            "type": "district",
+            "names": {
+                "en-GB": "Blansko District"
+            },
+            "identifiers": {
+                "ruian-okres": "3701",
+                "ruian-nuts-lau": "CZ0641"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-10-16",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_54CF78F4_D1E6_5E5B_B63A_5557C3275139"
+        },
+        {
+            "uuid": "84afd9db-84d6-5bfd-8389-463d157f16ed",
+            "parent_uuid": "b2b8ac1b-d4f5-5b39-af01-b3a45d2eda2a",
+            "type": "district",
+            "names": {
+                "en-GB": "Brno-město District"
+            },
+            "identifiers": {
+                "ruian-okres": "3702",
+                "ruian-nuts-lau": "CZ0642"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-10-13",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_84AFD9DB_84D6_5BFD_8389_463D157F16ED"
+        },
+        {
+            "uuid": "85b5e0d4-4d6f-597e-842d-c1afc04679b9",
+            "parent_uuid": "b2b8ac1b-d4f5-5b39-af01-b3a45d2eda2a",
+            "type": "district",
+            "names": {
+                "en-GB": "Brno-venkov District"
+            },
+            "identifiers": {
+                "ruian-okres": "3703",
+                "ruian-nuts-lau": "CZ0643"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-10-13",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_85B5E0D4_4D6F_597E_842D_C1AFC04679B9"
+        },
+        {
+            "uuid": "0bee76a5-2231-5da0-b20e-cacdc10e586a",
+            "parent_uuid": "d64d99dc-bd5b-55e0-ae43-7d19326248bc",
+            "type": "district",
+            "names": {
+                "en-GB": "Bruntál District"
+            },
+            "identifiers": {
+                "ruian-okres": "3801",
+                "ruian-nuts-lau": "CZ0801"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-04",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_0BEE76A5_2231_5DA0_B20E_CACDC10E586A"
+        },
+        {
+            "uuid": "215e753d-a840-51b7-8f86-2a7c7c8d3a23",
+            "parent_uuid": "b2b8ac1b-d4f5-5b39-af01-b3a45d2eda2a",
+            "type": "district",
+            "names": {
+                "en-GB": "Břeclav District"
+            },
+            "identifiers": {
+                "ruian-okres": "3704",
+                "ruian-nuts-lau": "CZ0644"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2024-06-27",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_215E753D_A840_51B7_8F86_2A7C7C8D3A23"
+        },
+        {
+            "uuid": "1bb5e416-77be-5f67-81ba-513e59e0b5cd",
+            "parent_uuid": "6ff092f6-ea84-5964-8683-bc86839b8a4f",
+            "type": "district",
+            "names": {
+                "en-GB": "Cheb District"
+            },
+            "identifiers": {
+                "ruian-okres": "3402",
+                "ruian-nuts-lau": "CZ0411"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-01",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_1BB5E416_77BE_5F67_81BA_513E59E0B5CD"
+        },
+        {
+            "uuid": "1805744c-7d29-51a7-b731-c225f3550a42",
+            "parent_uuid": "0c3e6ff1-9750-5300-961a-aae9b1974953",
+            "type": "district",
+            "names": {
+                "en-GB": "Chomutov District"
+            },
+            "identifiers": {
+                "ruian-okres": "3503",
+                "ruian-nuts-lau": "CZ0422"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2024-07-24",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_1805744C_7D29_51A7_B731_C225F3550A42"
+        },
+        {
+            "uuid": "2bf48232-a72f-5519-91ee-3688395ec37d",
+            "parent_uuid": "f8312799-16d6-55f6-9c35-214fe3123720",
+            "type": "district",
+            "names": {
+                "en-GB": "Chrudim District"
+            },
+            "identifiers": {
+                "ruian-okres": "3603",
+                "ruian-nuts-lau": "CZ0531"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-08",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_2BF48232_A72F_5519_91EE_3688395EC37D"
+        },
+        {
+            "uuid": "398f06a1-a428-533a-9d06-96f6ae84b625",
+            "parent_uuid": "de0198d6-a14c-5880-b834-9a04b897914f",
+            "type": "district",
+            "names": {
+                "en-GB": "Domažlice District"
+            },
+            "identifiers": {
+                "ruian-okres": "3401",
+                "ruian-nuts-lau": "CZ0321"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-08-06",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_398F06A1_A428_533A_9D06_96F6AE84B625"
+        },
+        {
+            "uuid": "55a9211c-3223-55fe-9cfc-6d026c6476a2",
+            "parent_uuid": "0c3e6ff1-9750-5300-961a-aae9b1974953",
+            "type": "district",
+            "names": {
+                "en-GB": "Děčín District"
+            },
+            "identifiers": {
+                "ruian-okres": "3502",
+                "ruian-nuts-lau": "CZ0421"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-08-07",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_55A9211C_3223_55FE_9CFC_6D026C6476A2"
+        },
+        {
+            "uuid": "a83172e3-9b8a-5ca4-8c0e-fd16e6268384",
+            "parent_uuid": "d64d99dc-bd5b-55e0-ae43-7d19326248bc",
+            "type": "district",
+            "names": {
+                "en-GB": "Frýdek-Místek District"
+            },
+            "identifiers": {
+                "ruian-okres": "3802",
+                "ruian-nuts-lau": "CZ0802"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-03-24",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_A83172E3_9B8A_5CA4_8C0E_FD16E6268384"
+        },
+        {
+            "uuid": "6f6ab5a9-300d-5add-8a29-18537515d362",
+            "parent_uuid": "52c7a322-8750-5119-82e6-60514ca38767",
+            "type": "district",
+            "names": {
+                "en-GB": "Havlíčkův Brod District"
+            },
+            "identifiers": {
+                "ruian-okres": "3601",
+                "ruian-nuts-lau": "CZ0631"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-08",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_6F6AB5A9_300D_5ADD_8A29_18537515D362"
+        },
+        {
+            "uuid": "b635b76a-e9d0-5ead-937e-8ed94574f74f",
+            "parent_uuid": "b2b8ac1b-d4f5-5b39-af01-b3a45d2eda2a",
+            "type": "district",
+            "names": {
+                "en-GB": "Hodonín District"
+            },
+            "identifiers": {
+                "ruian-okres": "3706",
+                "ruian-nuts-lau": "CZ0645"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-10-30",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_B635B76A_E9D0_5EAD_937E_8ED94574F74F"
+        },
+        {
+            "uuid": "c6a4e844-74d6-53cc-91fb-bbb5f5860a9e",
+            "parent_uuid": "5ba660ea-5bc0-536c-b531-62e11f94bc3a",
+            "type": "district",
+            "names": {
+                "en-GB": "Hradec Králové District"
+            },
+            "identifiers": {
+                "ruian-okres": "3602",
+                "ruian-nuts-lau": "CZ0521"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-10-13",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_C6A4E844_74D6_53CC_91FB_BBB5F5860A9E"
+        },
+        {
+            "uuid": "5ef19b98-045e-5b38-be8f-5cf76d90fa5f",
+            "parent_uuid": "670c9b21-ba13-5bff-a97d-66edba520807",
+            "type": "district",
+            "names": {
+                "en-GB": "Jablonec nad Nisou District"
+            },
+            "identifiers": {
+                "ruian-okres": "3504",
+                "ruian-nuts-lau": "CZ0512"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-05-06",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_5EF19B98_045E_5B38_BE8F_5CF76D90FA5F"
+        },
+        {
+            "uuid": "043d12d9-c1b8-5832-9648-12b51c3a91d8",
+            "parent_uuid": "71546279-cdb5-57d6-bc17-283210822398",
+            "type": "district",
+            "names": {
+                "en-GB": "Jeseník District"
+            },
+            "identifiers": {
+                "ruian-okres": "3811",
+                "ruian-nuts-lau": "CZ0711"
+            },
+            "valid_from": "1996-01-01",
+            "valid_to": null,
+            "source_updated_at": "2021-01-02",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_043D12D9_C1B8_5832_9648_12B51C3A91D8"
+        },
+        {
+            "uuid": "afdb88f7-0f29-55f0-860e-0fb87943deba",
+            "parent_uuid": "52c7a322-8750-5119-82e6-60514ca38767",
+            "type": "district",
+            "names": {
+                "en-GB": "Jihlava District"
+            },
+            "identifiers": {
+                "ruian-okres": "3707",
+                "ruian-nuts-lau": "CZ0632"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-01",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_AFDB88F7_0F29_55F0_860E_0FB87943DEBA"
+        },
+        {
+            "uuid": "e45699c6-5785-5c75-8e37-6c7eb81406f5",
+            "parent_uuid": "69df0aaa-ac9c-50fe-aa67-edd023de7546",
+            "type": "district",
+            "names": {
+                "en-GB": "Jindřichův Hradec District"
+            },
+            "identifiers": {
+                "ruian-okres": "3303",
+                "ruian-nuts-lau": "CZ0313"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-07-13",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_E45699C6_5785_5C75_8E37_6C7EB81406F5"
+        },
+        {
+            "uuid": "3db28a34-2938-5d2a-b37e-7e5bad32c9a7",
+            "parent_uuid": "5ba660ea-5bc0-536c-b531-62e11f94bc3a",
+            "type": "district",
+            "names": {
+                "en-GB": "Jičín District"
+            },
+            "identifiers": {
+                "ruian-okres": "3604",
+                "ruian-nuts-lau": "CZ0522"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-10-13",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_3DB28A34_2938_5D2A_B37E_7E5BAD32C9A7"
+        },
+        {
+            "uuid": "d77e7f96-91e8-5d46-80b1-de996261dbe4",
+            "parent_uuid": "6ff092f6-ea84-5964-8683-bc86839b8a4f",
+            "type": "district",
+            "names": {
+                "en-GB": "Karlovy Vary District"
+            },
+            "identifiers": {
+                "ruian-okres": "3403",
+                "ruian-nuts-lau": "CZ0412"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2024-10-21",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_D77E7F96_91E8_5D46_80B1_DE996261DBE4"
+        },
+        {
+            "uuid": "eac47913-75db-5335-9a97-0f7407398645",
+            "parent_uuid": "d64d99dc-bd5b-55e0-ae43-7d19326248bc",
+            "type": "district",
+            "names": {
+                "en-GB": "Karviná District"
+            },
+            "identifiers": {
+                "ruian-okres": "3803",
+                "ruian-nuts-lau": "CZ0803"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-03-24",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_EAC47913_75DB_5335_9A97_0F7407398645"
+        },
+        {
+            "uuid": "a29f987a-b009-574f-8951-478c651ca06a",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Kladno District"
+            },
+            "identifiers": {
+                "ruian-okres": "3203",
+                "ruian-nuts-lau": "CZ0203"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2023-12-22",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_A29F987A_B009_574F_8951_478C651CA06A"
+        },
+        {
+            "uuid": "5314f61a-77fc-515c-bd72-590ebc187557",
+            "parent_uuid": "de0198d6-a14c-5880-b834-9a04b897914f",
+            "type": "district",
+            "names": {
+                "en-GB": "Klatovy District"
+            },
+            "identifiers": {
+                "ruian-okres": "3404",
+                "ruian-nuts-lau": "CZ0322"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2024-12-11",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_5314F61A_77FC_515C_BD72_590EBC187557"
+        },
+        {
+            "uuid": "71598eb1-090b-5665-b2d0-9eb31be55051",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Kolín District"
+            },
+            "identifiers": {
+                "ruian-okres": "3204",
+                "ruian-nuts-lau": "CZ0204"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-17",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_71598EB1_090B_5665_B2D0_9EB31BE55051"
+        },
+        {
+            "uuid": "f510b7d5-ec69-5f4d-8bc3-61ac4783bca5",
+            "parent_uuid": "0cd8be4c-c1f0-5f6e-8967-dedb8102d4a9",
+            "type": "district",
+            "names": {
+                "en-GB": "Kroměříž District"
+            },
+            "identifiers": {
+                "ruian-okres": "3708",
+                "ruian-nuts-lau": "CZ0721"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-06-25",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_F510B7D5_EC69_5F4D_8BC3_61AC4783BCA5"
+        },
+        {
+            "uuid": "d4ba604a-a865-580c-b4d7-bab2b2d6cb8c",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Kutná Hora District"
+            },
+            "identifiers": {
+                "ruian-okres": "3205",
+                "ruian-nuts-lau": "CZ0205"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-01-27",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_D4BA604A_A865_580C_B4D7_BAB2B2D6CB8C"
+        },
+        {
+            "uuid": "e447e8d3-074d-5d4b-bc92-0517b4ce4eb2",
+            "parent_uuid": "670c9b21-ba13-5bff-a97d-66edba520807",
+            "type": "district",
+            "names": {
+                "en-GB": "Liberec District"
+            },
+            "identifiers": {
+                "ruian-okres": "3505",
+                "ruian-nuts-lau": "CZ0513"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-02-03",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_E447E8D3_074D_5D4B_BC92_0517B4CE4EB2"
+        },
+        {
+            "uuid": "09d714b9-4601-5df0-b425-37cc45eadb22",
+            "parent_uuid": "0c3e6ff1-9750-5300-961a-aae9b1974953",
+            "type": "district",
+            "names": {
+                "en-GB": "Litoměřice District"
+            },
+            "identifiers": {
+                "ruian-okres": "3506",
+                "ruian-nuts-lau": "CZ0423"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-06-25",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_09D714B9_4601_5DF0_B425_37CC45EADB22"
+        },
+        {
+            "uuid": "91def167-d689-54b5-be26-18249f37f425",
+            "parent_uuid": "0c3e6ff1-9750-5300-961a-aae9b1974953",
+            "type": "district",
+            "names": {
+                "en-GB": "Louny District"
+            },
+            "identifiers": {
+                "ruian-okres": "3507",
+                "ruian-nuts-lau": "CZ0424"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-04-28",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_91DEF167_D689_54B5_BE26_18249F37F425"
+        },
+        {
+            "uuid": "981cd5d3-9a89-58f9-a91a-55c6848b6ae6",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Mladá Boleslav District"
+            },
+            "identifiers": {
+                "ruian-okres": "3207",
+                "ruian-nuts-lau": "CZ0207"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-06-11",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_981CD5D3_9A89_58F9_A91A_55C6848B6AE6"
+        },
+        {
+            "uuid": "ff6975e1-bd20-54b4-8d11-5237a03ba815",
+            "parent_uuid": "0c3e6ff1-9750-5300-961a-aae9b1974953",
+            "type": "district",
+            "names": {
+                "en-GB": "Most District"
+            },
+            "identifiers": {
+                "ruian-okres": "3508",
+                "ruian-nuts-lau": "CZ0425"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-08-10",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_FF6975E1_BD20_54B4_8D11_5237A03BA815"
+        },
+        {
+            "uuid": "7b30636c-9279-531c-8730-9c3906463e48",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Mělník District"
+            },
+            "identifiers": {
+                "ruian-okres": "3206",
+                "ruian-nuts-lau": "CZ0206"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-07",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_7B30636C_9279_531C_8730_9C3906463E48"
+        },
+        {
+            "uuid": "1f3cb2ac-f7da-5c92-b7ca-3b5f0d0aa0f1",
+            "parent_uuid": "d64d99dc-bd5b-55e0-ae43-7d19326248bc",
+            "type": "district",
+            "names": {
+                "en-GB": "Nový Jičín District"
+            },
+            "identifiers": {
+                "ruian-okres": "3804",
+                "ruian-nuts-lau": "CZ0804"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-11-06",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_1F3CB2AC_F7DA_5C92_B7CA_3B5F0D0AA0F1"
+        },
+        {
+            "uuid": "40e8a502-47ed-5cda-8ae2-5f38bd7a20a9",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Nymburk District"
+            },
+            "identifiers": {
+                "ruian-okres": "3208",
+                "ruian-nuts-lau": "CZ0208"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-17",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_40E8A502_47ED_5CDA_8AE2_5F38BD7A20A9"
+        },
+        {
+            "uuid": "445b62f3-3449-58e5-9f03-dab60e42bee4",
+            "parent_uuid": "5ba660ea-5bc0-536c-b531-62e11f94bc3a",
+            "type": "district",
+            "names": {
+                "en-GB": "Náchod District"
+            },
+            "identifiers": {
+                "ruian-okres": "3605",
+                "ruian-nuts-lau": "CZ0523"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-10-21",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_445B62F3_3449_58E5_9F03_DAB60E42BEE4"
+        },
+        {
+            "uuid": "3b5e6525-8a6c-52b5-8fe7-3323e5922327",
+            "parent_uuid": "71546279-cdb5-57d6-bc17-283210822398",
+            "type": "district",
+            "names": {
+                "en-GB": "Olomouc District"
+            },
+            "identifiers": {
+                "ruian-okres": "3805",
+                "ruian-nuts-lau": "CZ0712"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-04",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_3B5E6525_8A6C_52B5_8FE7_3323E5922327"
+        },
+        {
+            "uuid": "b0703ed7-ce54-5dd3-b4bf-01fb77402293",
+            "parent_uuid": "d64d99dc-bd5b-55e0-ae43-7d19326248bc",
+            "type": "district",
+            "names": {
+                "en-GB": "Opava District"
+            },
+            "identifiers": {
+                "ruian-okres": "3806",
+                "ruian-nuts-lau": "CZ0805"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-11-06",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_B0703ED7_CE54_5DD3_B4BF_01FB77402293"
+        },
+        {
+            "uuid": "7fe5bf03-3ecc-5687-9d30-00aeea9857c5",
+            "parent_uuid": "d64d99dc-bd5b-55e0-ae43-7d19326248bc",
+            "type": "district",
+            "names": {
+                "en-GB": "Ostrava-město District"
+            },
+            "identifiers": {
+                "ruian-okres": "3807",
+                "ruian-nuts-lau": "CZ0806"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-03-24",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_7FE5BF03_3ECC_5687_9D30_00AEEA9857C5"
+        },
+        {
+            "uuid": "a0f1876a-6eed-52cb-9c4e-98e0fd8dd790",
+            "parent_uuid": "f8312799-16d6-55f6-9c35-214fe3123720",
+            "type": "district",
+            "names": {
+                "en-GB": "Pardubice District"
+            },
+            "identifiers": {
+                "ruian-okres": "3606",
+                "ruian-nuts-lau": "CZ0532"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-07-09",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_A0F1876A_6EED_52CB_9C4E_98E0FD8DD790"
+        },
+        {
+            "uuid": "e8244158-2ef4-5fcb-ae52-ade0d4e363dd",
+            "parent_uuid": "52c7a322-8750-5119-82e6-60514ca38767",
+            "type": "district",
+            "names": {
+                "en-GB": "Pelhřimov District"
+            },
+            "identifiers": {
+                "ruian-okres": "3304",
+                "ruian-nuts-lau": "CZ0633"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-07-22",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_E8244158_2EF4_5FCB_AE52_ADE0D4E363DD"
+        },
+        {
+            "uuid": "fe58e78a-8ba7-5dde-954c-68fbcf8078d1",
+            "parent_uuid": "de0198d6-a14c-5880-b834-9a04b897914f",
+            "type": "district",
+            "names": {
+                "en-GB": "Plzeň-jih District"
+            },
+            "identifiers": {
+                "ruian-okres": "3406",
+                "ruian-nuts-lau": "CZ0324"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-08",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_FE58E78A_8BA7_5DDE_954C_68FBCF8078D1"
+        },
+        {
+            "uuid": "2efab7ad-6799-51a5-9a90-3ca8e87da56d",
+            "parent_uuid": "de0198d6-a14c-5880-b834-9a04b897914f",
+            "type": "district",
+            "names": {
+                "en-GB": "Plzeň-město District"
+            },
+            "identifiers": {
+                "ruian-okres": "3405",
+                "ruian-nuts-lau": "CZ0323"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2024-12-30",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_2EFAB7AD_6799_51A5_9A90_3CA8E87DA56D"
+        },
+        {
+            "uuid": "6eff3ff6-1935-55f9-86ed-0246b1bd4cca",
+            "parent_uuid": "de0198d6-a14c-5880-b834-9a04b897914f",
+            "type": "district",
+            "names": {
+                "en-GB": "Plzeň-sever District"
+            },
+            "identifiers": {
+                "ruian-okres": "3407",
+                "ruian-nuts-lau": "CZ0325"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-10-12",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_6EFF3FF6_1935_55F9_86ED_0246B1BD4CCA"
+        },
+        {
+            "uuid": "1a0bdc27-efc1-500c-9ff0-2d0009fe1c1d",
+            "parent_uuid": "69df0aaa-ac9c-50fe-aa67-edd023de7546",
+            "type": "district",
+            "names": {
+                "en-GB": "Prachatice District"
+            },
+            "identifiers": {
+                "ruian-okres": "3306",
+                "ruian-nuts-lau": "CZ0315"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-05-11",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_1A0BDC27_EFC1_500C_9FF0_2D0009FE1C1D"
+        },
+        {
+            "uuid": "f7c3e7f1-7801-57e5-a5c5-fe3055c67b87",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Prague-East District"
+            },
+            "identifiers": {
+                "ruian-okres": "3209",
+                "ruian-nuts-lau": "CZ0209"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-04-30",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_F7C3E7F1_7801_57E5_A5C5_FE3055C67B87"
+        },
+        {
+            "uuid": "22ae7761-a13f-50e4-898e-a75535d7497d",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Prague-West District"
+            },
+            "identifiers": {
+                "ruian-okres": "3210",
+                "ruian-nuts-lau": "CZ020A"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2024-12-07",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_22AE7761_A13F_50E4_898E_A75535D7497D"
+        },
+        {
+            "uuid": "18b69d5f-ca90-5858-9e82-0c9eeb0277b4",
+            "parent_uuid": "71546279-cdb5-57d6-bc17-283210822398",
+            "type": "district",
+            "names": {
+                "en-GB": "Prostějov District"
+            },
+            "identifiers": {
+                "ruian-okres": "3709",
+                "ruian-nuts-lau": "CZ0713"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2023-12-05",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_18B69D5F_CA90_5858_9E82_0C9EEB0277B4"
+        },
+        {
+            "uuid": "605667b4-431a-5fc7-a820-bf1a54e6ef23",
+            "parent_uuid": "69df0aaa-ac9c-50fe-aa67-edd023de7546",
+            "type": "district",
+            "names": {
+                "en-GB": "Písek District"
+            },
+            "identifiers": {
+                "ruian-okres": "3305",
+                "ruian-nuts-lau": "CZ0314"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-06-08",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_605667B4_431A_5FC7_A820_BF1A54E6EF23"
+        },
+        {
+            "uuid": "1616bfeb-ad63-5929-b6b7-6dbe1d47339e",
+            "parent_uuid": "71546279-cdb5-57d6-bc17-283210822398",
+            "type": "district",
+            "names": {
+                "en-GB": "Přerov District"
+            },
+            "identifiers": {
+                "ruian-okres": "3808",
+                "ruian-nuts-lau": "CZ0714"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-06-27",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_1616BFEB_AD63_5929_B6B7_6DBE1D47339E"
+        },
+        {
+            "uuid": "2df6a52e-1984-5435-a555-fe1b2e8cc873",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Příbram District"
+            },
+            "identifiers": {
+                "ruian-okres": "3211",
+                "ruian-nuts-lau": "CZ020B"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-15",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_2DF6A52E_1984_5435_A555_FE1B2E8CC873"
+        },
+        {
+            "uuid": "cfbecd8d-852b-5cf3-897c-c9365ccfc126",
+            "parent_uuid": "cc718a1e-ead8-5f41-9ad7-99c74663e6b7",
+            "type": "district",
+            "names": {
+                "en-GB": "Rakovník District"
+            },
+            "identifiers": {
+                "ruian-okres": "3212",
+                "ruian-nuts-lau": "CZ020C"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-03-04",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_CFBECD8D_852B_5CF3_897C_C9365CCFC126"
+        },
+        {
+            "uuid": "183cbd90-6613-56de-8e8a-a71590e0374e",
+            "parent_uuid": "de0198d6-a14c-5880-b834-9a04b897914f",
+            "type": "district",
+            "names": {
+                "en-GB": "Rokycany District"
+            },
+            "identifiers": {
+                "ruian-okres": "3408",
+                "ruian-nuts-lau": "CZ0326"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-15",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_183CBD90_6613_56DE_8E8A_A71590E0374E"
+        },
+        {
+            "uuid": "927abbb2-52dc-5432-91a1-314fd679d23f",
+            "parent_uuid": "5ba660ea-5bc0-536c-b531-62e11f94bc3a",
+            "type": "district",
+            "names": {
+                "en-GB": "Rychnov nad Kněžnou District"
+            },
+            "identifiers": {
+                "ruian-okres": "3607",
+                "ruian-nuts-lau": "CZ0524"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-05-19",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_927ABBB2_52DC_5432_91A1_314FD679D23F"
+        },
+        {
+            "uuid": "76a4e997-83d1-5d43-b40a-68ec22ce27ef",
+            "parent_uuid": "670c9b21-ba13-5bff-a97d-66edba520807",
+            "type": "district",
+            "names": {
+                "en-GB": "Semily District"
+            },
+            "identifiers": {
+                "ruian-okres": "3608",
+                "ruian-nuts-lau": "CZ0514"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-05-06",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_76A4E997_83D1_5D43_B40A_68EC22CE27EF"
+        },
+        {
+            "uuid": "192c0f37-03de-5295-9b5f-1249c0b17340",
+            "parent_uuid": "6ff092f6-ea84-5964-8683-bc86839b8a4f",
+            "type": "district",
+            "names": {
+                "en-GB": "Sokolov District"
+            },
+            "identifiers": {
+                "ruian-okres": "3409",
+                "ruian-nuts-lau": "CZ0413"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-01",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_192C0F37_03DE_5295_9B5F_1249C0B17340"
+        },
+        {
+            "uuid": "f3764ce3-55c9-5d25-8ed6-8dae15bc8868",
+            "parent_uuid": "69df0aaa-ac9c-50fe-aa67-edd023de7546",
+            "type": "district",
+            "names": {
+                "en-GB": "Strakonice District"
+            },
+            "identifiers": {
+                "ruian-okres": "3307",
+                "ruian-nuts-lau": "CZ0316"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-05-11",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_F3764CE3_55C9_5D25_8ED6_8DAE15BC8868"
+        },
+        {
+            "uuid": "22827db6-dd80-5315-8da4-48e7fb243e7e",
+            "parent_uuid": "f8312799-16d6-55f6-9c35-214fe3123720",
+            "type": "district",
+            "names": {
+                "en-GB": "Svitavy District"
+            },
+            "identifiers": {
+                "ruian-okres": "3609",
+                "ruian-nuts-lau": "CZ0533"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-08-12",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_22827DB6_DD80_5315_8DA4_48E7FB243E7E"
+        },
+        {
+            "uuid": "9aa0bcab-5be2-5d58-8972-f8f0619a3f0a",
+            "parent_uuid": "de0198d6-a14c-5880-b834-9a04b897914f",
+            "type": "district",
+            "names": {
+                "en-GB": "Tachov District"
+            },
+            "identifiers": {
+                "ruian-okres": "3410",
+                "ruian-nuts-lau": "CZ0327"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-10-12",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_9AA0BCAB_5BE2_5D58_8972_F8F0619A3F0A"
+        },
+        {
+            "uuid": "df7e042e-5454-56ce-a3f4-ffde4b916a3a",
+            "parent_uuid": "0c3e6ff1-9750-5300-961a-aae9b1974953",
+            "type": "district",
+            "names": {
+                "en-GB": "Teplice District"
+            },
+            "identifiers": {
+                "ruian-okres": "3509",
+                "ruian-nuts-lau": "CZ0426"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-08-10",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_DF7E042E_5454_56CE_A3F4_FFDE4B916A3A"
+        },
+        {
+            "uuid": "50ca96ae-57c4-51ff-ac5a-aef34082d457",
+            "parent_uuid": "5ba660ea-5bc0-536c-b531-62e11f94bc3a",
+            "type": "district",
+            "names": {
+                "en-GB": "Trutnov District"
+            },
+            "identifiers": {
+                "ruian-okres": "3610",
+                "ruian-nuts-lau": "CZ0525"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-10-21",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_50CA96AE_57C4_51FF_AC5A_AEF34082D457"
+        },
+        {
+            "uuid": "9a127c79-7e18-531c-bea8-2dd123849990",
+            "parent_uuid": "69df0aaa-ac9c-50fe-aa67-edd023de7546",
+            "type": "district",
+            "names": {
+                "en-GB": "Tábor District"
+            },
+            "identifiers": {
+                "ruian-okres": "3308",
+                "ruian-nuts-lau": "CZ0317"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-06-08",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_9A127C79_7E18_531C_BEA8_2DD123849990"
+        },
+        {
+            "uuid": "4727faa4-85b8-52e2-be70-4f758c88bbd4",
+            "parent_uuid": "52c7a322-8750-5119-82e6-60514ca38767",
+            "type": "district",
+            "names": {
+                "en-GB": "Třebíč District"
+            },
+            "identifiers": {
+                "ruian-okres": "3710",
+                "ruian-nuts-lau": "CZ0634"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-07-13",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_4727FAA4_85B8_52E2_BE70_4F758C88BBD4"
+        },
+        {
+            "uuid": "bcd0c568-ce6b-587e-8656-6542161a2b59",
+            "parent_uuid": "0cd8be4c-c1f0-5f6e-8967-dedb8102d4a9",
+            "type": "district",
+            "names": {
+                "en-GB": "Uherské Hradiště District"
+            },
+            "identifiers": {
+                "ruian-okres": "3711",
+                "ruian-nuts-lau": "CZ0722"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-10-30",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_BCD0C568_CE6B_587E_8656_6542161A2B59"
+        },
+        {
+            "uuid": "33696931-b74b-5ee4-9f4c-6f5d5978e2b2",
+            "parent_uuid": "0cd8be4c-c1f0-5f6e-8967-dedb8102d4a9",
+            "type": "district",
+            "names": {
+                "en-GB": "Vsetín District"
+            },
+            "identifiers": {
+                "ruian-okres": "3810",
+                "ruian-nuts-lau": "CZ0723"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-06-27",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_33696931_B74B_5EE4_9F4C_6F5D5978E2B2"
+        },
+        {
+            "uuid": "ebd2b184-9872-51fa-83e3-c1831deaf649",
+            "parent_uuid": "b2b8ac1b-d4f5-5b39-af01-b3a45d2eda2a",
+            "type": "district",
+            "names": {
+                "en-GB": "Vyškov District"
+            },
+            "identifiers": {
+                "ruian-okres": "3712",
+                "ruian-nuts-lau": "CZ0646"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2023-12-05",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_EBD2B184_9872_51FA_83E3_C1831DEAF649"
+        },
+        {
+            "uuid": "a940a972-de36-5387-812f-80cf06a8d9cf",
+            "parent_uuid": "0cd8be4c-c1f0-5f6e-8967-dedb8102d4a9",
+            "type": "district",
+            "names": {
+                "en-GB": "Zlín District"
+            },
+            "identifiers": {
+                "ruian-okres": "3705",
+                "ruian-nuts-lau": "CZ0724"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2024-09-04",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_A940A972_DE36_5387_812F_80CF06A8D9CF"
+        },
+        {
+            "uuid": "05e53c83-e522-5122-8dc9-80f5706de917",
+            "parent_uuid": "b2b8ac1b-d4f5-5b39-af01-b3a45d2eda2a",
+            "type": "district",
+            "names": {
+                "en-GB": "Znojmo District"
+            },
+            "identifiers": {
+                "ruian-okres": "3713",
+                "ruian-nuts-lau": "CZ0647"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-07-08",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_05E53C83_E522_5122_8DC9_80F5706DE917"
+        },
+        {
+            "uuid": "ccb37472-fc57-53ba-9380-e8073e3a1206",
+            "parent_uuid": "0c3e6ff1-9750-5300-961a-aae9b1974953",
+            "type": "district",
+            "names": {
+                "en-GB": "Ústí nad Labem District"
+            },
+            "identifiers": {
+                "ruian-okres": "3510",
+                "ruian-nuts-lau": "CZ0427"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2025-06-13",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_CCB37472_FC57_53BA_9380_E8073E3A1206"
+        },
+        {
+            "uuid": "6d42ce63-c68b-594a-8994-0b5ea2601357",
+            "parent_uuid": "f8312799-16d6-55f6-9c35-214fe3123720",
+            "type": "district",
+            "names": {
+                "en-GB": "Ústí nad Orlicí District"
+            },
+            "identifiers": {
+                "ruian-okres": "3611",
+                "ruian-nuts-lau": "CZ0534"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-08-14",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_6D42CE63_C68B_594A_8994_0B5EA2601357"
+        },
+        {
+            "uuid": "44786d19-ebe0-51a4-95cc-aade83799b4c",
+            "parent_uuid": "78a2bffb-363d-5b2e-b86a-ccb7e08afd0a",
+            "type": "capital_territory",
+            "names": {
+                "en-GB": "Prague Capital Territory"
+            },
+            "identifiers": {
+                "ruian-okres": "9999",
+                "ruian-nuts-lau": "CZ0100"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2022-07-19",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_44786D19_EBE0_51A4_95CC_AADE83799B4C"
+        },
+        {
+            "uuid": "0b961abe-ce2c-568a-9e8a-6a1eff38367e",
+            "parent_uuid": "670c9b21-ba13-5bff-a97d-66edba520807",
+            "type": "district",
+            "names": {
+                "en-GB": "Česká Lípa District"
+            },
+            "identifiers": {
+                "ruian-okres": "3501",
+                "ruian-nuts-lau": "CZ0511"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-09-07",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_0B961ABE_CE2C_568A_9E8A_6A1EFF38367E"
+        },
+        {
+            "uuid": "7f636ab6-5218-598d-bc43-cef9a638d3a2",
+            "parent_uuid": "69df0aaa-ac9c-50fe-aa67-edd023de7546",
+            "type": "district",
+            "names": {
+                "en-GB": "České Budějovice District"
+            },
+            "identifiers": {
+                "ruian-okres": "3301",
+                "ruian-nuts-lau": "CZ0311"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-07-08",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_7F636AB6_5218_598D_BC43_CEF9A638D3A2"
+        },
+        {
+            "uuid": "c08b4af4-426b-5eb4-9174-d1e2cabf46e8",
+            "parent_uuid": "69df0aaa-ac9c-50fe-aa67-edd023de7546",
+            "type": "district",
+            "names": {
+                "en-GB": "Český Krumlov District"
+            },
+            "identifiers": {
+                "ruian-okres": "3302",
+                "ruian-nuts-lau": "CZ0312"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-07-08",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_C08B4AF4_426B_5EB4_9174_D1E2CABF46E8"
+        },
+        {
+            "uuid": "10a37b83-7440-5c6b-b509-51e4529eed15",
+            "parent_uuid": "71546279-cdb5-57d6-bc17-283210822398",
+            "type": "district",
+            "names": {
+                "en-GB": "Šumperk District"
+            },
+            "identifiers": {
+                "ruian-okres": "3809",
+                "ruian-nuts-lau": "CZ0715"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-02-05",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_10A37B83_7440_5C6B_B509_51E4529EED15"
+        },
+        {
+            "uuid": "f66119ac-20f4-50df-848a-e5213bb141f6",
+            "parent_uuid": "52c7a322-8750-5119-82e6-60514ca38767",
+            "type": "district",
+            "names": {
+                "en-GB": "Žďár nad Sázavou District"
+            },
+            "identifiers": {
+                "ruian-okres": "3714",
+                "ruian-nuts-lau": "CZ0635"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": null,
+            "source_updated_at": "2026-10-16",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_F66119AC_20F4_50DF_848A_E5213BB141F6"
+        },
+        {
+            "uuid": "b06db5d5-8d46-565b-bca2-5b12422e77c2",
+            "parent_uuid": "78a2bffb-363d-5b2e-b86a-ccb7e08afd0a",
+            "type": "district",
+            "names": {
+                "en-GB": "Prague District"
+            },
+            "identifiers": {
+                "ruian-okres": "3100",
+                "ruian-nuts-lau": "CZ0100"
+            },
+            "valid_from": "1960-04-11",
+            "valid_to": "2022-07-01",
+            "source_updated_at": "2021-01-02",
+            "flag": null,
+            "label_key": "COM_KLUCONCOUNTRIES_UNIT_B06DB5D5_8D46_565B_BCA2_5B12422E77C2"
+        }
+    ]
+}

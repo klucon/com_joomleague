@@ -13,6 +13,7 @@ use Joomla\CMS\Session\Session;
 use Joomla\CMS\Utility\Utility;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Log\Log;
+use Joomleague\Component\Joomleague\Administrator\Service\ImportCatalogueConflict;
 
 final class DataimportController extends BaseController
 {
@@ -36,6 +37,11 @@ final class DataimportController extends BaseController
 			$result = $this->getModel('Dataimport')->import($sql);
 			$this->app->enqueueMessage(Text::sprintf('COM_JOOMLEAGUE_DATAIMPORT_SUCCESS', $result['executed'], $result['skipped']));
 		} catch (\Throwable $error) {
+			if ($error instanceof ImportCatalogueConflict) {
+				$this->app->enqueueMessage(Text::sprintf('COM_JOOMLEAGUE_DATAIMPORT_ERROR_CATALOGUE_CONFLICT', htmlspecialchars($error->entity, ENT_QUOTES, 'UTF-8'), htmlspecialchars($error->identity, ENT_QUOTES, 'UTF-8')), 'error');
+				$this->setRedirect(Route::_('index.php?option=com_joomleague&view=dataimport', false));
+				return;
+			}
 			$knownErrors = ['COM_JOOMLEAGUE_DATAIMPORT_ERROR_FILE', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_SIZE', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_STATEMENT', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_LOCK', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_RECOVERED', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_RECOVERY_INCOMPLETE', 'COM_JOOMLEAGUE_DATAIMPORT_ERROR_PROFILE'];
 			if (!in_array($error->getMessage(), $knownErrors, true)) {
 				Log::add('SQL import failed (' . get_class($error) . ', code ' . $error->getCode() . ').', Log::ERROR, 'com_joomleague.import');

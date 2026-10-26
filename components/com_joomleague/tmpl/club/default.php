@@ -32,7 +32,7 @@ $data = $this->club;
 					<h1 class="mb-1"><?php echo htmlspecialchars((string) $club->name, ENT_QUOTES, 'UTF-8'); ?></h1>
 					<?php if ($club->short_name) : ?><div class="text-body-secondary"><?php echo htmlspecialchars((string) $club->short_name, ENT_QUOTES, 'UTF-8'); ?></div><?php endif; ?>
 					<div class="d-flex flex-wrap gap-3 mt-2 small text-body-secondary">
-						<?php if ($club->country_code) : ?><span><?php echo htmlspecialchars((string) $club->country_code, ENT_QUOTES, 'UTF-8'); ?></span><?php endif; ?>
+						<?php if ($club->country_code) : ?><span><?php echo \Joomleague\Component\Joomleague\Domain\Service\CountryPresentation::html((string) $club->country_code); ?></span><?php endif; ?>
 						<?php if ($club->founded_date) : ?><span><?php echo Text::sprintf('COM_JOOMLEAGUE_CLUB_FOUNDED', HTMLHelper::_('date', $club->founded_date, Text::_('DATE_FORMAT_LC3'))); ?></span><?php endif; ?>
 						<?php if ($club->dissolved_date) : ?><span><?php echo Text::sprintf('COM_JOOMLEAGUE_CLUB_DISSOLVED', HTMLHelper::_('date', $club->dissolved_date, Text::_('DATE_FORMAT_LC3'))); ?></span><?php endif; ?>
 					</div>

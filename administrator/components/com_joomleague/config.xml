@@ -21,6 +21,8 @@
 	</fieldset>
 
 	<fieldset name="dashboard" label="COM_JOOMLEAGUE_CONFIG_FIELDSET_DASHBOARD_LABEL" description="COM_JOOMLEAGUE_CONFIG_FIELDSET_DASHBOARD_DESC">
+		<field name="dashboard_project_ids" type="sql" multiple="true" label="COM_JOOMLEAGUE_CONFIG_DASHBOARD_PROJECTS_LABEL" description="COM_JOOMLEAGUE_CONFIG_DASHBOARD_PROJECTS_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_project WHERE published = 1 ORDER BY name, id" key_field="value" value_field="text" filter="int_array" validate="options" layout="joomla.form.field.list-fancy-select" />
+		<field name="dashboard_result_lookback_days" type="number" label="COM_JOOMLEAGUE_CONFIG_DASHBOARD_LOOKBACK_LABEL" description="COM_JOOMLEAGUE_CONFIG_DASHBOARD_LOOKBACK_DESC" default="30" min="0" max="365" step="1" filter="integer" />
 		<field name="dashboard_match_limit" type="number" label="COM_JOOMLEAGUE_CONFIG_DASHBOARD_MATCH_LIMIT_LABEL" description="COM_JOOMLEAGUE_CONFIG_DASHBOARD_MATCH_LIMIT_DESC" default="9" min="1" max="50" step="1" filter="integer" />
 		<field name="dashboard_match_link" type="list" label="COM_JOOMLEAGUE_CONFIG_DASHBOARD_MATCH_LINK_LABEL" description="COM_JOOMLEAGUE_CONFIG_DASHBOARD_MATCH_LINK_DESC" default="match">
 			<option value="match">COM_JOOMLEAGUE_CONFIG_MATCH_LINK_MATCH</option>

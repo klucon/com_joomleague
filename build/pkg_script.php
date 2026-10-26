@@ -4,12 +4,18 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Installer\InstallerAdapter;
+use Joomla\CMS\Installer\Installer;
+use Joomla\CMS\Installer\InstallerHelper;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\Filesystem\Folder;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\Database\DatabaseInterface;
 
 final class Pkg_JoomleagueInstallerScript
 {
+	private bool $countriesConnectorExisted = true;
+
 	public function preflight(string $type, InstallerAdapter $adapter): bool
 	{
 		if (!in_array($type, ['install', 'update'], true)) {
@@ -18,6 +24,11 @@ final class Pkg_JoomleagueInstallerScript
 
 		$this->loadLanguage($adapter);
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$query = $database->getQuery(true)->select('COUNT(*)')->from($database->quoteName('#__extensions'))
+			->where($database->quoteName('type') . ' = ' . $database->quote('plugin'))
+			->where($database->quoteName('folder') . ' = ' . $database->quote('kluconcountries'))
+			->where($database->quoteName('element') . ' = ' . $database->quote('joomleague'));
+		$this->countriesConnectorExisted = (int) $database->setQuery($query)->loadResult() > 0;
 		$temporaryDirectory = (string) Factory::getApplication()->get('tmp_path');
 		$checks = [
 			['label' => 'PKG_JOOMLEAGUE_INSTALL_CHECK_PHP', 'passed' => version_compare(PHP_VERSION, '8.3.0', '>=')],
@@ -43,7 +54,16 @@ final class Pkg_JoomleagueInstallerScript
 		}
 
 		$this->loadLanguage($adapter);
+		$this->ensureCountries($adapter);
 		$db = Factory::getContainer()->get('DatabaseDriver');
+		if (!$this->countriesConnectorExisted) {
+			$query = $db->getQuery(true)->update($db->quoteName('#__extensions'))
+				->set($db->quoteName('enabled') . ' = 1')
+				->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
+				->where($db->quoteName('folder') . ' = ' . $db->quote('kluconcountries'))
+				->where($db->quoteName('element') . ' = ' . $db->quote('joomleague'));
+			$db->setQuery($query)->execute();
+		}
 		$query = $db->getQuery(true)
 			->update($db->quoteName('#__extensions'))
 			->set($db->quoteName('enabled') . ' = 1')
@@ -56,6 +76,37 @@ final class Pkg_JoomleagueInstallerScript
 		$this->renderPostflight($type);
 
 		return true;
+	}
+
+	private function ensureCountries(InstallerAdapter $adapter): void
+	{
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
+		$query = $db->getQuery(true)->select('COUNT(*)')->from($db->quoteName('#__extensions'))
+			->where($db->quoteName('type') . ' = ' . $db->quote('component'))
+			->where($db->quoteName('element') . ' = ' . $db->quote('com_kluconcountries'));
+		if ((int) $db->setQuery($query)->loadResult() > 0) {
+			// A shared directory is independently maintained; never downgrade or reseed it.
+			return;
+		}
+		$archive = $adapter->getParent()->getPath('source') . '/dependencies/com_kluconcountries.zip';
+		if (!is_file($archive)) {
+			throw new RuntimeException('Bundled Klucon Countries dependency is missing.');
+		}
+		$package = InstallerHelper::unpack($archive);
+		if (!$package || empty($package['dir'])) {
+			throw new RuntimeException('Unable to unpack Klucon Countries.');
+		}
+		try {
+			$installer = new Installer();
+			$installer->setDatabase($db);
+			if (!$installer->install($package['dir'])) {
+				throw new RuntimeException('Unable to install Klucon Countries.');
+			}
+		} finally {
+			Folder::delete($package['extractdir']);
+		}
+		// Installed after package finalisation and deliberately absent from its owned files.
+		ComponentHelper::getComponent('com_kluconcountries');
 	}
 
 	private function loadLanguage(InstallerAdapter $adapter): void

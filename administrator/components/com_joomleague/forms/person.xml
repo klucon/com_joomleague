@@ -7,7 +7,7 @@
 		<field name="alias" type="text" label="JFIELD_ALIAS_LABEL" description="COM_JOOMLEAGUE_FIELD_ALIAS_DESC" maxlength="255" />
 		<field name="country_code" type="text" label="COM_JOOMLEAGUE_FIELD_COUNTRY_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_COUNTRY_CODE_DESC" maxlength="8" size="8" filter="cmd" />
 		<field name="contact_id" type="modal_contact" label="COM_JOOMLEAGUE_FIELD_CONTACT_LABEL" description="COM_JOOMLEAGUE_FIELD_CONTACT_DESC" select="true" new="true" edit="true" clear="true" />
-			<field name="club_id" type="sql" label="COM_JOOMLEAGUE_FIELD_CLUB_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_CLUB_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name" key_field="value" value_field="text" default="0" required="false">
+			<field name="club_id" type="sql" layout="joomla.form.field.list-fancy-select" label="COM_JOOMLEAGUE_FIELD_CLUB_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_CLUB_DESC" query="SELECT id AS value, name AS text FROM #__joomleague_club WHERE published = 1 ORDER BY name" key_field="value" value_field="text" default="0" required="false">
 				<option value="0">COM_JOOMLEAGUE_OPTION_NO_CLUB</option>
 			</field>
 		<field name="external_code" type="text" label="COM_JOOMLEAGUE_FIELD_EXTERNAL_CODE_LABEL" description="COM_JOOMLEAGUE_FIELD_PERSON_EXTERNAL_CODE_DESC" maxlength="191" />

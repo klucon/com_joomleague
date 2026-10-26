@@ -137,4 +137,54 @@ $assert($missing['played']===59,'Missing result was counted');
 $homeScore->numeric_value=$originalHome;$awayScore->numeric_value=$originalAway;$homeScore->text_value=null;
 $db->updateObject('#__joomleague_match_score_value',$homeScore,'id',true);$db->updateObject('#__joomleague_match_score_value',$awayScore,'id',true);
 $projectRow->profile_version_id=$version;$db->updateObject('#__joomleague_project',$projectRow,'id');
+$staffFilters=['person_type'=>'staff','staff_only'=>true];
+$baseline=$reader->read($club,$staffFilters,[1])['people'][0]['manager_record'];
+$firstId=(int)$baseline['first_match_id'];$lastId=(int)$baseline['last_match_id'];
+$assert($firstId>0 && $lastId>$firstId,'Coach boundary events missing');
+// Deliberately reverse chronological order relative to insertion IDs.
+$moved=(object)['id'=>$lastId,'scheduled_start'=>'2019-01-01 12:00:00'];
+$lastDate=$baseline['last_match_date'];$db->updateObject('#__joomleague_project_match',$moved,'id');
+$boundary=$reader->read($club,$staffFilters,[1])['people'][0]['manager_record'];
+$assert((int)$boundary['first_match_id']===$lastId && $boundary['first_match_date']==='2019-01-01 12:00:00','Boundary uses IDs or membership dates instead of coached dates');
+$moved->scheduled_start=null;$db->updateObject('#__joomleague_project_match',$moved,'id',true);
+$boundary=$reader->read($club,$staffFilters,[1])['people'][0]['manager_record'];
+$assert((int)$boundary['first_match_id']===$firstId && (int)$boundary['last_match_id']!==$lastId && $boundary['played']===60,'Undated event became a dated boundary');
+$moved->scheduled_start=$lastDate;$db->updateObject('#__joomleague_project_match',$moved,'id');
+foreach (['project_stage'=>$a['stage'],'project_round'=>$a['round']] as $table=>$id) {
+    $row=(object)['id'=>$id,'published'=>0];$db->updateObject('#__joomleague_'.$table,$row,'id');
+    $assert($reader->read($club,$staffFilters,[1])['people']===[],'Hidden parent leaked coach records: '.$table);
+    $row->published=1;$db->updateObject('#__joomleague_'.$table,$row,'id');
+}
+$opponentClub=$insert('club',['name'=>'Private opponent club','access'=>2]);
+$originalClub=$db->setQuery('SELECT club_id FROM #__joomleague_team WHERE id='.$opponentTeam)->loadResult();
+$opponentClubRow=(object)['id'=>$opponentTeam,'club_id'=>$opponentClub];$db->updateObject('#__joomleague_team',$opponentClubRow,'id');
+$assert($reader->read($club,$staffFilters,[1])['people']===[],'Private opponent club leaked statistics or boundary links');
+$opponentClubRow->club_id=$originalClub;$db->updateObject('#__joomleague_team',$opponentClubRow,'id',true);
+// A second squad of the same club must not contaminate the selected team's record.
+$reserve=$insert('team',['club_id'=>$club,'name'=>'History reserves']);
+$reserveEntry=$insert('project_entry',['project_id'=>$a['id'],'entry_kind'=>'team','team_id'=>$reserve]);
+$reserveMatch=$insert('project_match',['project_id'=>$a['id'],'stage_id'=>$a['stage'],'round_id'=>$a['round'],'scheduled_start'=>'2025-01-01 12:00:00']);
+$reserveHome=$insert('match_participant',['match_id'=>$reserveMatch,'project_id'=>$a['id'],'project_entry_id'=>$reserveEntry,'slot_number'=>1]);
+$reserveAway=$insert('match_participant',['match_id'=>$reserveMatch,'project_id'=>$a['id'],'project_entry_id'=>$a['entries'][1],'slot_number'=>2]);
+$insert('match_result',['match_id'=>$reserveMatch,'result_type'=>'score','status_code'=>'final'],false);
+$reserveRoot=$insert('match_score_segment',['match_id'=>$reserveMatch,'level_code'=>'result','sequence_number'=>1],false);
+foreach ([$reserveHome=>5,$reserveAway=>0] as $participantId=>$score) $insert('match_score_value',['match_id'=>$reserveMatch,'segment_id'=>$reserveRoot,'participant_id'=>$participantId,'numeric_value'=>$score],false);
+$reserveLineup=$insert('match_lineup_member',['match_id'=>$reserveMatch,'match_participant_id'=>$reserveHome,'person_id'=>900000,'member_person_type'=>'staff','role_code'=>$coachRole]);
+$reserveRecord=$reader->read($club,$staffFilters+['team_id'=>$reserve],[1])['people'][0]['manager_record'];
+$assert($reserveRecord['played']===1 && $reserveRecord['scored']==='5' && (int)$reserveRecord['first_match_id']===$reserveMatch && (int)$reserveRecord['last_match_id']===$reserveMatch,'Reserve team totals or boundary links crossed squad scope');
+$assert($reader->read($club,$staffFilters+['team_id'=>$team],[1])['people'][0]['manager_record']['played']===60,'First-team totals include reserve fixture');
+$assert($reader->read($club,$staffFilters,[1])['people'][0]['manager_record']['played']===61,'Explicit club aggregate missing reserve fixture');
+$assert($reader->read($club,$staffFilters+['team_id'=>$opponentTeam],[1])['people']===[],'Foreign-club team filter exposed coaches');
+$row=(object)['id'=>$reserveLineup,'published'=>0];$db->updateObject('#__joomleague_match_lineup_member',$row,'id');
+$menu=new Joomla\CMS\Table\Menu($db);
+$menu->setLocation(1,'last-child');
+$componentId=(int)$db->setQuery("SELECT extension_id FROM #__extensions WHERE element='com_joomleague' AND type='component'")->loadResult();
+$assert($menu->bind(['menutype'=>'mainmenu','title'=>'Staff history settings','alias'=>'staff-history-settings','type'=>'component',
+    'link'=>'index.php?option=com_joomleague&view=clubstaffhistory&club_id='.$club.'&team_id='.$team,
+    'component_id'=>$componentId,'published'=>1,'access'=>1,'language'=>'*','client_id'=>0,
+    'params'=>json_encode(['show_score'=>0,'show_period'=>0,'show_losses'=>0,'enable_column_sorting'=>1],JSON_THROW_ON_ERROR)]) && $menu->check() && $menu->store(),'Cannot persist staff menu settings');
+$menuState=['id'=>(int)$menu->id,'team_id'=>$team,'club_id'=>$club,'first_match_id'=>$firstId,'last_match_id'=>$lastId];
+file_put_contents('/tmp/jl-staff-menu.json',json_encode($menuState,JSON_THROW_ON_ERROR));
+require __DIR__ . '/club-people-team-acceptance.php';
+echo "PASS: chronological first/last coached events, undated exclusion, hidden parent/opponent club, isolated reserve squad and persisted column settings\n";
 echo 'PASS: 1205 people, 72300 lineups, SQL totals, metric sort, page clamp, all cap, selected coach detail, search and ACL; peak='.memory_get_peak_usage(true)." bytes\n";

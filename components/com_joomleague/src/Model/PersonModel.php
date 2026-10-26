@@ -20,6 +20,7 @@ use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomleague\Component\Joomleague\Domain\Service\StandingsDecimal;
+use Joomleague\Component\Joomleague\Domain\Service\PersonMembershipPeriod;
 
 final class PersonModel extends BaseDatabaseModel
 {
@@ -30,9 +31,14 @@ final class PersonModel extends BaseDatabaseModel
 		$this->setState('filter.project_id', $input->getInt('filter_project_id', 0));
 		$this->setState('filter.role_code', $input->getCmd('filter_role_code', ''));
 		$this->setState('filter.opponent_club_id', $input->getInt('filter_opponent_club_id', 0));
+		$this->setState('filter.team_id', max(0, $input->getInt('filter_team_id', 0)));
 		$this->setState('carom.project_id', $input->getInt('carom_project_id', 0));
 		$this->setState('carom.season_id', $input->getInt('carom_season_id', 0));
 		$this->setState('carom.start', max(0, $input->getInt('carom_start', 0)));
+		$this->setState('player.project_id', max(0, $input->getInt('player_project_id', $input->getInt('project_id', 0))));
+		$this->setState('player.start', max(0, $input->getInt('player_limitstart', $input->getInt('player_start', 0))));
+		$playerLimit = $input->getInt('player_limit', 5);
+		$this->setState('player.limit', in_array($playerLimit, [5, 10, 25], true) ? $playerLimit : 5);
 	}
 
 	/** @return array<string,mixed> */
@@ -72,6 +78,14 @@ final class PersonModel extends BaseDatabaseModel
 					'member.valid_from', 'member.valid_until', 'member.lifecycle_state',
 					$db->quoteName('entry.id', 'entry_id'), $db->quoteName('project.id', 'project_id'),
 					$db->quoteName('project.name', 'project_name'), $db->quoteName('sport_type.name', 'sport_type_name'),
+					$db->quoteName('season.name', 'season_name'),
+					$db->quoteName('season.id', 'season_id'), $db->quoteName('season.ordering', 'season_ordering'),
+					$db->quoteName('membership_profile.name_key', 'profile_name_key'),
+					$db->quoteName('competition.name', 'competition_name'),
+					$db->quoteName('membership_club.id', 'membership_club_id'), $db->quoteName('membership_club.name', 'membership_club_name'),
+					$db->quoteName('project.start_date', 'project_start_date'), $db->quoteName('project.end_date', 'project_end_date'),
+					$db->quoteName('project.lifecycle_state', 'project_lifecycle_state'),
+					$db->quoteName('season.start_date', 'season_start_date'), $db->quoteName('season.end_date', 'season_end_date'),
 					$db->quoteName('position.name', 'role_name'), $db->quoteName('position.name_key', 'role_name_key'),
 					'COALESCE(NULLIF(' . $db->quoteName('entry.display_name') . ", ''), "
 						. $db->quoteName('team.name') . ', NULLIF(TRIM(CONCAT('
@@ -87,6 +101,9 @@ final class PersonModel extends BaseDatabaseModel
 				->leftJoin($db->quoteName('#__joomleague_sport_position', 'position') . ' ON position.sport_type_id = project.sport_type_id AND position.code = member.role_code AND position.published = 1')
 				->leftJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.published = 1')
 				->leftJoin($db->quoteName('#__joomleague_person', 'entry_person') . ' ON entry_person.id = entry.person_id AND entry_person.published = 1')
+				->leftJoin($db->quoteName('#__joomleague_sport_profile_version', 'membership_version') . ' ON membership_version.id = project.profile_version_id')
+				->leftJoin($db->quoteName('#__joomleague_sport_profile', 'membership_profile') . ' ON membership_profile.id = membership_version.profile_id')
+				->leftJoin($db->quoteName('#__joomleague_club', 'membership_club') . ' ON membership_club.id = COALESCE(team.club_id, entry_person.club_id) AND membership_club.published = 1 AND ' . \Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'membership_club'))
 				->where('member.person_id = :personId')
 				->where('member.published = 1')
 				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'project'))
@@ -94,21 +111,21 @@ final class PersonModel extends BaseDatabaseModel
 				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'season'))
 				->where("(entry.entry_kind = 'group' OR (entry.entry_kind = 'team' AND team.id IS NOT NULL) OR (entry.entry_kind = 'person' AND entry_person.id IS NOT NULL))")
 				->bind(':personId', $personId, ParameterType::INTEGER)
-				->order('member.valid_from DESC, project.name ASC, entry.ordering ASC, entry.id ASC')
+				->order('season.name DESC, season.id DESC, project.start_date DESC, project.id DESC, entry.ordering ASC, entry.id ASC, member.id ASC')
 		)->loadObjectList();
 
 		$currentMemberships = [];
 		$membershipHistory = [];
+		$upcomingMemberships = [];
+		$undatedMemberships = [];
+		$membershipToday = Factory::getDate('now', (string) Factory::getApplication()->get('offset', 'UTC'))->format('Y-m-d', true);
 
 		foreach ($memberships as $membership) {
-			$isCurrent = ($membership->valid_from === null || $membership->valid_from <= $today)
-				&& ($membership->valid_until === null || $membership->valid_until >= $today)
-				&& (string) $membership->lifecycle_state !== 'departed';
-
-			if ($isCurrent) {
-				$currentMemberships[] = $membership;
-			} else {
-				$membershipHistory[] = $membership;
+			switch (PersonMembershipPeriod::classify($membership, $membershipToday)) {
+				case 'current': $currentMemberships[] = $membership; break;
+				case 'history': $membershipHistory[] = $membership; break;
+				case 'upcoming': $upcomingMemberships[] = $membership; break;
+				default: $undatedMemberships[] = $membership;
 			}
 		}
 
@@ -160,6 +177,7 @@ final class PersonModel extends BaseDatabaseModel
 				->from($db->quoteName('#__joomleague_match_actor_role', 'assignment'))
 				->innerJoin($db->quoteName('#__joomleague_project_match', 'match') . ' ON match.id = assignment.match_id AND match.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_project_round', 'round') . ' ON round.id = match.round_id AND round.published = 1')
+				->innerJoin($db->quoteName('#__joomleague_project_stage', 'stage') . ' ON stage.id = match.stage_id AND stage.project_id = match.project_id AND stage.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_project', 'project') . ' ON project.id = assignment.project_id AND project.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_competition', 'competition') . ' ON competition.id = project.competition_id AND competition.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_season', 'season') . ' ON season.id = project.season_id AND season.published = 1')
@@ -212,7 +230,9 @@ final class PersonModel extends BaseDatabaseModel
 		}
 		$officiatingByProject = [];
 		$siteClubId = (int) $this->getState('site_club_id', ComponentHelper::getParams('com_joomleague')->get('site_club_id', 0));
-		$siteClubStats = $this->loadOfficiatedSiteClubStats($db, array_keys($officiatedMatches), $siteClubId);
+		$teamContext = $this->officiatingTeamContext($db, array_keys($officiatedMatches), $siteClubId);
+		$teamFilter = max(0, (int) $this->getState('filter.team_id', 0));
+		$siteClubStats = $this->loadOfficiatedSiteClubStats($db, array_keys($officiatedMatches), $siteClubId, $teamFilter);
 		$filterOpponents = [];
 		foreach (($siteClubStats['all']['opponents'] ?? []) as $opponent) $filterOpponents[(int) $opponent['club_id']] = (string) $opponent['club_name'];
 		$projectFilter = (int) $this->getState('filter.project_id', 0);
@@ -222,9 +242,10 @@ final class PersonModel extends BaseDatabaseModel
 		if ($opponentFilter > 0) foreach (($siteClubStats['all']['matches'] ?? []) as $match) if ((int) $match['opponent_club_id'] === $opponentFilter) $opponentMatchIds[(int) $match['match_id']] = true;
 		$officiatedMatches = array_filter($officiatedMatches, static fn (object $assignment, int $matchId): bool =>
 			($projectFilter < 1 || (int) $assignment->project_id === $projectFilter)
+			&& ($teamFilter < 1 || isset($teamContext['matches'][$matchId][$teamFilter]))
 			&& ($roleFilter === '' || (string) $assignment->role_code === $roleFilter)
 			&& ($opponentFilter < 1 || isset($opponentMatchIds[$matchId])), ARRAY_FILTER_USE_BOTH);
-		$siteClubStats = $this->loadOfficiatedSiteClubStats($db, array_keys($officiatedMatches), $siteClubId);
+		$siteClubStats = $this->loadOfficiatedSiteClubStats($db, array_keys($officiatedMatches), $siteClubId, $teamFilter);
 		$roleBreakdown = [];
 		$careerProjects = [];
 		$careerSeasons = [];
@@ -261,9 +282,13 @@ final class PersonModel extends BaseDatabaseModel
 
 		return [
 			'person' => $person,
+			'player_history' => $this->playerHistory($db, (int) $person->id),
 			'carom' => $this->caromHistory($db, (int) $person->id),
 			'memberships' => $currentMemberships,
 			'membership_history' => $membershipHistory,
+			'career_memberships' => $memberships,
+			'membership_upcoming' => $upcomingMemberships,
+			'membership_undated' => $undatedMemberships,
 			'competition_roles' => $currentCompetitionRoles,
 			'competition_role_history' => $competitionRoleHistory,
 			'event_assignments' => $eventAssignments,
@@ -278,13 +303,29 @@ final class PersonModel extends BaseDatabaseModel
 				'roles' => $roleBreakdown,
 				'projects' => $officiatingByProject,
 				'site_club' => $siteClubStats['club'],
+				'team' => $teamFilter > 0 && isset($teamContext['teams'][$teamFilter]) ? ['id'=>$teamFilter,'name'=>$teamContext['teams'][$teamFilter]] : null,
 				'site_club_stats' => $siteClubStats['all'],
 				'filters' => [
 					'project_id' => $projectFilter, 'role_code' => $roleFilter, 'opponent_club_id' => $opponentFilter,
+					'team_id' => $teamFilter, 'teams' => $teamContext['teams'], 'site_club_id' => $siteClubId,
 					'projects' => $filterProjects, 'roles' => $filterRoles, 'opponents' => $filterOpponents,
 				],
 			],
 		];
+	}
+
+	private function playerHistory(DatabaseInterface $db, int $personId): array
+	{
+		$data = (new \Joomleague\Component\Joomleague\Site\Service\PlayerHistoryReader($db))->forPerson($personId, Factory::getApplication()->getIdentity()->getAuthorisedViewLevels());
+		$projectId = (int) $this->getState('player.project_id', 0);
+		$data['profiles'] = \Joomleague\Component\Joomleague\Site\Service\PlayerHistoryReader::profilesForProject($data['profiles'], $projectId);
+		$history = array_values(array_filter($data['history'], static fn(array $row): bool => $projectId === 0 || $row['project_id'] === $projectId));
+		$total = count($history); $limit = (int) $this->getState('player.limit', 5);
+		if (!in_array($limit, [5, 10, 25], true)) $limit = 5;
+		$start = min(intdiv((int) $this->getState('player.start', 0), $limit) * $limit, intdiv(max(0, $total - 1), $limit) * $limit);
+		$pagination = new \Joomla\CMS\Pagination\Pagination($total, $start, $limit, 'player_');
+		foreach (['option' => 'com_joomleague', 'view' => 'person', 'person_id' => $personId, 'player_project_id' => $projectId, 'player_limit' => $limit] as $key => $value) $pagination->setAdditionalUrlParam($key, $value);
+		return ['available' => $data['history'] !== [], 'history' => array_slice($history, $start, $limit), 'profiles' => $data['profiles'], 'projects' => $data['projects'], 'project_id' => $projectId, 'total' => $total, 'start' => $start, 'limit' => $limit, 'pagination' => $pagination];
 	}
 
 	private function caromHistory(DatabaseInterface $db, int $personId): array
@@ -311,13 +352,46 @@ final class PersonModel extends BaseDatabaseModel
 		];
 	}
 
+	/** @param list<int> $matchIds @return array{teams:array<int,string>,matches:array<int,array<int,true>>} */
+	private function officiatingTeamContext(DatabaseInterface $db, array $matchIds, int $siteClubId): array
+	{
+		$context = ['teams'=>[], 'matches'=>[]];
+		if ($matchIds === []) return $context;
+		$rows = $db->setQuery($db->getQuery(true)
+			->select(['participant.match_id', 'team.id', 'team.name', 'team.club_id'])
+			->from($db->quoteName('#__joomleague_match_participant', 'participant'))
+			->innerJoin($db->quoteName('#__joomleague_project_match', 'match') . ' ON match.id=participant.match_id')
+			->innerJoin($db->quoteName('#__joomleague_project_entry', 'entry') . " ON entry.id=participant.project_entry_id AND entry.project_id=match.project_id AND entry.entry_kind='team' AND entry.published=1")
+			->innerJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id=entry.team_id AND team.published=1')
+			->innerJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id=team.club_id AND club.published=1')
+			->whereIn('participant.match_id', array_map('intval', $matchIds), ParameterType::INTEGER)
+			->where('participant.published=1')
+			->where('(SELECT COUNT(*) FROM ' . $db->quoteName('#__joomleague_match_participant') . ' visible_count WHERE visible_count.match_id=match.id AND visible_count.published=1)=2')
+			->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'team'))
+			->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'club'))
+			->order('participant.match_id ASC, team.name ASC, team.id ASC'))->loadObjectList();
+		$byMatch = [];
+		foreach ($rows as $row) $byMatch[(int) $row->match_id][] = $row;
+		foreach ($byMatch as $id=>$participants) {
+			if (count($participants) !== 2) continue;
+			foreach ($participants as $participant) {
+				if ($siteClubId > 0 && (int) $participant->club_id !== $siteClubId) continue;
+				$teamId = (int) $participant->id;
+				$context['teams'][$teamId] = (string) $participant->name;
+				$context['matches'][$id][$teamId] = true;
+			}
+		}
+		natcasesort($context['teams']);
+		return $context;
+	}
+
 	/**
 	 * Build the configured site club's W/D/L balance for final two-team events.
 	 *
 	 * @param list<int> $matchIds
 	 * @return array{club:?array{id:int,name:string},projects:array<int,array<string,mixed>>,all:?array<string,mixed>}
 	 */
-	private function loadOfficiatedSiteClubStats(DatabaseInterface $db, array $matchIds, int $siteClubId): array
+	private function loadOfficiatedSiteClubStats(DatabaseInterface $db, array $matchIds, int $siteClubId, int $teamFilter = 0): array
 	{
 		if ($matchIds === [] || $siteClubId < 1) {
 			return ['club' => null, 'projects' => [], 'all' => null];
@@ -335,11 +409,12 @@ final class PersonModel extends BaseDatabaseModel
 				->innerJoin($db->quoteName('#__joomleague_match_score_segment', 'segment') . " ON segment.match_id = match.id AND segment.level_code = 'result'")
 				->innerJoin($db->quoteName('#__joomleague_match_score_value', 'value') . ' ON value.segment_id = segment.id AND value.match_id = match.id')
 				->innerJoin($db->quoteName('#__joomleague_match_participant', 'participant') . ' ON participant.id = value.participant_id AND participant.match_id = match.id AND participant.published = 1')
-				->innerJoin($db->quoteName('#__joomleague_project_entry', 'entry') . ' ON entry.id = participant.project_entry_id AND entry.published = 1')
+				->innerJoin($db->quoteName('#__joomleague_project_entry', 'entry') . ' ON entry.id = participant.project_entry_id AND entry.project_id = match.project_id AND entry.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_team', 'team') . ' ON team.id = entry.team_id AND team.published = 1')
 				->innerJoin($db->quoteName('#__joomleague_club', 'club') . ' ON club.id = team.club_id AND club.published = 1')
 				->whereIn($db->quoteName('match.id'), array_map('intval', $matchIds), ParameterType::INTEGER)
 				->where('match.published = 1')
+				->where('(SELECT COUNT(*) FROM ' . $db->quoteName('#__joomleague_match_participant') . ' visible_count WHERE visible_count.match_id=match.id AND visible_count.published=1)=2')
 				->where('value.numeric_value IS NOT NULL')
 				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'team'))
 				->where(\Joomleague\Component\Joomleague\Site\Service\PublicAccess::condition($db, 'club'))
@@ -358,7 +433,7 @@ final class PersonModel extends BaseDatabaseModel
 			if (count($participants) !== 2) {
 				continue;
 			}
-			$siteIndexes = array_keys(array_filter($participants, static fn (object $participant): bool => (int) $participant->club_id === $siteClubId));
+			$siteIndexes = array_keys(array_filter($participants, static fn (object $participant): bool => (int) $participant->club_id === $siteClubId && ($teamFilter < 1 || (int) $participant->team_id === $teamFilter)));
 			if (count($siteIndexes) !== 1) continue;
 
 			$siteIndex = $siteIndexes[0];
@@ -374,21 +449,22 @@ final class PersonModel extends BaseDatabaseModel
 			$projectId = (int) $site->project_id;
 			$club ??= ['id' => $siteClubId, 'name' => (string) $site->club_name];
 			$this->addClubResult($projects[$projectId], $site, $opponent, $siteComparison);
-			$this->addClubResult($projects[$projectId]['opponents'][(int) $opponent->club_id], $site, $opponent, $siteComparison, true);
+			$this->addClubResult($projects[$projectId]['opponents'][(int) $opponent->team_id], $site, $opponent, $siteComparison, true);
 			$this->addClubResult($all, $site, $opponent, $siteComparison);
-			$this->addClubResult($all['opponents'][(int) $opponent->club_id], $site, $opponent, $siteComparison, true);
+			$this->addClubResult($all['opponents'][(int) $opponent->team_id], $site, $opponent, $siteComparison, true);
 			$match = [
 				'match_id' => (int) $site->match_id, 'project_id' => $projectId,
 				'site_team_name' => (string) $site->team_name, 'opponent_team_name' => (string) $opponent->team_name,
+				'site_team_id' => (int) $site->team_id, 'opponent_team_id' => (int) $opponent->team_id,
 				'opponent_club_id' => (int) $opponent->club_id, 'opponent_club_name' => (string) $opponent->club_name,
 				'scored' => StandingsDecimal::normalize((string) $site->numeric_value),
 				'conceded' => StandingsDecimal::normalize((string) $opponent->numeric_value),
 				'outcome' => $siteComparison > 0 ? 'win' : ($siteComparison < 0 ? 'loss' : 'draw'),
 			];
 			$projects[$projectId]['matches'][] = $match;
-			$projects[$projectId]['opponents'][(int) $opponent->club_id]['matches'][] = $match;
+			$projects[$projectId]['opponents'][(int) $opponent->team_id]['matches'][] = $match;
 			$all['matches'][] = $match;
-			$all['opponents'][(int) $opponent->club_id]['matches'][] = $match;
+			$all['opponents'][(int) $opponent->team_id]['matches'][] = $match;
 		}
 
 		foreach ($projects as &$projectStats) $projectStats['opponents'] = $this->sortClubStats($projectStats['opponents'] ?? []);
@@ -407,6 +483,10 @@ final class PersonModel extends BaseDatabaseModel
 			'played' => 0, 'wins' => 0, 'draws' => 0, 'losses' => 0,
 			'scored' => '0', 'conceded' => '0',
 		];
+		if ($opponentRow) {
+			$stats['team_id'] = (int) $opponent->team_id;
+			$stats['team_name'] = (string) $opponent->team_name;
+		}
 		$stats['played']++;
 		$stats[$comparison > 0 ? 'wins' : ($comparison < 0 ? 'losses' : 'draws')]++;
 		$stats['scored'] = StandingsDecimal::add((string) $stats['scored'], (string) $team->numeric_value);
@@ -420,7 +500,7 @@ final class PersonModel extends BaseDatabaseModel
 	private function sortClubStats(array $stats): array
 	{
 		$stats = array_values($stats);
-		usort($stats, static fn (array $left, array $right): int => strnatcasecmp((string) $left['club_name'], (string) $right['club_name']));
+		usort($stats, static fn (array $left, array $right): int => strnatcasecmp((string) $left['club_name'], (string) $right['club_name']) ?: strnatcasecmp((string) $left['team_name'], (string) $right['team_name']) ?: $left['team_id'] <=> $right['team_id']);
 		return $stats;
 	}
 }

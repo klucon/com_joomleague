@@ -10,7 +10,7 @@ final class CaromStandingsContract
 	{
 		$contract = $profile['standings']['calculation'];
 		if (($profile['code'] ?? '') !== 'carom' || !isset($profile['standings']['tie_breaks'])) return $contract;
-		$allowed = ['score_for', 'score_difference', 'caroms', 'average', 'high_run', 'wins', 'head_to_head_points', 'head_to_head_average', 'head_to_head_caroms'];
+		$allowed = ['score_for', 'score_difference', 'caroms', 'average', 'best_average', 'high_run', 'wins', 'head_to_head_points', 'head_to_head_average', 'head_to_head_caroms'];
 		$ordering = [['metric' => 'points', 'direction' => 'desc', 'nulls' => 'last']];
 		$seen = ['points' => true];
 		foreach (['first', 'second', 'third', 'fourth', 'fifth'] as $position) {

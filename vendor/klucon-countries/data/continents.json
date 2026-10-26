@@ -1,0 +1,89 @@
+{
+  "reviewed_on": "2026-10-20",
+  "continents": {
+    "europe": {
+      "geonames_code": "EU",
+      "overview": "Europe occupies the western part of Eurasia and has an extensively indented coastline.",
+      "location": "Northern Hemisphere, extending across the Eastern and Western Hemispheres.",
+      "boundaries": "The conventional boundary with Asia follows the Urals, Ural River, Caspian Sea, Caucasus and Black Sea straits. Continental boundaries are conventions, not national borders.",
+      "oceans": "Atlantic Ocean and Arctic Ocean; major adjacent seas include the Mediterranean, Baltic and Black Seas.",
+      "terrain": "Major landscapes include the European Plain, Scandinavian uplands, Alps, Carpathians and extensive peninsulas.",
+      "climate": "Conditions range from Arctic and subarctic climates to temperate maritime, continental and Mediterranean climates.",
+      "classification": "Europe and Asia are separate geographic groupings here, despite sharing the Eurasian landmass. Transcontinental countries can belong to both.",
+      "registry_note": "The count includes registered countries and territories, not only sovereign states. It is calculated from current registry memberships.",
+      "sources": ["https://education.nationalgeographic.org/resource/europe-physical-geography/", "https://www.nationalgeographic.org/national-geographic-map-policy"]
+    },
+    "africa": {
+      "geonames_code": "AF",
+      "overview": "Africa is the second-largest continent and extends across the Equator.",
+      "location": "Northern and Southern Hemispheres; the prime meridian also crosses the continent.",
+      "boundaries": "The Mediterranean separates Africa from Europe. The Red Sea and the Suez region mark its northeastern connection with Asia.",
+      "oceans": "Atlantic Ocean to the west and Indian Ocean to the east; the Mediterranean and Red Seas form important northern boundaries.",
+      "terrain": "Major landscapes include the Sahara, Sahel, Congo Basin, East African Rift, Ethiopian Highlands and southern plateaus.",
+      "climate": "Climate zones include equatorial rainforest, tropical savanna, hot desert, highland and Mediterranean environments.",
+      "classification": "Africa is a geographic continent, not an administrative parent or a political union. Egypt has African and Asian geographic memberships in this registry.",
+      "registry_note": "Country and territory memberships are counted together. Regional organizations and their membership totals are separate concepts.",
+      "sources": ["https://education.nationalgeographic.org/resource/africa-physical-geography/", "https://education.nationalgeographic.org/resource/africa-human-geography/"]
+    },
+    "asia": {
+      "geonames_code": "AS",
+      "overview": "Asia is the largest continent and forms the eastern part of the Eurasian landmass.",
+      "location": "Predominantly in the Northern and Eastern Hemispheres, with islands extending south of the Equator.",
+      "boundaries": "Its western boundary with Europe is conventional. The Suez region connects it with Africa, and the Bering Strait separates it from North America.",
+      "oceans": "Arctic Ocean to the north, Pacific Ocean to the east and Indian Ocean to the south.",
+      "terrain": "The Himalayas, Tibetan Plateau, Siberian plains, major river basins, deserts and island arcs illustrate its geographic diversity.",
+      "climate": "Climates range from polar and subarctic to continental, arid, monsoon and humid tropical conditions.",
+      "classification": "A country may have multiple continental memberships. Geographic membership is independent of political or sporting affiliations.",
+      "registry_note": "The count reflects registered countries and territories assigned to Asia, including transcontinental entries.",
+      "sources": ["https://education.nationalgeographic.org/resource/asia/", "https://www.nationalgeographic.org/national-geographic-map-policy"]
+    },
+    "north-america": {
+      "geonames_code": "NA",
+      "overview": "North America extends from the Arctic to the Central American isthmus and includes the Caribbean geographic region.",
+      "location": "Predominantly in the Northern and Western Hemispheres.",
+      "boundaries": "The Bering Strait separates it from Asia. Central America connects it to South America at the Isthmus of Panama.",
+      "oceans": "Arctic Ocean to the north, Atlantic Ocean to the east and Pacific Ocean to the west.",
+      "terrain": "The western cordilleras, Canadian Shield, interior plains, Appalachian Mountains and coastal lowlands form major physical regions.",
+      "climate": "Conditions range from Arctic and subarctic through temperate and arid zones to tropical Central American and Caribbean climates.",
+      "classification": "This grouping includes Central America, the Caribbean and Greenland. It is broader than the statistical subregion called Northern America.",
+      "registry_note": "Territories are classified geographically, not automatically under the continent of their administering state.",
+      "sources": ["https://education.nationalgeographic.org/resource/north-america-physical-geography/", "https://education.nationalgeographic.org/resource/Continent/"]
+    },
+    "south-america": {
+      "geonames_code": "SA",
+      "overview": "South America extends from the Caribbean region toward the southern end of the Americas.",
+      "location": "Western Hemisphere, mostly south of the Equator, with northern areas in the Northern Hemisphere.",
+      "boundaries": "The Isthmus of Panama joins it to North America. The Drake Passage lies between its southern end and the Antarctic Peninsula.",
+      "oceans": "Pacific Ocean to the west and Atlantic Ocean to the east.",
+      "terrain": "Principal landscapes include the Andes, Amazon Basin, Guiana and Brazilian highlands, Pampas and Patagonia.",
+      "climate": "Equatorial rainforest, tropical savanna, arid coastal, temperate, mountain and subpolar environments occur across the continent.",
+      "classification": "South America is separate from North America in this registry's seven-group model. Latin America is a cultural grouping and is not synonymous with this continent.",
+      "registry_note": "The count includes countries and territories geographically assigned to South America, regardless of their administrative affiliation.",
+      "sources": ["https://education.nationalgeographic.org/resource/south-america-physical-geography/", "https://education.nationalgeographic.org/resource/Continent/"]
+    },
+    "oceania": {
+      "geonames_code": "OC",
+      "overview": "Oceania is a broad geographic grouping comprising Australia and Pacific island regions.",
+      "location": "Pacific-centred region spanning both sides of the Equator and the international date line.",
+      "boundaries": "Its limits depend on the classification used; geographic, geological, statistical and sporting definitions do not always agree.",
+      "oceans": "Pacific Ocean and the Indian Ocean around western Australia.",
+      "terrain": "Continental land, mountainous and volcanic islands, coral atolls, reefs and extensive marine environments characterize the region.",
+      "climate": "Environments range from arid Australian interiors to tropical islands, temperate New Zealand and alpine landscapes.",
+      "classification": "Oceania is used here as a regional registry group. It is not identical to the geological continent of Australia. Melanesia, Micronesia and Polynesia are associated regional groupings.",
+      "registry_note": "Country assignments follow the registry's geographic catalogue and can differ from sporting confederations. Ocean surface is not land area.",
+      "sources": ["https://education.nationalgeographic.org/resource/oceania-physical-geography/", "https://www.nationalgeographic.org/national-geographic-map-policy"]
+    },
+    "antarctica": {
+      "geonames_code": "AN",
+      "overview": "Antarctica is the ice-covered continent surrounding the South Pole.",
+      "location": "Southern Hemisphere, largely south of the Antarctic Circle, spanning all longitudes.",
+      "boundaries": "The continental coastline, Antarctic region and Antarctic Treaty area are different geographic or legal concepts. The Treaty applies south of 60 degrees south latitude.",
+      "oceans": "Southern Ocean surrounds the continent.",
+      "terrain": "A vast ice sheet covers most of the land, with mountain ranges, exposed rock, ice shelves and the Antarctic Peninsula.",
+      "climate": "Polar desert conditions predominate, with extreme cold, strong winds and seasonal daylight differences.",
+      "classification": "Antarctica has no sovereign countries. Territorial claims do not constitute ordinary national subdivisions, and this registry does not adjudicate sovereignty.",
+      "registry_note": "The count includes Antarctica and southern territories assigned to this catalogue group. It is not a count of sovereign countries or a statement that every entry lies on the continental mainland.",
+      "sources": ["https://education.nationalgeographic.org/resource/antarctica/", "https://www.ats.aq/e/antarctictreaty.html"]
+    }
+  }
+}

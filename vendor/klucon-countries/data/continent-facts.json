@@ -1,0 +1,74 @@
+{
+  "reviewed_on": "2026-10-20",
+  "population_reference": {
+    "url": "https://ourworldindata.org/grapher/population.csv",
+    "sha256": "6e72d4ffe8f0e940df60c90b13c8ad6eda85043b995b244e8b3e20b1e833b541",
+    "reference_year": 2023,
+    "methodology": "OWID continental aggregates; UN World Population Prospects 2024. Historical estimates, not current-year projections. Antarctica is a separate permanent/seasonal-population observation."
+  },
+  "continents": {
+    "europe": {
+      "area_km2": 10400000, "area_scope": "Rounded geographic estimate, approximately 10.4 million square kilometres. Boundaries with Asia are conventional; this is not the sum of member countries' full areas.", "area_source": "https://media.nationalgeographic.org/assets/file/Interactions_of_Land__Water.pdf",
+      "population": 746966209, "population_year": 2023, "population_status": "estimate", "population_min": null, "population_max": null,
+      "population_scope": "OWID continental aggregate based on UN WPP 2024, reference year 2023. Whole-country statistical assignments differ from physical boundaries and the registry's multiple memberships. Not a 2026 census.", "population_source": "https://ourworldindata.org/grapher/population",
+      "highest_name": "Mount Elbrus", "highest_elevation_m": 5642, "highest_scope": "Caucasus, Russia; uses the convention placing this summit in Europe.", "highest_source": "https://education.nationalgeographic.org/resource/europe-physical-geography/",
+      "lowest_name": "Caspian Depression / Caspian shoreline", "lowest_elevation_m": -28, "lowest_year": 1985, "lowest_scope": "Historical approximate shoreline reference from NASA photograph documentation, not the current lake level. The water level changes over time.", "lowest_source": "https://eol.jsc.nasa.gov/Collections/EarthFromSpace/photoinfo.pl?PHOTO=STS51F-40-64",
+      "river_name": "Volga", "river_length_km": 3530, "river_scope": "Conventional approximate river length; measurements depend on source and channel definitions.", "river_source": "https://www.pearsonschoolsandfecolleges.co.uk/asset-library/pdf/Primary/ActiveHub/Lesson-Plan-samples/Geography-Rivers-lesson-plan.pdf",
+      "lake_name": "Caspian Sea", "lake_area_km2": 371000, "lake_scope": "Approximate conventional surface-area reference for the shared European-Asian inland water body. Water level and area vary; Lake Ladoga is the largest lake wholly within Europe.", "lake_source": "https://en.wikipedia.org/wiki/Caspian_Sea"
+    },
+    "africa": {
+      "area_km2": 30365000, "area_scope": "Approximate continental land-area reference including associated islands; geographic boundary conventions can differ.", "area_source": "https://en.wikipedia.org/wiki/Continent",
+      "population": 1479690254, "population_year": 2023, "population_status": "estimate", "population_min": null, "population_max": null,
+      "population_scope": "OWID aggregate from UN WPP 2024 for 2023, using whole-country statistical assignments. This is not a sum of duplicate transcontinental registry entries or a 2026 census.", "population_source": "https://ourworldindata.org/grapher/population",
+      "highest_name": "Kilimanjaro / Uhuru Peak", "highest_elevation_m": 5895, "highest_scope": "Tanzania; elevation above mean sea level.", "highest_source": "https://whc.unesco.org/en/list/403",
+      "lowest_name": "Lake Assal", "lowest_elevation_m": -155, "lowest_year": null, "lowest_scope": "Djibouti; approximate surface/shoreline elevation below sea level, not lake-bottom depth.", "lowest_source": "https://en.wikipedia.org/wiki/Lake_Assal_(Djibouti)",
+      "river_name": "Nile river system", "river_length_km": 6695, "river_scope": "Approximate National Geographic atlas reference. Source-selection methods produce different published lengths.", "river_source": "https://media.nationalgeographic.org/assets/file/Africa_Activities.pdf",
+      "lake_name": "Lake Victoria", "lake_area_km2": 69500, "lake_scope": "Approximate atlas surface-area reference shared by Tanzania, Uganda and Kenya. Published estimates differ by shoreline definition and water level.", "lake_source": "https://media.nationalgeographic.org/assets/file/Africa_Activities.pdf"
+    },
+    "asia": {
+      "area_km2": 44614000, "area_scope": "Approximate physical-continent land-area reference. The Europe-Asia boundary is conventional and is not equivalent to whole-country statistical regions.", "area_source": "https://en.wikipedia.org/wiki/Continent",
+      "population": 4776659631, "population_year": 2023, "population_status": "estimate", "population_min": null, "population_max": null,
+      "population_scope": "OWID continental aggregate from UN WPP 2024 for 2023. Whole-country statistical assignments differ from geographic boundaries; Russia is not split into a separate Asian population here.", "population_source": "https://ourworldindata.org/grapher/population",
+      "highest_name": "Mount Everest", "highest_elevation_m": 8848.86, "highest_scope": "China-Nepal border; official snow-surface height announced in 2020, rather than rock-summit elevation.", "highest_source": "https://doi.org/10.1016/j.geog.2021.04.002",
+      "lowest_name": "Dead Sea shoreline", "lowest_elevation_m": -430, "lowest_year": 2016, "lowest_scope": "Dated approximate shoreline level from the cited geological report. The Dead Sea continues to change; this is not a current observation or lake-bottom depth.", "lowest_source": "https://www.gov.il/BlobFolder/reports/arnon-et-al-report-2016/en/report_2016_GSI-11-2016.pdf",
+      "river_name": "Yangtze river system", "river_length_km": 6300, "river_scope": "Conventional approximate main-system length; headwater selection changes reported measurements.", "river_source": "https://en.wikipedia.org/wiki/List_of_rivers_by_length",
+      "lake_name": "Caspian Sea", "lake_area_km2": 371000, "lake_scope": "Shared European-Asian inland water body. Approximate conventional surface area; level and shoreline change over time.", "lake_source": "https://en.wikipedia.org/wiki/Caspian_Sea"
+    },
+    "north-america": {
+      "area_km2": 24230000, "area_scope": "Reference continental land area including associated islands. Central America, Greenland and the Caribbean belong to this broad grouping.", "area_source": "https://en.wikipedia.org/wiki/Continent",
+      "population": 608770547, "population_year": 2023, "population_status": "estimate", "population_min": null, "population_max": null,
+      "population_scope": "OWID aggregate from UN WPP 2024 for 2023, using the broad North American grouping, not only the Northern America statistical subregion.", "population_source": "https://ourworldindata.org/grapher/population",
+      "highest_name": "Denali / Mount McKinley", "highest_elevation_m": 6190, "highest_scope": "Alaska, United States; rounded metric equivalent of 20,310 feet. Both widely used mountain names are retained.", "highest_source": "https://home.nps.gov/places/dena-stony-hill-overlook.htm",
+      "lowest_name": "Badwater Basin", "lowest_elevation_m": -86, "lowest_year": null, "lowest_scope": "Death Valley, United States; exposed land elevation, approximately 282 feet below sea level.", "lowest_source": "https://home.nps.gov/places/badwater-basin.htm",
+      "river_name": "Mississippi-Missouri river system", "river_length_km": 5970, "river_scope": "Approximate combined length published by the National Park Service. Other headwater definitions yield different lengths; this is not the Mississippi alone.", "river_source": "https://home.nps.gov/miss/riverfacts.htm/index.htm",
+      "lake_name": "Lake Michigan-Huron", "lake_area_km2": 117400, "lake_scope": "Hydrologically connected single lake system. If Michigan and Huron are counted separately, Lake Superior is the largest named lake at approximately 82,100 square kilometres.", "lake_source": "https://www.michigan.gov/egle/public/learn/great-lakes"
+    },
+    "south-america": {
+      "area_km2": 17814000, "area_scope": "Approximate continental land-area reference including associated islands. Boundaries and inland-water treatment can differ between sources.", "area_source": "https://en.wikipedia.org/wiki/Continent",
+      "population": 433024223, "population_year": 2023, "population_status": "estimate", "population_min": null, "population_max": null,
+      "population_scope": "OWID aggregate from UN WPP 2024 for 2023. Whole-country statistical assignments are used, rather than repeatedly counting territory memberships.", "population_source": "https://ourworldindata.org/grapher/population",
+      "highest_name": "Aconcagua", "highest_elevation_m": 6960.8, "highest_scope": "Argentina; official mean-sea-level height announced by Instituto Geografico Nacional in 2012.", "highest_source": "https://www.ign.gob.ar/Novedades/NuevaAlturaAconcagua",
+      "lowest_name": "Laguna del Carbon", "lowest_elevation_m": -105, "lowest_year": null, "lowest_scope": "Santa Cruz, Argentina; approximate surface elevation in the Gran Bajo de San Julian depression.", "lowest_source": "https://en.wikipedia.org/wiki/Laguna_del_Carb%C3%B3n",
+      "river_name": "Amazon river system", "river_length_km": 6400, "river_scope": "Conventional approximate length. Alternative headwaters and estuary definitions yield different values, so global longest-river rankings are disputed.", "river_source": "https://en.wikipedia.org/wiki/List_of_rivers_by_length",
+      "lake_name": "Lake Titicaca", "lake_area_km2": 8372, "lake_scope": "Largest freshwater lake by surface area in South America under the conventional definition excluding coastal lagoons such as Maracaibo. Surface area varies with water level.", "lake_source": "https://en.wikipedia.org/wiki/Lake_Titicaca"
+    },
+    "oceania": {
+      "area_km2": 8510926, "area_scope": "Regional land-area reference including Australia, New Zealand, Papua New Guinea and Pacific islands, excluding western New Guinea. This is not Pacific Ocean surface area.", "area_source": "https://en.wikipedia.org/wiki/Continent",
+      "population": 45563135, "population_year": 2023, "population_status": "estimate", "population_min": null, "population_max": null,
+      "population_scope": "OWID aggregate from UN WPP 2024 for 2023. Statistical Oceania excludes Indonesia; it differs from a geological definition including all of New Guinea.", "population_source": "https://ourworldindata.org/grapher/population",
+      "highest_name": "Puncak Jaya / Carstensz Pyramid", "highest_elevation_m": 4884, "highest_scope": "Physical Australasia including western New Guinea, Indonesia. This broader mountain convention differs from the area/population scope above; Mount Wilhelm is the highest in Papua New Guinea, while Kosciuszko is the mainland Australian high point.", "highest_source": "https://science.nasa.gov/earth/earth-observatory/glaciers-in-the-tropics-but-not-for-long-91716/",
+      "lowest_name": "Kati Thanda-Lake Eyre", "lowest_elevation_m": -15, "lowest_year": null, "lowest_scope": "Australia; approximate lake-bed elevation below sea level, not the water level during a flood.", "lowest_source": "https://www.ga.gov.au/scientific-topics/national-location-information/landforms/elevations",
+      "river_name": "Murray-Darling-Condamine river system", "river_length_km": 3672, "river_scope": "Longest continuous Australian river system under Geoscience Australia's 2008 mapped-channel calculation. The Murray alone is about 2,508 kilometres.", "river_source": "https://www.ga.gov.au/scientific-topics/national-location-information/landforms/longest-rivers",
+      "lake_name": "Kati Thanda-Lake Eyre", "lake_area_km2": 9500, "lake_scope": "Approximate maximum filled surface area of a usually dry or partly filled salt lake, not a permanent water surface.", "lake_source": "https://en.wikipedia.org/wiki/Lake_Eyre"
+    },
+    "antarctica": {
+      "area_km2": 14200000, "area_scope": "Approximate continental area including permanent ice; excludes the seasonally expanding sea-ice cover. Published values vary with ice-shelf and coastline treatment.", "area_source": "https://www.nhm.ac.uk/discover/climate-change-antarctica.html",
+      "population": 0, "population_year": 2026, "population_status": "no_permanent_population", "population_min": 1000, "population_max": 5000,
+      "population_scope": "Zero denotes no permanent native/resident population, not an uninhabited continent. Approximately 1,000 winter and 5,000 summer research/support personnel are a broad seasonal reference range, not a current station census. Density is not calculated from the permanent-population zero.", "population_source": "https://education.nationalgeographic.org/resource/antarctica/",
+      "highest_name": "Mount Vinson", "highest_elevation_m": 4892, "highest_scope": "Ellsworth Mountains; 2004 GPS measurement reported by USGS.", "highest_source": "https://pubs.usgs.gov/of/2007/1047/srp/srp069/of2007-1047srp069.pdf",
+      "lowest_name": "Deep Lake shoreline, Vestfold Hills", "lowest_elevation_m": -50, "lowest_year": 2024, "lowest_scope": "Approximate accessible surface/shoreline depression. This is not the continent's deepest subglacial bedrock, which lies much farther below sea level.", "lowest_source": "https://www.antarctica.gov.au/news/stations/davis/2024/20-september/",
+      "river_name": "Onyx River", "river_length_km": 32, "river_scope": "Approximate length of a seasonal surface meltwater stream, excluding subglacial drainage systems.", "river_source": "https://en.wikipedia.org/wiki/Onyx_River",
+      "lake_name": "Lake Vostok", "lake_area_km2": 15690, "lake_scope": "Approximate subglacial lake area cited by USGS; the lake is beneath the ice sheet rather than an exposed water surface. Published geometric estimates vary.", "lake_source": "https://pubs.usgs.gov/of/2007/1047/ea/of2007-1047ea040.pdf"
+    }
+  }
+}

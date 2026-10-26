@@ -7,6 +7,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
 HTMLHelper::_('behavior.multiselect');
+$this->getDocument()->getWebAssetManager()->useScript('com_joomleague.matchlineup');
 $matchId = (int) $this->match->id;
 $participantId = (int) ($this->participant->id ?? 0);
 ?>
@@ -70,14 +71,14 @@ $participantId = (int) ($this->participant->id ?? 0);
 						<div class="col-md-3"><label class="form-label" for="substitution-clock-unit"><?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_CLOCK_UNIT'); ?></label><input class="form-control" id="substitution-clock-unit" name="substitution[clock_unit]" type="text" maxlength="50"><div class="form-text"><?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_CLOCK_UNIT_DESC'); ?></div></div>
 						<div class="col-12"><label class="form-label" for="substitution-notes"><?php echo Text::_('COM_JOOMLEAGUE_FIELD_NOTES_LABEL'); ?></label><textarea class="form-control" id="substitution-notes" name="substitution[notes]" rows="3"></textarea><div class="form-text"><?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_SUBSTITUTION_NOTES_DESC'); ?></div></div>
 					</div>
-					<button class="btn btn-success mt-3" type="submit" name="task" value="matchlineup.addSubstitution"><span class="icon-plus" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_SUBSTITUTION_ADD'); ?></button>
+					<button class="btn btn-success mt-3" type="submit" data-lineup-task="matchlineup.addSubstitution"><span class="icon-plus" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_SUBSTITUTION_ADD'); ?></button>
 				</fieldset>
 				<h3 class="h5 mt-4"><?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_SUBSTITUTION_HISTORY'); ?></h3>
 				<div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th class="w-1"><span class="visually-hidden"><?php echo Text::_('JGLOBAL_SELECTION'); ?></span></th><th class="text-center"><?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_SEQUENCE'); ?></th><th><?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_OUTGOING'); ?></th><th><?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_INCOMING'); ?></th><th><?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_PHASE'); ?></th><th><?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_CLOCK'); ?></th><th><?php echo Text::_('COM_JOOMLEAGUE_FIELD_NOTES_LABEL'); ?></th></tr></thead><tbody>
 				<?php foreach ($this->substitutions as $change) : ?><tr><td><input class="form-check-input" type="checkbox" name="sid[]" value="<?php echo (int) $change->id; ?>" aria-label="<?php echo Text::_('JGLOBAL_SELECTION'); ?>"></td><td class="text-center"><?php echo (int) $change->sequence_number; ?></td><td><?php echo $this->escape(trim($change->outgoing_first_name . ' ' . $change->outgoing_last_name)); ?></td><td><?php echo $this->escape(trim($change->incoming_first_name . ' ' . $change->incoming_last_name)); ?></td><td><?php echo $change->phase_code ? $this->escape(Text::_($this->substitutionPhases[$change->phase_code] ?? $change->phase_code) . ($change->phase_sequence ? ' ' . (int) $change->phase_sequence : '')) : Text::_('JNONE'); ?></td><td><?php echo $change->clock_value !== null ? $this->escape(rtrim(rtrim((string) $change->clock_value, '0'), '.') . ($change->clock_unit ? ' ' . $change->clock_unit : '')) : Text::_('JNONE'); ?></td><td><?php echo $change->notes ? $this->escape($change->notes) : Text::_('JNONE'); ?></td></tr><?php endforeach; ?>
 				<?php if ($this->substitutions === []) : ?><tr><td colspan="7"><div class="alert alert-light mb-0"><?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_SUBSTITUTION_EMPTY'); ?></div></td></tr><?php endif; ?>
 				</tbody></table></div>
-				<button class="btn btn-danger" type="submit" name="task" value="matchlineup.removeSubstitution"><span class="icon-minus" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_SUBSTITUTION_REMOVE'); ?></button>
+				<button class="btn btn-danger" type="submit" data-lineup-task="matchlineup.removeSubstitution" formnovalidate><span class="icon-minus" aria-hidden="true"></span> <?php echo Text::_('COM_JOOMLEAGUE_MATCHLINEUP_SUBSTITUTION_REMOVE'); ?></button>
 			<?php endif; ?>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 			<?php echo HTMLHelper::_('uitab.endTabSet'); ?>

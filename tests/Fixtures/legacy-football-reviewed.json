@@ -1,0 +1,869 @@
+[
+  {
+    "source": {
+      "id": 3903,
+      "team1_result": 1.0,
+      "team2_result": 2.0,
+      "team1_result_split": "1;1",
+      "team2_result_split": "1;1",
+      "team1_result_ot": 1.0,
+      "team2_result_ot": 2.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 0,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "1",
+        "2"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "1",
+          "2"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "1",
+          "2"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 3906,
+      "team1_result": 2.0,
+      "team2_result": 3.0,
+      "team1_result_split": "0;1",
+      "team2_result_split": "0;1",
+      "team1_result_ot": 2.0,
+      "team2_result_ot": 3.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "2",
+        "3"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "2",
+          "3"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "2",
+          "3"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 3909,
+      "team1_result": 3.0,
+      "team2_result": 0.0,
+      "team1_result_split": ";0",
+      "team2_result_split": ";0",
+      "team1_result_ot": 3.0,
+      "team2_result_ot": 0.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "3",
+        "0"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "3",
+          "0"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "3",
+          "0"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 3925,
+      "team1_result": 1.0,
+      "team2_result": 4.0,
+      "team1_result_split": "0;1",
+      "team2_result_split": "1;1",
+      "team1_result_ot": 1.0,
+      "team2_result_ot": 4.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "1",
+        "4"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "1",
+          "4"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "1",
+          "4"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 3931,
+      "team1_result": 1.0,
+      "team2_result": 2.0,
+      "team1_result_split": "0;1",
+      "team2_result_split": "0;1",
+      "team1_result_ot": 1.0,
+      "team2_result_ot": 2.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "1",
+        "2"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "1",
+          "2"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "1",
+          "2"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 5318,
+      "team1_result": 2.0,
+      "team2_result": 0.0,
+      "team1_result_split": "0;0",
+      "team2_result_split": "0;0",
+      "team1_result_ot": 2.0,
+      "team2_result_ot": 0.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "2",
+        "0"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "2",
+          "0"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "2",
+          "0"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 5330,
+      "team1_result": 0.0,
+      "team2_result": 2.0,
+      "team1_result_split": ";0",
+      "team2_result_split": ";0",
+      "team1_result_ot": 0.0,
+      "team2_result_ot": 2.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "0",
+        "2"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "0",
+          "2"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "0",
+          "2"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 5351,
+      "team1_result": 1.0,
+      "team2_result": 2.0,
+      "team1_result_split": ";1",
+      "team2_result_split": ";1",
+      "team1_result_ot": 1.0,
+      "team2_result_ot": 2.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "1",
+        "2"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "1",
+          "2"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "1",
+          "2"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 5364,
+      "team1_result": 2.0,
+      "team2_result": 1.0,
+      "team1_result_split": ";1",
+      "team2_result_split": ";1",
+      "team1_result_ot": 2.0,
+      "team2_result_ot": 1.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "2",
+        "1"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "2",
+          "1"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "2",
+          "1"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 5365,
+      "team1_result": 1.0,
+      "team2_result": 0.0,
+      "team1_result_split": ";0",
+      "team2_result_split": ";0",
+      "team1_result_ot": 1.0,
+      "team2_result_ot": 0.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 1,
+      "team1_result_decision": 0.0,
+      "team2_result_decision": 3.0,
+      "decision_info": "nie uprawniony do gry W.Musiał"
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "0",
+        "3"
+      ],
+      "children": [],
+      "outcome": "forfeit",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "1",
+          "0"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "1",
+          "0"
+        ],
+        "shootout": null,
+        "awarded": [
+          "0",
+          "3"
+        ],
+        "decision_reason": "nie uprawniony do gry W.Musiał"
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 5366,
+      "team1_result": 2.0,
+      "team2_result": 1.0,
+      "team1_result_split": ";1",
+      "team2_result_split": ";1",
+      "team1_result_ot": 2.0,
+      "team2_result_ot": 1.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "2",
+        "1"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "2",
+          "1"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "2",
+          "1"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 5372,
+      "team1_result": 1.0,
+      "team2_result": 2.0,
+      "team1_result_split": ";1",
+      "team2_result_split": ";1",
+      "team1_result_ot": 1.0,
+      "team2_result_ot": 2.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "1",
+        "2"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "1",
+          "2"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "1",
+          "2"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 5376,
+      "team1_result": 2.0,
+      "team2_result": 1.0,
+      "team1_result_split": ";1",
+      "team2_result_split": ";1",
+      "team1_result_ot": 2.0,
+      "team2_result_ot": 1.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "2",
+        "1"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "2",
+          "1"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "2",
+          "1"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 5998,
+      "team1_result": 1.0,
+      "team2_result": 2.0,
+      "team1_result_split": ";1",
+      "team2_result_split": ";1",
+      "team1_result_ot": 1.0,
+      "team2_result_ot": 2.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "1",
+        "2"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "1",
+          "2"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "1",
+          "2"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 7017,
+      "team1_result": 3.0,
+      "team2_result": 2.0,
+      "team1_result_split": ";2",
+      "team2_result_split": ";2",
+      "team1_result_ot": 3.0,
+      "team2_result_ot": 2.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "3",
+        "2"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "3",
+          "2"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "3",
+          "2"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 9482,
+      "team1_result": 4.0,
+      "team2_result": 1.0,
+      "team1_result_split": ";2",
+      "team2_result_split": ";1",
+      "team1_result_ot": 4.0,
+      "team2_result_ot": 1.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "4",
+        "1"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "4",
+          "1"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "4",
+          "1"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 10004,
+      "team1_result": 3.0,
+      "team2_result": 2.0,
+      "team1_result_split": ";2",
+      "team2_result_split": ";2",
+      "team1_result_ot": 3.0,
+      "team2_result_ot": 2.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "3",
+        "2"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "3",
+          "2"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "3",
+          "2"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  },
+  {
+    "source": {
+      "id": 12127,
+      "team1_result": 2.0,
+      "team2_result": 1.0,
+      "team1_result_split": ";1",
+      "team2_result_split": ";1",
+      "team1_result_ot": 2.0,
+      "team2_result_ot": 1.0,
+      "team1_result_so": null,
+      "team2_result_so": null,
+      "match_result_type": 1,
+      "alt_decision": 0,
+      "team1_result_decision": null,
+      "team2_result_decision": null,
+      "decision_info": ""
+    },
+    "profile": "football",
+    "project": {
+      "game_parts": 2,
+      "game_regular_time": 90,
+      "split_mode": null
+    },
+    "expected": {
+      "final": [
+        "2",
+        "1"
+      ],
+      "children": [],
+      "outcome": "completed",
+      "resolution": {
+        "version": 2,
+        "regulation_source": "unknown",
+        "played_final": [
+          "2",
+          "1"
+        ],
+        "regulation": null,
+        "extra_time_total": [
+          "2",
+          "1"
+        ],
+        "shootout": null,
+        "awarded": null,
+        "decision_reason": ""
+      }
+    }
+  }
+]

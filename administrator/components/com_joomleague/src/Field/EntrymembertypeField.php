@@ -11,7 +11,7 @@ use Joomla\CMS\Form\Field\ListField;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\Database\DatabaseInterface;
-use Joomleague\Component\Joomleague\Administrator\Service\ProjectEntryContextRepository;
+use Joomleague\Component\Joomleague\Administrator\Service\EntryMemberPersonOptions;
 
 final class EntrymembertypeField extends ListField
 {
@@ -19,17 +19,13 @@ final class EntrymembertypeField extends ListField
 
 	protected function getOptions(): array
 	{
-		$entryId = Factory::getApplication()->getInput()->getInt('entry_id');
-
-		if ($entryId < 1 && is_object($this->form->getData())) {
-			$entryId = (int) $this->form->getData()->get('entry_id');
-		}
-
-		if ($entryId < 1) {
+		try {
+			$entry = (new EntryMemberPersonOptions(Factory::getContainer()->get(DatabaseInterface::class)))->context(
+				(int) $this->form->getValue('entry_id'), (int) $this->form->getValue('id'), Factory::getApplication()->getIdentity()
+			);
+		} catch (\Throwable) {
 			return [];
 		}
-
-		$entry = (new ProjectEntryContextRepository(Factory::getContainer()->get(DatabaseInterface::class)))->get($entryId);
 		$options = [];
 
 		foreach ($entry->profile['entry_model']['member_person_types'] ?? [] as $personType) {

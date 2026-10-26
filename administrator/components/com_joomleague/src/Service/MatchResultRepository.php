@@ -131,20 +131,23 @@ final class MatchResultRepository
 	}
 
 	/** @param array<string,mixed> $payload */
-	public function replace(int $matchId, array $payload, int $actorId): int
+	public function replace(int $matchId, array $payload, int $actorId, ?callable $beforeReplace = null): int
 	{
 		if ($matchId < 1 || $actorId < 0) throw new \InvalidArgumentException('Match and actor identifiers are invalid.');
 		$context = $this->context($matchId);
 		$participantIds = $this->participantIds($matchId); $result = $this->validator->validate($context['profile'], $participantIds, $payload);
 		$this->database->transactionStart();
 		try {
+			// Do not open a repeatable-read snapshot before waiting for these locks.
+			$project = $context['project_id'];
+			$this->database->setQuery('SELECT id FROM ' . $this->database->quoteName('#__joomleague_project') . ' WHERE id = ' . $project . ' FOR UPDATE')->loadResult();
+			$lockedMatch = $this->database->setQuery('SELECT * FROM ' . $this->database->quoteName('#__joomleague_project_match') . ' WHERE id = ' . $matchId . ' FOR UPDATE')->loadAssoc();
+			if (!$lockedMatch) throw new \RuntimeException('The selected match does not exist.');
+			$context = $this->context($matchId);
+			$participantIds = $this->participantIds($matchId);
+			if ($beforeReplace !== null) $beforeReplace($lockedMatch);
+			$result = $this->validator->validate($context['profile'], $participantIds, $payload);
 			if (isset($context['profile']['match']['encounter'])) {
-				$project = (int) $this->database->setQuery('SELECT project_id FROM ' . $this->database->quoteName('#__joomleague_project_match') . ' WHERE id = ' . $matchId)->loadResult();
-				$this->database->setQuery('SELECT id FROM ' . $this->database->quoteName('#__joomleague_project') . ' WHERE id = ' . $project . ' FOR UPDATE')->loadResult();
-				$this->database->setQuery('SELECT id FROM ' . $this->database->quoteName('#__joomleague_project_match') . ' WHERE id = ' . $matchId . ' FOR UPDATE')->loadResult();
-				$context = $this->context($matchId);
-				$participantIds = $this->participantIds($matchId);
-				$result = $this->validator->validate($context['profile'], $participantIds, $payload);
 				(new TeamEncounterRepository($this->database))->replace($matchId, $participantIds, $context['profile']['match']['encounter'], $payload, $result, $actorId);
 				$query = $this->database->getQuery(true)->update($this->database->quoteName('#__joomleague_standing_freshness'))->set('is_dirty = 1')->where('project_id = :project')->bind(':project', $project, ParameterType::INTEGER);
 				$this->database->setQuery($query)->execute();
@@ -158,7 +161,7 @@ final class MatchResultRepository
 		} catch (\Throwable $exception) { $this->database->transactionRollback(); throw $exception; }
 	}
 
-	/** @return array{profile:array<string,mixed>} */
+	/** @return array{profile:array<string,mixed>,project_id:int} */
 	private function context(int $matchId): array
 	{
 		$query = $this->database->getQuery(true)->select($this->database->quoteName(['version.payload_json', 'project.id', 'match.stage_id']))->from($this->database->quoteName('#__joomleague_project_match', 'match'))
@@ -167,7 +170,7 @@ final class MatchResultRepository
 		$row = $this->database->setQuery($query)->loadAssoc(); if (!$row) throw new \RuntimeException('The selected match or profile does not exist.');
 		$profile = json_decode((string) $row['payload_json'], true, 512, JSON_THROW_ON_ERROR); if (!is_array($profile)) throw new \UnexpectedValueException('Match profile payload is invalid.');
 		$profile = (new ProjectRuleConfigRepository($this->database))->resolve((int) $row['id'], $profile);
-		return ['profile' => (new StageEncounterRules($this->database))->resolve($profile, (int) $row['id'], $row['stage_id'] === null ? null : (int) $row['stage_id'])];
+		return ['profile' => (new StageEncounterRules($this->database))->resolve($profile, (int) $row['id'], $row['stage_id'] === null ? null : (int) $row['stage_id']), 'project_id' => (int) $row['id']];
 	}
 
 	/** @return list<int> */

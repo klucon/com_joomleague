@@ -26,7 +26,7 @@ final class StandingmetricField extends ListField
 		$version = $db->setQuery($query)->loadObject(); $profile = $version ? json_decode((string) $version->payload_json, true) : null;
 		if (!is_array($profile['standings']['calculation'] ?? null) && $version) { $profileId = (int) $version->profile_id; $query = $db->getQuery(true)->select('payload_json')->from($db->quoteName('#__joomleague_sport_profile_version'))->where('profile_id = :profile')->where('state = ' . $db->quote('active'))->bind(':profile', $profileId, ParameterType::INTEGER)->order('id DESC'); $profile = json_decode((string) $db->setQuery($query, 0, 1)->loadResult(), true); }
 		$options = [];
-		foreach ($profile['standings']['calculation']['metrics'] ?? [] as $metric) if (is_array($metric) && is_string($metric['code'] ?? null) && !in_array($metric['operation'] ?? null, ['difference', 'ratio'], true)) $options[] = HTMLHelper::_('select.option', $metric['code'], Text::_('COM_JOOMLEAGUE_STANDING_METRIC_' . strtoupper($metric['code'])));
+		foreach ($profile['standings']['calculation']['metrics'] ?? [] as $metric) if (is_array($metric) && is_string($metric['code'] ?? null) && !in_array($metric['operation'] ?? null, ['difference', 'ratio', 'max_ratio'], true)) $options[] = HTMLHelper::_('select.option', $metric['code'], Text::_('COM_JOOMLEAGUE_STANDING_METRIC_' . strtoupper($metric['code'])));
 		return array_merge(parent::getOptions(), $options);
 	}
 }

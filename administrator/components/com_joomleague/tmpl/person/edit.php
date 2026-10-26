@@ -14,6 +14,7 @@ $description = $this->form->getField('description');
 	<div class="main-card">
 		<?php echo HTMLHelper::_('uitab.startTabSet', 'personTabs', ['active' => 'details', 'recall' => true, 'breakpoint' => 768]); ?>
 		<?php echo HTMLHelper::_('uitab.addTab', 'personTabs', 'details', Text::_('COM_JOOMLEAGUE_FIELDSET_DETAILS')); ?>
+		<p class="alert alert-info" id="person-role-context"><?php echo $this->escape(Text::_('COM_JOOMLEAGUE_PERSON_ROLE_CONTEXT_DESC')); ?></p>
 		<div class="row"><div class="col-12"><fieldset class="options-form"><legend><?php echo Text::_('COM_JOOMLEAGUE_FIELDSET_DETAILS'); ?></legend><?php echo $this->form->renderFieldset('details'); ?></fieldset></div></div>
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 

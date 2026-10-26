@@ -162,7 +162,12 @@ class EventreportModel extends BaseDatabaseModel
 				->from($db->quoteName('#__joomleague_match_event', 'event'))
 				->where('event.match_id = :eventId')->where('event.published = 1')
 				->bind(':eventId', $matchId, ParameterType::INTEGER)
-				->order('event.sequence_number ASC, event.id ASC')
+				->order([
+					'COALESCE(event.phase_sequence, 0) ASC',
+					'CASE WHEN event.clock_value IS NULL THEN 1 ELSE 0 END ASC',
+					'event.clock_value ASC',
+					'event.sequence_number ASC, event.id ASC',
+				])
 		)->loadObjectList();
 
 		$officials = $db->setQuery(

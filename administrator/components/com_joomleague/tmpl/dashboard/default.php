@@ -75,7 +75,7 @@ $clubMatchTile = function (array $match) use ($formatMatchDate, $clubMatchHref):
 	$homeClass = $match['our_slot'] === 1 ? ' class="fw-semibold"' : '';
 	$awayClass = $match['our_slot'] === 2 ? ' class="fw-semibold"' : '';
 
-	return '<a class="text-decoration-none text-body d-block h-100" href="' . $clubMatchHref($match, $this->clubMatchLinkTarget) . '">'
+	return '<a class="text-decoration-none text-body d-block h-100" data-club-match-id="' . (int) $match['id'] . '" href="' . $clubMatchHref($match, $this->clubMatchLinkTarget) . '">'
 		. '<div class="border rounded p-2 h-100 text-center">'
 		. '<div class="small text-body-secondary text-truncate mb-1">' . $dateLine . '</div>'
 		. '<div class="text-truncate mb-1"><span' . $homeClass . '>' . $this->escape($match['home'] ?: Text::_('JNONE')) . '</span> &ndash; <span' . $awayClass . '>' . $this->escape($match['away'] ?: Text::_('JNONE')) . '</span></div>'
@@ -118,8 +118,8 @@ $clubMatchTile = function (array $match) use ($formatMatchDate, $clubMatchHref):
 
 	<?php // ---- Club schedule: a shortcut for the configured home club, nothing more ---- ?>
 	<?php if ($this->siteClub !== null && $this->clubScheduleDisplay !== 'hide' && $this->clubMatches !== []) : ?>
-		<div class="card mb-4">
-			<div class="card-header"><h2 class="h5 mb-0"><?php echo Text::sprintf('COM_JOOMLEAGUE_DASHBOARD_CLUB_MATCHES_TITLE', $this->siteClub['name']); ?></h2></div>
+		<div class="card mb-4" data-club-schedule>
+			<div class="card-header"><h2 class="h5 mb-0"><?php echo Text::sprintf('COM_JOOMLEAGUE_DASHBOARD_CLUB_MATCHES_TITLE', $this->escape($this->siteClub['name'])); ?></h2></div>
 			<div class="card-body">
 				<?php if ($this->clubScheduleDisplay === 'collapse') : ?>
 					<?php $firstRow = array_slice($this->clubMatches, 0, 5); $rest = array_slice($this->clubMatches, 5); ?>

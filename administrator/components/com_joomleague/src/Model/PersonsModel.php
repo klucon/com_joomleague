@@ -17,7 +17,7 @@ final class PersonsModel extends ListModel
 		parent::__construct($config);
 	}
 
-	protected function populateState($ordering = 'a.id', $direction = 'desc'): void
+	protected function populateState($ordering = 'a.last_name', $direction = 'asc'): void
 	{
 		$this->setState('filter.search', $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search'));
 		$this->setState('filter.published', $this->getUserStateFromRequest($this->context . '.filter.published', 'filter_published', ''));
@@ -59,7 +59,8 @@ final class PersonsModel extends ListModel
 			}
 		}
 
-		$query->order($database->escape((string) $this->getState('list.ordering', 'a.id')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC'));
+		$query->order($database->escape((string) $this->getState('list.ordering', 'a.last_name')) . ' ' . (strtolower((string) $this->getState('list.direction')) === 'desc' ? 'DESC' : 'ASC'));
+		$query->order('a.first_name ASC, a.id ASC');
 
 		return $query;
 	}

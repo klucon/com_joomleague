@@ -8,7 +8,7 @@ defined('_JEXEC') or die;
 
 final class StandingsContractValidator
 {
-	private const OPERATIONS = ['count_matches', 'count_outcome', 'sum_root', 'sum_awards', 'difference', 'sum_segment_wins', 'sum_segment_values', 'sum_statistic', 'max_statistic', 'ratio', 'best_rank', 'status_order'];
+	private const OPERATIONS = ['count_matches', 'count_outcome', 'sum_root', 'sum_awards', 'difference', 'sum_segment_wins', 'sum_segment_values', 'sum_statistic', 'max_statistic', 'ratio', 'max_ratio', 'best_rank', 'status_order'];
 	private const DIRECTIONS = ['asc', 'desc'];
 
 	/** @param array<string,mixed> $contract */
@@ -57,6 +57,11 @@ final class StandingsContractValidator
 			if (isset($metric['when'])) $this->condition($metric['when'], 0);
 			if (in_array($metric['operation'], ['difference', 'ratio'], true) && (!isset($metric['left_metric'], $metric['right_metric']))) throw new \UnexpectedValueException('Derived standings metrics require both references.');
 			if ($metric['operation'] === 'max_statistic' && !isset($metric['statistic_code'])) throw new \UnexpectedValueException('Maximum statistic requires a statistic code.');
+			if ($metric['operation'] === 'max_ratio') {
+				$this->code($metric['numerator_statistic'] ?? null, 'ratio numerator statistic');
+				$this->code($metric['denominator_statistic'] ?? null, 'ratio denominator statistic');
+				if ($metric['value_type'] !== 'decimal') throw new \UnexpectedValueException('Maximum ratio requires a decimal value type.');
+			}
 			if (($metric['operation'] ?? null) === 'status_order') $this->codes($metric['status_precedence'] ?? null, 'metric status precedence');
 			$known[$code] = true;
 		}

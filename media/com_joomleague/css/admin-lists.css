@@ -1,4 +1,10 @@
 /* Allow Atum's flex content column to shrink before tables start scrolling. */
+#matchList .jl-quick-score {
+    width: 5rem;
+    min-width: 4rem;
+    max-width: 5rem;
+    flex: 0 0 auto;
+}
 body.com_joomleague:is(.view-matches, .view-positions, .view-projects, .view-sportprofiles) .container-main {
     min-width: 0;
 }

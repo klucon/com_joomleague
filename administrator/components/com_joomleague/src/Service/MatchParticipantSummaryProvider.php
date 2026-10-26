@@ -28,7 +28,7 @@ final class MatchParticipantSummaryProvider
 		return $result;
 	}
 
-	/** @param list<int> $matchIds @return array<int,list<array{entry_id:int,slot_number:int,name:string}>> */
+	/** @param list<int> $matchIds @return array<int,list<array{participant_id:int,published:int,entry_id:int,slot_number:int,name:string}>> */
 	public function loadDetails(array $matchIds): array
 	{
 		$matchIds = array_values(array_unique(array_filter(array_map('intval', $matchIds), static fn (int $id): bool => $id > 0)));
@@ -37,6 +37,8 @@ final class MatchParticipantSummaryProvider
 
 		$query = $this->database->getQuery(true)
 			->select([
+				$this->database->quoteName('participant.id', 'participant_id'),
+				$this->database->quoteName('participant.published'),
 				$this->database->quoteName('participant.match_id'),
 				$this->database->quoteName('participant.slot_number'),
 				$this->database->quoteName('participant.project_entry_id'),
@@ -62,6 +64,8 @@ final class MatchParticipantSummaryProvider
 				default => (string) $row->display_name,
 			};
 			$participants[(int) $row->match_id][] = [
+				'participant_id' => (int) $row->participant_id,
+				'published' => (int) $row->published,
 				'entry_id' => (int) $row->project_entry_id,
 				'slot_number' => (int) $row->slot_number,
 				'name' => $name,

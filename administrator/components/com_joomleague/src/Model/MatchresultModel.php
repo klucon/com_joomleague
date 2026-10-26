@@ -58,6 +58,15 @@ final class MatchresultModel extends BaseDatabaseModel
 		}
 	}
 
+	public function saveQuickResult(int $matchId, int $roundId, array $scores, string $revision): string
+	{
+		$editor = new \Joomleague\Component\Joomleague\Administrator\Service\MatchQuickResultEditor($this->getDatabase());
+		$revision = $editor->save($matchId, $roundId, $scores, $revision);
+		$this->clearTransient($matchId);
+		$this->cascadeStandings($matchId, (int) Factory::getApplication()->getIdentity()->id);
+		return $revision;
+	}
+
 	/** @param array<string,mixed> $data */
 	public function mutateResult(int $matchId, array $data, string $operation, string $locator, string $segmentCode = ''): void
 	{

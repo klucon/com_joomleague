@@ -26,16 +26,30 @@ final class MatchResultPayloadValidator
 			&& (($score['aggregation']['allow_legacy_aggregate_only'] ?? false) === true);
 		$segments = $payload['segments'] ?? null;
 		if (!is_array($segments) || count($segments) !== 1) throw new \InvalidArgumentException('A result requires exactly one root segment.');
+		// Only an entirely absent breakdown may bypass sum/count validation.
+		$aggregateOnly = ($score['type'] ?? null) === 'numeric_score'
+			&& ($score['aggregation']['mode'] ?? null) === 'validate'
+			&& in_array($score['value_type'] ?? null, ['integer', 'decimal'], true)
+			&& !isset($profile['match']['encounter']) && is_array($segments[0])
+			&& ($segments[0]['children'] ?? []) === [];
+		unset($metadata['aggregate_only']);
+		if ($aggregateOnly) $metadata['aggregate_only'] = true;
 		$segmentTypes = [];
 		foreach ($score['segment_types'] ?? [] as $segmentType) if (is_array($segmentType) && is_string($segmentType['code'] ?? null)) $segmentTypes[$segmentType['code']] = $segmentType;
 		$participants = array_fill_keys($participantIds, true);
 		$segmentBudget = 1000; $valueBudget = 10000;
-		$root = $this->segment($segments[0], $participants, $segmentTypes, null, $profile['match']['participant_status_codes'] ?? [], $status === 'final' && !$legacyAggregateOnly, $segmentBudget, $valueBudget);
+		$root = $this->segment($segments[0], $participants, $segmentTypes, null, $profile['match']['participant_status_codes'] ?? [], $status === 'final' && !$legacyAggregateOnly && !$aggregateOnly, $segmentBudget, $valueBudget);
 		if ($root['level_code'] !== 'result') throw new \InvalidArgumentException('The root score segment must use the result level.');
 		if (isset($profile['match']['encounter'])) $root = (new TeamEncounterScoreNormalizer())->normalize($root, $participantIds, $status, $profile['match']['encounter']);
 		$root = $this->aggregationValidator->normalize($score, $root, $participantIds, $status, $legacyAggregateOnly);
+		if (($score['value_type'] ?? null) === 'integer') foreach ($root['values'] as $value) {
+			if ($value['numeric_value'] !== null && preg_match('/\.[0-9]*[1-9][0-9]*$/D', $value['numeric_value']) === 1) throw new MatchResultValidationException('COM_JOOMLEAGUE_MATCHRESULT_ERROR_INTEGER_VALUE');
+		}
 		if ($status === 'final' && count($root['values']) !== count($participantIds)) throw new MatchResultValidationException('COM_JOOMLEAGUE_MATCHRESULT_ERROR_FINAL_ROOT_VALUES_REQUIRED');
-		$this->aggregationValidator->validate($score, $root, $participantIds, $status, $legacyAggregateOnly);
+		if ($aggregateOnly && $status === 'final') foreach ($root['values'] as $value) {
+			if ($value['numeric_value'] === null) throw new MatchResultValidationException('COM_JOOMLEAGUE_MATCHRESULT_ERROR_AGGREGATION_ROOT_NUMERIC');
+		}
+		$this->aggregationValidator->validate($score, $root, $participantIds, $status, $legacyAggregateOnly || $aggregateOnly);
 		return ['result_type' => $score['type'], 'status_code' => $status, 'outcome_code' => $outcome, 'finalized_at' => $this->dateTime($payload['finalized_at'] ?? null), 'notes' => $this->longText($payload['notes'] ?? null, 65535), 'metadata' => $metadata, 'segments' => [$root]];
 	}
 
